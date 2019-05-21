@@ -7,7 +7,7 @@ const Joi = require('joi');
 
 const assessmentSchema = Joi.object({
   createdBy: Joi.number(),
-  candidateId: Joi.number(),
+  candidateId: Joi.object(),
   workExperience: Joi.number(),
   skillCompetencies: Joi.number(),
   attitude: Joi.number(),

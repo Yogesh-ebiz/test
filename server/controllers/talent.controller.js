@@ -103,6 +103,7 @@ module.exports = {
   payJob,
   getJobActivities,
   searchJobApplications,
+  getApplicationById,
   rejectApplication,
   updateApplicationProgress,
   getApplicationQuestions,
@@ -330,10 +331,10 @@ async function getStats(currentUserId, companyId) {
   let userIds = _.map(newApplications, 'user');
   let users = await lookupUserIds(userIds);
   newApplications.forEach(function(app){
-    let found = _.find(users, {id: app.user});
-    if(found){
-      app.user = convertToCandidate(found);
-    }
+    // let found = _.find(users, {id: app.user});
+    // if(found){
+    //   app.user = convertToCandidate(found);
+    // }
 
     app.progress=[];
 
@@ -377,7 +378,7 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   let sortBy = {};
   sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
 
-
+  console.log(filter)
   let options = {
     select:   select,
     sort:     sortBy,
@@ -391,6 +392,8 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
 
   let company = await findCompanyById(companyId, currentUserId);
   let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
+  let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
+  let users = await lookupUserIds(userIds);
 
   const loadPromises = result.docs.map(job => {
     job.isHot = false;
@@ -398,6 +401,10 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
     job.company = convertToCompany(company);
     job.hasSaved = _.some(member.followedJobs, job._id);
 
+    let createdBy = _.find(users, {id: job.createdBy});
+    if(createdBy){
+      job.createdBy = convertToAvatar(createdBy);
+    }
     return job;
   });
   // result = await Promise.all(loadPromises);
@@ -859,17 +866,15 @@ async function searchJobApplications(currentUserId, jobId, filter, locale) {
   }
 
   let result = await applicationService.findApplicationsByJobId(jobId, filter);
-  let userIds = _.map(result.docs, 'user');
-  let users = await lookupUserIds(userIds);
+    // let userIds = _.map(result.docs, 'user');
+    // let users = await lookupUserIds(userIds);
 
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
   result.docs.forEach(function(app){
-    let user = _.find(users, {id: app.user});
-    if(user){
-      app.user = user;
-    }
-
+    app.labels = [];
+    app.note = [];
+    app.comments = [];
     if(_.some(subscriptions, {subjectId: ObjectID(app._id)})){
       app.hasFollowed = true;
     }
@@ -901,7 +906,57 @@ async function searchCompanyApplications(currentUserId, companyId, filter, local
 
   return results;
 
+}
 
+
+
+async function getApplicationById(companyId, currentUserId, applicationId) {
+
+  if(!companyId  || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let application;
+  try {
+    let currentParty = await findByUserId(currentUserId);
+
+    application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'currentProgress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
+      },
+      {
+        path: 'progress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
+      }
+    ]);
+    if (application) {
+
+
+    } else {
+      application=null;
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
 }
 
 
@@ -915,9 +970,9 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    job = await applicationService.findApplicationById(applicationId, locale);
+    job = await applicationService.findApplicationBy_Id(applicationId, locale);
 
-    if(job) {;
+    if(job) {
 
 
 
@@ -942,7 +997,7 @@ async function updateApplication(currentUserId, jobId, applicationId, newStatus)
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    application = await applicationService.findApplicationById(applicationId, locale);
+    application = await applicationService.findApplicationBy_Id(applicationId, locale);
 
     if(application) {
 
@@ -984,6 +1039,10 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
           path: 'stage',
           model: 'Stage'
         }
+      },
+      {
+        path: 'user',
+        model: 'Candidate'
       }
     ]);
 
@@ -1019,9 +1078,8 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
       }
 
 
-      let user = await lookupUserIds([application.user]);
-      let job = await jobService.findJobId(application.jobId);
-      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.MOVED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: foundStage.name}});
+      let job = await jobService.findJob_Id(application.jobId);
+      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: foundStage.name}});
     }
 
   } catch (error) {
@@ -1213,13 +1271,13 @@ async function addApplicationComment(currentUserId, applicationId, comment) {
 
     let application = await applicationService.findApplicationBy_Id(applicationId);
 
-
     if(application) {
       comment.subjectType = subjectType.APPLICATION;
       comment.subjectId = application._id;
       comment.createdBy = currentUserId;
       result = await commentService.addComment(comment);
 
+      // await application.comments.push(result._id);
     }
 
   } catch (error) {
@@ -1340,28 +1398,35 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
           path: 'evaluations',
           model: 'Evaluation'
         },
-          {
-            path: 'stage',
-            model: 'Stage'
-          }]
+        {
+          path: 'stage',
+          model: 'Stage'
+        }]
+      },
+      {
+        path: 'user',
+        model: 'Candidate'
       }
     ]);
 
-    if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
+    console.log(application.user)
+    if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
       form.createdBy = currentUserId;
       form.applicationId=ObjectID(applicationId);
       form.applicationProgressId=ObjectID(applicationProgressId);
-      form.candidateId = application.user
+      form.candidateId = application.user._id
 
 
       result = await evaluationService.addEvaluation(form);
 
       if(result){
+        application.user.evaluations.push(result._id);
         application.currentProgress.evaluations.push(result._id);
-        await applicationProgressService.addApplicationProgressEvaluation(applicationProgressId, result._id);
-        let job = await jobService.findJobId(application.jobId);
+        await application.currentProgress.save();
+        await application.user.save();
+        let job = await jobService.findJob_Id(application.jobId);
         let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {name: application.currentProgress.stage.name, jobId: job._id}});
       }
     }
@@ -1387,41 +1452,7 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 
   let result;
   try {
-
-
-    let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
-
-    if(progress && progress.evaluations.length) {
-      // progress.evaluations.forEach(function(evaluation, index, object){
-      //   console.log(evaluation.createdBy, currentUserId)
-      //   if(evaluation.createdBy==currentUserId){
-      //     console.log('yes')
-      //     await evaluation.delete();
-      //     object.splice(index, 1);
-      //   }
-      // });
-      // let evaluation = _.find(progress.evaluations, {createdBy: currentUserId});
-      // if(evaluation){
-      //   console.log(evaluation)
-      //   await evaluation.delete();
-      //   // await found.save();
-      // }
-
-      for(const [i, evaluation] of progress.evaluations.entries()){
-        if(evaluation.createdBy==currentUserId){
-          if(evaluation){
-            if(evaluation.assessment){
-              await evaluation.assessment.delete();
-            }
-            await evaluation.delete();
-          }
-
-          progress.evaluations.splice(i, 1);
-        }
-      }
-      await progress.save();
-    }
-
+    result = await evaluationService.removeEvaluation(currentUserId, ObjectID(applicationProgressId));
   } catch (error) {
     console.log(error);
   }
@@ -1570,6 +1601,7 @@ async function getBoard(currentUserId, jobId, locale) {
   let boardStages = [];
   let pipelineStages;
   let job = await jobService.findJob_Id(jobId, locale);
+
   let pipeline = await getPipelineByJobId(job._id);
   if(pipeline.stages) {
 
@@ -1577,29 +1609,6 @@ async function getBoard(currentUserId, jobId, locale) {
     let pipelineStages = pipeline.stages;
 
 
-    // let userIds = [5, 7, 12, 63, 75, 80, 85, 89, 91, 187, 188, 197, 198, 276, 277, 279, 286, 288, 289, 290, 4075]
-    // let users = await lookupUserIds(userIds);
-    //
-    //
-    // let columns = ['APPLIED', 'PHONE_SCREEN', 'TEST', 'INTERVIEW', 'OFFER'];
-    //
-    // for(var i=0; i<5; i++){
-    //   let column = {type: columns[i], candidates: []};
-    //   var items = getRandomInt(1, 5);
-    //   for(var j=0; j<items; j++){
-    //     let removed = _.pullAt(users, 0);
-    //     column.candidates.push(removed[0]);
-    //   }
-    //   boardStages.push(column);
-    // }
-
-    // let applicationsGroupByStage = await Application.aggregate([
-    //   {$match: {jobId: job.jobId}},
-    //   {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
-    //   {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }},
-    //   {$group: {_id: '$currentProgress.stageId', applications: {$push: "$$ROOT"}}}
-    // ]);
-    //
     let applicationsGroupByStage = await Application.aggregate([
       {$match: {jobId: job._id}},
       {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
@@ -1609,19 +1618,10 @@ async function getBoard(currentUserId, jobId, locale) {
 
 
 
-    let userIds = _.reduce(applicationsGroupByStage, function(res, item){ res.push(_.map(item.applications, 'user')); return res; }, []);
-    let users = await lookupUserIds(_.flatten(userIds));
-
     pipelineStages.forEach(function(item){
       let found = _.find(applicationsGroupByStage, {'_id': item._id});
       if(found){
-        found.applications.forEach(function(application){
-          let user = _.find(users, {id: application.user});
-          if(user){
-            application.user = convertToAvatar(user);
-          }
 
-        });
 
         item.applications = found.applications;
       }
@@ -1726,7 +1726,12 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
 
   let result;
 
-  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, company).populate('applications');
+  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, company).populate([
+    {
+      path: 'applications',
+      model: 'Application'
+    }
+    ]);
 
   if(candidate){
     result = convertToCandidate(candidate);

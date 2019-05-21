@@ -9,8 +9,12 @@ const AnswerSchema = new mongoose.Schema({
     default: Date.now
   },
   answer: {
-    type: String,
+    type: Object,
     required: true
+  },
+  options: {
+    type: Array,
+    required: false
   },
   question: { type: Schema.Types.ObjectId, ref: 'Question'}
 }, {

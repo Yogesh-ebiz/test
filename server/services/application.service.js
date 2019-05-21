@@ -8,8 +8,9 @@ const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
 const  ApplicationSearchParam = require('../const/applicationSearchParam');
 const Pagination = require('../utils/job.pagination');
-const JobService = require('../services/jobrequisition.service');
+const jobService = require('../services/jobrequisition.service');
 const activityService = require('../services/activity.service');
+const pipelineService = require('../services/pipeline.service');
 const feedService = require('../services/api/feed.service.api');
 
 
@@ -20,24 +21,7 @@ function findApplicationById(applicationId) {
     return;
   }
 
-  return Application.findOne({applicationId: applicationId}).populate([
-    {
-      path: 'currentProgress',
-      model: 'ApplicationProgress',
-      populate: {
-        path: 'stage',
-        model: 'Stage'
-      }
-    },
-    {
-      path: 'progress',
-      model: 'ApplicationProgress',
-      // populate: {
-      //   path: 'schedule',
-      //   model: 'Event'
-      // }
-    }
-  ]);
+  return Application.findOne({applicationId: applicationId})
 }
 
 function findApplicationBy_Id(applicationId) {
@@ -77,7 +61,7 @@ async function findApplicationsByJobId(jobId, filter) {
 
   let options = {
     select:   select,
-    sort:     sortBy,
+    sort:     {createdDate: -1},
     lean:     true,
     limit:    limit,
     page: parseInt(filter.page)+1
@@ -86,7 +70,6 @@ async function findApplicationsByJobId(jobId, filter) {
   filter.jobId=jobId;
 
 
-  console.log(jobId)
   const aggregate = Application.aggregate([{
     $match: {
       jobId: ObjectID(jobId)
@@ -100,7 +83,16 @@ async function findApplicationsByJobId(jobId, filter) {
         as: 'currentProgress',
       },
     },
-
+    {$unwind: '$currentProgress'},
+    {
+      $lookup: {
+        from: 'candidates',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {$unwind: '$user'}
   ]);
 
   //   (filter = {}, skip = 0, limit = 10, sort = {}) => [{
@@ -119,6 +111,24 @@ async function findApplicationsByJobId(jobId, filter) {
   //
   // ];
   let result = await Application.aggregatePaginate(aggregate, options);
+  if(result.docs.length){
+    let job = await jobService.findJob_Id(result.docs[0].jobId);
+    let pipeline = await pipelineService.getPipelineByJobId(job._id);
+
+    if(pipeline){
+      result.docs.forEach(function(app){
+        let stage = _.find(pipeline.stages, {_id: ObjectID(app.currentProgress.stage)});
+        if(stage) {
+          stage.members = [];
+          stage.tasks = [];
+          stage.evaluations = [];
+          app.currentProgress.stage = stage;
+        }
+      })
+    }
+
+  }
+
   return result;
 
   // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
@@ -210,7 +220,7 @@ async function findCandidatesByCompanyId(company, filter) {
 
 
 
-  let jobs = await JobService.findJobsByCompanyId(company);
+  let jobs = await jobService.findJobsByCompanyId(company);
 
   let match = {
     jobId: {$in: _.map(jobs, 'jobId')}
@@ -257,7 +267,7 @@ async function getLatestCandidates(company) {
     return;
   }
 
-  let jobs = await JobService.findJobsByCompanyId(company);
+  let jobs = await jobService.findJobsByCompanyId(company);
 
 
   var from = new Date();
@@ -267,7 +277,7 @@ async function getLatestCandidates(company) {
   let now = Date.now();
 
 
-  let result = await Application.find({$and: [ {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] });
+  let result = await Application.find({$and: [ {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] }).populate('user');
 
   return result;
 
@@ -325,7 +335,8 @@ function findApplicationByUserIdAndJobId(userId, jobId) {
     return;
   }
 
-  return Application.findOne({user: userId, jobId: ObjectID(jobId)});
+  console.log(userId, jobId)
+  return Application.findOne({user: ObjectID(userId), jobId: ObjectID(jobId)});
 }
 
 function findAppliedCountByUserIdAndJobId(userId, jobId) {
@@ -358,7 +369,7 @@ async function disqualifyApplication(applicationId, reason, member) {
 
       let user = await feedService.lookupUserIds([application.user]);
 
-      let job = await JobService.findJobId(application.jobId);
+      let job = await jobService.findJobId(application.jobId);
       //Add activity
       let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: user[0].firstName + ' ' + user[0].lastName, jobTitle: job.title, jobId: job._id, reason: reason}});
     }
@@ -383,7 +394,7 @@ async function revertApplication(applicationId, member) {
       result = {status: statusEnum.ACTIVE};
 
       let user = await feedService.lookupUserIds([application.user]);
-      let job = await JobService.findJobId(application.jobId);
+      let job = await jobService.findJobId(application.jobId);
       let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.REVERTED, meta: {candidate: user[0].firstName + ' ' + user[0].lastName, jobTitle: job.title, jobId: job._id}});
     }
   }

@@ -5,19 +5,19 @@ const statusEnum = require('../const/statusEnum');
 
 
 const PromotionSchema = new mongoose.Schema({
-  promotionId: {
+  createdBy: {
     type: Number,
     required: true
   },
-  partyId: {
+  createdDate: {
     type: Number,
+    default: Date.now
+  },
+  planId: {
+    type: Object,
     required: true
   },
   status: {
-    type: String,
-    required: false
-  },
-  type: {
     type: String,
     required: false
   },
@@ -25,10 +25,6 @@ const PromotionSchema = new mongoose.Schema({
     type: Boolean,
     required: false,
     default: false
-  },
-  createdDate: {
-    type: Number,
-    default: Date.now
   },
   lastUpdatedDate: {
     type: Number,

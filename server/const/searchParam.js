@@ -6,6 +6,10 @@ function SearchParam(filter) {
   this.query = {};
 
 
+  if(filter.status){
+    this.query.status =  filter.status;
+  }
+
   if(filter.partyId){
     this.query.partyId =  { $eq: filter.partyId };
   }
@@ -144,7 +148,6 @@ function SearchParam(filter) {
     this.query.distance =  { $in: filter.distance};
   }
 
-  console.log(this.query)
   return this.query;
 }
 

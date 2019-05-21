@@ -13,8 +13,11 @@ const BookmarkSchema = new mongoose.Schema({
     required: true
   },
   jobId: {
-    type: Number,
+    type: Object,
     required: true
+  },
+  job: {
+    type: Object
   },
   createdDate: {
     type: Number,

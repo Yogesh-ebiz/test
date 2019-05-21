@@ -16,12 +16,20 @@ const ApplicationSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  job: {
+    type: Object
+  },
   jobTitle: {
     type: String
   },
   //user = partyId
-  user: {
-    type: Object,
+  // user: {
+  //   type: Object,
+  //   required: false
+  // },
+  user: { type: Schema.Types.ObjectId, ref: 'Candidate' },
+  company: {
+    type: Number,
     required: false
   },
   status: {
@@ -76,14 +84,14 @@ const ApplicationSchema = new mongoose.Schema({
   attachment: {
     type: String
   },
-  progress: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
   sources: {
     type: Array
   },
   questionSubmission: { type: Schema.Types.ObjectId, ref: 'QuestionSubmission' },
-  note: [{ type: Schema.Types.ObjectId, ref: 'Note' }],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   progress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
+  allProgress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
   currentProgress: { type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }
 
 }, {

@@ -4,15 +4,14 @@ const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const Evaluation = require('../models/evaluation.model');
 const assessmentService = require('../services/assessment.service');
-
-
+const applicationProgressService = require('../services/applicationprogress.service');
 
 
 const evaulationSchema = Joi.object({
   createdBy: Joi.number().optional(),
   applicationId: Joi.object(),
   applicationProgressId: Joi.object(),
-  candidateId: Joi.number(),
+  candidateId: Joi.object(),
   rating: Joi.number(),
   comment: Joi.string(),
   assessment: Joi.object().optional(),
@@ -36,31 +35,42 @@ async function addEvaluation(form) {
     }
   }
   let evaluation = new Evaluation(form).save();
-
-
   return evaluation;
 
 }
 
 
-async function removeEvaluation(evaluation) {
+async function removeEvaluation(userId, applicationProgressId) {
 
-  if(!evaluation){
+  if(!userId || !applicationProgressId){
     return;
   }
 
+  let result;
+  let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
 
-  if(evaluation.assessment){
-    evaluation.assessment.candidateId = evaluation.candidateId;
-    evaluation.assessment.createdBy = evaluation.createdBy;
-    let assessment = await assessmentService.addAssessment(evaluation.assessment);
-    if(assessment){
-      evaluation.assessment = assessment._id;
+  if(progress && progress.evaluations.length) {
+
+
+    for(const [i, evaluation] of progress.evaluations.entries()){
+      if(evaluation.createdBy==userId){
+        if(evaluation){
+          if(evaluation.assessment){
+            await evaluation.assessment.delete();
+          }
+          await evaluation.delete();
+        }
+
+        progress.evaluations.splice(i, 1);
+      }
+    }
+    progress = await progress.save();
+    if(progress){
+      result = {success: true}
     }
   }
-  evaluation = new Evaluation(evaluation).save();
 
-  return evaluation;
+  return result;
 
 }
 
@@ -116,6 +126,7 @@ async function getEvaluations(candidateId, companyId, applicationId, progressId,
 
 module.exports = {
   addEvaluation:addEvaluation,
+  removeEvaluation:removeEvaluation,
   findByUserIdAndProgressId:findByUserIdAndProgressId,
   getEvaluations:getEvaluations
 }

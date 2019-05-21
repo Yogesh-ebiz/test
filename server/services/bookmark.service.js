@@ -18,10 +18,11 @@ function findBookById(userId, jobId) {
 function findBookByUserId(userId, size) {
   let data = null;
 
-  if(userId==null){
+  if(!userId){
     return;
   }
 
+  console.log(userId)
   return size?BookMark.find({partyId: userId}).sort({createdDate: -1}).limit(size):BookMark.find({partyId: userId}).sort({createdDate: -1});
 }
 
@@ -39,10 +40,11 @@ function addBookById(userId, jobId) {
 
 function removeBookById(userId, jobId) {
   let data = null;
-
-  if(userId==null || jobId==null){
+  console.log(userId, jobId)
+  if(!userId || !jobId){
     return;
   }
+
 
   return BookMark.remove({partyId: userId, jobId: jobId});
 }

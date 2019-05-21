@@ -75,11 +75,11 @@ async function addComment(comment) {
 
   let job;
   if(comment.subjectType==subjectType.JOB){
-    job = await jobService.findJob_Id(comment.subjectId);
+    job = await jobService.findJob_Id(ObjectID(comment.subjectId));
   } else if(comment.subjectType==subjectType.APPLICATION) {
-    let application = await applicationService.findApplicationBy_Id(comment.subjectId);
+    let application = await applicationService.findApplicationBy_Id(ObjectID(comment.subjectId));
     if(application){
-      job = await jobService.findJobId(application.jobId);
+      job = await jobService.findJob_Id(ObjectID(application.jobId));
     }
 
   }

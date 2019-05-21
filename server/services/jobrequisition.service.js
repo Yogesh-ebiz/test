@@ -209,6 +209,17 @@ async function findJobIds(jobIds) {
   return JobRequisition.find({jobId: {$in: jobIds }});
 }
 
+async function findJob_Ids(jobIds) {
+  let data = null;
+
+  if(!jobIds){
+    return;
+  }
+
+
+  return JobRequisition.find({_id: {$in: jobIds }});
+}
+
 
 async function updateJobPipeline(jobId, form, currentUserId, locale) {
   let data = null;
@@ -587,6 +598,7 @@ module.exports = {
   findJobId: findJobId,
   findJob_Id:findJob_Id,
   findJobIds: findJobIds,
+  findJob_Ids:findJob_Ids,
   removeByJobId: removeByJobId,
   updateJobPipeline:updateJobPipeline,
   getJobPipeline:getJobPipeline,

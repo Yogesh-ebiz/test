@@ -2,9 +2,9 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
-
 const fs = require('fs');
 const AWS = require('aws-sdk');
+const {convertToCompany, jobMinimal} = require('../utils/helper');
 
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
@@ -16,7 +16,7 @@ const ApplicationProgress = require('../models/applicationprogress.model');
 const {addUserResume, syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, findEmployeeById, searchCompany} = require('../services/api/feed.service.api');
 const {getCompanyById,  isPartyActive} = require('../services/party.service');
 
-const {findJobId} = require('../services/jobrequisition.service');
+const jobService = require('../services/jobrequisition.service');
 const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
 const {findWorkflowById} = require('../services/workflow.service');
@@ -51,19 +51,39 @@ async function getApplicationById(currentUserId, applicationId) {
 
 
     if(isPartyActive(currentParty)) {
-      application = await findApplicationById(applicationId);
+      application = await findApplicationById(applicationId).populate([
+        {
+          path: 'currentProgress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        },
+        {
+          path: 'progress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        }
+      ]);
       if (application) {
-        // let job = await findJobId(application.jobId);
-
-        // let company = await findCompanyById(application.job.company, currentUserId);
+        let job = await jobService.findJob_Id(application.jobId);
+        let company = await findCompanyById(job.company, currentUserId);
         // application.job.company = company;
         // application.job.responsibilities=[];
         // application.job.qualifications = [];
         // application.job.skills = []
+        job.company = convertToCompany(company);
+        application.job = jobMinimal(job);
+        application.progress = _.reduce(application.progress, function(res, progress){
 
-        application.progress = _.reduce(application.progress, function(res, item){
-          // item.label = workflowEnum[item.type]['en'];
-          res.push(item);
+          progress.stage.evaluations = [];
+          progress.stage.members = [];
+          progress.stage.tasks = [];
+          res.push(progress);
           return res;
         }, [])
 

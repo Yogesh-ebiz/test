@@ -35,6 +35,7 @@ async function findBySubjectTypeAndSubjectId(subjectType, subjectId, filter) {
     return;
   }
 
+
   let limit = (filter.size && filter.size>0) ? filter.size:20;
   let page = (filter.page && filter.page==0) ? filter.page:1;
   let sortBy = {};
@@ -49,6 +50,7 @@ async function findBySubjectTypeAndSubjectId(subjectType, subjectId, filter) {
     limit:    limit,
     page: parseInt(filter.page)+1
   };
+
   return Activity.paginate({subjectType: subjectType, subjectId: subjectId}, options);
   // return Activity.find({subjectType: subjectType, subjectId: subjectId});
 

@@ -9,6 +9,7 @@ const Joi = require('joi');
 const candidateSchema = Joi.object({
   userId: Joi.number().optional(),
   company: Joi.number(),
+  avatar: Joi.string().allow('').optional(),
   firstName: Joi.string(),
   lastName: Joi.string(),
   middleName: Joi.string().allow('').optional(),
@@ -21,7 +22,6 @@ const candidateSchema = Joi.object({
 
 async function addCandidate(candidate) {
 
-  console.log(candidate)
   if(!candidate){
     return;
   }

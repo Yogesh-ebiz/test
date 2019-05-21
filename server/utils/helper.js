@@ -65,19 +65,25 @@ const convertToCandidate = (user) => {
   return {
     id: user.id,
     userId: user.userId,
+    createdDate: user.createdDate,
     company: user.company,
     name: user.name,
     firstName: user.firstName,
     middleName: user.middleName,
     lastName: user.lastName,
-    avatar: user.avatar,
+    avatar: user.avatar?user.avatar:'',
     isOnline: user.isOnline,
-    partyType: user.partyType,
+    partyType: user.partyType?user.partyType:'',
     jobTitle: user.jobTitle?user.jobTitle:'',
     headline: user.headline,
-    noOfMonthExperiences: user.noOfMonthExperiences,
-    level:user.level,
-    match:user.match,
+    noOfMonthExperiences: user.noOfMonthExperiences?user.noOfMonthExperiences:6.5,
+    level:user.level?user.level:'SENIOR',
+    match:user.match?user.match:0,
+    overallRating: user.overallRating?user.overallRating:0,
+    teamRating: user.teamRating?user.teamRating:0,
+    socialLinks: user.socialLinks?user.socialLinks:[],
+    tags: user.tags,
+    sources: user.sources,
     applications: user.applications?user.applications:[]
   };
 }
@@ -105,7 +111,9 @@ const convertToCompany = (company) => {
     headline: company.headline,
     primaryAddress: primaryAddress,
     hasFollowed:company.hasFollowed,
-    images: company.images
+    images: company.images,
+    rating: company.rating,
+    noOfFollowers: company.noOfFollowers
   };
 }
 
@@ -151,6 +159,25 @@ const roleMinimal = (role) => {
   };
 }
 
+
+const jobMinimal = (job) => {
+  if(!job){
+    return null;
+  }
+  return {
+    _id: job._id,
+    jobId: job.jobId,
+    title: job.title,
+    hasSaved: job.hasSaved,
+    level: job.level,
+    employmentType: job.employmentType,
+    city: job.city,
+    state: job.state,
+    country: job.country,
+    company: job.company
+  };
+}
+
 module.exports = {
   capitalizeLocale:capitalizeLocale,
   convertToAvatar:convertToAvatar,
@@ -159,5 +186,6 @@ module.exports = {
   categoryMinimal:categoryMinimal,
   convertToTalentUser:convertToTalentUser,
   convertToCandidate:convertToCandidate,
-  roleMinimal:roleMinimal
+  roleMinimal:roleMinimal,
+  jobMinimal:jobMinimal
 };

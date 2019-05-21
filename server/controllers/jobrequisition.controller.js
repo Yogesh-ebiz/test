@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
-const {convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const ObjectID = require('mongodb').ObjectID;
+
+const {jobMinimal, convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
@@ -59,7 +61,7 @@ let SearchParam = require('../const/searchParam');
 const applicationSchema = Joi.object({
   jobTitle: Joi.string().allow(''),
   jobId: Joi.object().required(),
-  user: Joi.number().required(),
+  user: Joi.object().required(),
   phoneNumber: Joi.string(),
   email: Joi.string().required(),
   availableDate: Joi.number(),
@@ -67,7 +69,8 @@ const applicationSchema = Joi.object({
   follow: Joi.boolean().optional(),
   resumeId: Joi.any().optional(),
   questionAnswers: Joi.array(),
-  coverLetter: Joi.string().allow('').optional()
+  coverLetter: Joi.string().allow('').optional(),
+  source: Joi.string().allow('').optional()
 });
 
 
@@ -181,7 +184,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
           if (isPartyActive(currentParty)) {
             let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
             if (!jobView) {
-              await addJobViewByUserId(currentParty.id, jobId);
+              await addJobViewByUserId(currentParty.id, job._id);
             } else {
               jobView.viewCount++
               await jobView.save();
@@ -382,12 +385,13 @@ async function getJobLanding(currentUserId, locale) {
     let newJobs = await getNewJobs();
     let popularJobs = await findMostViewed();
 
+
     if(!popularJobs.length){
       popularJobs = await findMostBookmarked();
     }
 
-    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, 'jobId')).concat(_.map(highlight, 'jobId')).concat(_.map(newJobs, 'jobId'));
-    let jobs = await JobRequisition.find({jobId: {$in: ids}});
+    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, 'jobId')).concat(_.map(highlight, '_id')).concat(_.map(newJobs, '_id'));
+    let jobs = await JobRequisition.find({_id: {$in: ids}});
     let listOfCompanyIds = _.map(jobs, 'company');
 
     let res = await searchCompany('', listOfCompanyIds, currentUserId);
@@ -407,7 +411,7 @@ async function getJobLanding(currentUserId, locale) {
     });
 
     _.forEach(viewed, function(item){
-      let job = _.find(jobs, {jobId: item.jobId});
+      let job = _.find(jobs, {_id: item.jobId});
 
       if(job) {
         // job.company = _.find(foundCompanies, {id: job.company});
@@ -423,7 +427,7 @@ async function getJobLanding(currentUserId, locale) {
 
 
     _.forEach(saved, function(item){
-      let job = _.find(jobs, {jobId: item.jobId});
+      let job = _.find(jobs, {_id: item.jobId});
 
       if(job) {
         // job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
@@ -434,7 +438,7 @@ async function getJobLanding(currentUserId, locale) {
     })
 
     _.forEach(popularJobs, function(item){
-      let job = _.find(jobs, {jobId: item.jobId});
+      let job = _.find(jobs, {_id: item.jobId});
 
       if(job) {
         result.popularJobs.push(job);
@@ -443,7 +447,7 @@ async function getJobLanding(currentUserId, locale) {
     })
 
     _.forEach(highlight, function(item){
-      let job = _.find(jobs, {jobId: item.jobId});
+      let job = _.find(jobs, {_id: item.jobId});
 
       if(job) {
         result.highlightJobs.push(job);
@@ -452,7 +456,7 @@ async function getJobLanding(currentUserId, locale) {
     })
 
     _.forEach(newJobs, function(item){
-      let job = _.find(jobs, {jobId: item.jobId});
+      let job = _.find(jobs, {_id: item.jobId});
 
       if(job) {
         result.newJobs.push(job);
@@ -549,6 +553,7 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
     }
   }
 
+  filter.status = statusEnum.ACTIVE;
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
   let docs = [];
 
@@ -559,8 +564,10 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
   let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
   let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
 
-  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
+  let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
+  let users = await lookupUserIds(userIds);
 
+  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
   let res = await searchCompany('', listOfCompanyIds, currentUserId);
   let foundCompanies = res.content;
 
@@ -573,7 +580,7 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
 
   _.forEach(result.docs, function(job){
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-    job.company = _.find(foundCompanies, {id: job.company});
+    job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
 
@@ -588,6 +595,8 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
     }, []);
 
     job.industry = industry;
+
+
 
     // var skills = _.reduce(job.skills, function(res, skill){
     //   let find = _.filter(listOfSkills, { 'id': skill});
@@ -779,13 +788,22 @@ async function applyJobById(currentUserId, jobId, application ) {
 
       let candidate = null;
       let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE });
-
       if(job) {
+        let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
+        if(!candidate){
+          candidate = await candidateService.addCandidate({userId: currentUserId, avatar: currentParty.avatar, company: job.company, firstName: currentParty.firstName, middleName: currentParty.middleName, lastName: currentParty.lastName,
+            jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber});
+        }
+
+        application.user = candidate._id;
         application.jobId = job._id;
         application.jobTitle = job.title;
-        application = await Joi.validate(application, applicationSchema, {abortEarly: false});
 
-        let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
+        console.log(application)
+        application = await Joi.validate(application, applicationSchema, {abortEarly: false});
+        application.company = job.company
+
+        let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
         if (!foundApplication) {
 
           if (application.resumeId) {
@@ -797,14 +815,15 @@ async function applyJobById(currentUserId, jobId, application ) {
 
 
           if (application.source) {
-            application.sources.push(source);
+
+            // application.sources.push(source);
+            delete application.source;
           }
 
           savedApplication = await applyJob(application);
 
           if (savedApplication) {
             let jobPipeline = await getPipelineById(job.pipeline);
-
             if (jobPipeline) {
               let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
 
@@ -813,23 +832,22 @@ async function applyJobById(currentUserId, jobId, application ) {
                 stage: applyStage._id
               });
               // progress.stage = applyStage._id;
-              savedApplication.progress.push(progress._id)
+              savedApplication.progress.push(progress._id);
+              savedApplication.allProgress.push(progress._id)
               savedApplication.currentProgress = progress._id;
+
+
+              await candidate.applications.push(savedApplication._id);
               await savedApplication.save();
 
             }
 
-            await addApplicationHistory({
-              applicationId: savedApplication.applicationId,
-              partyId: currentParty.id,
-              action: {type: applicationEnum.APPLIED}
-            });
+            // await addApplicationHistory({
+            //   applicationId: savedApplication.applicationId,
+            //   partyId: currentParty.id,
+            //   action: {type: applicationEnum.APPLIED}
+            // });
 
-            let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
-            if(!candidate){
-              await candidateService.addCandidate({userId: currentUserId, company: job.company, firstName: currentParty.firstName, middleName: currentParty.middleName, lastName: currentParty.lastName,
-                jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber, applications: [savedApplication._id]});
-            }
 
             //Create Notification
             let meta = {
@@ -867,27 +885,22 @@ async function applyJobById(currentUserId, jobId, application ) {
 
 async function addBookmark(currentUserId, jobId) {
 
-  if(currentUserId==null || jobId==null){
+  if(!currentUserId || !jobId){
     return null;
   }
 
 
   let result;
   try {
-    job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
-
+    let job = await JobRequisition.findOne({_id: ObjectID(jobId), status: statusEnum.ACTIVE });
     if(job) {
-      let currentParty = await findByUserId(currentUserId);
-      // console.log('currentParty', currentParty)
-      if (isPartyActive(currentParty)) {
+      result = await findBookById(currentUserId, ObjectID(jobId));
 
-        result = await findBookById(currentParty.id, jobId);
-
-        if(!result) {
-          result = await addBookById(currentParty.id, jobId);
-        }
-
+      if(!result) {
+        result = await addBookById(currentUserId, ObjectID(jobId));
       }
+
+
     }
 
   } catch (error) {
@@ -900,7 +913,7 @@ async function addBookmark(currentUserId, jobId) {
 
 async function removeBookmark(currentUserId, jobId) {
 
-  if(currentUserId==null || jobId==null){
+  if(!currentUserId || !jobId){
     return null;
   }
 
@@ -908,22 +921,13 @@ async function removeBookmark(currentUserId, jobId) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+      let deleted = await removeBookById(currentUserId, ObjectID(jobId));
 
-    if (isPartyActive(currentParty)) {
-      result = await findBookById(currentParty.id, jobId);
-
-      if(result){
-        let deleted = await removeBookById(currentParty.id, jobId);
-
-        if(deleted && deleted.deletedCount>0){
-          result.status=statusEnum.DELETED;
-        } else {
-          result = null;
-        }
+      if(deleted && deleted.deletedCount>0){
+        result = {success: true};
+      } else {
+        result = null;
       }
-
-    }
 
   } catch (error) {
     console.log(error);

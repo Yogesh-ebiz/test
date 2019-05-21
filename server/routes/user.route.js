@@ -268,7 +268,8 @@ async function setResumeDefault(req, res) {
 
 async function getApplicationsByUserId(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
+
   let filter = req.query;
   let data = await userCtl.getApplicationsByUserId(currentUserId, filter, res.locale);
 

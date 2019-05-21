@@ -162,7 +162,6 @@ async function applyJobById(req, res) {
   let jobId = parseInt(req.params.id);
   let application = req.body;
   application.jobId=jobId;
-  application.user=currentUserId;
   let data = await jobRequisitionCtl.applyJobById(currentUserId, jobId, application);
 
   res.json(new Response(data, data?'application_submit_successful':'not_found', res));
@@ -174,7 +173,7 @@ async function addBookmark(req, res) {
   // console.log('JobID: ', req.params.id)
   // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
-  let jobId = parseInt(req.params.id);
+  let jobId = req.params.id;
   let data = await jobRequisitionCtl.addBookmark(currentUserId, jobId);
 
   res.json(new Response(data, data?'bookmark_saved_successful':'not_found', res));
@@ -187,7 +186,7 @@ async function removeBookmark(req, res) {
   // console.log('JobID: ', req.params.id)
   // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
-  let jobId = parseInt(req.params.id);
+  let jobId = req.params.id;
   let data = await jobRequisitionCtl.removeBookmark(currentUserId, jobId);
 
   res.json(new Response(data, data?'bookmark_removed_successful':'not_found', res));

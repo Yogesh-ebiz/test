@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
+
 const ISO6391 = require('iso-639-1');
-const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {jobMinimal, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 
 const CustomPagination = require('../utils/custompagination');
 //const pagination = require('../const/pagination');
@@ -28,7 +30,7 @@ const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
 const {updateResumeDefault, addUserResume, getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
-const {findJobIds} = require('../services/jobrequisition.service');
+const {findJobIds, findJob_Ids} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes, addSkillType} = require('../services/skilltype.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
@@ -1315,10 +1317,9 @@ async function getPartyLanguages(currentUserId, locale) {
     if(isPartyActive(currentParty)) {
 
       let userLanguages = await findPartyLanguageByUserId(currentParty.id);
-      console.log('userLanguage', userLanguages)
 
       userLanguages = _.reduce(userLanguages, function(res, item){
-        item.language = ISO6391.getName(item.language);
+        // item.language = ISO6391.getName(item.language);
         res.push(item);
         return res;
       }, []);
@@ -1647,11 +1648,17 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
         filter.partyId=currentParty.id;
 
-        result = await Application.aggregatePaginate(new ApplicationSearchParam(filter), options);
+
+        const aggregate = Application.aggregate([{
+          $match: {
+            user: currentUserId
+          }
+        }
+        ]);
+        result = await Application.aggregatePaginate(aggregate, options);
         let jobIds = _.map(result.docs, 'jobId');
 
-
-        let jobs = await findJobIds(jobIds);
+        let jobs = await findJob_Ids(jobIds);
 
         let companyIds = _.map(jobs, 'company');
 
@@ -1670,17 +1677,20 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
 
         _.forEach(result.docs, function(application, idx) {
-          let job = _.find(jobs, {jobId: application.jobId});
-          job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-          job.description = null;
-          job.responsibilities=[];
-          job.qualifications = [];
-          job.skills = [];
-          job.connection = {noConnection: 0, list: []};
-          job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-          job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-          job.level = _.find(experienceLevels, {shortCode: job.level});
-          job.promotion = _.find(promotions, {promotionId: job.promotion});
+
+          let job = _.find(jobs, {_id: ObjectID(application.jobId)});
+          if(job) {
+            job.hasSaved = _.some(hasSaves, {jobId: job._id});
+            job.description = null;
+            job.responsibilities = [];
+            job.qualifications = [];
+            job.skills = [];
+            job.connection = {noConnection: 0, list: []};
+            job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
+            job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+            job.level = _.find(experienceLevels, {shortCode: job.level});
+            job.promotion = _.find(promotions, {promotionId: job.promotion});
+          }
           // let industry = _.reduce(industries, function(res, item){
           //   if(_.includes(job.industry, item.shortCode)){
           //     res.push(item);
@@ -1690,7 +1700,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
           //
           // job.industry = industry;
 
-          application.job = job;
+          application.job = jobMinimal(job);
 
 
 
@@ -1741,9 +1751,8 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       result = await Bookmark.paginate(new BookmarkSearchParam(filter), options);
       let jobIds = _.map(result.docs, 'jobId');
+      let jobs = await findJob_Ids(jobIds);
 
-
-      let jobs = await findJobIds(jobIds);
       let companyIds = _.map(jobs, 'company');
       let res = await searchCompany('', companyIds, currentUserId);
       let foundCompanies = res.content;
@@ -1756,29 +1765,31 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
 
       _.forEach(result.docs, function(bookmark, idx) {
-        let job = _.find(jobs, {jobId: bookmark.jobId});
-        job.hasSaved = true;
-        job.description = null;
-        job.responsibilities=[];
-        job.qualifications = [];
-        job.skills = [];
-        job.connection = {noConnection: 0, list: []};
-        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-        job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-        job.level = _.find(experienceLevels, {shortCode: job.level});
-        job.promotion = _.find(promotions, {promotionId: job.promotion});
-        let industry = _.reduce(industries, function(res, item){
-          if(_.includes(job.industry, item.shortCode)){
-            res.push(item);
-          }
-          return res;
-        }, []);
+        let job = _.find(jobs, {_id: ObjectID(bookmark.jobId)});
+        console.log(job)
+        if(job) {
+          job.hasSaved = true;
+          job.description = null;
+          job.responsibilities = [];
+          job.qualifications = [];
+          job.skills = [];
+          job.connection = {noConnection: 0, list: []};
+          job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
+          job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+          job.level = _.find(experienceLevels, {shortCode: job.level});
+          job.promotion = _.find(promotions, {promotionId: job.promotion});
+          let industry = _.reduce(industries, function (res, item) {
+            if (_.includes(job.industry, item.shortCode)) {
+              res.push(item);
+            }
+            return res;
+          }, []);
 
-        job.industry = industry;
+          job.industry = industry;
 
-        bookmark.job = job;
-
-
+          console.log(job)
+          bookmark.job = jobMinimal(job);
+        }
 
       })
 
@@ -2009,7 +2020,7 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
       let hasSaves = await findBookByUserId(currentUserId);
 
 
-      let jobs = await findJobIds(jobIds);
+      let jobs = await findJob_Ids(jobIds);
       let companyIds = _.map(jobs, 'company');
       let res = await searchCompany('', companyIds, currentUserId);
       let foundCompanies = res.content;
@@ -2020,10 +2031,9 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
       let promotionIds = _.map(jobs, 'promotion');
       let promotions = await getPromotions(promotionIds);
 
-
       _.forEach(result.docs, function(view, idx) {
-        let job = _.find(jobs, {jobId: view.jobId});
-        job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+        let job = _.find(jobs, {_id: ObjectID(view.jobId)});
+        job.hasSaved = _.some(hasSaves, {jobId: job._id});
         job.description = null;
         job.responsibilities=[];
         job.qualifications = [];

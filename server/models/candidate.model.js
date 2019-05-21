@@ -16,7 +16,7 @@ const CandidateSchema = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    required:false
+    default: Date.now
   },
   status: {
     type: String,
@@ -69,8 +69,24 @@ const CandidateSchema = new mongoose.Schema({
     required:false,
     default: ''
   },
+  overallRating: {
+    type: Number,
+    required:false,
+    default: 0
+  },
+  teamRating: {
+    type: Number,
+    required:false,
+    default: 0
+  },
+  socialLinks: {
+    type: Array,
+    required:false
+  },
   tags: { type: Schema.Types.ObjectId, ref: 'Label' },
-  applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }]
+  sources: { type: Schema.Types.ObjectId, ref: 'Label' },
+  applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
+  evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }]
 }, {
   versionKey: false
 });

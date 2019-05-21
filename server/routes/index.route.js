@@ -14,6 +14,8 @@ const promotionRoutes = require('./promotion.route');
 const suggestionRoutes = require('./suggestion.route');
 const companyRoutes = require('./company.route');
 const talentRoutes = require('./talent.route');
+const planRoutes = require('./plan.route');
+const productRoutes = require('./product.route');
 
 const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
@@ -46,6 +48,8 @@ router.use('/workflows', workflowRoutes);
 router.use('/company', companyRoutes);
 router.use('/talent', talentRoutes);
 router.use('/policies', policyRoutes);
+router.use('/plans', planRoutes);
+router.use('/products', productRoutes);
 
 
 module.exports = router;

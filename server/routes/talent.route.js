@@ -46,6 +46,7 @@ router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncH
 
 
 // router.route('/company/:id/applications').get(asyncHandler(searchAllApplications));
+router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
 router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
 
@@ -278,9 +279,8 @@ async function updateJobComment(req, res) {
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let filter = req.body;
+  let filter = req.query;
   let pagination = req.query;
-  filter.query = req.query.query;
   filter.company = [companyId];
   filter.department = req.query.department;
 
@@ -364,6 +364,20 @@ async function updateApplication(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
+
+
+
+async function getApplicationById(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.getApplicationById(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'applicagion_retrieved_successful':'not_found', res));
+}
+
+
 async function updateApplicationProgress(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
@@ -378,9 +392,9 @@ async function updateApplicationProgress(req, res) {
 
 
 async function getApplicationQuestions(req, res) {
-
-  let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+
   let applicationId = req.params.applicationId;
 
   let data = await talentCtrl.getApplicationQuestions(companyId, currentUserId, applicationId);
@@ -509,7 +523,7 @@ async function removeApplicationProgressEvaluation(req, res) {
   let progressId = req.params.progressId;
   let evaluation = req.body;
 
-  let data = await talentCtrl.removeApplicationProgressEvaluation(companyId, currentUserId, applicationId, progressId, evaluation);
+  let data = await talentCtrl.removeApplicationProgressEvaluation(companyId, currentUserId, applicationId, progressId);
 
   res.json(new Response(data, data?'evaluation_removed_successful':'not_found', res));
 }

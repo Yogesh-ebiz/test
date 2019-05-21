@@ -26,7 +26,7 @@ function findJobViewByUserIdAndJobId(userId, jobId) {
 function addJobViewByUserId(userId, jobId) {
   let data = null;
 
-  if(userId==null || jobId==null){
+  if(!userId || !jobId){
     return;
   }
 
