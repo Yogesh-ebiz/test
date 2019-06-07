@@ -75,6 +75,8 @@ router.route('/company/:id/applications/:applicationId/progress/:progressId/eval
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').delete(asyncHandler(removeApplicationProgressEvaluation));
 
 router.route('/company/:id/applications/:applicationId/progress/:progressId/event').post(asyncHandler(updateApplicationProgressEvent));
+router.route('/company/:id/applications/:applicationId/progress/:progressId/event').delete(asyncHandler(removeApplicationProgressEvent));
+
 
 router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHandler(disqualifyApplication));
 router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
@@ -669,11 +671,23 @@ async function removeApplicationProgressEvaluation(req, res) {
 async function updateApplicationProgressEvent(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = req.params.applicationId;
-  let progressId = req.params.progressId;
+  let applicationId = ObjectID(req.params.applicationId);
+  let progressId = ObjectID(req.params.progressId);
   let form = req.body;
 
   let data = await talentCtrl.updateApplicationProgressEvent(companyId, currentUserId, applicationId, progressId, form);
+
+  res.json(new Response(data, data?'application_event_updated_successful':'not_found', res));
+}
+
+
+async function removeApplicationProgressEvent(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = ObjectID(req.params.applicationId);
+  let progressId = ObjectID(req.params.progressId);
+
+  let data = await talentCtrl.removeApplicationProgressEvent(companyId, currentUserId, applicationId, progressId);
 
   res.json(new Response(data, data?'application_event_updated_successful':'not_found', res));
 }

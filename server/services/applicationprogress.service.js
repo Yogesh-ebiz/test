@@ -94,6 +94,17 @@ function updateApplicationProgressEvent(applicationProgress_Id, form) {
 }
 
 
+function removeApplicationProgressEvent(applicationProgress_Id) {
+  let data = null;
+
+  if(!applicationProgress_Id){
+    return;
+  }
+
+  return ApplicationProgress.updateOne({_id: ObjectID(applicationProgress_Id)}, { $unset: {event: ''} });
+}
+
+
 module.exports = {
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationProgresssByIds:findApplicationProgresssByIds,
@@ -101,6 +112,7 @@ module.exports = {
   addApplicationProgress: addApplicationProgress,
   getApplicationProgressEvaluations:getApplicationProgressEvaluations,
   addApplicationProgressEvaluation:addApplicationProgressEvaluation,
-  updateApplicationProgressEvent:updateApplicationProgressEvent
+  updateApplicationProgressEvent:updateApplicationProgressEvent,
+  removeApplicationProgressEvent:removeApplicationProgressEvent
 
 }

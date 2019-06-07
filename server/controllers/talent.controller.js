@@ -140,6 +140,7 @@ module.exports = {
   addApplicationProgressEvaluation,
   removeApplicationProgressEvaluation,
   updateApplicationProgressEvent,
+  removeApplicationProgressEvent,
   disqualifyApplication,
   revertApplication,
   subscribeApplication,
@@ -1933,7 +1934,29 @@ async function updateApplicationProgressEvent(companyId, currentUserId, applicat
 
   let result;
   try {
-    result = await applicationProgressService.updateApplicationProgressEvent(ObjectID(applicationProgressId), form);
+    result = await applicationProgressService.updateApplicationProgressEvent(applicationProgressId, form);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function removeApplicationProgressEvent(companyId, currentUserId, applicationId, applicationProgressId) {
+
+  if(!companyId || !currentUserId || !applicationId || !applicationProgressId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await applicationProgressService.removeApplicationProgressEvent(applicationProgressId);
   } catch (error) {
     console.log(error);
   }
@@ -3537,7 +3560,7 @@ async function addPoolCandidates(companyId, currentUserId, poolId, candidateIds)
           let found = await candidateService.findByUserIdAndCompanyId(candidate, companyId);
           if(!found){
             let user = await feedService.findCandidateById(candidate);
-            candidate = await candidateService.addCandidate({userId: currentUserId, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
+            candidate = await candidateService.addCandidate({userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
               jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
               city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
               skills: _.map(user.skills, 'id'), url: user.shareUrl
