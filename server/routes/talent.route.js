@@ -167,6 +167,7 @@ router.route('/company/:id/projects/:projectId/candidates/:candidateId').delete(
 router.route('/company/:id/projects/:projectId/candidates').delete(asyncHandler(removeProjectCandidates));
 
 router.route('/company/:id/people/:peopleId/projects').post(asyncHandler(updateCandidateProject));
+router.route('/company/:id/people/:peopleId/pools').post(asyncHandler(updatePeoplePool));
 
 
 router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
@@ -961,7 +962,6 @@ async function updateCandidatePool(req, res) {
 }
 
 
-
 async function getCandidateEvaluations(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -1299,11 +1299,10 @@ async function getCompanyLabels(req, res) {
 
 
 async function inviteMembers(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let form = req.body;
 
-  let data = await talentCtrl.inviteMembers(company, currentUserId, form);
+  let data = await talentCtrl.inviteMembers(company, form);
   res.json(new Response(data, data?'members_invited_successful':'not_found', res));
 }
 
@@ -1574,6 +1573,18 @@ async function updateCandidateProject(req, res) {
   let data = await talentCtrl.updateCandidateProject(companyId, currentUserId, peopleId, projectIdss);
 
   res.json(new Response(data, data?'projects_added_successful':'not_found', res));
+}
+
+
+async function updatePeoplePool(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let peopleId = parseInt(req.params.userId);
+  let poolIds = req.body.pools;
+
+  let data = await talentCtrl.updatePeoplePool(companyId, currentUserId, peopleId, poolIds);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
 
 

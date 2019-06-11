@@ -58,6 +58,9 @@ const EmailSchema = new mongoose.Schema({
   meta: {
     type: Object
   },
+  attachLinks: {
+    type: Array
+  },
   createdBy:{ type: Schema.Types.ObjectId, ref: 'Member'},
   labels:[{ type: Schema.Types.ObjectId, ref: 'Label'}],
   threads:[{ type: Schema.Types.ObjectId, ref: 'Email'}]

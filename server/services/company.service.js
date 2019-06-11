@@ -38,7 +38,6 @@ async function register(currentParty, form) {
 
   form = await Joi.validate(form, companySchema, {abortEarly: false});
   let company = await feedService.registerCompany(form);
-  console.log(company)
   if(company){
     company = await new Company({
       name: company.name,

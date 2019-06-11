@@ -47,6 +47,7 @@ const jobViewService = require('../services/jobview.service');
 const bookmarkService = require('../services/bookmark.service');
 const departmentService = require('../services/department.service');
 const cardService = require('../services/card.service');
+const flagService = require('../services/flag.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -162,6 +163,7 @@ module.exports = {
   addCandidateSource,
   removeCandidateSource,
   updateCandidatePool,
+  updatePeoplePool,
   addCompanyDepartment,
   updateCompanyDepartment,
   deleteCompanyDepartment,
@@ -2783,6 +2785,79 @@ async function updateCandidatePool(companyId, currentUserId, candidateId, poolId
 }
 
 
+async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
+  if(!companyId || !currentUserId || !userId || !poolIds){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let candidateId;
+  let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
+  if(!candidate){
+    let user = await feedService.findCandidateById(userId);
+    if(user){
+        candidate = await candidateService.addCandidate({userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
+          jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
+          city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
+          skills: _.map(user.skills, 'id'), url: user.shareUrl
+        });
+        candidateId = candidate._id;
+    }
+  } else {
+    candidateId = candidate._id;
+  }
+
+  try {
+    let pools = await poolService.findByCompany(companyId);
+    if (pools) {
+      for([i, pool] of pools.entries()){
+        let existPool = _.find(poolIds, function(item){return ObjectID(item).equals(pool._id); });
+        if(!existPool){
+          for(const [i, candidate] of pool.candidates.entries()){
+            if(candidate==candidateId){
+              pool.candidates.splice(i, 1);
+            }
+          }
+
+          await pool.save();
+        } else {
+          let existCandidate= false;
+          for(const [i, candidate] of pool.candidates.entries()){
+            if(candidate.equals(candidateId)){
+              existCandidate = true
+            }
+          }
+          if(!existCandidate){
+            pool.candidates.push(candidateId);
+            await pool.save();
+          }
+
+        }
+
+
+      }
+
+    }
+
+
+
+  } catch(e){
+    console.log('addPoolCandidate: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+
 /************************** DEPARTMENTS *****************************/
 async function addCompanyDepartment(companyId, currentUserId, form) {
   form = await Joi.validate(form, departmentSchema, { abortEarly: false });
@@ -3275,14 +3350,10 @@ async function getCompanyLabels(companyId, query, type, currentUserId, locale) {
 
 async function inviteMembers(companyId, currentUserId, form) {
 
-  if(!companyId || !currentUserId || !form){
+  if(!companyId || !form){
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
-    return null;
-  }
 
   let result = await memberService.inviteMembers(companyId, currentUserId, form.emails, form.role);
 
@@ -3292,9 +3363,9 @@ async function inviteMembers(companyId, currentUserId, form) {
 }
 
 
-async function getCompanyMemberInvitations(companyId) {
+async function getCompanyMemberInvitations(companyId, currentUserId) {
 
-  if(!companyId){
+  if(!companyId || !currentUserId){
     return null;
   }
 
@@ -3628,6 +3699,11 @@ async function getPoolCandidates(companyId, currentUserId, poolId, query, sort) 
 
   try {
     result = await poolService.getPoolCandidates(poolId);
+    result.docs = _.reduce(result.docs, function(res, candidate){
+      res.push(convertToCandidate(candidate));
+      return res;
+
+    }, []);
 
     // let candidateIds = pool.candidates;
     // result = await candidateService.searchCandidates(candidateIds, query, options);

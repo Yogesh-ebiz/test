@@ -11,6 +11,7 @@ const router = express.Router();
 module.exports = router;
 
 router.route('/:id').get(asyncHandler(getPeopleById));
+router.route('/:id/flag').post(asyncHandler(addPeopleToBlacklist));
 
 router.route('/search').post(asyncHandler(searchPeople));
 router.route('/suggestions').post(asyncHandler(getPeopleSuggestions));
@@ -51,5 +52,18 @@ async function getPeopleSuggestions(req, res) {
 
   data = await peopleCtrl.getPeopleSuggestions(filter, sort, res.locale);
   res.json(new Response(data, data?'people_retrieved_successful':'not_found', res));
+}
+
+
+
+async function addPeopleToBlacklist(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let peopleId = parseInt(req.params.id);
+  let flag = req.body;
+  flag.userId = peopleId;
+  flag.createdBy = currentUserId;
+  let data = await peopleCtrl.addPeopleToBlacklist(currentUserId, flag);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
 
