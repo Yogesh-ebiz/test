@@ -53,7 +53,6 @@ const jobSchema = Joi.object({
   employmentType: Joi.string(),
   allowRemote: Joi.boolean(),
   education: Joi.string().allow(''),
-  company: Joi.number(),
   district: Joi.string().allow('').optional(),
   city: Joi.string().allow('').optional(),
   state: Joi.string().allow(''),
@@ -85,8 +84,9 @@ async function addJob(companyId, member, form) {
     form.department = ObjectID(form.department);
   }
 
+
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
-  form.companyId = companyId
+  form.company = companyId
   form.members = [member._id];
   form.createdBy = member._id;
 
@@ -102,10 +102,8 @@ async function addJob(companyId, member, form) {
       tag = ObjectID(tag);
     }
   }
-
   result = await new JobRequisition(form).save();
-
-  let subscription = {memberId: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subjectId: result._id};
+  let subscription = {member: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subject: result._id};
   await memberService.subscribe(subscription);
 
   return result;

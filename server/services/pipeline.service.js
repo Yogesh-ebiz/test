@@ -24,6 +24,7 @@ async function getPipelineById(pipelineId) {
     return;
   }
 
+
   return await Pipeline.findById(pipelineId).populate('stages');
 }
 

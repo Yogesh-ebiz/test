@@ -247,7 +247,6 @@ async function getLatestCandidates(company) {
   let now = Date.now();
 
   let result = await Application.find({$and: [ {company: company}, {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] }).populate('user').sort({createdDate: -1});
-
   return result;
 
 }
@@ -510,19 +509,21 @@ async function apply(application) {
     return;
   }
 
+  let job = application.jobId;
+  let candidate = application.user;
+  application.jobId = job._id;
+  application.user = candidate._id;
   application = await Joi.validate(application, applicationSchema, {abortEarly: false});
-
 
 
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
-    let jobPipeline = await pipelineService.getPipelineById(application.jobId.pipeline);
+    let jobPipeline = await pipelineService.getPipelineById(job.pipeline);
     if (jobPipeline) {
+
       let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
-
       let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
-
-      application.jobId.noOfApplied+=1;
+      job.noOfApplied+=1;
       // progress.stage = applyStage._id;
 
       if(jobPipeline.autoRejectBlackList && candidate.flag){
@@ -533,9 +534,8 @@ async function apply(application) {
       savedApplication.allProgress.push(progress._id)
       savedApplication.currentProgress = progress._id;
 
-
       if(application.applicationQuestions) {
-        application.applicationQuestions.createdBy = application.user.userId;
+        application.applicationQuestions.createdBy = candidate.userId;
         let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
 
         if (questionSubmission) {
@@ -546,16 +546,17 @@ async function apply(application) {
 
       let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
 
-      application.user.applications.push(savedApplication._id);
-      await application.user.save();
-      await application.jobId.save();
+      candidate.applications.push(savedApplication._id);
+      await candidate.save();
+      await job.save();
+
       await stageService.createTasksForStage(applyStage, application.jobId.title, taskMeta);
 
       let campaign;
       if(application.token){
         campaign = await emailCampaignService.findByToken(application.token);
       } else {
-        campaign = await emailCampaignService.findByEmailAndJobId(application.email, application.jobId._id);
+        campaign = await emailCampaignService.findByEmailAndJobId(application.email, job._id);
       }
 
       savedApplication = await savedApplication.save();
@@ -574,24 +575,23 @@ async function apply(application) {
 
     }
 
-
-    let activity = await activityService.addActivity({causer: application.user._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobId: application.jobId._id, jobTitle: application.jobId.title}});
+    let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobId: job._id, jobTitle: job.title}});
 
 
     //Create Notification
     let meta = {
-      companyId: application.jobId.company,
-      jobId: application.jobId._id,
-      jobTitle: application.jobId.title,
+      companyId: job.company,
+      jobId: job._id,
+      jobTitle: job.title,
       applicationId: savedApplication.applicationId,
-      applicantId: application.user.userId,
-      createdBy: application.jobId.createdBy.userId
+      applicantId: candidate.userId,
+      createdBy: job.createdBy.userId
     };
 
-    await await feedService.createNotification(application.jobId.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+    await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
     if (application.follow) {
-      await feedService.followCompany(application.jobId.company, application.user.userId);
+      await feedService.followCompany(job.company, candidate.userId);
     }
 
   }

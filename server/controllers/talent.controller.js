@@ -15,6 +15,7 @@ const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const taskType = require('../const/taskType');
 const stageType = require('../const/stageType');
+const jobType = require('../const/jobType');
 
 const {upload} = require('../services/aws.service');
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
@@ -806,7 +807,6 @@ async function verifyCard(companyId, currentUserId, jobId, form) {
 
 
 async function createJob(companyId, currentUserId, job) {
-
   if(!companyId || !currentUserId || !job){
     return null;
   }
@@ -1283,6 +1283,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
     if(job){
       job.status = statusEnum.ACTIVE;
       job.publishedDate = Date.now();
+      job.type = jobType.PROMOTE;
       job = await job.save();
     }
 

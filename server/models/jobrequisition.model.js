@@ -156,7 +156,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false
   },
   promotion: {
-    type: Object,
+    type: Array,
     required: false
   },
   hasSaved: {
@@ -237,8 +237,8 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: false,
     required: false
   },
-  pipeline: { type: Schema.Types.ObjectId, ref: 'Pipeline' }
-
+  pipeline: { type: Schema.Types.ObjectId, ref: 'Pipeline' },
+  campaign: { type: Schema.Types.ObjectId, ref: 'Campaign' }
 }, {
   versionKey: false
 });

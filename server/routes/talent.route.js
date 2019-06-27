@@ -333,7 +333,6 @@ async function createJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
   let job = req.body;
-  job.company = companyId;
   let data = await talentCtrl.createJob(companyId, currentUserId, job);
   res.json(new Response(data, data?'job_created_successful':'not_found', res));
 }
