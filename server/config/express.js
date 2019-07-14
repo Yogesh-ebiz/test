@@ -117,7 +117,7 @@ app.use((req, res, next) => {
 });
 
 // error handler, send stacktrace only during development
-app.use(handleErrors);
+// app.use(handleErrors);
 
 
 app.use((err, req, res, next) => {
