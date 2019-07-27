@@ -114,9 +114,34 @@ async function findByCompanyIds(companyIds, needSubscription) {
   }
 
   let companies = null;
-  
   if(needSubscription){
-    companies = await Company.find({companyId: {$in: companyIds}}).populate('subscription');
+
+    companies = await Company.aggregate([
+      { $match: {companyId: {$in: companyIds}}},
+      { $lookup: {
+        from:"subscriptions",
+        let:{subscription: '$subscription'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$subscription","$_id"]}}}
+        ],
+        as: 'subscription'
+      }},
+      { $unwind: '$subscription' },
+      {
+        $lookup: {
+          from: 'jobrequisitions',
+          localField: '_id',
+          foreignField: 'company',
+          as: 'jobs',
+        },
+      },
+      // { $unwind: '$jobs'},
+      { $addFields:
+          {
+            noOfJobs: {$size: '$jobs'}
+          }
+      },
+      ]);
   } else {
     companies = await Company.find({companyId: {$in: companyIds}});
   }
