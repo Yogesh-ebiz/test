@@ -15,6 +15,7 @@ router.route('/plans').get(asyncHandler(getPlans));
 router.route('/:id').get(asyncHandler(getSubscriptionById));
 router.route('/:id').put(asyncHandler(updateSubscription));
 router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
+router.route('/:id/activate').post(asyncHandler(activateSubscription));
 router.route('/:id').delete(asyncHandler(deleteSubscription));
 router.route('/:id/payment/update').post(asyncHandler(updateSubscriptionPaymentMethod));
 
