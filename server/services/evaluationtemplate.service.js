@@ -22,7 +22,7 @@ const questionSchema = Joi.object({
 const evaluationTemplateSchema = Joi.object({
   name: Joi.string().required(),
   questions: Joi.array().required(),
-  company: Joi.number().required(),
+  company: Joi.object().required(),
   createdBy: Joi.number().optional(),
   updatedBy: Joi.number().optional()
 });
@@ -59,7 +59,6 @@ async function add(form) {
     return;
   }
 
-  console.log(form)
   form = await Joi.validate(form, evaluationTemplateSchema, { abortEarly: false });
 
   let questions = form.questions;
@@ -146,10 +145,39 @@ async function remove(questionTemplateId) {
 
 }
 
+
+
+async function deactivate(id, member) {
+  if(!id || !member){
+    return;
+  }
+  let result = null;
+  result = await EvaluationTemplate.update({_id: id}, {$set: {status: statusEnum.DISABLED, updatedBy: member._id, updatedAt: Date.now()}});
+  return {success: true};
+
+}
+
+
+async function activate(id, member) {
+  if(!id ||  !member){
+    return;
+  }
+  console.log(id)
+  let result = await EvaluationTemplate.update({_id: id}, {$set: {status: statusEnum.ACTIVE, updatedBy: member._id, updatedAt: Date.now()}});
+  if(result){
+
+  }
+
+  return {success: true};
+
+}
+
 module.exports = {
   add:add,
   update:update,
   remove:remove,
   search: search,
-  findById:findById
+  findById:findById,
+  deactivate:deactivate,
+  activate:activate
 }

@@ -2,15 +2,28 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
+const statusEnum = require('../const/statusEnum');
+
 
 const EvaluationTemplateSchema = new mongoose.Schema({
-  createdAt: {
+  status: {
+    type: String,
+    default: statusEnum.ACTIVE
+  },
+  createdDate: {
     type: Number,
+    required: false,
     default: Date.now
   },
   createdBy: {
+    type: Object
+  },
+  updatedDate: {
     type: Number,
-    required: true
+    required: false
+  },
+  updatedBy: {
+    type: Object
   },
   name: {
     type: String,
@@ -18,7 +31,7 @@ const EvaluationTemplateSchema = new mongoose.Schema({
   },
   questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
   company: {
-    type: Number,
+    type: Object,
     required: true
   }
 }, {

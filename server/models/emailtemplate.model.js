@@ -1,17 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const statusEnum = require('../const/statusEnum');
 
 
 const EmailSchema = new mongoose.Schema({
-  name: {
-    type: String
-  },
-  bodyHtml: {
+  status: {
     type: String,
-    required: true
-  },
-  company: {
-    type: Number
+    default: statusEnum.ACTIVE
   },
   createdDate: {
     type: Number,
@@ -26,6 +21,16 @@ const EmailSchema = new mongoose.Schema({
     required: false
   },
   updatedBy: {
+    type: Object
+  },
+  name: {
+    type: String
+  },
+  bodyHtml: {
+    type: String,
+    required: true
+  },
+  company: {
     type: Object
   },
 }, {

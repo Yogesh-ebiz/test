@@ -262,11 +262,15 @@ module.exports = {
   getCompanyEvaluationTemplate,
   updateCompanyEvaluationTemplate,
   deleteCompanyEvaluationTemplate,
+  deactivateCompanyEvaluationTemplate,
+  activateCompanyEvaluationTemplate,
   getEvaluationFilters,
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
   updateCompanyEmailTemplate,
   deleteCompanyEmailTemplate,
+  deactivateCompanyEmailTemplate,
+  activateCompanyEmailTemplate,
   searchContacts
 }
 
@@ -5513,7 +5517,8 @@ async function getCompanyEvaluationTemplates(companyId, query, currentUserId, lo
     return null;
   }
 
-  let result = await evaluationTemplateService.search(companyId);
+  let company = await companyService.findByCompanyId(companyId);
+  let result = await evaluationTemplateService.search(company._id);
 
   return result;
 
@@ -5532,7 +5537,8 @@ async function addCompanyEvaluationTemplate(companyId, form, currentUserId) {
   let result = null;
   try {
 
-    form.company = companyId;
+    let company = await companyService.findByCompanyId(companyId);
+    form.company = company._id;
     form.createdBy = currentUserId;
     result = await evaluationTemplateService.add(form);
 
@@ -5630,6 +5636,51 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
 }
 
 
+async function deactivateCompanyEvaluationTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  let result = null;
+  try {
+    result = await evaluationTemplateService.deactivate(templateId, member);
+
+
+  } catch(e){
+    console.log('updateTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function activateCompanyEvaluationTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  let result = null;
+  try {
+    result = await evaluationTemplateService.activate(templateId, member);
+
+
+  } catch(e){
+    console.log('updateTemplate: Error', e);
+  }
+
+
+  return result
+}
+
 
 async function getEvaluationFilters(companyId, currentUserId) {
   if(!companyId || !currentUserId){
@@ -5666,8 +5717,8 @@ async function getCompanyEmailTemplates(companyId, currentUserId, query, locale)
   if(!companyId || !currentUserId){
     return null;
   }
-
-  let result = await emailTemplateService.search(companyId);
+  let company = await companyService.findByCompanyId(companyId);
+  let result = await emailTemplateService.search(company._id);
 
   return result;
 
@@ -5678,6 +5729,7 @@ async function addCompanyEmailTemplate(companyId, form, currentUserId) {
     return null;
   }
 
+
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
@@ -5685,8 +5737,8 @@ async function addCompanyEmailTemplate(companyId, form, currentUserId) {
 
   let result = null;
   try {
-
-    form.company = companyId;
+    let company = await companyService.findByCompanyId(companyId);
+    form.company = company._id;
     form.createdBy = currentUserId;
     result = await emailTemplateService.add(form);
 
@@ -5750,6 +5802,52 @@ async function deleteCompanyEmailTemplate(companyId, templateId, currentUserId) 
   } catch(e){
     console.log('deleteCompanyEmailTemplate: Error', e);
   }
+  return result
+}
+
+
+async function deactivateCompanyEmailTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  let result = null;
+  try {
+    result = await emailTemplateService.deactivate(templateId, member);
+
+
+  } catch(e){
+    console.log('updateTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function activateCompanyEmailTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  let result = null;
+  try {
+    result = await emailTemplateService.activate(templateId, member);
+
+
+  } catch(e){
+    console.log('updateTemplate: Error', e);
+  }
+
+
   return result
 }
 

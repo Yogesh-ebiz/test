@@ -216,6 +216,8 @@ router.route('/company/:id/evaluations/templates').post(asyncHandler(addCompanyE
 router.route('/company/:id/evaluations/templates/:templateId').get(asyncHandler(getCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/templates/:templateId').put(asyncHandler(updateCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/templates/:templateId').delete(asyncHandler(deleteCompanyEvaluationTemplate));
+router.route('/company/:id/evaluations/templates/:templateId/disable').post(asyncHandler(deactivateCompanyEvaluationTemplate));
+router.route('/company/:id/evaluations/templates/:templateId/enable').post(asyncHandler(activateCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/filters').get(asyncHandler(getEvaluationFilters));
 
 
@@ -224,7 +226,8 @@ router.route('/company/:id/emails/templates').get(asyncHandler(getCompanyEmailTe
 router.route('/company/:id/emails/templates').post(asyncHandler(addCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').put(asyncHandler(updateCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(deleteCompanyEmailTemplate));
-
+router.route('/company/:id/emails/templates/:templateId/disable').post(asyncHandler(deactivateCompanyEmailTemplate));
+router.route('/company/:id/emails/templates/:templateId/enable').post(asyncHandler(activateCompanyEmailTemplate));
 router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 
 
@@ -2008,6 +2011,35 @@ async function deleteCompanyEvaluationTemplate(req, res) {
   res.json(new Response(data, data?'evlaluation_deleted_successful':'not_found', res));
 }
 
+
+async function deactivateCompanyEvaluationTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = ObjectID(req.params.templateId);
+
+  let data = await talentCtrl.deactivateCompanyEvaluationTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'template_updated_successful':'not_found', res));
+}
+
+
+async function activateCompanyEvaluationTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = ObjectID(req.params.templateId);
+
+  let data = await talentCtrl.activateCompanyEvaluationTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'template_updated_successful':'not_found', res));
+}
+
+async function getEvaluationFilters(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await talentCtrl.getEvaluationFilters(company, currentUserId);
+  res.json(new Response(data, data?'filters_retrieved_successful':'not_found', res));
+}
+
+
 async function getEvaluationFilters(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -2059,6 +2091,24 @@ async function deleteCompanyEmailTemplate(req, res) {
 }
 
 
+async function deactivateCompanyEmailTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = ObjectID(req.params.templateId);
+
+  let data = await talentCtrl.deactivateCompanyEmailTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'template_updated_successful':'not_found', res));
+}
+
+
+async function activateCompanyEmailTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = ObjectID(req.params.templateId);
+
+  let data = await talentCtrl.activateCompanyEmailTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'template_updated_successful':'not_found', res));
+}
 
 async function searchContacts(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
