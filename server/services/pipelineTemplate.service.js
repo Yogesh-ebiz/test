@@ -107,6 +107,7 @@ async function update(id, form, member) {
   form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
 
   let template = await findById(id);
+
   if(template){
     template.name = form.name;
     template.stages=form.stages;
@@ -119,6 +120,7 @@ async function update(id, form, member) {
 
     let newStages = [];
     let pipeline = await pipelineService.findByPipelineTemplateId(result._id);
+    console.log(pipeline)
 
     for(let [i, stage] of pipeline.stages.entries()){
       let existStage = _.find(template.stages, {type: stage.type});
