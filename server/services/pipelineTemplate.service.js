@@ -120,29 +120,27 @@ async function update(id, form, member) {
 
     let newStages = [];
     let pipeline = await pipelineService.findByPipelineTemplateId(result._id);
-    console.log(pipeline)
 
-    for(let [i, stage] of pipeline.stages.entries()){
-      let existStage = _.find(template.stages, {type: stage.type});
-      if(!existStage){
-        await existStage.delete();
-        pipeline.stages.split(i, 1);
+    if(pipeline) {
+      for (let [i, stage] of pipeline.stages.entries()) {
+        let existStage = _.find(template.stages, {type: stage.type});
+        if (!existStage) {
+          await existStage.delete();
+          pipeline.stages.split(i, 1);
+        }
+      }
+
+      for (let [i, stage] of template.stages.entries()) {
+        let currentStage = _.find(pipeline.stages, {type: stage.type});
+        if (currentStage) {
+          newStages.push(currentStage._id)
+          console.log(i, 'exist', currentStage.name, stage.type);
+        } else {
+          console.log(i, 'not exist', stage.name, stage.type)
+          let newStage = await stageService.addStage()
+        }
       }
     }
-
-    for(let [i, stage] of template.stages.entries()){
-      let currentStage = _.find(pipeline.stages, {type: stage.type});
-      if(currentStage){
-        newStages.push(currentStage._id)
-        console.log(i, 'exist', currentStage.name, stage.type);
-      } else {
-        console.log(i, 'not exist', stage.name, stage.type)
-        let newStage = await stageService.addStage()
-      }
-    }
-    console.log(newStages);
-
-
   }
 
   return result;

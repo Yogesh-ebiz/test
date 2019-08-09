@@ -197,7 +197,7 @@ async function addPipeline(jobId, newPipeline) {
 
   for (let stage of newPipeline.stages) {
     stage._id = new ObjectID();
-    stage = await addStage(stage)
+    stage = await stageService.addStage(stage)
   }
 
   newPipeline = new Pipeline(newPipeline).save();

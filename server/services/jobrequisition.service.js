@@ -321,6 +321,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
       }
     } else {
 
+      console.log('else')
       let stageMigration = form.stageMigration;
       delete form.stageMigration;
 
