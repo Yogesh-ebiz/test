@@ -5,8 +5,9 @@ const ObjectID = require('mongodb').ObjectID;
 const statusEnum = require('../const/statusEnum');
 const PipelineTemplate = require('../models/pipelineTemplate.model');
 const Stage = require('../models/stage.model');
-const {addStage} = require('../services/stage.service');
+const stageService = require('../services/stage.service');
 const companyService = require('../services/company.service');
+const pipelineService = require('../services/pipeline.service');
 
 
 const pipelineSchema = Joi.object({
@@ -105,15 +106,41 @@ async function update(id, form, member) {
 
   form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
 
-  let pipeline = await findById(id);
-  if(pipeline){
-    pipeline.name = form.name;
-    pipeline.stages=form.stages;
-    pipeline.category=form.category;
-    pipeline.department=form.department;
-    pipeline.updatedBy = member._id;
-    pipeline.updatedDate = Date.now();
-    result = await pipeline.save();
+  let template = await findById(id);
+  if(template){
+    template.name = form.name;
+    template.stages=form.stages;
+    template.category=form.category;
+    template.department=form.department;
+    template.updatedBy = member._id;
+    template.updatedDate = Date.now();
+    result = await template.save();
+
+
+    let newStages = [];
+    let pipeline = await pipelineService.findByPipelineTemplateId(result._id);
+
+    for(let [i, stage] of pipeline.stages.entries()){
+      let existStage = _.find(template.stages, {type: stage.type});
+      if(!existStage){
+        await existStage.delete();
+        pipeline.stages.split(i, 1);
+      }
+    }
+
+    for(let [i, stage] of template.stages.entries()){
+      let currentStage = _.find(pipeline.stages, {type: stage.type});
+      if(currentStage){
+        newStages.push(currentStage._id)
+        console.log(i, 'exist', currentStage.name, stage.type);
+      } else {
+        console.log(i, 'not exist', stage.name, stage.type)
+        let newStage = await stageService.addStage()
+      }
+    }
+    console.log(newStages);
+
+
   }
 
   return result;

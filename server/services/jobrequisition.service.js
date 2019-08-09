@@ -370,8 +370,10 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
           await job.save();
         }
 
-        for(let [i, stage] of stageMigration.entries()){
-          await applicationProgressService.updateApplicationProgressStage(oldPipeline.stages[stage.old]._id, pipeline.stages[stage.new]);
+        if(stageMigration) {
+          for (let [i, stage] of stageMigration.entries()) {
+            await applicationProgressService.updateApplicationProgressStage(oldPipeline.stages[stage.old]._id, pipeline.stages[stage.new]);
+          }
         }
       }
 
@@ -961,6 +963,18 @@ async function search(currentUserId, query, filter, sort, locale) {
 }
 
 
+async function removePipeline(pipeline) {
+  let data = null;
+
+  if(pipeline==null){
+    return;
+  }
+
+
+  return await JobRequisition.update({pipeline: pipeline}, {$set: {pipeline: null, _pipeline: pipeline}})
+}
+
+
 
 module.exports = {
   addJob:addJob,
@@ -988,5 +1002,6 @@ module.exports = {
   findJobsByCompanyId:findJobsByCompanyId,
   getGroupOfCompanyJobs:getGroupOfCompanyJobs,
   getJobsEndingSoon:getJobsEndingSoon,
-  search:search
+  search:search,
+  removePipeline:removePipeline,
 }

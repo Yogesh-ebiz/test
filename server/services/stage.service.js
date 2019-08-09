@@ -55,6 +55,7 @@ async function createTasksForStage(stage, jobTitle, meta) {
     return;
   }
   for (let task of stage.tasks) {
+    task.tasks = [];
     for(let member of task.members){
       let newTask = {};
       newTask.members = [ObjectID(member)];
@@ -83,12 +84,12 @@ async function createTasksForStage(stage, jobTitle, meta) {
       }
 
       // await add(newTask)
-      task = await add(newTask);
+      newTask = await add(newTask);
     }
 
   }
 
-  stage = new Stage(stage).save();
+  // stage = new Stage(stage).save();
   return stage;
 
 }

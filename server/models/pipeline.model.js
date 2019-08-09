@@ -8,13 +8,15 @@ const PipelineSchema = new mongoose.Schema({
     type: Number
   },
   pipelineTemplateId: {
-    type: Object,
-    required: true
+    type: Object
   },
   jobId: {
     type: Object
   },
-  createdAt: {
+  name: {
+    type: String
+  },
+  createdDate: {
     type: Number,
     default: Date.now
   },
@@ -22,7 +24,7 @@ const PipelineSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  updatedAt: {
+  updatedDate: {
     type: Number,
     default: Date.now
   },
@@ -40,6 +42,15 @@ const PipelineSchema = new mongoose.Schema({
   default: {
     type: Boolean,
     default: false
+  },
+  category: {
+    type: String
+  },
+  department: {
+    type: Number
+  },
+  company: {
+    type: Object
   },
   stages: [{ type: Schema.Types.ObjectId, ref: 'Stage' }],
 }, {

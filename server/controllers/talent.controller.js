@@ -4119,7 +4119,8 @@ async function addCompanyPipelineTemplate(companyId, currentUserId, form) {
   try {
     let company = await companyService.findByCompanyId(companyId);
     form.company = company._id;
-    result = await pipelineTemplateService.add(form);
+    // result = await pipelineTemplateService.add(form);
+    result = await pipelineService.add(form);
 
   } catch(e){
     console.log('addCompanyPipeline: Error', e);
@@ -4140,9 +4141,9 @@ async function updateCompanyPipelineTemplate(companyId, pipelineId, currentUserI
   }
   let result = null;
   try {
-    result = await pipelineTemplateService.update(pipelineId, form, member);
-
-
+    // result = await pipelineTemplateService.update(pipelineId, form, member);
+    form.updatedBy = member.userId;
+    result = await pipelineService.update(pipelineId, form);
   } catch(e){
     console.log('updateCompanyPipeline: Error', e);
   }
@@ -4161,12 +4162,16 @@ async function deleteCompanyPipelineTemplate(companyId, pipelineId, currentUserI
     return null;
   }
 
-  let result = null;
+  let result = {success: false};
   try {
 
-    result = await pipelineTemplateService.remove(pipelineId);
+    // result = await pipelineTemplateService.remove(pipelineId);
+    await jobService.removePipeline(pipelineId);
+    result = await pipelineService.remove(pipelineId);
 
-
+    if(result.ok==1){
+      result = {success: true};
+    }
   } catch(e){
     console.log('deleteCompanyPipeline: Error', e);
   }
@@ -4186,7 +4191,8 @@ async function getCompanyPipelineTemplate(companyId, pipelineId, currentUserId, 
     return null;
   }
 
-  let result = await pipelineTemplateService.findById(pipelineId);
+  // let result = await pipelineTemplateService.findById(pipelineId);
+  let result = await pipelineService.findById(pipelineId);
 
   return result;
 
@@ -4204,8 +4210,8 @@ async function deactivateCompanyPipelineTemplate(companyId, pipelineId, currentU
   }
   let result = null;
   try {
-    result = await pipelineTemplateService.deactivate(pipelineId, member);
-
+    // result = await pipelineTemplateService.deactivate(pipelineId, member);
+    result = await pipelineService.deactivate(pipelineId, member);
 
   } catch(e){
     console.log('updateCompanyPipeline: Error', e);
@@ -4227,8 +4233,8 @@ async function activateCompanyPipelineTemplate(companyId, pipelineId, currentUse
   }
   let result = null;
   try {
-    result = await pipelineTemplateService.activate(pipelineId, member);
-
+    // result = await pipelineTemplateService.activate(pipelineId, member);
+    result = await pipelineService.activate(pipelineId, member);
 
   } catch(e){
     console.log('activateCompanyPipelineTemplate: Error', e);
@@ -4252,7 +4258,8 @@ async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
   let result = [];
   let company = await companyService.findByCompanyId(companyId);
   if(company) {
-    result = await pipelineTemplateService.getPipelineTemplates(company._id);
+    // result = await pipelineTemplateService.getPipelineTemplates(company._id);
+    result = await pipelineService.findByCompany(company._id);
   }
   return result;
 
