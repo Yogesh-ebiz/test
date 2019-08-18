@@ -34,6 +34,7 @@ const memberService = require('../services/member.service');
 const jobService = require('../services/jobrequisition.service');
 
 
+const Company = require('../models/company.model');
 const JobRequisition = require('../models/jobrequisition.model');
 const CompanyReview = require('../models/companyreview.model');
 // const CompanyReviewReport = require('../models/companyreviewreport.model');
@@ -178,7 +179,6 @@ async function sync(form) {
   let result;
   try {
     let company = await companyService.findByCompanyId(form.id);
-
     if(company){
       company.avatar = form.avatar;
       company.name = form.name;
@@ -186,8 +186,11 @@ async function sync(form) {
       await company.save();
     } else {
       let user = await feedService.lookupPeopleIds([form.createdBy]);
+
       let role = await roleService.getAdminRole();
-      if(user && company) {
+      if(user && form && role) {
+        user = user[0];
+
         let company = await new Company({
           name: form.name,
           companyId: form.id,
