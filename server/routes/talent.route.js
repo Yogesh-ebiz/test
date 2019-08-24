@@ -129,10 +129,14 @@ router.route('/company/:id/candidates/:candidateId/evaluations/stats').post(asyn
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
-router.route('/company/:id/candidates/:candidateId/experiences').post(asyncHandler(addCandidateExperiences));
+router.route('/company/:id/candidates/:candidateId/experiences').post(asyncHandler(addCandidateExperience));
 router.route('/company/:id/candidates/:candidateId/experiences').get(asyncHandler(getCandidateExperiences));
-router.route('/company/:id/candidates/:candidateId/educations').post(asyncHandler(addCandidateEducations));
+router.route('/company/:id/candidates/:candidateId/experiences/:experienceId').delete(asyncHandler(removeCandidateExperience));
+
+router.route('/company/:id/candidates/:candidateId/educations').post(asyncHandler(addCandidateEducation));
 router.route('/company/:id/candidates/:candidateId/educations').get(asyncHandler(getCandidateEducations));
+router.route('/company/:id/candidates/:candidateId/educations/:educationId').delete(asyncHandler(removeCandidateEducation));
+
 router.route('/company/:id/candidates/:candidateId/skills').post(asyncHandler(addCandidateSkills));
 router.route('/company/:id/candidates/:candidateId/skills').get(asyncHandler(getCandidateSkills));
 
@@ -1291,13 +1295,13 @@ async function getCandidateActivities(req, res) {
 }
 
 
-async function addCandidateExperiences(req, res) {
+async function addCandidateExperience(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let candidateId = ObjectID(req.params.candidateId);
   let form = req.body;
 
-  let data = await talentCtrl.addCandidateExperiences(company, currentUserId, candidateId, form);
+  let data = await talentCtrl.addCandidateExperience(company, currentUserId, candidateId, form);
   res.json(new Response(data, data?'experiences_added_successful':'not_found', res));
 }
 
@@ -1312,14 +1316,23 @@ async function getCandidateExperiences(req, res) {
 }
 
 
+async function removeCandidateExperience(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = ObjectID(req.params.candidateId);
+  let experienceId = ObjectID(req.params.experienceId);
 
-async function addCandidateEducations(req, res) {
+  let data = await talentCtrl.removeCandidateExperience(company, currentUserId, candidateId, experienceId);
+  res.json(new Response(data, data?'experience_deleted_successful':'not_found', res));
+}
+
+async function addCandidateEducation(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let candidateId = ObjectID(req.params.candidateId);
   let form = req.body;
 
-  let data = await talentCtrl.addCandidateEducations(company, currentUserId, candidateId, form);
+  let data = await talentCtrl.addCandidateEducation(company, currentUserId, candidateId, form);
   res.json(new Response(data, data?'educations_added_successful':'not_found', res));
 }
 
@@ -1333,6 +1346,15 @@ async function getCandidateEducations(req, res) {
   res.json(new Response(data, data?'educations_retrieved_successful':'not_found', res));
 }
 
+async function removeCandidateEducation(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = ObjectID(req.params.candidateId);
+  let educationId = ObjectID(req.params.educationId);
+
+  let data = await talentCtrl.removeCandidateEducation(company, currentUserId, candidateId, educationId);
+  res.json(new Response(data, data?'educations_deleted_successful':'not_found', res));
+}
 
 async function addCandidateSkills(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

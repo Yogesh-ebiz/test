@@ -206,10 +206,12 @@ module.exports = {
   getCandidateEvaluationById,
   getCandidatesSimilar,
   getCandidateActivities,
-  addCandidateExperiences,
+  addCandidateExperience,
+  removeCandidateExperience,
   getCandidateExperiences,
-  addCandidateEducations,
+  addCandidateEducation,
   getCandidateEducations,
+  removeCandidateEducation,
   addCandidateSkills,
   getCandidateSkills,
   uploadAvatar,
@@ -3670,7 +3672,7 @@ async function getCandidateActivities(companyId, currentUserId, userId, sort) {
 }
 
 
-async function addCandidateExperiences(companyId, currentUserId, candidateId, form) {
+async function addCandidateExperience(companyId, currentUserId, candidateId, form) {
   if(!companyId || !currentUserId || !candidateId || !form){
     return null;
   }
@@ -3682,7 +3684,7 @@ async function addCandidateExperiences(companyId, currentUserId, candidateId, fo
 
   let result;
   try {
-    result = await candidateService.addExperiences(candidateId, form);
+    result = await candidateService.addExperience(candidateId, form);
 
   } catch (error) {
     console.log(error);
@@ -3715,8 +3717,28 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
 }
 
 
+async function removeCandidateExperience(companyId, currentUserId, candidateId, experienceId) {
+  if(!companyId || !currentUserId || !candidateId || !experienceId){
+    return null;
+  }
 
-async function addCandidateEducations(companyId, currentUserId, candidateId, form) {
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    await candidateService.removeExperience(candidateId, experienceId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {success: true};
+}
+
+async function addCandidateEducation(companyId, currentUserId, candidateId, form) {
   if(!companyId || !currentUserId || !candidateId || !form){
     return null;
   }
@@ -3728,7 +3750,7 @@ async function addCandidateEducations(companyId, currentUserId, candidateId, for
 
   let result;
   try {
-    result = await candidateService.addEducations(candidateId, form);
+    result = await candidateService.addEducation(candidateId, form);
 
   } catch (error) {
     console.log(error);
@@ -3750,14 +3772,36 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
 
   let result;
   try {
-    let educations = await candidateService.getEducations(candidateId);
-    result = educations;
+    await candidateService.getEducations(candidateId);
 
   } catch (error) {
     console.log(error);
   }
 
   return result;
+}
+
+
+async function removeCandidateEducation(companyId, currentUserId, candidateId, educationId) {
+  if(!companyId || !currentUserId || !candidateId || !educationId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let educations = await candidateService.removeEducation(candidateId, educationId);
+    result = educations;
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {success: true};
 }
 
 

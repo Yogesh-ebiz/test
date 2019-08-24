@@ -467,7 +467,7 @@ async function getCompanyBlacklisted(company, sort) {
 
 
 
-async function addExperiences(id, form) {
+async function addExperience(id, form) {
 
   if(!id || !form){
     return;
@@ -502,8 +502,24 @@ async function getExperiences(id) {
 }
 
 
+async function removeExperience(id, experienceId) {
 
-async function addEducations(id, form) {
+  if(!id){
+    return;
+  }
+  let candidate = await Candidate.findById(id).populate('experiences').select('experiences');
+  for(let [i ,exp] of candidate.experiences.entries()){
+
+    if(exp._id.equals(experienceId)){
+      candidate.experiences.splice(i, 1);
+      await exp.delete();
+    }
+  }
+
+}
+
+
+async function addEducation(id, form) {
 
   if(!id || !form){
     return;
@@ -536,6 +552,21 @@ async function getEducations(id) {
   return candidate.educations;
 }
 
+async function removeEducation(id, educationId) {
+
+  if(!id){
+    return;
+  }
+  let candidate = await Candidate.findById(id).populate('educations').select('educations');
+  for(let [i ,edu] of candidate.educations.entries()){
+
+    if(edu._id.equals(educationId)){
+      candidate.educations.splice(i, 1);
+      await edu.delete();
+    }
+  }
+
+}
 
 
 async function addSkills(id, form) {
@@ -544,9 +575,7 @@ async function addSkills(id, form) {
     return;
   }
 
-  console.log(id, form)
   let candidate = await Candidate.findById(id);
-  console.log(candidate)
   candidate.skills = form;
 
   candidate = await candidate.save();
@@ -594,10 +623,12 @@ module.exports = {
   getAllCandidatesSkills:getAllCandidatesSkills,
   getCandidatesSimilar:getCandidatesSimilar,
   getCompanyBlacklisted:getCompanyBlacklisted,
-  addExperiences:addExperiences,
+  addExperience:addExperience,
   getExperiences:getExperiences,
-  addEducations:addEducations,
+  removeExperience:removeExperience,
+  addEducation:addEducation,
   getEducations:getEducations,
+  removeEducation:removeEducation,
   addSkills:addSkills,
   getSkills:getSkills,
   checkEmail:checkEmail
