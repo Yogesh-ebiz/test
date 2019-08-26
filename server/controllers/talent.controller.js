@@ -332,12 +332,11 @@ async function getCompany(currentUserId, companyId, locale) {
 
 
 async function updateCompany(companyId, currentUserId, form) {
-  if(!currentUserId || !companyId, form){
+  if(!currentUserId || !companyId || !form){
     return null;
   }
 
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-
   if(!member){
     return null;
   }
@@ -345,13 +344,13 @@ async function updateCompany(companyId, currentUserId, form) {
   let result;
   try {
 
-    let update = await companyService.update(companyId, currentUserId, form);
+    result = await companyService.update(companyId, currentUserId, form);
 
   } catch (error) {
     console.log(error);
   }
 
-  return update;
+  return result;
 }
 
 async function getUserSession(currentUserId, preferredCompany) {

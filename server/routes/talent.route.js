@@ -18,6 +18,8 @@ router.route('/market/salary').get(asyncHandler(getMarketSalary));
 
 router.route('/company/search').post(asyncHandler(searchCompany));
 router.route('/company/:id').get(asyncHandler(getCompany));
+router.route('/company/:id').put(asyncHandler(updateCompany));
+
 router.route('/company/:id/subscriptions').get(asyncHandler(getSubscriptions));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
@@ -265,7 +267,7 @@ async function getCompany(req, res) {
 async function updateCompany(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
-  let data = await talentCtrl.updateCompany(currentUserId, companyId);
+  let data = await talentCtrl.updateCompany(companyId, currentUserId, req.body);
   res.json(new Response(data, data?'company_updated_successful':'not_found', res));
 }
 

@@ -124,22 +124,21 @@ async function register(currentParty, form) {
 
 async function update(companyId, currentUserId, form) {
 
-  if(!companyId || !form){
+  if(!companyId || !currentUserId || !form){
     return;
   }
+
 
   form = await Joi.validate(form, feedCompanySchema, {abortEarly: false});
   let company = await findByCompanyId(companyId);
 
-
-
   if(company){
     let savedCompany;
 
-    if(form.partyType==='COMPANY'){
-      savedCompany = await feedService.updateCompany(currentUserId, companyId, form);
+    if(company.partyType==='COMPANY'){
+      savedCompany = await feedService.updateCompany(companyId, currentUserId, form);
     } else {
-      savedCompany = await feedService.updateInstitute(currentUserId, companyId, form);
+      savedCompany = await feedService.updateInstitute(companyId, currentUserId, form);
     }
 
     if(savedCompany){
