@@ -1073,7 +1073,7 @@ async function closeJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let result = await jobService.closeJob(jobId, currentUserId);
+  let result = await jobService.closeJob(jobId, member);
 
   return result;
 }
