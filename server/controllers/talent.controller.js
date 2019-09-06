@@ -3553,8 +3553,8 @@ async function importResumes(companyId, currentUserId, files) {
       "primaryAddress": {
         "address1": null,
         "address2": null,
-        "district": null,
-        "city": null,
+        "district": "Quan 1",
+        "city": "Ho Chi Minh",
         "state": "Hồ Chí Minh",
         "country": "Vietnam"
       },
