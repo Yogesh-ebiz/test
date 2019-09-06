@@ -81,6 +81,7 @@ const MemberSchema = new mongoose.Schema({
     required:true
   },
   role: { type: Schema.Types.ObjectId, ref: 'Role' },
+  notificationPreference: { type: Schema.Types.ObjectId, ref: 'NotificationPreference' },
   followedJobs: [{ type: Schema.Types.ObjectId, ref: 'JobRequisition' }],
   followedCandidates: [{ type: Schema.Types.ObjectId, ref: 'Candidate' }]
 }, {

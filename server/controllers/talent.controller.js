@@ -84,6 +84,7 @@ const JobRequisition = require('../models/jobrequisition.model');
 const Application = require('../models/application.model');
 const Role = require('../models/role.model');
 const Department = require('../models/department.model');
+const NotificationPreference = require('../models/notificationpreference.model');
 
 
 const invitationSchema = Joi.object({
@@ -262,6 +263,8 @@ module.exports = {
   deleteCompanyMember,
   getJobsSubscribed,
   getApplicationsSubscribed,
+  getNotificationPreference,
+  updateNotificationPreference,
   searchTasks,
   getCompanyPools,
   addCompanyPool,
@@ -5701,6 +5704,72 @@ async function getApplicationsSubscribed(companyId, currentUserId, sort) {
 }
 
 
+
+async function getNotificationPreference(companyId, currentUserId) {
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId).populate('notificationPreference');
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+
+  return member.notificationPreference;
+}
+
+async function updateNotificationPreference(companyId, currentUserId, form) {
+  if(!companyId || !currentUserId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId).populate('notificationPreference');
+  if(!member){
+    return null;
+  }
+  if(member.notificationPreference){
+    console.log(form.isAppliedOn)
+    member.notificationPreference.isNotificationOn = form.isNotificationOn;
+    member.notificationPreference.isApplicationUpdated = form.isApplicationUpdated;
+    member.notificationPreference.isAppliedOn = form.isAppliedOn
+    member.notificationPreference.isCandidateRecommended = form.isCandidateRecommended;
+    member.notificationPreference.isEventInvited = form.isEventInvited;
+    member.notificationPreference.isEventCancelled = form.isEventCancelled;
+    member.notificationPreference.isEventDeclinedOn = form.isEventDeclinedOn;
+    member.notificationPreference.isEventAcceptedOn = form.isEventAcceptedOn;
+    member.notificationPreference.isEventUpdatedOn = form.isEventUpdatedOn;
+    member.notificationPreference.isJobUpdated = form.isJobUpdated;
+    member.notificationPreference.isJobCommented = form.isJobCommented;
+    member.notificationPreference.isJobMembered = form.isJobMembered;
+    member.notificationPreference.isMessaged = form.isMessaged;
+    await member.notificationPreference.save();
+  } else {
+    let notificationPreference = {};
+    notificationPreference.isNotificationOn = form.isNotificationOn;
+    notificationPreference.isApplicationUpdated = form.isApplicationUpdated;
+    notificationPreference.isAppliedOn = form.isAppliedOn
+    notificationPreference.isCandidateRecommended = form.isCandidateRecommended;
+    notificationPreference.isEventInvited = form.isEventInvited;
+    notificationPreference.isEventCancelled = form.isEventCancelled;
+    notificationPreference.isEventDeclinedOn = form.isEventDeclinedOn;
+    notificationPreference.isEventAcceptedOn = form.isEventAcceptedOn;
+    notificationPreference.isEventUpdatedOn = form.isEventUpdatedOn;
+    notificationPreference.isJobUpdated = form.isJobUpdated;
+    notificationPreference.isJobCommented = form.isJobCommented;
+    notificationPreference.isJobMembered = form.isJobMembered;
+    notificationPreference.isMessaged = form.isMessaged;
+    notificationPreference = await new NotificationPreference(notificationPreference).save();
+    member.notificationPreference = notificationPreference;
+    member = await member.save();
+  }
+
+
+
+  return member.notificationPreference;
+}
 
 
 async function searchTasks(companyId, currentUserId, filter, sort, query) {

@@ -203,13 +203,14 @@ router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
 router.route('/company/:id/members/:memberId').get(asyncHandler(getCompanyMember));
 
 router.route('/company/:id/members/:memberId').put(asyncHandler(updateCompanyMember));
-router.route('/company/:id/members/:memberId/role').put(asyncHandler(updateCompanyMemberRole));
 router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompanyMember));
+router.route('/company/:id/members/:memberId/role').put(asyncHandler(updateCompanyMemberRole));
 
 router.route('/company/:id/members/:memberId/jobs/subscribes').get(asyncHandler(getJobsSubscribed));
 router.route('/company/:id/members/:memberId/applications/subscribes').get(asyncHandler(getApplicationsSubscribed));
 router.route('/company/:id/members/:memberId/tasks').post(asyncHandler(searchTasks));
-
+router.route('/company/:id/members/:memberId/notifications/preference').get(asyncHandler(getNotificationPreference));
+router.route('/company/:id/members/:memberId/notifications/preference').put(asyncHandler(updateNotificationPreference));
 
 
 router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
@@ -1972,6 +1973,21 @@ async function getApplicationsSubscribed(req, res) {
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
 
+
+async function getNotificationPreference(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let data = await talentCtrl.getNotificationPreference(company, currentUserId);
+  res.json(new Response(data, data?'notification_preferene_retrieved_successful':'not_found', res));
+}
+
+
+async function updateNotificationPreference(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let data = await talentCtrl.updateNotificationPreference(company, currentUserId, req.body);
+  res.json(new Response(data, data?'notification_preferene_updated_successful':'not_found', res));
+}
 
 async function searchTasks(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

@@ -190,7 +190,7 @@ async function findMemberByUserId(userId) {
 }
 
 
-async function findByUserIdAndCompany(userId, company) {
+function findByUserIdAndCompany(userId, company) {
   let data = null;
 
   if(!userId || !company){
