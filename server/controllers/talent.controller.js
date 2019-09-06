@@ -3547,6 +3547,7 @@ async function importResumes(companyId, currentUserId, files) {
 
 
     result.parsed = {
+      "avatar": "avatar.png",
       "firstName": "John",
       "middleName": "",
       "lastName": "Doe",
@@ -5731,7 +5732,6 @@ async function updateNotificationPreference(companyId, currentUserId, form) {
     return null;
   }
   if(member.notificationPreference){
-    console.log(form.isAppliedOn)
     member.notificationPreference.isNotificationOn = form.isNotificationOn;
     member.notificationPreference.isApplicationUpdated = form.isApplicationUpdated;
     member.notificationPreference.isAppliedOn = form.isAppliedOn

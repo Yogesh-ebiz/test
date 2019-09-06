@@ -107,7 +107,7 @@ async function addPeopleToBlacklist(currentUserId, flag) {
   }
 
   flag.createdBy = member._id;
-  flag.candidate = candidate._id;
+  flag.candidate = candidate;
   result = await flagService.add(flag);
   candidate.flag = result._id;
   await candidate.save();

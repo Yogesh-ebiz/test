@@ -36,8 +36,9 @@ async function add(flag) {
     causer: flag.createdBy,
     causerType: subjectType.MEMBER,
     subjectType: subjectType.CANDIDATE,
-    subject: flag.candidate,
-    action: actionEnum.FLAGGED
+    subject: flag.candidate._id,
+    action: actionEnum.FLAGGED,
+    meta: {name: flag.candidate.firstName + ' ' + flag.candidate.lastName}
   });
 
   return result;
@@ -62,7 +63,8 @@ async function remove(company, userId, member) {
         causerType: subjectType.MEMBER,
         subjectType: subjectType.CANDIDATE,
         subject: candidate._id,
-        action: actionEnum.UNFLAGGED
+        action: actionEnum.UNFLAGGED,
+        meta: {name: candidate.firstName + ' ' + candidate.lastName}
       });
     }
   }
