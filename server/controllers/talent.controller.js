@@ -3505,7 +3505,7 @@ async function importResumes(companyId, currentUserId, files) {
     return null;
   }
 
-  let result = [];
+  let result = {};
   let basePath = 'candidates/';
   try {
 
@@ -3516,17 +3516,31 @@ async function importResumes(companyId, currentUserId, files) {
     //   candidates.push(candidate);
     // }
 
-    // const resume = new ResumeParser(files.file[0].path);
-    // //Convert to JSON Object
-    // resume.parseToJSON()
-    //   .then(data => {
-    //     console.log('Yay! ', data);
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
-    //   });
+    const resume = new ResumeParser(files.file[0].path);
+    //Convert to JSON Object
+    let parsed = await resume.parseToJSON()
+      .then(data => {
+        return data;
 
-    result = {
+      })
+      .catch(error => {
+        console.error(error);
+      });
+
+    if(parsed.parts && parsed.parts.email) {
+      console.log('hasEmail')
+      let candidate = await candidateService.findByEmailAndCompanyId("chan@gmail.com", companyId);
+      result.exist = {
+        id: candidate._id,
+        userId: candidate.userId,
+        email: candidate.email,
+        firstName: candidate.firstName,
+        lastName: candidate.lastName
+      }
+    }
+
+
+    result.parsed = {
       "firstName": "John",
       "middleName": "",
       "lastName": "Doe",
@@ -3587,7 +3601,8 @@ async function importResumes(companyId, currentUserId, files) {
           "country": "US"
         }
       ]
-    };
+    }
+
 
   } catch (error) {
     console.log(error);

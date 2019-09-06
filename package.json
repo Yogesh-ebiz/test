@@ -101,6 +101,7 @@
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "1.1.0",
     "querystring": "^0.2.0",
+    "textract": "^2.5.0",
     "ts-node": "~6.1.0",
     "tslint": "^5.20.1",
     "typescript": "~3.5.3"
