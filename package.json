@@ -73,10 +73,12 @@
     "promise": "^8.1.0",
     "querystring": "^0.2.0",
     "raven-js": "^3.27.2",
+    "resume-parser": "^1.7.0",
     "rxjs": "^6.5.3",
     "simple-resume-parser": "^1.1.8",
     "swagger-editor": "^3.8.0",
     "swagger-ui-express": "^3.0.9",
+    "textract": "^2.5.0",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
@@ -101,7 +103,6 @@
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "1.1.0",
     "querystring": "^0.2.0",
-    "textract": "^2.5.0",
     "ts-node": "~6.1.0",
     "tslint": "^5.20.1",
     "typescript": "~3.5.3"
