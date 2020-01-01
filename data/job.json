@@ -1,0 +1,46 @@
+[
+  {
+    "title": "VP, Business Technology",
+    "description": "Marqeta's Vice President of Business Technology (Information Technology and Business Systems) leads a team that creates and delivers internal infrastructure and systems to improve the overall value and performance of the organisation. The Vice President will be responsible for planning and delivering the function's strategy, goals, budget, services, processes, projects, infrastructure and assets ensuring consistent alignment with, and facilitation of, Marqeta's business strategy. The ideal candidate will be a strong technical leader with sound business acumen and executive presence, able to drive focus and accountability to business commitments.",
+    "durationMonths": null,
+    "experienceMonths": 60,
+    "lastCurrencyUom": "USD",
+    "city": "Oakland",
+    "state": "CA",
+    "isPromoted": false,
+    "noOfResources": 1,
+    "type": "Full Time",
+    "expirationDate": 1580545602,
+    "requiredOnDate": 1581755202,
+    "salaryRangeLow": 65000,
+    "salaryRangeHigh": 80000,
+    "salaryFixed": null,
+    "noApplied": 0,
+    "level": "Senior",
+    "industry": "",
+    "responsibilities": [
+      "Analyse the organisation's needs and requirements. Validate and develop technology investments including new enhancements and functionality. Ensure appropriate research, configuration and testing of system functionality.",
+      "Define, design, develop, implement and operate a single source of truth for all business data, including data definitions, architecture, governance and access.",
+      "Own all business systems, infrastructure and assets, including the architecture, operations, licencing and management. Support core IT systems, Network / Cloud Management & Security, and Business Applications (including CRM, ERP, HRIS, Document Management, Content Management, Business Process Management and workflow systems including SDFC, Docusign, Sage Intacct, Paylocity).",
+      "Evaluate current business systems and relevant processes and recommend better solutions to improve efficiency. Streamline business processes and applications with technology.",
+      "Collaborate and manage vendors that supply systems, infrastructure, assets and applications.",
+      "Align the company's IT infrastructure with business priorities and develop strategies to increase the company's bottom line (profitability).",
+      "Evaluate and enhance internal controls, and quality assurance related to application development and key processes. Establish security standards and proactively identify and prevent security risks.",
+      "Develop and maintain training programs for all business systems.",
+      "Develop, maintain and enforce written policies and procedures regarding all business technology systems including data processing and infrastructure.",
+      "Manage the IT and Systems teams with empathy, humility and intelligence, mentoring staff and providing direction and guidance."
+    ],
+    "qualifications": [
+      "Minimum 15+ years of relevant technical experience, including 8+ years in a leadership role. Strong Servant Leadership Philosophy.",
+      "Graduate degree in Computer Science, Computer Engineering, Information Systems, Business Administration or other related field",
+      "Demonstrated experience in solution design and enterprise architecture with experience leading technology transformation, automation and scaling strategies both at the start-up and enterprise levels. Deep understanding of IT systems and infrastructure including the universe of SaaS business products (i.e. Salesforce), data management, architecture databases, data management techniques and experience across all IT functional areas. Experience implementing and maintaining financial business systems. Experience across multiple geographies preferred.",
+      "Experience with sensitive data and creating systems that meet security and compliance requirements. Experience with SOX, PCI, SOC2 and IT audit controls of a public company.",
+      "Ability to communicate clearly and effectively with a wide range of individuals from various functional and technical backgrounds.",
+      "Comprehensive expertise in business analysis, requirement gathering, technical documentation and business process reengineering. Strong understanding of and experience with implementing and maintaining IT Service Management best practices and framework.",
+      "Effectively influence, negotiate and lead the evaluations and implementation of technology solutions. Working knowledge in Agile development environment with strong engineering principles.",
+      "Strong customer service orientation and ability to work well with diverse internal and external constituents in a team-oriented environment."
+    ],
+    "skills": ["Data Science", "Machine Learning", "B2B", "Deep Learning", "Leadership", "Management"]
+  }
+
+]
