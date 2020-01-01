@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  app:
+    build: ./
+    image: accessed-job-service
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      SERVER_PORT: 3000
+      JWT_SECRET: 0a6b944d-d2fb-46fc-a85e-0295c986cd9f
+      MONGO_HOST: mongodb://mongo/accessed-job
+    restart: always
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:3.6
+    expose:
+      - 27017
+    ports:
+      - "27017:27017"
