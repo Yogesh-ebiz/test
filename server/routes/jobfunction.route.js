@@ -6,11 +6,12 @@ const industryCtl = require('../controllers/industry.controller');
 const router = express.Router();
 module.exports = router;
 
-router.use(passport.authenticate('jwt', { session: false }))
+//router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/').post(asyncHandler(insert));
 router.route('/').get(asyncHandler(getIndustry));
 router.route('/:id').get(asyncHandler(getIndustry));
+
 
 
 async function insert(req, res) {
@@ -23,3 +24,4 @@ async function getIndustry(req, res) {
   let industry = await industryCtl.getIndustry(req.params.id);
   res.json(industry);
 }
+

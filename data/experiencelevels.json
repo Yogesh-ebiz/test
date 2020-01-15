@@ -1,0 +1,11 @@
+[
+  { "id": 1, "name": { "en": "Internships"}, "type": "INTERNSHIPS", "sequence": 1 },
+  { "id": 2, "name": { "en": "Entry Level"}, "type": "ENTRY", "sequence": 2 },
+  { "id": 3, "name": { "en": "Associate"}, "type": "ASSOCIATE", "sequence": 3 },
+  { "id": 4, "name": { "en": "Mid"}, "type": "MID", "sequence": 4 },
+  { "id": 5, "name": { "en": "Senior"}, "type": "SENIOR", "sequence": 5 },
+  { "id": 6, "name": { "en": "Management"}, "type": "MANAGEMENT", "sequence": 6 },
+  { "id": 7, "name": { "en": "Director"}, "type": "DIRECTOR", "sequence": 7 },
+  { "id": 8, "name": { "en": "Executive"}, "type": "EXECUTIVES", "sequence": 8 }
+
+]

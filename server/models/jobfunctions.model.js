@@ -21,9 +21,8 @@ const IndustrySchema = new mongoose.Schema({
     default: ""
   },
   parent: {
-    type: Object,
-    required: false,
-    default: null
+    type: Number,
+    required: false
   },
   createdAt: {
     type: Number,
@@ -32,6 +31,11 @@ const IndustrySchema = new mongoose.Schema({
   sequence: {
     type: Number,
     default: 0
+  },
+  children: {
+    type: Array,
+    required: false,
+    default: []
   }
 }, {
   versionKey: false
