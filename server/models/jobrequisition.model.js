@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const JobRequisitionSchema = new mongoose.Schema({
+
+  jobId: {
+    type: Number,
+    required: true
+  },
   title: {
     type: String,
     required: true
@@ -23,18 +30,6 @@ const JobRequisitionSchema = new mongoose.Schema({
   lastCurrencyUom: {
     type: String,
     required: true
-  },
-  city: {
-    type: String,
-    required: false
-  },
-  state: {
-    type: String,
-    required: false
-  },
-  isPromoted: {
-    type: Boolean,
-    required: false
   },
   noOfResources: {
     type: Number,
@@ -74,9 +69,9 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  industry: {
+  jobFunction: {
     type: String,
-    required: true
+    required: false
   },
   responsibilities: {
     type: Array,
@@ -88,15 +83,45 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   skills: {
     type: Array,
-    required: false
+    required: true
   },
-  createdAt: {
+  createdDate: {
     type: Number,
     default: Date.now
+  },
+  employmentType: {
+    type: String,
+    required: true
+  },
+  promotion: {
+    type: Object,
+    default: null,
+    required: false
+  },
+  isSaved: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  company: {
+    type: Object,
+    required: true
+  },
+  connection: {
+    type: Object,
+    required: false
   }
 }, {
   versionKey: false
 });
+
+JobRequisitionSchema.plugin(autoIncrement, {
+  model: 'JobRequisition',
+  field: 'jobId',
+  startAt: 100000,
+  incrementBy: 1
+});
+JobRequisitionSchema.plugin(mongoosePaginate);
 
 
 module.exports = mongoose.model('JobRequisition', JobRequisitionSchema);

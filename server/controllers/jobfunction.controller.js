@@ -1,27 +1,42 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
-const Industry = require('../models/industry.model');
+var mongoose = require('mongoose');
+const JobFunction = require('../models/jobfunctions.model');
 
-const industrySchema = Joi.object({
+const jobFunctionSchema = Joi.object({
   name: Joi.string().required()
 })
 
 
 module.exports = {
   insert,
-  getIndustry
+  getAllJobFunctions,
+  getJobFunctionById
 }
 
-async function insert(industry) {
-  return await new Industry(industry).save();
+async function insert(jobfunction) {
+  return await new Industry(jobfunction).save();
 }
 
 
-async function getIndustry(industryId, locale) {
+async function getAllJobFunctions(locale) {
+  let jobFunction = await JobFunction.aggregate([
+    { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: ('$name.' + 'en') } }
+  ]);
+  return jobFunction;
+}
 
 
 
-  industryId=(typeof industryId !== 'undefined') ? industryId : null;
-  //return await Industry.find({parent: parseInt(industryId)});
-  return await Industry.aggregate([ { $lookup: { from: "industries", localField: "_id", foreignField: "parent", as: "children" } }, { $match: { _id: parseInt(industryId) } } ])
+async function getJobFunctionById(id, locale) {
+  let jobFunction = await JobFunction.aggregate([
+    { $lookup: { from: "jobfunctions", localField: "jobFunctionId", foreignField: "parent", as: "children" } },
+    { $match: { _id: mongoose.Types.ObjectId(id) },  },
+    { $project: {
+        children: { $map: { input: '$children', as: "child", in: { _id: '$$child._id', parent: '$$child.parent', shortCode: '$$child.shortCode', icon: '$$child.icon', sequence: '$$child.sequence', name: '$$child.name.en'} } },
+        parent: 1, shortCode: 1, icon: 1, sequence: 1, name: ('$name.' + 'en') } }
+    ]);
+  //jobFunction.name = jobFunction.name['en'];
+  return jobFunction;
+
 }

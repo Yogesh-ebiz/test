@@ -12,9 +12,19 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const routes = require('../routes/index.route');
 const config = require('./config');
-const passport = require('./passport')
+const passport = require('./passport');
+const i18n = require('./i18n');
+let Response = require('../const/response');
+
+
+const locale = require("locale")
+  , supported = ["en", "en_US", "ja"]
+  , defaultLocale = "en";
 
 const app = express();
+
+
+app.use(locale(supported, defaultLocale));
 
 if (config.env === 'development') {
   app.use(logger('dev'));
@@ -28,7 +38,7 @@ if (config.frontend == 'react'){
   distDir ='../../dist/' ;
  }
 
-// 
+//
 app.use(express.static(path.join(__dirname, distDir)))
 app.use(/^((?!(api)).)*/, (req, res) => {
   res.sendFile(path.join(__dirname, distDir + '/index.html'));
@@ -39,7 +49,7 @@ console.log(distDir);
 app.use(express.static(path.join(__dirname, '../../node_modules/material-dashboard-react/dist')))
 app.use(/^((?!(api)).)*/, (req, res) => {
 res.sendFile(path.join(__dirname, '../../dist/index.html'));
-}); 
+});
 
 
 app.use(bodyParser.json());
@@ -57,14 +67,21 @@ app.use(cors());
 
 app.use(passport.initialize());
 
+app.use(i18n);
+
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 // API router
 app.use('/api/', routes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
-  const err = new httpError(404)
+  //const err = new httpError(404)
+  const err = httpError(404, "Not Found");
+
+
   return next(err);
 });
 

@@ -1,5 +1,5 @@
 [
-  { "id": 1, "name": { "en": "Internships"}, "type": "INTERNSHIPS", "sequence": 1 },
+  { "id": 1, "name": { "en": "Internship"}, "type": "INTERNSHIP", "sequence": 1 },
   { "id": 2, "name": { "en": "Entry Level"}, "type": "ENTRY", "sequence": 2 },
   { "id": 3, "name": { "en": "Associate"}, "type": "ASSOCIATE", "sequence": 3 },
   { "id": 4, "name": { "en": "Mid"}, "type": "MID", "sequence": 4 },

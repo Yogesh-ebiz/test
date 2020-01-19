@@ -1,9 +1,19 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+const { autoIncrement } = require('mongoose-plugin-autoinc');
 
-const IndustrySchema = new mongoose.Schema({
+const JobFunctionSchema = new mongoose.Schema({
+  jobFunctionId: {
+    type: Number,
+    required: true
+  },
   name: {
     type: Object,
     required: true
+  },
+  shortCode: {
+    type: String,
+    required: false
   },
   description: {
     type: String,
@@ -15,7 +25,7 @@ const IndustrySchema = new mongoose.Schema({
     required: false,
     default: ""
   },
-  image: {
+  icon: {
     type: String,
     required: false,
     default: ""
@@ -42,6 +52,16 @@ const IndustrySchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model('Industry', IndustrySchema);
+JobFunctionSchema.plugin(autoIncrement, {
+  model: 'JobFunction',
+  field: 'id',
+  startAt: 100000,
+  incrementBy: 1
+});
+
+JobFunctionSchema.plugin(mongoosePaginate);
+
+
+module.exports = mongoose.model('JobFunction', JobFunctionSchema);
 
 

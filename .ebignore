@@ -1,0 +1,10 @@
+/.idea
+/.git
+/node_modules
+/coverage
+.DS_Store
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+accessed-job-service.zip

@@ -1,0 +1,32 @@
+const bcrypt = require('bcrypt');
+const Joi = require('joi');
+const SkillType = require('../models/skilltype.model');
+
+const skillTypeSchema = Joi.object({
+  name: Joi.string().required(),
+  parent: Joi.number().required(),
+  description: Joi.string().required(),
+})
+
+
+module.exports = {
+  insert,
+  getSkillTypes,
+  getSkillTypeById
+}
+
+async function insert(skilltype) {
+  console.log('skill', skilltype)
+  return await new SkillType(skilltype).save();
+}
+
+async function getSkillTypes(locale) {
+  return await SkillType.find({});
+}
+
+
+async function getSkillTypeById(id, locale) {
+
+  id=(typeof id !== 'undefined') ? id : 0;
+  return await SkillType.aggregate([ { $lookup: { from: "skilltypes", localField: "skillTypeId", foreignField: "parent", as: "children" } }, { $match: { skillTypeId: parseInt(id) } } ])
+}

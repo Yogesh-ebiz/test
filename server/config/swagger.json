@@ -2,23 +2,19 @@
     "swagger": "2.0",
     "info": {
       "version": "1.0.0",
-      "title": "Mean Application API",
-      "description": "Mean Application API",
-      "license": {
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT"
-      }
+      "title": "Job Service API",
+      "description": "Job Service API"
     },
-    "host": "localhost:3000",
+    "host": "http://accessed-job-service.us-west-2.elasticbeanstalk.com",
     "basePath": "/api/",
     "tags": [
       {
-        "name": "Users",
-        "description": "API for users in the system"
+        "name": "Job Functions",
+        "description": "API for job functions in the system"
       },
       {
-        "name": "Auth",
-        "description": "API for auth in the system"
+        "name": "Jobs",
+        "description": "API for jobs in the system"
       }
     ],
     "schemes": [
@@ -38,7 +34,7 @@
       }
     },
     "paths": {
-      "/auth/login": {
+      "/jobfunctions": {
         "post": {
           "tags": ["Auth"],
           "description": "Login to the system",
@@ -74,7 +70,7 @@
       }
     },
     "definitions": {
-      "User": {
+      "Job Functions": {
         "required": [
           "email",
           "fullname"
@@ -102,9 +98,9 @@
           }
         }
       },
-      "Users": {
+      "Jobs": {
         "type": "array",
-        "$ref": "#/definitions/User"
+        "$ref": "#/definitions/Jobs"
       },
       "Auth": {
         "type": "object",
