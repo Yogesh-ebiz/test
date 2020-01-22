@@ -1,0 +1,10 @@
+[
+  { "id": 1, "name": { "en": "Full Time"}, "shortCode": "FULLTIME", "sequence": 1, "description": "", "icon": "" },
+  { "id": 2, "name": { "en": "Part Time"}, "shortCode": "PARTTIME", "sequence": 2, "description": "", "icon": "" },
+  { "id": 3, "name": { "en": "Freelance"}, "shortCode": "FREELANCE", "sequence": 3, "description": "", "icon": "" },
+  { "id": 4, "name": { "en": "Temporary"}, "shortCode": "TEMPORARY", "sequence": 4, "description": "", "icon": "" },
+  { "id": 5, "name": { "en": "Seasonal"}, "shortCode": "SEASONAL", "sequence": 5, "description": "", "icon": "" },
+  { "id": 6, "name": { "en": "Remote"}, "shortCode": "REMOTE", "sequence": 6, "description": "", "icon": "" },
+  { "id": 7, "name": { "en": "Contract"}, "shortCode": "CONTRACT", "sequence": 7, "description": "", "icon": "" }
+
+]
