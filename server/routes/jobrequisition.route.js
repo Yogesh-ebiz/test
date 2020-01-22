@@ -14,6 +14,9 @@ router.route('/').post(asyncHandler(importJobs));
 router.route('/search').get(asyncHandler(searchJob));
 router.route('/:id').get(asyncHandler(getJobById));
 router.route('/latest').get(asyncHandler(getLatestJobs));
+router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
+router.route('/:id/similar/company').get(asyncHandler(getSimilarCompanyJobs));
+router.route('/:id/save').post(asyncHandler(saveJob));
 
 
 async function insert(req, res) {
@@ -32,32 +35,67 @@ async function importJobs(req, res) {
 
 async function getJobById(req, res) {
   console.log('JobID: ', req.params.id)
+  console.log('locale', res.locale);
   let map = {data: null , "message": "Retrieved successfully", "status": 200};
-  let data = await jobRequisitionCtl.getJobById(req.params.id);
+  let data = await jobRequisitionCtl.getJobById(req.params.id, res.locale);
 
   res.json(new Response(data, res));
 }
 
 
 async function searchJob(req, res) {
-  //let map = {"message": "Retrieved successfully", "status": 200, data: null };
   let data = await jobRequisitionCtl.searchJob(req.query);
-  //map.data = jobs;
+  res.json(new Response(data, res));
+}
 
 
+async function getLatestJobs(req, res) {
+  let data = await jobRequisitionCtl.searchJob(req.query);
 
   //res.json(map);
   res.json(new Response(data, res));
 }
 
 
+async function getSimilarJobs(req, res) {
+  if(!req.params.id){
+    res.json(new Response(null, res));
+  }
 
-async function getLatestJobs(req, res) {
-  let map = {"message": "Retrieved successfully", "status": 200, data: null };
-  let jobs = await jobRequisitionCtl.getLatestJobs(req.query);
-  map.data = jobs;
+  let query = req.query;
+  query.id=req.params.id;
 
-  res.json(map);
+
+  let data = await jobRequisitionCtl.searchJob(query);
+  res.json(new Response(data, res));
 }
 
 
+async function getSimilarCompanyJobs(req, res) {
+  if(!req.params.id){
+    res.json(new Response(null, res));
+  }
+
+  let query = req.query;
+  query.id=req.params.id;
+
+
+  let data = await jobRequisitionCtl.getSimilarCompanyJobs(query);
+
+  res.json(new Response(data, res));
+}
+
+
+
+async function saveJob(req, res) {
+  if(!req.params.id){
+    res.json(new Response(null, res));
+  }
+
+  let userId=1;
+
+
+  let data = await jobRequisitionCtl.saveJob(userId, req.params.id);
+
+  res.json(new Response(data, res));
+}

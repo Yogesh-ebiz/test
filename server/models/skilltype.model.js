@@ -19,7 +19,10 @@ const SkillTypeSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-
+  createdDate: {
+    type: Number,
+    required: false
+  },
 
 }, {
   versionKey: false

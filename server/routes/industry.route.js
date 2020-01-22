@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
-const experienceLevelCtl = require('../controllers/experiencelevel.controller');
+const industryCtl = require('../controllers/industry.controller');
 let Response = require('../const/response');
 
 const router = express.Router();
@@ -10,7 +10,7 @@ module.exports = router;
 //router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/').post(asyncHandler(insert));
-router.route('/').get(asyncHandler(getExperienceLevels));
+router.route('/').get(asyncHandler(getAllIndustryies));
 router.route('/:id').get(asyncHandler(getExperienceLevelById));
 
 
@@ -21,14 +21,14 @@ async function insert(req, res) {
 }
 
 
-async function getExperienceLevels(req, res) {
-  let data = await experienceLevelCtl.getExperienceLevels(req.locale);
+async function getAllIndustryies(req, res) {
+  let data = await industryCtl.getIndustries(req.locale);
   res.json(new Response(data, res));
 }
 
 
 async function getExperienceLevelById(req, res) {
-  let data = await experienceLevelCtl.getExperienceLevelById(req.params.id, res.locale);
+  let data = await industryCtl.getIndustryById(req.params.id, res.locale);
   res.json(new Response(data, res));
 }
 

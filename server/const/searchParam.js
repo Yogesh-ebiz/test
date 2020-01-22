@@ -27,7 +27,6 @@ function SearchParam(filter) {
       return result;
     }, []);
 
-    console.log('company', company);
     this.query['company.id'] = { $in: company } ;
   }
 

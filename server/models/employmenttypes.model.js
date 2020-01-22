@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ExperienceLevelSchema = new mongoose.Schema({
+const EmploymentTypeSchema = new mongoose.Schema({
   name: {
     type: Object,
     required: true
@@ -11,6 +11,10 @@ const ExperienceLevelSchema = new mongoose.Schema({
     default: ""
   },
   shortCode: {
+    type: String,
+    required: false
+  },
+  icon: {
     type: String,
     required: false
   },
@@ -27,6 +31,6 @@ const ExperienceLevelSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model('ExperienceLevel', ExperienceLevelSchema);
+module.exports = mongoose.model('EmploymentType', EmploymentTypeSchema);
 
 

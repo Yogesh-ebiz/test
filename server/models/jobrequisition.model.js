@@ -22,7 +22,12 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: null
   },
-  experienceMonths: {
+  minMonthExperience: {
+    type: Number,
+    required: false,
+    default: null
+  },
+  maxMonthExperience: {
     type: Number,
     required: false,
     default: null
@@ -70,7 +75,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false
   },
   jobFunction: {
-    type: String,
+    type: Object,
     required: false
   },
   responsibilities: {

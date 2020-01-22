@@ -70,7 +70,10 @@ app.use(passport.initialize());
 app.use(i18n);
 
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+var options = {
+  explorer: true
+};
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 
 // API router

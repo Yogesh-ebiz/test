@@ -25,14 +25,14 @@ async function insert(req, res) {
 
 
 async function getAllJobFunctions(req, res) {
-  let data = await jobFunctionCtl.getAllJobFunctions();
+  let data = await jobFunctionCtl.getAllJobFunctions(res.locale);
   res.json(new Response(data, res));
 }
 
 
 
 async function getJobFunctionById(req, res) {
-  let data = await jobFunctionCtl.getJobFunctionById(req.params.id);
+  let data = await jobFunctionCtl.getJobFunctionById(req.params.id, res.locale);
   res.json(new Response(data, res));
 }
 

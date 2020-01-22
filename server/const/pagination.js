@@ -31,8 +31,8 @@ const defaultPagination = {
       sort: true,
       empty: false
     },
-    pageSize: 0,
-    pageNumber: 1,
+    pageSize: 1,
+    pageNumber: 0,
     offset: 0,
     paged: false,
     unpaged: false
@@ -41,7 +41,7 @@ const defaultPagination = {
   totalPages: 0,
   totalElements: 0,
   first: false,
-  numOfElements: 0,
+  numberOfElements: 0,
   size: 0,
   number: 0,
   empty: true
@@ -49,10 +49,12 @@ const defaultPagination = {
 
 function Pagination(pagination) {
 
+  let page = --pagination.page;
   if(pagination===null){
     return defaultPagination;
   }
 
+  console.log(pagination.docs);
   this.content = pagination.docs ? pagination.docs : [];
   this.pageable = {
     sort: {
@@ -61,7 +63,7 @@ function Pagination(pagination) {
       empty: false
     },
     pageSize: pagination.limit,
-    pageNumber: pagination.page,
+    pageNumber: page,
     offset: pagination.offset,
     paged: pagination.docs.length?true:false,
     unpaged: false
@@ -73,9 +75,9 @@ function Pagination(pagination) {
   this.totalPages = pagination.totalPages;
   this.totalElements = pagination.totalDocs;
   this.first = (pagination.page-1 == 0) ? true:false;
-  this.numOfElements = pagination.totalDocs;
+  this.numberOfElements = pagination.docs.length;
   this.size = pagination.limit;
-  this.number = pagination.page;
+  this.number = page;
   this.empty = (pagination && pagination.totalDocs.lengh) ? false : true;
 
 

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
-const ExperienceLevel = require('../models/experiencelevel.model');
+const Industry = require('../models/industry.model');
 const filterService = require('../services/filter.service');
 
 const industrySchema = Joi.object({
@@ -12,24 +12,24 @@ const industrySchema = Joi.object({
 
 module.exports = {
   insert,
-  getExperienceLevels,
-  getExperienceLevelById
+  getIndustries,
+  getIndustryById
 }
 
 async function insert(experience) {
   return await new ExperienceLevel(experience).save();
 }
 
-async function getExperienceLevels(locale) {
+async function getIndustries(locale) {
   let localeStr = locale? locale : 'en';
 
-  let data = await filterService.getAllExperienceLevels(locale)
+  let data = await filterService.getAllIndustries(locale);
   return data;
 }
 
-async function getExperienceLevelById(id, locale) {
+async function getIndustryById(id, locale) {
   let localeStr = locale? locale : 'en';
-  let data = await ExperienceLevel.aggregate([
+  let data = await Industry.aggregate([
     { $match: { id: parseInt(id) },  },
     { $project: {id: 1, description: 1, shortCode: 1, sequence: 1, name: '$name.' + localeStr }}
   ]);

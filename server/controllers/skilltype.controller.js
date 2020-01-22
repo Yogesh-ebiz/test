@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const SkillType = require('../models/skilltype.model');
+const filterService = require('../services/filter.service');
+
 
 const skillTypeSchema = Joi.object({
   name: Joi.string().required(),
@@ -21,7 +23,7 @@ async function insert(skilltype) {
 }
 
 async function getSkillTypes(locale) {
-  return await SkillType.find({});
+  return await filterService.getAllSkillTypes(locale);
 }
 
 

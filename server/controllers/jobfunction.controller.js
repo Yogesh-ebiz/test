@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 var mongoose = require('mongoose');
 const JobFunction = require('../models/jobfunctions.model');
+const filterService = require('../services/filter.service');
+
 
 const jobFunctionSchema = Joi.object({
   name: Joi.string().required()
@@ -20,23 +22,23 @@ async function insert(jobfunction) {
 
 
 async function getAllJobFunctions(locale) {
-  let jobFunction = await JobFunction.aggregate([
-    { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: ('$name.' + 'en') } }
-  ]);
-  return jobFunction;
+  let localeStr = locale? locale : 'en';
+  let data = await filterService.getAllJobFunctions(locale);
+  return data;
 }
 
 
 
 async function getJobFunctionById(id, locale) {
-  let jobFunction = await JobFunction.aggregate([
+  let localeStr = locale? locale : 'en';
+  let data = await JobFunction.aggregate([
     { $lookup: { from: "jobfunctions", localField: "jobFunctionId", foreignField: "parent", as: "children" } },
     { $match: { _id: mongoose.Types.ObjectId(id) },  },
     { $project: {
-        children: { $map: { input: '$children', as: "child", in: { _id: '$$child._id', parent: '$$child.parent', shortCode: '$$child.shortCode', icon: '$$child.icon', sequence: '$$child.sequence', name: '$$child.name.en'} } },
-        parent: 1, shortCode: 1, icon: 1, sequence: 1, name: ('$name.' + 'en') } }
+        children: { $map: { input: '$children', as: "child", in: { _id: '$$child._id', parent: '$$child.parent', shortCode: '$$child.shortCode', icon: '$$child.icon', jobFunctionId: '$$child.jobFunctionId', sequence: '$$child.sequence', name: '$$child.name.' + localeStr} } },
+        parent: 1, shortCode: 1, icon: 1, jobFunctionId: 1, sequence: 1, name: ('$name.' + localeStr) } }
     ]);
   //jobFunction.name = jobFunction.name['en'];
-  return jobFunction;
+  return data?data[0]:null;
 
 }
