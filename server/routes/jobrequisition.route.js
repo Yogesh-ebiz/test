@@ -16,7 +16,7 @@ router.route('/:id').get(asyncHandler(getJobById));
 router.route('/latest').get(asyncHandler(getLatestJobs));
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
 router.route('/:id/similar/company').get(asyncHandler(getSimilarCompanyJobs));
-router.route('/:id/save').post(asyncHandler(saveJob));
+router.route('/:id/bookmark').post(asyncHandler(addToJobBookmark));
 
 
 async function insert(req, res) {
@@ -44,13 +44,13 @@ async function getJobById(req, res) {
 
 
 async function searchJob(req, res) {
-  let data = await jobRequisitionCtl.searchJob(req.query);
+  let data = await jobRequisitionCtl.searchJob(req);
   res.json(new Response(data, res));
 }
 
 
 async function getLatestJobs(req, res) {
-  let data = await jobRequisitionCtl.searchJob(req.query);
+  let data = await jobRequisitionCtl.searchJob(req);
 
   //res.json(map);
   res.json(new Response(data, res));
@@ -66,7 +66,7 @@ async function getSimilarJobs(req, res) {
   query.id=req.params.id;
 
 
-  let data = await jobRequisitionCtl.searchJob(query);
+  let data = await jobRequisitionCtl.searchJob(req);
   res.json(new Response(data, res));
 }
 
@@ -87,7 +87,7 @@ async function getSimilarCompanyJobs(req, res) {
 
 
 
-async function saveJob(req, res) {
+async function addToJobBookmark(req, res) {
   if(!req.params.id){
     res.json(new Response(null, res));
   }
@@ -95,7 +95,7 @@ async function saveJob(req, res) {
   let userId=1;
 
 
-  let data = await jobRequisitionCtl.saveJob(userId, req.params.id);
+  let data = await jobRequisitionCtl.addToJobBookmark(userId, req.params.id);
 
   res.json(new Response(data, res));
 }

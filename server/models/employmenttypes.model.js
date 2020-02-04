@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const EmploymentTypeSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: false
+  },
   name: {
     type: Object,
     required: true

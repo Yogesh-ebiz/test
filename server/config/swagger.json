@@ -637,6 +637,15 @@
         },
         "connection": {
           "type": "object"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
         }
       },
       "xml": {

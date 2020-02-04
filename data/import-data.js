@@ -6,7 +6,6 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/accessed_job', {useNewUrlParser: true});
 const JobRequisition = require('../server/models/jobrequisition.model');
 
-
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -18,6 +17,23 @@ db.once('open', function() {
   });
 
 });
+
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'accessed',
+  password : 'admin',
+  database : 'accessed'
+});
+
+connection.connect();
+
+connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+  if (error) throw error;
+  console.log('The solution is: ', results[0].solution);
+});
+
+connection.end();
 
 
 //

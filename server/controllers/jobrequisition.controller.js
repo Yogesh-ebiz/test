@@ -1,12 +1,16 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
+const _ = require('lodash');
+
 //const pagination = require('../const/pagination');
 const JobRequisition = require('../models/jobrequisition.model');
 const Skilltype = require('../models/skilltype.model');
 const JobFunction = require('../models/jobfunctions.model');
-const _ = require('lodash');
+const JobBookmark = require('../models/jobbookmark.model');
 
-let PaginationModel = require('../const/pagination');
+
+
+let Pagination = require('../utils/job.pagination');
 let SearchParam = require('../const/searchParam');
 
 const jobRequisitionSchema = Joi.object({
@@ -33,7 +37,10 @@ const jobRequisitionSchema = Joi.object({
   promotion: Joi.object(),
   isSaved: Joi.boolean(),
   company: Joi.object(),
-  connection: Joi.object()
+  connection: Joi.object(),
+  city: Joi.string(),
+  state: Joi.string(),
+  country: Joi.string()
 });
 
 
@@ -44,8 +51,7 @@ module.exports = {
   getJobById,
   searchJob,
   getLatestJobs,
-  getSimilarCompanyJobs,
-  saveJob
+  getSimilarCompanyJobs
 }
 
 async function insert(job) {
@@ -87,6 +93,49 @@ async function getJobById(id, locale) {
 
     //jobFunction.name=jobFunction[name][localeStr];
 
+    skills = _.reduce(skills, function(res, skill, key){
+      let temp = {
+        _id: skill._id,
+        skillTypeId: skill.skillTypeId,
+        name: skill.name,
+        parent: skill.parent,
+        sequence: 0,
+        hasSkill: false
+      }
+      if(_.includes([1, 2, 3, 5, 6, 8, 10, 11], skill.skillTypeId)){
+        temp.hasSkill=true;
+      }
+
+      res.push(temp);
+      return res;
+    }, []);
+
+    job.skills = skills;
+    job.jobFunction=jobFunction[0];
+
+  } catch (error) {
+    console.log(error);
+
+  }
+
+
+
+
+  return job;
+}
+
+
+async function addToUser(id, locale) {
+
+  try {
+    let localeStr = locale? locale : 'en';
+    job = await JobRequisition.findOne({jobId: id});
+    let skills = await Skilltype.find({skillTypeId: job.skills});
+    //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
+
+
+    //jobFunction.name=jobFunction[name][localeStr];
+
 
     job.skills = skills;
     job.jobFunction=jobFunction;
@@ -103,8 +152,9 @@ async function getJobById(id, locale) {
 }
 
 
-async function searchJob(filter) {
+async function searchJob(req) {
 
+  let filter = req.query;
   let foundJob = null;
   let select = '-description -qualifications -responsibilities -skills ';
   let limit = (filter.size && filter.size>0) ? filter.size:20;
@@ -123,60 +173,52 @@ async function searchJob(filter) {
 
   if(filter.id){
     foundJob = await JobRequisition.findOne({jobId: filter.id});
-
-    if(!foundJob){
-      return new PaginationModel(null);
-    }
+    //
+    // if(!foundJob){
+    //   return new Pagination(null);
+    // }
 
     //filter.query = foundJob.title;
     filter.level = foundJob.level;
     filter.jobFunction=foundJob.jobFunction;
     filter.employmentType=foundJob.employmentType;
+    filter.employmentType=null;
   }
 
 
 
   // let select = 'title createdDate';
 
+  // if(filter.id && !result.content.length)
 
-  let result = await JobRequisition.paginate(new SearchParam(filter), options, function(err, result) {
-    // result.docs
-    // result.totalDocs = 100
-    // result.limit = 10
-    // result.page = 1;
-    // result.totalPages = 10
-    // result.hasNextPage = true
-    // result.nextPage = 2
-    // result.hasPrevPage = false
-    // result.prevPage = null
-    // result.pagingCounter = 1
 
-    console.log('result', result.page, result.limit);
-    return new PaginationModel(result);
-  });
+  let result = await JobRequisition.paginate(new SearchParam(filter), options);
 
 
 
-  if(filter.id && !result.content.length){
-    filter.employmentType=null;
+  // if(filter.id && !result.content.length){
+  //   filter.employmentType=null;
+  //
+  //
+  //   //Assuring similar Job always have data
+  //   result = await JobRequisition.paginate(new SearchParam(filter), options, function(err, result) {
+  //     console.log('result', result)
+  //     return new PaginationModel(result);
+  //   });
+  // }
 
 
-    //Assuring similar Job always have data
-    result = await JobRequisition.paginate(new SearchParam(filter), options, function(err, result) {
-      return new PaginationModel(result);
-    });
-  }
-
-
-  return result;
+  return new Pagination(result, req.locale);
 
 }
 
 
 
-async function getLatestJobs(query) {
+async function getLatestJobs(req) {
+
+  let filter = req.query
   let sortBy = {};
-  sortBy[query.sortBy] = (query.direction && query.direction=="DESC") ? -1:1;
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
 
 
   var options = {
@@ -187,23 +229,10 @@ async function getLatestJobs(query) {
     page: page
   };
 
-  console.log('search', new SearchParam(query))
 
-  let result = await JobRequisition.paginate(new SearchParam(query), options, function(err, result) {
-    // result.docs
-    // result.totalDocs = 100
-    // result.limit = 10
-    // result.page = 1;
-    // result.totalPages = 10
-    // result.hasNextPage = true
-    // result.nextPage = 2
-    // result.hasPrevPage = false
-    // result.prevPage = null
-    // result.pagingCounter = 1
-
-    return new PaginationModel(result);
+  return await JobRequisition.paginate(new SearchParam(filter), options, function(result){
+    new Pagination(result);
   });
-  return result;
 
   //return await JobRequisition.find({}).select(['-description','-qualifications', '-responsibilities']);
 }
@@ -241,34 +270,3 @@ async function getSimilarCompanyJobs(filter) {
 
 }
 
-
-async function saveJob(filter) {
-
-  let foundJob = null;
-  let select = '-description -qualifications -responsibilities -skills ';
-
-  if(filter.id){
-    foundJob = await JobRequisition.findOne({jobId: filter.id});
-
-    if(!foundJob){
-      return null;
-    }
-
-    filter.level = foundJob.level;
-    filter.jobFunction=foundJob.jobFunction;
-  }
-
-  console.log('Job ID', foundJob.id)
-  let companies = await JobRequisition.aggregate([{$match: {level: foundJob.level}}, { $group: {_id: '$company'} }  ]);
-
-  companies = _.reduce(companies, function(result, value, key){
-    let company = value._id;
-    delete company.benefits;
-    result.push(company);
-    return result;
-  }, [])
-
-
-  return companies;
-
-}

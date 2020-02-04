@@ -30,6 +30,28 @@ function SearchParam(filter) {
     this.query['company.id'] = { $in: company } ;
   }
 
+  if (filter.company && filter.company!="") {
+
+    let company = _.reduce(filter.company.split(','), function(result, value, key) {
+      result.push(parseInt(value));
+      return result;
+    }, []);
+
+    this.query['company.id'] = { $in: company } ;
+  }
+
+  if (filter.city && filter.city!="") {
+    this.query.city =  { $regex: filter.city, $options: 'i' };
+  }
+
+  if (filter.state && filter.state!="") {
+    this.query.state =  { $regex: filter.state, $options: 'i' };
+  }
+
+  if (filter.country && filter.country!="") {
+    this.query.country =  { $regex: filter.country, $options: 'i' };
+  }
+
   return this.query;
 }
 

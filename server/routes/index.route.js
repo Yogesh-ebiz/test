@@ -6,6 +6,7 @@ const jobRequisitionRoutes = require('./jobrequisition.route');
 const skillTypeRoutes = require('./skilltypes.route');
 const experienceLevelRoutes = require('./experiencelevel.route');
 const industryRoutes = require('./industry.route');
+const employmentTypeRoutes = require('./employmenttypes.route');
 const filtersRoutes = require('./filters.route');
 
 const router = express.Router(); // eslint-disable-line new-cap
@@ -16,12 +17,13 @@ router.get('/health-check', (req, res) =>
 );
 
 router.use('/auth', authRoutes);
-router.use('/user', userRoutes);
 router.use('/jobfunctions', jobFunctionsRoutes);
 router.use('/jobs', jobRequisitionRoutes);
 router.use('/skilltypes', skillTypeRoutes);
 router.use('/experiencelevels', experienceLevelRoutes);
 router.use('/industries', industryRoutes);
+router.use('/employmenttypes', employmentTypeRoutes);
+//router.use('/user', userRoutes);
 router.use('/filters', filtersRoutes);
 
 module.exports = router;

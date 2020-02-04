@@ -3,6 +3,7 @@ const JobFunction = require('../models/jobfunctions.model');
 const EmploymentTypes = require('../models/employmenttypes.model');
 const Industry = require('../models/industry.model');
 const SkillType = require('../models/skilltype.model');
+const EmploymentType = require('../models/employmenttypes.model');
 
 function getAllExperienceLevels(locale) {
   let localeStr = locale? locale : 'en';
@@ -47,10 +48,22 @@ function getAllSkillTypes(locale) {
 }
 
 
+
+function getAllEmploymentTypes(locale) {
+  let localeStr = locale? locale : 'en';
+  console.log('locale', localeStr)
+  let data = EmploymentType.aggregate([
+    { $project: {id: 1, description: 1, icon: 1, sequence: 1, createdDate:1, name: ('$name.' + localeStr)} }
+  ]);
+  return data;
+}
+
+
 module.exports = {
   getAllExperienceLevels: getAllExperienceLevels,
   getAllJobFunctions: getAllJobFunctions,
   getAllEmploymentTypes: getAllEmploymentTypes,
   getAllIndustries: getAllIndustries,
-  getAllSkillTypes: getAllSkillTypes
+  getAllSkillTypes: getAllSkillTypes,
+  getAllEmploymentTypes:getAllEmploymentTypes
 }
