@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
-const JobRequisitionSchema = new mongoose.Schema({
+const ArticleSchema = new mongoose.Schema({
 
   jobId: {
     type: Number,
@@ -132,14 +132,14 @@ const JobRequisitionSchema = new mongoose.Schema({
   versionKey: false
 });
 
-JobRequisitionSchema.plugin(autoIncrement, {
-  model: 'JobRequisition',
-  field: 'jobId',
+ArticleSchema.plugin(autoIncrement, {
+  model: 'Article',
+  field: 'articleId',
   startAt: 100000,
   incrementBy: 1
 });
-JobRequisitionSchema.plugin(mongoosePaginate);
+ArticleSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('JobRequisition', JobRequisitionSchema);
+module.exports = mongoose.model('Article', ArticleSchema);
 
