@@ -12,8 +12,9 @@ module.exports = router;
 router.route('/').post(asyncHandler(insert));
 router.route('/').post(asyncHandler(importJobs));
 router.route('/search').get(asyncHandler(searchJob));
-router.route('/:id').get(asyncHandler(getJobById));
 router.route('/latest').get(asyncHandler(getLatestJobs));
+router.route('/:id').get(asyncHandler(getJobById));
+
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
 router.route('/:id/similar/company').get(asyncHandler(getSimilarCompanyJobs));
 router.route('/:id/bookmark').post(asyncHandler(addToJobBookmark));

@@ -40,9 +40,11 @@ const jobRequisitionSchema = Joi.object({
   connection: Joi.object(),
   city: Joi.string(),
   state: Joi.string(),
-  country: Joi.string()
+  country: Joi.string(),
+  isExternal: Joi.boolean(),
+  externalUrl: Joi.string()
 });
-
+@
 
 
 module.exports = {
@@ -156,7 +158,7 @@ async function searchJob(req) {
 
   let filter = req.query;
   let foundJob = null;
-  let select = '-description -qualifications -responsibilities -skills ';
+  let select = '-description -qualifications -responsibilities';
   let limit = (filter.size && filter.size>0) ? filter.size:20;
   let page = (filter.page && filter.page==0) ? filter.page:1;
   let sortBy = {};
@@ -193,6 +195,23 @@ async function searchJob(req) {
 
 
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
+  let docs = [];
+
+  let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+  let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+
+  _.forEach(result.docs, function(job){
+    var skills = _.reduce(job.skills, function(res, skill){
+      let find = _.filter(listOfSkills, { 'skillTypeId': skill});
+      if(find){
+        res.push(find[0]);
+      }
+      return res;
+    }, [])
+
+    job.skills = skills;
+  })
+
 
 
 

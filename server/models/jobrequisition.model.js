@@ -127,6 +127,15 @@ const JobRequisitionSchema = new mongoose.Schema({
   country: {
     type: String,
     required: true
+  },
+  isExternal: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  externalUrl: {
+    type: String,
+    required: false
   }
 }, {
   versionKey: false
