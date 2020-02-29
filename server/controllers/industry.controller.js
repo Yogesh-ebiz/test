@@ -12,7 +12,7 @@ const industrySchema = Joi.object({
 
 module.exports = {
   insert,
-  getIndustries,
+  getAllIndustries,
   getIndustryById
 }
 
@@ -20,10 +20,10 @@ async function insert(experience) {
   return await new ExperienceLevel(experience).save();
 }
 
-async function getIndustries(locale) {
+async function getAllIndustries(query, locale) {
   let localeStr = locale? locale : 'en';
 
-  let data = await filterService.getAllIndustries(locale);
+  let data = await filterService.getAllIndustries(query, locale);
   return data;
 }
 

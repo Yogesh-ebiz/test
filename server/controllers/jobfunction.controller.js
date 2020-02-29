@@ -21,9 +21,9 @@ async function insert(jobfunction) {
 }
 
 
-async function getAllJobFunctions(locale) {
+async function getAllJobFunctions(query, locale) {
   let localeStr = locale? locale : 'en';
-  let data = await filterService.getAllJobFunctions(locale);
+  let data = await filterService.getAllJobFunctions(query, locale);
   return data;
 }
 

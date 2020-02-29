@@ -35,16 +35,17 @@ const jobRequisitionSchema = Joi.object({
   industry: Joi.string(),
   employmentType: Joi.string(),
   promotion: Joi.object(),
-  isSaved: Joi.boolean(),
+  hasSaved: Joi.boolean(),
   company: Joi.object(),
   connection: Joi.object(),
   city: Joi.string(),
   state: Joi.string(),
   country: Joi.string(),
   isExternal: Joi.boolean(),
-  externalUrl: Joi.string()
+  externalUrl: Joi.string(),
+  hasApplied: Joi.boolean()
 });
-@
+
 
 
 module.exports = {
@@ -94,6 +95,7 @@ async function getJobById(id, locale) {
 
 
     //jobFunction.name=jobFunction[name][localeStr];
+
 
     skills = _.reduce(skills, function(res, skill, key){
       let temp = {
@@ -174,17 +176,18 @@ async function searchJob(req) {
 
 
   if(filter.id){
-    foundJob = await JobRequisition.findOne({jobId: filter.id});
+    console.log('ID', filter.id)
+    //foundJob = await JobRequisition.findOne({jobId: filter.id});
     //
     // if(!foundJob){
     //   return new Pagination(null);
     // }
 
     //filter.query = foundJob.title;
-    filter.level = foundJob.level;
-    filter.jobFunction=foundJob.jobFunction;
-    filter.employmentType=foundJob.employmentType;
-    filter.employmentType=null;
+    // filter.level = foundJob.level;
+    // filter.jobFunction=foundJob.jobFunction;
+    // filter.employmentType=foundJob.employmentType;
+    // filter.employmentType=null;
   }
 
 

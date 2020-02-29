@@ -20,10 +20,11 @@ async function insert(employmenttype) {
   return await new EmploymentType(employmenttype).save();
 }
 
-async function getEmploymentTypes(locale) {
+async function getEmploymentTypes(query, locale) {
   let localeStr = locale? locale : 'en';
 
-  let data = await filterService.getAllExperienceLevels(locale)
+  console.log('getEmploymentTypes', query)
+  let data = await filterService.getAllEmploymentTypes(query, locale)
   return data;
 }
 

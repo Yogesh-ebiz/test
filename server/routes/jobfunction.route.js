@@ -10,7 +10,7 @@ module.exports = router;
 //router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/').post(asyncHandler(insert));
-router.route('/').get(asyncHandler(getAllJobFunctions));
+router.route('/search').get(asyncHandler(getAllJobFunctions));
 router.route('/:id').get(asyncHandler(getJobFunctionById));
 
 
@@ -25,7 +25,7 @@ async function insert(req, res) {
 
 
 async function getAllJobFunctions(req, res) {
-  let data = await jobFunctionCtl.getAllJobFunctions(res.locale);
+  let data = await jobFunctionCtl.getAllJobFunctions(req.query, res.locale);
   res.json(new Response(data, res));
 }
 

@@ -65,6 +65,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  hasApplied: {
+    type: Boolean,
+    default: false
+  },
   noApplied: {
     type: Number,
     required: false,
@@ -103,7 +107,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: null,
     required: false
   },
-  isSaved: {
+  hasSaved: {
     type: Boolean,
     default: false,
     required: false

@@ -23,7 +23,8 @@ async function insert(skilltype) {
 }
 
 async function getSkillTypes(locale) {
-  return await filterService.getAllSkillTypes(locale);
+  let query = req.query;
+  return await filterService.getAllSkillTypes(query, locale);
 }
 
 

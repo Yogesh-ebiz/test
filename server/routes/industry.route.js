@@ -10,7 +10,7 @@ module.exports = router;
 //router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/').post(asyncHandler(insert));
-router.route('/').get(asyncHandler(getAllIndustryies));
+router.route('/search').get(asyncHandler(getAllIndustryies));
 router.route('/:id').get(asyncHandler(getExperienceLevelById));
 
 
@@ -22,7 +22,7 @@ async function insert(req, res) {
 
 
 async function getAllIndustryies(req, res) {
-  let data = await industryCtl.getIndustries(req.locale);
+  let data = await industryCtl.getAllIndustries(req.query, req.locale);
   res.json(new Response(data, res));
 }
 
