@@ -8,6 +8,8 @@ const industryRoutes = require('./industry.route');
 const employmentTypeRoutes = require('./employmenttypes.route');
 const userRoutes = require('./user.route');
 const applicationRoutes = require('./application.route');
+const workflowRoutes = require('./workflow.route');
+
 
 const filterRoutes = require('./filter.route');
 
@@ -29,6 +31,7 @@ router.use('/industries', industryRoutes);
 router.use('/employmenttypes', employmentTypeRoutes);
 router.use('/users', userRoutes);
 router.use('/applications', applicationRoutes);
+router.use('/workflows', workflowRoutes);
 
 router.use('/filters', filterRoutes);
 

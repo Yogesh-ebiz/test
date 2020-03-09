@@ -21,5 +21,9 @@
 	"experiencelevels_retrieved_successful": "Experience Levels retrieved successfully",
 	"Industries_retrieved_successful": "Industries_retrieved_successful",
 	"expereiencelevels_retrieved_successful": "expereiencelevels_retrieved_successful",
-	"locations_retrieved_successful": "locations_retrieved_successful"
+	"locations_retrieved_successful": "locations_retrieved_successful",
+	"workflow_added_successful": "workflow_added_successful",
+	"workflow_retrieved_successful": "workflow_retrieved_successful",
+	"workflows_retrieved_successful": "workflows_retrieved_successful",
+	"workflow_removed_successful": "workflow_removed_successful"
 }

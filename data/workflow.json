@@ -1,0 +1,6 @@
+[
+  {"workflowId": 0, "title": "Master Workflow", "workflow":["APPLY", "SCREEN", "TEST", "INTERVIEW1", "INTERVIEW2", "OFFER"], "isMaster": true, "status": "ACTIVE"},
+  {"workflowId": 1, "title": "Sales Team Workflow", "workflow":["APPLY", "SCREEN", "TEST", "INTERVIEW1", "INTERVIEW2", "OFFER"], "isMaster": false, "status": "ACTIVE", "isPrimary": true, "function": "SNM", "partyId": 1, "companyId": 19},
+  {"workflowId": 2, "title": "Development Workflow", "workflow":["APPLY", "SCREEN", "TEST", "INTERVIEW1", "OFFER"], "isMaster": false, "status": "ACTIVE", "isPrimary": true, "function": "SNM", "partyId": 2, "companyId": 19}
+]
+
