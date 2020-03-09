@@ -42,7 +42,6 @@ function getAllEmploymentTypes(filter, locale) {
   let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
   let data = null;
 
-  console.log('key', filter)
   let propLocale = '$name.'+localeStr;
   if(keyword){
     console.log('key', keyword)
@@ -66,7 +65,6 @@ function getAllIndustries(filter, locale) {
   let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
   let data = null;
 
-  console.log('key', filter)
   let propLocale = '$name.'+localeStr;
   if(keyword){
     console.log('key', keyword)

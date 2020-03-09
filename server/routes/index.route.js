@@ -23,7 +23,7 @@ router.use('/skilltypes', skillTypeRoutes);
 router.use('/experiencelevels', experienceLevelRoutes);
 router.use('/industries', industryRoutes);
 router.use('/employmenttypes', employmentTypeRoutes);
-//router.use('/user', userRoutes);
+router.use('/users', userRoutes);
 router.use('/filters', filtersRoutes);
 
 module.exports = router;

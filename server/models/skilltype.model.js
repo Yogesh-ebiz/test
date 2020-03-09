@@ -8,7 +8,7 @@ const SkillTypeSchema = new mongoose.Schema({
     required: true
   },
   name: {
-    type: String,
+    type: Object,
     required: true
   },
   parent: {
@@ -23,7 +23,10 @@ const SkillTypeSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-
+  icon: {
+    type: String,
+    required: false
+  }
 }, {
   versionKey: false
 });

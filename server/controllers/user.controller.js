@@ -1,73 +1,111 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 //const pagination = require('../const/pagination');
-const JobBookmark = require('../models/jobbookmark.model')
+const Application = require('../models/application.model')
+const Bookmark = require('../models/bookmark.model')
 const _ = require('lodash');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills} = require('../services/party.service');
 
-let PaginationModel = require('../utils/pagination');
-let SearchParam = require('../const/searchParam');
+let Pagination = require('../utils/pagination');
+let ApplicationSearchParam = require('../const/applicationSearchParam');
+let BookmarkSearchParam = require('../const/bookmarkSearchParam');
 
-const JobBookmarkSchema = Joi.object({
-  id: Joi.number(),
-  userId: Joi.number().required(),
-  jobId: Joi.number().required(),
-  createdDate: Joi.number(),
-  status: Joi.string().required()
-});
+const {findApplicationByUserId} = require('../services/application.service');
 
 
 
 module.exports = {
-  getJobsByUserId,
-  addToJobBookmark
+  getApplicationsByUserId,
+  getBookmarksByUserId
 }
 
 
-async function getJobsByUserId(id, locale) {
-
-  let job, skills=[];
-  try {
-    let localeStr = locale? locale : 'en';
-    job = await JobRequisition.findOne({jobId: id});
-    let skills = await Skilltype.find({skillTypeId: job.skills});
-    //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-    let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
-
-
-    //jobFunction.name=jobFunction[name][localeStr];
-
-
-    job.skills = skills;
-    job.jobFunction=jobFunction;
-
-  } catch (error) {
-    console.log(error);
-
-  }
 
 
 
+async function getApplicationsByUserId(currentUserId, filter) {
 
-  return job;
-}
-
-
-async function addToJobBookmark(userId, jobId) {
-
-  let foundJob = await JobRequisition.findOne({jobId: filter.id});
-
-  if(!foundJob){
+  if(currentUserId==null || filter==null){
     return null;
   }
 
-  let bookmark = await JobBookmark.find({userId: userId, jobId: jobId});
-  if (!bookmark) {
-    bookmark = await new JobRequisition({userId:userId, jobId: jobId}).save();
-  }else if (bookmark && bookmark.status==='INACTIVE'){
-    bookmark.status="ACTIVE";
-    bookmark = await JobBookmark.save(bookmark);
+  let result = null;
+  try {
+
+      let response = await getPersonById(currentUserId);
+      let currentParty = response.data.data;
+
+
+      if(isPartyActive(currentParty)) {
+        console.debug('isActive')
+        let select = '';
+        let limit = (filter.size && filter.size > 0) ? filter.size : 20;
+        let page = (filter.page && filter.page == 0) ? filter.page : 1;
+        let sortBy = {};
+        sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+
+        let options = {
+          select: select,
+          sort: sortBy,
+          lean: true,
+          limit: limit,
+          page: parseInt(filter.page) + 1
+        };
+
+        filter.partyId=currentParty.id;
+
+        result = await Application.paginate(new ApplicationSearchParam(filter), options);
+
+      }
+
+  } catch (error) {
+    console.log(error);
   }
 
-  return bookmark;
+  return new Pagination(result);
 
 }
+
+async function getBookmarksByUserId(currentUserId, filter) {
+
+  if(currentUserId==null || filter==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if(isPartyActive(currentParty)) {
+      console.debug('isActive')
+      let select = '';
+      let limit = (filter.size && filter.size > 0) ? filter.size : 20;
+      let page = (filter.page && filter.page == 0) ? filter.page : 1;
+      let sortBy = {};
+      sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+
+      let options = {
+        select: select,
+        sort: sortBy,
+        lean: true,
+        limit: limit,
+        page: parseInt(filter.page) + 1
+      };
+
+      filter.partyId=currentParty.id;
+
+      result = await Bookmark.paginate(new BookmarkSearchParam(filter), options);
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+
+}
+

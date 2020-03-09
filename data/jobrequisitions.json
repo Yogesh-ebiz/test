@@ -56,28 +56,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 2,
-      "groupName": "Amazon",
-      "logoImageUrl": "amazon.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.2,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "San Francisco",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 215000,
-      "companyImages": ["amazon.jpg", "amazon2.jpg", "amazon3.jpg", "amazon4.jpg", "amazon5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 16,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -133,28 +112,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 1,
-      "groupName": "eBay",
-      "logoImageUrl": "ebay.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.2,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Los Angeles",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["ebay.jpg", "ebay2.jpg", "ebay3.jpg", "ebay4.jpg", "ebay5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 15,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -209,28 +167,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 1,
-      "groupName": "eBay",
-      "logoImageUrl": "ebay.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.2,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Los Angeles",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["ebay.jpg", "ebay2.jpg", "ebay3.jpg", "ebay4.jpg", "ebay5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 15,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -287,28 +224,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 1,
-      "groupName": "eBay",
-      "logoImageUrl": "ebay.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.2,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "San Francisco",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["ebay.jpg", "ebay2.jpg", "ebay3.jpg", "ebay4.jpg", "ebay5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 15,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -363,28 +279,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 1,
-      "groupName": "eBay",
-      "logoImageUrl": "ebay.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.2,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "San Jose",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["ebay.jpg", "ebay2.jpg", "ebay3.jpg", "ebay4.jpg", "ebay5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 15,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -439,28 +334,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 2,
-      "groupName": "Amazon",
-      "logoImageUrl": "amazon.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.8,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "San Jose",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 215000,
-      "companyImages": ["amazon.jpg", "amazon2.jpg", "amazon3.jpg", "amazon4.jpg", "amazon5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 16,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -516,28 +390,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 2,
-      "groupName": "Amazon",
-      "logoImageUrl": "amazon.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.8,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "San Jose",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 215000,
-      "companyImages": ["amazon.jpg", "amazon2.jpg", "amazon3.jpg", "amazon4.jpg", "amazon5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 16,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -593,28 +446,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 2,
-      "groupName": "Amazon",
-      "logoImageUrl": "amazon.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.8,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "San Jose",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 215000,
-      "companyImages": ["amazon.jpg", "amazon2.jpg", "amazon3.jpg", "amazon4.jpg", "amazon5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 16,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -670,28 +502,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 2,
-      "groupName": "Amazon",
-      "logoImageUrl": "amazon.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.8,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "San Jose",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 215000,
-      "companyImages": ["amazon.jpg", "amazon2.jpg", "amazon3.jpg", "amazon4.jpg", "amazon5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 16,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -747,28 +558,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -824,28 +614,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -901,28 +670,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -978,28 +726,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1055,28 +782,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1132,28 +838,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1209,28 +894,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1286,28 +950,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 3,
-      "groupName": "Google",
-      "logoImageUrl": "google.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.9,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Mountain View",
-        "state": "CA",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 17,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1363,28 +1006,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 4,
-      "groupName": "Microsoft",
-      "logoImageUrl": "microsoft.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.5,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "Seattle",
-        "state": "Washington",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 18,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1440,28 +1062,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 4,
-      "groupName": "Microsoft",
-      "logoImageUrl": "microsoft.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.5,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Seattle",
-        "state": "Washington",
-        "country": "US"
-      },
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 18,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1517,28 +1118,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 4,
-      "groupName": "Microsoft",
-      "logoImageUrl": "microsoft.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.5,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Seattle",
-        "state": "Washington",
-        "country": "US"
-      },
-      "noFollowers": 142000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 18,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1594,28 +1174,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 4,
-      "groupName": "Microsoft",
-      "logoImageUrl": "microsoft.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.5,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Seattle",
-        "state": "Washington",
-        "country": "US"
-      },
-      "noFollowers": 142000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 4,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1671,36 +1230,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 4,
-      "groupName": "Microsoft",
-      "logoImageUrl": "microsoft.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.5,
-      "hasFollowed": false,
-      "address": {
-        "id": 1,
-        "city": "Seattle",
-        "state": "Washington",
-        "country": "US"
-      },
-      "noFollowers": 142000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ],
-      "noFollowers": 120000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 18,
     "connection": {
       "noConnection": 3,
       "list": [
@@ -1759,28 +1289,7 @@
       "createdDate": 1578887589,
       "hasExpired": true
     },
-    "company": {
-      "id": 4,
-      "groupName": "Microsoft",
-      "logoImageUrl": "microsoft.png",
-      "coverImageUrl": "cover.png",
-      "rating": 4.5,
-      "hasFollowed": true,
-      "address": {
-        "id": 1,
-        "city": "Seattle",
-        "state": "Washington",
-        "country": "US"
-      },
-      "noFollowers": 142000,
-      "companyImages": ["office.jpg", "office2.jpg", "office3.jpg", "office4.jpg", "office5.jpg"],
-      "benefits": [
-        {"id": 1, "name": "Dental Insurance"},
-        {"id": 2, "name": "Medical Insurance"},
-        {"id": 3, "name": "Vision Insurance"},
-        {"id": 4, "name": "401(K) Match"}
-      ]
-    },
+    "company": 18,
     "connection": {
       "noConnection": 3,
       "list": [

@@ -1,4 +1,14 @@
 {
-	"404": "404",
-	"hello": "hello"
+	"400": "NOT PERMITTED",
+	"401": "UNAUTHORIZED",
+	"403": "FORBIDDEN",
+	"404": "NOT FOUND",
+	"500": "SERVER ERROR",
+	"not_found": "No record found",
+	"bad_input": "Bad Input",
+	"application_submit_successful": "Application submitted successfully",
+	"bookmark_saved_successful": "Bookmark saved successfully",
+	"bookmark_removed_successful": "Bookmark removed successfully",
+	"applications_retrieved_successful": "applications_retrieved_successful",
+	"bookmarks_retrieved_successful": "bookmarks_retrieved_successful"
 }

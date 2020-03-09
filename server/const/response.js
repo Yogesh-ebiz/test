@@ -1,9 +1,9 @@
-function Response(data, res) {
+function Response(data, message, res) {
 
   let defaultStatus = 200;
 
   this.data  = data  || null;
-  this.message = data? 'Retrieved Successfully': 'Not Found';
+  this.message = res.__(message);
   this.status = 200;
 
 

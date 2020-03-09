@@ -1,0 +1,6 @@
+module.exports = {
+  REQUIRED: 'REQUIRED',
+  CONFIRMED: 'CONFIRMED',
+  DECLINED: 'DECLINED',
+  DELETED: 'DELETED'
+};

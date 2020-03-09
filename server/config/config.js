@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // define validation for all the env vars
 const envVarsSchema = Joi.object({
+  BASE_URL: Joi.string().default('https://www.accessed.com/'),
   NODE_ENV: Joi.string()
     .allow(['development', 'production', 'test', 'provision'])
     .default('development'),
@@ -39,7 +40,8 @@ const config = {
   mongo: {
     host: envVars.MONGO_HOST,
     port: envVars.MONGO_PORT
-  }
+  },
+  base_url: envVars.BASE_URL
 };
 
 module.exports = config;

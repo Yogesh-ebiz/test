@@ -1,12 +1,21 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+const statusEnum = require('../const/statusEnum');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills} = require('../services/party.service');
+const {getListofSkillTypes} = require('../services/skilltype.service');
+const {findApplicationById, applyJob} = require('../services/application.service');
+const {findBookById, addBookById, removeBookById} = require('../services/bookmark.service');
+
+
 
 //const pagination = require('../const/pagination');
 const JobRequisition = require('../models/jobrequisition.model');
 const Skilltype = require('../models/skilltype.model');
 const JobFunction = require('../models/jobfunctions.model');
-const JobBookmark = require('../models/jobbookmark.model');
+const Bookmark = require('../models/bookmark.model');
+const PartySkill = require('../models/party_skill.model');
+const Application = require('../models/application.model');
 
 
 
@@ -46,6 +55,15 @@ const jobRequisitionSchema = Joi.object({
   hasApplied: Joi.boolean()
 });
 
+const applicationSchema = Joi.object({
+  jobId: Joi.number().required(),
+  partyId: Joi.number().required(),
+  phoneNumber: Joi.string().required(),
+  email: Joi.string().required(),
+  availableDate: Joi.number().required(),
+  attachment: Joi.string().allow('').optional()
+});
+
 
 
 module.exports = {
@@ -54,7 +72,10 @@ module.exports = {
   getJobById,
   searchJob,
   getLatestJobs,
-  getSimilarCompanyJobs
+  getSimilarCompanyJobs,
+  applyJobById,
+  addBookmark,
+  removeBookmark
 }
 
 async function insert(job) {
@@ -74,56 +95,66 @@ async function importJobs(type, jobs) {
 }
 
 
+async function getJobById(currentUserId, jobId, locale) {
 
+  if(!jobId || !currentUserId){
+    return null;
+  }
 
-
-async function getJobById(id, locale) {
-
-  id=(typeof id !== 'undefined') ? id : null;
-  // let job = await JobRequisition.find({jobId: id}).then(function(result){
-  //   Skilltype.find({skillTypeId: {$in: result.skills}}, function(err, skills){
-  //     console.log(skills)
-  //   });
-
-  let job, skills=[];
+  let job;
   try {
     let localeStr = locale? locale : 'en';
-    job = await JobRequisition.findOne({jobId: id});
-    let skills = await Skilltype.find({skillTypeId: job.skills});
-    //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-    let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
+    job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+
+    if(job) {
+
+      let response = await getPersonById(currentUserId);
+      let currentParty = response.data.data;
+      // console.log('currentParty', response.data)
+
+      response = await getCompanyById(job.company);
+      job.company = response.data.data;
 
 
-    //jobFunction.name=jobFunction[name][localeStr];
 
 
-    skills = _.reduce(skills, function(res, skill, key){
-      let temp = {
-        _id: skill._id,
-        skillTypeId: skill.skillTypeId,
-        name: skill.name,
-        parent: skill.parent,
-        sequence: 0,
-        hasSkill: false
+
+      //Security Check if user is part of meeting attendees that is ACTIVE.
+      if (isPartyActive(currentParty)) {
+        let partySkills = await PartySkill.find({partyId: currentParty.id});
+        partySkills = _.map(partySkills, "skillTypeId");
+        console.log('partyskills', partySkills)
+
+        let jobSkills = await getListofSkillTypes(job.skills);
+        // console.log('jobSkils', jobSkills)
+
+
+        //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
+        let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
+
+
+        skills = _.reduce(jobSkills, function(res, skill, key){
+          let temp = _.clone(skill);
+
+          if(_.includes(partySkills, skill.skillTypeId)){
+            temp.hasSkill=true;
+          } else {
+            temp.hasSkill=false;
+          }
+
+          res.push(temp);
+          return res;
+        }, []);
+
+        job.skills = skills;
+        job.jobFunction=jobFunction[0];
+
       }
-      if(_.includes([1, 2, 3, 5, 6, 8, 10, 11], skill.skillTypeId)){
-        temp.hasSkill=true;
-      }
-
-      res.push(temp);
-      return res;
-    }, []);
-
-    job.skills = skills;
-    job.jobFunction=jobFunction[0];
+    }
 
   } catch (error) {
     console.log(error);
-
   }
-
-
-
 
   return job;
 }
@@ -137,9 +168,7 @@ async function addToUser(id, locale) {
     let skills = await Skilltype.find({skillTypeId: job.skills});
     //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
 
-
     //jobFunction.name=jobFunction[name][localeStr];
-
 
     job.skills = skills;
     job.jobFunction=jobFunction;
@@ -148,9 +177,6 @@ async function addToUser(id, locale) {
     console.log(error);
 
   }
-
-
-
 
   return job;
 }
@@ -292,3 +318,121 @@ async function getSimilarCompanyJobs(filter) {
 
 }
 
+
+
+
+async function applyJobById(currentUserId, application) {
+
+  application = await Joi.validate(application, applicationSchema, { abortEarly: false });
+
+  if(currentUserId==null || application==null){
+    return null;
+  }
+
+  let result;
+  try {
+    job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+
+    if(job) {
+
+      let response = await getPersonById(currentUserId);
+      let currentParty = response.data.data;
+      // console.log('currentParty', currentParty)
+
+      //Security Check if user is part of meeting attendees that is ACTIVE.
+      if (isPartyActive(currentParty)) {
+
+        result = await findApplicationById(currentParty.id, application.jobId);
+        if(!result){
+          application.attachment = application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf");
+          result = await applyJob(application);
+        }
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+
+async function addBookmark(currentUserId, jobId) {
+
+  console.log('saveJobById')
+  if(currentUserId==null || jobId==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+    job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+
+    if(job) {
+      console.log('job', job)
+      let response = await getPersonById(currentUserId);
+      let currentParty = response.data.data;
+      console.log('currentParty', currentParty)
+
+      //Security Check if user is part of meeting attendees that is ACTIVE.
+      if (isPartyActive(currentParty)) {
+
+        result = await findBookById(currentParty.id, jobId);
+
+        if(!result) {
+          result = await addBookById(currentParty.id, jobId);
+        }
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+
+async function removeBookmark(currentUserId, jobId) {
+
+  if(currentUserId==null || jobId==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    //Security Check if user is part of meeting attendees that is ACTIVE.
+    if (isPartyActive(currentParty)) {
+      result = await findBookById(currentParty.id, jobId);
+
+      if(result){
+        let deleted = await removeBookById(currentParty.id, jobId);
+
+        if(deleted && deleted.deletedCount>0){
+          result.status=statusEnum.DELETED;
+        } else {
+          result = null;
+        }
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
