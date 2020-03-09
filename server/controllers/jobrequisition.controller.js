@@ -669,7 +669,7 @@ async function applyJobById(currentUserId, application ) {
             await savedApplication.save();
 
             console.log(savedApplication)
-            let meta = {jobId: application.jobId, jobTitle: job.title, applicationId: savedApplication.applicationId, applicantId: currentUserId, createdBy: job.createdBy};
+            let meta = {companyId: job.company, jobId: application.jobId, jobTitle: job.title, applicationId: savedApplication.applicationId, applicantId: currentUserId, createdBy: job.createdBy};
             await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
             //TODO: Call Follow API
