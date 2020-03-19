@@ -249,7 +249,7 @@ async function searchJob(req) {
     job.skills = skills;
   })
 
-  
+
   // if(filter.id && !result.content.length){
   //   filter.employmentType=null;
   //
@@ -309,17 +309,11 @@ async function getSimilarCompanyJobs(filter) {
     filter.jobFunction=foundJob.jobFunction;
   }
 
-  console.log('Job ID', foundJob.id)
-  let companies = await JobRequisition.aggregate([{$match: {level: foundJob.level}}, { $group: {_id: '$company'} }  ]);
-
-  companies = _.reduce(companies, function(result, value, key){
-    let company = value._id;
-    delete company.benefits;
-    result.push(company);
-    return result;
-  }, [])
+  let similarCompanies = await JobRequisition.aggregate([{$match: {level: foundJob.level}}, { $group: {_id: '$company'} }  ]);
 
 
+  let res = await searchParties(_.uniq(_.map(similarCompanies, '_id')), partyEnum.COMPANY);
+  let companies = res.data.data.content;
   return companies;
 
 }
