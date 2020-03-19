@@ -22,9 +22,8 @@ async function insert(skilltype) {
   return await new SkillType(skilltype).save();
 }
 
-async function getSkillTypes(locale) {
-  let query = req.query;
-  return await filterService.getAllSkillTypes(query, locale);
+async function getSkillTypes(filter, locale) {
+  return await filterService.getAllSkillTypes(filter, locale);
 }
 
 

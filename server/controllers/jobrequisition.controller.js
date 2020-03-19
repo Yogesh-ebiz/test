@@ -115,15 +115,11 @@ async function getJobById(currentUserId, jobId, locale) {
       response = await getCompanyById(job.company);
       job.company = response.data.data;
 
-
-
-
-
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
         let partySkills = await PartySkill.find({partyId: currentParty.id});
         partySkills = _.map(partySkills, "skillTypeId");
-        console.log('partyskills', partySkills)
+        // console.log('partyskills', partySkills)
 
         let jobSkills = await getListofSkillTypes(job.skills);
         // console.log('jobSkils', jobSkills)
@@ -376,7 +372,7 @@ async function addBookmark(currentUserId, jobId) {
       console.log('job', job)
       let response = await getPersonById(currentUserId);
       let currentParty = response.data.data;
-      console.log('currentParty', currentParty)
+      // console.log('currentParty', currentParty)
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {

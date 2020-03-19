@@ -1,5 +1,5 @@
 {
-  "name": "accessed-job-service",
+  "name": "accessed-news-service",
   "version": "0.0.1",
   "scripts": {
     "ng": "ng",
@@ -24,6 +24,7 @@
     "@angular/platform-browser-dynamic": "^8.2.14",
     "@angular/router": "^8.2.14",
     "aws-sdk": "^2.603.0",
+    "axios": "^0.19.2",
     "bcrypt": "^3.0.2",
     "body-parser": "^1.18.2",
     "chalk": "^3.0.0",
@@ -53,6 +54,7 @@
     "mongoose-plugin-autoinc": "^1.1.9",
     "morgan": "^1.9.1",
     "mysql": "^2.18.1",
+    "newsapi": "^2.4.0",
     "nodemon": "^1.17.5",
     "npm": "^6.13.6",
     "passport": "^0.4.0",

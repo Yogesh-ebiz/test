@@ -16,23 +16,23 @@ router.route('/:id').get(asyncHandler(getJobFunctionById));
 
 
 async function insert(req, res) {
-  let jobfunction = await jobFunctionCtl.insert(req.body);
+  let data = await jobFunctionCtl.insert(req.body);
 
-  res.json(new Response(data, res));
-  res.json(jobfunction);
+  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
 }
 
 
 
 async function getAllJobFunctions(req, res) {
   let data = await jobFunctionCtl.getAllJobFunctions(req.query, res.locale);
-  res.json(new Response(data, res));
+
+  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
 }
 
 
 
 async function getJobFunctionById(req, res) {
   let data = await jobFunctionCtl.getJobFunctionById(req.params.id, res.locale);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
 }
 

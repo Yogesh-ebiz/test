@@ -17,19 +17,21 @@ router.route('/:id').get(asyncHandler(getSkillTypeById));
 
 async function insert(req, res) {
   let data = await skillTypeCtl.insert(req.body);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
 }
 
 
 async function getSkillTypes(req, res) {
-  let data = await skillTypeCtl.getSkillTypes();
-  res.json(new Response(data, res));
+  let filter = req.query;
+  let data = await skillTypeCtl.getSkillTypes(filter, res.locale);
+
+  res.json(new Response(data, data?'skilltypes_retrieved_successful':'not_found', res));
 }
 
 
 
 async function getSkillTypeById(req, res) {
   let data = await skillTypeCtl.getSkillTypeById(req.params.id);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
 }
 

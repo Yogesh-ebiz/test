@@ -65,7 +65,7 @@ function ApplicationSearchParam(filter) {
   if (filter.country && filter.country!="") {
     this.query.country =  { $regex: filter.country, $options: 'i' };
   }
-  
+
   return this.query;
 }
 

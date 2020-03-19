@@ -26,16 +26,13 @@ router.route('/:id/bookmark').delete(asyncHandler(removeBookmark));
 
 async function insert(req, res) {
   let map = {"message": "Created successfully", "status": 200, data: null };
-  let job = await jobRequisitionCtl.insert(req.body);
-  map.data = job;
-  res.json(map);
+  let data = await jobRequisitionCtl.insert(req.body);
+  res.json(new Response(data, data?'job_created_successful':'not_found', res));
 }
 
 async function importJobs(req, res) {
-  let map = {"message": "Import successfully", "status": 200, data: null };
-  let job = await jobRequisitionCtl.importJobs(req.query.type, req.body);
-  map.data = job;
-  res.json(map);
+  let data = await jobRequisitionCtl.importJobs(req.query.type, req.body);
+  res.json(new Response(data, data?'jobs_imported_successful':'not_found', res));
 }
 
 async function getJobById(req, res) {
@@ -53,7 +50,7 @@ async function getJobById(req, res) {
 
 async function searchJob(req, res) {
   let data = await jobRequisitionCtl.searchJob(req);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
 
@@ -61,7 +58,7 @@ async function getLatestJobs(req, res) {
   let data = await jobRequisitionCtl.searchJob(req);
 
   //res.json(map);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
 
@@ -74,7 +71,7 @@ async function getSimilarJobs(req, res) {
   query.id=req.params.id;
 
   let data = await jobRequisitionCtl.searchJob(req);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
 
@@ -89,45 +86,30 @@ async function getSimilarCompanyJobs(req, res) {
 
   let data = await jobRequisitionCtl.getSimilarCompanyJobs(query);
 
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
-
-
-
-async function addToJobBookmark(req, res) {
-  if(!req.params.id){
-    res.json(new Response(null, res));
-  }
-
-  let userId=1;
-
-
-  let data = await jobRequisitionCtl.addToJobBookmark(userId, req.params.id);
-
-  res.json(new Response(data, res));
-}
-
-
-
 
 
 async function applyJobById(req, res) {
 
-  console.log('currentUserId: ', req.header('UserId'))
-  console.log('JobID: ', req.params.id)
-  console.log('locale', res.locale);
+  // console.log('currentUserId: ', req.header('UserId'))
+  // console.log('JobID: ', req.params.id)
+  // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
-  let data = await jobRequisitionCtl.applyJobById(currentUserId, req.body);
+  let application = req.body;
+  application.jobId=jobId;
+  application.partyId=currentUserId;
+  let data = await jobRequisitionCtl.applyJobById(currentUserId, application);
 
   res.json(new Response(data, data?'application_submit_successful':'not_found', res));
 }
 
 async function addBookmark(req, res) {
 
-  console.log('currentUserId: ', req.header('UserId'))
-  console.log('JobID: ', req.params.id)
-  console.log('locale', res.locale);
+  // console.log('currentUserId: ', req.header('UserId'))
+  // console.log('JobID: ', req.params.id)
+  // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.addBookmark(currentUserId, jobId);
@@ -138,9 +120,9 @@ async function addBookmark(req, res) {
 
 async function removeBookmark(req, res) {
 
-  console.log('currentUserId: ', req.header('UserId'))
-  console.log('JobID: ', req.params.id)
-  console.log('locale', res.locale);
+  // console.log('currentUserId: ', req.header('UserId'))
+  // console.log('JobID: ', req.params.id)
+  // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.removeBookmark(currentUserId, jobId);
