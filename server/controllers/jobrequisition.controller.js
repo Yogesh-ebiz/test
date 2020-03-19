@@ -2,7 +2,9 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills} = require('../services/party.service');
+const partyEnum = require('../const/partyEnum');
+
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationById, applyJob} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById} = require('../services/bookmark.service');
@@ -225,7 +227,17 @@ async function searchJob(req) {
   let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
   let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
 
+  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
+  console.log(listOfCompanyIds)
+
+  let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
+  let foundCompanies = res.data.data.content;
+  console.log(foundCompanies)
+
   _.forEach(result.docs, function(job){
+
+
+    job.company = _.find(foundCompanies, {id: job.company});
     var skills = _.reduce(job.skills, function(res, skill){
       let find = _.filter(listOfSkills, { 'skillTypeId': skill});
       if(find){
@@ -237,9 +249,7 @@ async function searchJob(req) {
     job.skills = skills;
   })
 
-
-
-
+  
   // if(filter.id && !result.content.length){
   //   filter.employmentType=null;
   //

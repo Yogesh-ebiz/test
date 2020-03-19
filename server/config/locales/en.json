@@ -12,5 +12,6 @@
 	"applications_retrieved_successful": "applications_retrieved_successful",
 	"bookmarks_retrieved_successful": "bookmarks_retrieved_successful",
 	"skilltypes_retrieved_successful": "Skill types retrieved successful",
-	"event_retrieved_successful": "event_retrieved_successful"
+	"event_retrieved_successful": "event_retrieved_successful",
+	"jobs_retrieved_successful": "jobs_retrieved_successful"
 }

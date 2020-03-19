@@ -38,12 +38,13 @@ function getCompanyById(partyId) {
   return axiosInstance.request('/api/company/' + partyId + "?source=job");
 }
 
-function searchParties(listOfParties) {
+function searchParties(listOfParties, type) {
   if(listOfParties==null){
     return;
   }
+
   let listOfIds = listOfParties.toString();
-  return axiosInstance.request('/api/search/all?type=PERSON&id=' + listOfIds + "&source=job");
+  return axiosInstance.request('/api/search/all?type=' + type + '&id=' + listOfIds + "&source=job");
 }
 
 
