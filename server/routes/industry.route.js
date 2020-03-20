@@ -11,24 +11,27 @@ module.exports = router;
 
 router.route('/').post(asyncHandler(insert));
 router.route('/search').get(asyncHandler(getAllIndustryies));
-router.route('/:id').get(asyncHandler(getExperienceLevelById));
+router.route('/:id').get(asyncHandler(getIndustryById));
 
 
 
 async function insert(req, res) {
   let data = await industryCtl.insert(req.body);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'Industry_added_successful':'not_found', res));
 }
 
 
 async function getAllIndustryies(req, res) {
   let data = await industryCtl.getAllIndustries(req.query, req.locale);
-  res.json(new Response(data, res));
+  console.log('data', data)
+  res.json(new Response(data, data?'Industries_retrieved_successful':'not_found', res));
+
 }
 
 
-async function getExperienceLevelById(req, res) {
+async function getIndustryById(req, res) {
   let data = await industryCtl.getIndustryById(req.params.id, res.locale);
-  res.json(new Response(data, res));
+  res.json(new Response(data, data?'industry_retrieved_successful':'not_found', res));
+
 }
 

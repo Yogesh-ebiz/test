@@ -15,6 +15,16 @@ function findBookById(userId, jobId) {
   return BookMark.findOne({partyId: userId, jobId: jobId});
 }
 
+function findBookByUserId(userId) {
+  let data = null;
+
+  if(userId==null){
+    return;
+  }
+
+  return BookMark.find({partyId: userId});
+}
+
 function addBookById(userId, jobId) {
   let data = null;
 
@@ -40,6 +50,7 @@ function removeBookById(userId, jobId) {
 
 module.exports = {
   findBookById: findBookById,
+  findBookByUserId: findBookByUserId,
   addBookById: addBookById,
   removeBookById: removeBookById
 }

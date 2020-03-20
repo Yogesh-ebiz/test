@@ -17,18 +17,18 @@ router.route('/:id').get(asyncHandler(getExperienceLevelById));
 
 async function insert(req, res) {
   let data = await employmentTypeCtl.insert(req.body);
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'experiencelevel_added_successful':'not_found', res));
 }
 
 
 async function getExperienceLevels(req, res) {
   let data = await employmentTypeCtl.getEmploymentTypes(req.query, req.locale);
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'expereiencelevels_retrieved_successful':'not_found', res));
 }
 
 
 async function getExperienceLevelById(req, res) {
   let data = await employmentTypeCtl.getEmploymentTypeById(req.params.id, res.locale);
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'experiencelevel_retrieved_successful':'not_found', res));
 }
 

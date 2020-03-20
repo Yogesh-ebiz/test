@@ -20,29 +20,43 @@ const JobAlertSchema = new mongoose.Schema({
     required: true,
     default: "ACTIVE"
   },
+  title: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  company: {
+    type: Number,
+    required: false
+  },
   distance: {
     type: Number,
     required: false
   },
   level: {
     type: String,
-    required: false
+    required: false,
+    default: '',
   },
   employmentType: {
     type: String,
-    required: false
+    required: false,
+    default: '',
   },
   city: {
     type: String,
-    required: false
+    required: false,
+    default: '',
   },
   state: {
     type: String,
-    required: false
+    required: false,
+    default: '',
   },
   country: {
     type: String,
-    required: false
+    required: false,
+    default: '',
   },
   createdDate: {
     type: Date,
@@ -50,7 +64,8 @@ const JobAlertSchema = new mongoose.Schema({
   },
   repeats: {
     type: String,
-    required: false
+    required: false,
+    default: ''
   }
 }, {
   versionKey: false

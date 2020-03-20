@@ -1,0 +1,15 @@
+[
+  {"id" : 1, "name" : { "en" : "Sales & Marketing" }, "shortCode" : "SNM", "icon" : "sales.png", "parent" : null, "sequence" : 0 },
+  {"id" : 2, "name" : { "en" : "Business Development" }, "shortCode" : "BD", "icon" : "business.png", "parent" : null, "sequence" : 0 },
+  {"id" : 4, "name" : { "en" : "Manufacturing" }, "shortCode" : "MNFT", "icon" : "manufacturing.png", "parent" : null, "sequence" : 0 },
+  {"id" : 7, "name" : { "en" : "Data" }, "shortCode" : "DATA", "icon" : "data.png", "parent" : null, "sequence" : 0 },
+  {"id" : 6, "name" : { "en" : "Customer Service" }, "shortCode" : "CUST", "icon" : "customer.png", "parent" : null, "sequence" : 0 },
+  {"id" : 9, "name" : { "en" : "Administration" }, "shortCode" : "ADM", "icon" : "adminstration.png", "parent" : null, "sequence" : 0 },
+  {"id" : 8, "name" : { "en" : "Analyst" }, "shortCode" : "ANAT", "icon" : "analyst.png", "parent" : null, "sequence" : 0 },
+  {"id" : 5, "name" : { "en" : "Driver" }, "shortCode" : "DRI", "icon" : "driver.png", "parent" : null, "sequence" : 0 },
+  {"id" : 3, "name" : { "en" : "Management" }, "shortCode" : "MNGR", "icon" : "management.png", "parent" : null, "sequence" : 0 },
+  {"id" : 10, "name" : { "en" : "Communications" }, "shortCode" : "COM", "icon" : "communication.png", "parent" : null, "sequence" : 0 },
+  {"id" : 13, "name" : { "en" : "Informatino & Technology" }, "shortCode" : "TECH", "icon" : "technology.png", "parent" : null, "sequence" : 0 },
+  {"id" : 11, "name" : { "en" : "Finance Management" }, "shortCode" : "FNMN", "icon" : "finance.png", "parent" : null, "sequence" : 0 },
+  {"id" : 12, "name" : { "en" : "Travel & Tourism" }, "shortCode" : "TOUR", "icon" : "tour.png", "parent" : null, "sequence" : 0 }
+]

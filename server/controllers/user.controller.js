@@ -12,6 +12,7 @@ const partyEnum = require('../const/partyEnum');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
+const {findBookByUserId} = require('../services/bookmark.service');
 
 
 let Pagination = require('../utils/pagination');
@@ -74,20 +75,23 @@ async function getApplicationsByUserId(currentUserId, filter) {
         console.log(jobs)
 
         let companyIds = _.map(jobs, 'company');
-        console.log(companyIds)
+
 
         let res = await searchParties(companyIds, partyEnum.COMPANY);
         let foundCompanies = res.data.data.content;
-        console.log(foundCompanies)
 
+
+        let hasSaves = await findBookByUserId(currentParty.id);
 
         _.forEach(jobs, function(job){
           job.description = null;
           job.responsibilities=[];
           job.qualifications = [];
           job.skills = [];
-          job.connection = [];
+          job.connection = {noConnection: 0, list: []};
           job.company = _.find(foundCompanies, {id: job.company});
+          job.hasApplied = true;
+          job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
 
         })
 
@@ -137,25 +141,20 @@ async function getBookmarksByUserId(currentUserId, filter) {
       result = await Bookmark.paginate(new BookmarkSearchParam(filter), options);
       let jobIds = _.map(result.docs, 'jobId');
 
-      console.log(jobIds)
 
       let jobs = await findJobIds(jobIds);
-      console.log(jobs)
-
       let companyIds = _.map(jobs, 'company');
-      console.log(companyIds)
-
       let res = await searchParties(companyIds, partyEnum.COMPANY);
       let foundCompanies = res.data.data.content;
-      console.log(foundCompanies)
 
 
       _.forEach(jobs, function(job){
+        job.hasSaved=true;
         job.description = null;
         job.responsibilities=[];
         job.qualifications = [];
         job.skills = [];
-        job.connection = [];
+        job.connection = {noConnection: 0, list: []};
         job.company = _.find(foundCompanies, {id: job.company});
 
       })

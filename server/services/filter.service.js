@@ -4,7 +4,29 @@ const EmploymentTypes = require('../models/employmenttypes.model');
 const Industry = require('../models/industry.model');
 const SkillType = require('../models/skilltype.model');
 const EmploymentType = require('../models/employmenttypes.model');
+const JobRequisition = require('../models/jobrequisition.model');
 
+
+function getAllJobLocations(filter) {
+  let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
+  let data = null;
+
+  if(keyword){
+
+    // let match = {};
+    // match = { $regex: keyword, $options: 'i'};
+    // data = JobFunction.aggregate([
+    //   { $match: match },
+    //   { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+    // ]);
+  }else {
+    data = JobRequisition.aggregate([
+      // { $group : { _id : "$city", _id: "$state"  } },
+      { $project: {city: 1, state: 1, country: 1} }
+    ]);
+  }
+  return data;
+}
 
 function getAllExperienceLevels(locale) {
   let localeStr = locale? locale : 'en';
@@ -104,6 +126,7 @@ function getAllSkillTypes(locale) {
 
 
 module.exports = {
+  getAllJobLocations: getAllJobLocations,
   getAllExperienceLevels: getAllExperienceLevels,
   getAllJobFunctions: getAllJobFunctions,
   getAllEmploymentTypes: getAllEmploymentTypes,

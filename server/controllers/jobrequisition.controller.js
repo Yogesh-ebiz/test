@@ -6,9 +6,10 @@ const partyEnum = require('../const/partyEnum');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
-const {findApplicationByUserIdAndJobId, findApplicationById, applyJob} = require('../services/application.service');
-const {findBookById, addBookById, removeBookById} = require('../services/bookmark.service');
+const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByUserIdAndJobId} = require('../services/application.service');
+const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
 const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
+const filterService = require('../services/filter.service');
 
 
 
@@ -92,7 +93,8 @@ module.exports = {
   addBookmark,
   removeBookmark,
   addAlert,
-  removeAlert
+  removeAlert,
+  getAllJobLocations
 }
 
 async function insert(job) {
@@ -149,6 +151,11 @@ async function getJobById(currentUserId, jobId, locale) {
         job.hasApplied = (hasApplied)?true:false;
 
 
+        let noApplied = await findAppliedCountByUserIdAndJobId(currentParty.id, job.jobId);
+        job.noApplied = noApplied;
+
+
+
         //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
         let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
 
@@ -202,9 +209,8 @@ async function addToUser(id, locale) {
 }
 
 
-async function searchJob(req) {
+async function searchJob(currentUserId, filter) {
 
-  let filter = req.query;
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
   let limit = (filter.size && filter.size>0) ? filter.size:20;
@@ -254,9 +260,13 @@ async function searchJob(req) {
   let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
   let foundCompanies = res.data.data.content;
 
+
+  let hasSaves = await findBookByUserId(currentUserId);
+
+
   _.forEach(result.docs, function(job){
 
-
+    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
     job.company = _.find(foundCompanies, {id: job.company});
     var skills = _.reduce(job.skills, function(res, skill){
       let find = _.filter(listOfSkills, { 'skillTypeId': skill});
@@ -282,7 +292,7 @@ async function searchJob(req) {
   // }
 
 
-  return new Pagination(result, req.locale);
+  return new Pagination(result);
 
 }
 
@@ -570,6 +580,8 @@ async function addAlert(currentUserId, jobId, alert) {
         if(!result) {
           alert.partyId = currentParty.id;
           alert.jobId = job.jobId;
+
+          console.log('alert', alert);
           result = await addAlertById(currentParty.id, alert);
         }
 
@@ -623,4 +635,12 @@ async function removeAlert(currentUserId, jobId) {
   }
 
   return found;
+}
+
+
+async function getAllJobLocations(query, locale) {
+  let data = await filterService.getAllJobLocations(query, locale);
+
+  data = _.uniqBy(data, 'city');
+  return data;
 }

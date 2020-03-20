@@ -52,7 +52,9 @@ async function getJobById(req, res) {
 
 
 async function searchJob(req, res) {
-  let data = await jobRequisitionCtl.searchJob(req);
+  let currentUserId = parseInt(req.header('UserId'));
+  let filter = req.query;
+  let data = await jobRequisitionCtl.searchJob(currentUserId, filter);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
@@ -143,7 +145,7 @@ async function addAlert(req, res) {
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.addAlert(currentUserId, jobId, req.body);
 
-  res.json(new Response(data, data?'alert_saved_successful':'not_found', res));
+  res.json(new Response(data, data?'alert_added_successful':'not_found', res));
 }
 
 
@@ -155,6 +157,7 @@ async function removeAlert(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.removeAlert(currentUserId, jobId);
+
 
   res.json(new Response(data, data?'alert_removed_successful':'not_found', res));
 }

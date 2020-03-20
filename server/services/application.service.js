@@ -27,6 +27,16 @@ function findApplicationByUserIdAndJobId(userId, jobId) {
   return Application.findOne({partyId: userId, jobId: jobId});
 }
 
+function findAppliedCountByUserIdAndJobId(userId, jobId) {
+  let data = null;
+
+  if(userId==null || jobId==null){
+    return;
+  }
+
+  return Application.find({partyId: userId, jobId: jobId}).count();
+}
+
 function applyJob(application) {
   let data = null;
 
@@ -46,5 +56,6 @@ function applyJob(application) {
 module.exports = {
   findApplicationByUserId: findApplicationByUserId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
+  findAppliedCountByUserIdAndJobId: findAppliedCountByUserIdAndJobId,
   applyJob: applyJob
 }

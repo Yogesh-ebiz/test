@@ -7,15 +7,19 @@
 	"not_found": "No record found",
 	"bad_input": "Bad Input",
 	"application_submit_successful": "Application submitted successfully",
+	"bookmarks_retrieved_successful": "bookmarks_retrieved_successful",
 	"bookmark_saved_successful": "Bookmark saved successfully",
 	"bookmark_removed_successful": "Job Removed",
 	"applications_retrieved_successful": "applications_retrieved_successful",
-	"bookmarks_retrieved_successful": "bookmarks_retrieved_successful",
 	"bookmark_added_successful": "Job Saved",
 	"alert_added_successful": "Alert Saved",
 	"alert_removed_successful": "Alert Removed",
 	"skilltypes_retrieved_successful": "Skill types retrieved successful",
-	"event_retrieved_successful": "event_retrieved_successful",
 	"jobs_retrieved_successful": "jobs_retrieved_successful",
-	"alert_saved_successful": "alert_saved_successful"
+	"alert_saved_successful": "alert_saved_successful",
+	"event_retrieved_successful": "event_retrieved_successful",
+	"experiencelevels_retrieved_successful": "Experience Levels retrieved successfully",
+	"Industries_retrieved_successful": "Industries_retrieved_successful",
+	"expereiencelevels_retrieved_successful": "expereiencelevels_retrieved_successful",
+	"locations_retrieved_successful": "locations_retrieved_successful"
 }
