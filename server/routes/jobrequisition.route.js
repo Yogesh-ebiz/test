@@ -141,7 +141,7 @@ async function addAlert(req, res) {
   // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
-  let data = await jobRequisitionCtl.addAlert(currentUserId, jobId);
+  let data = await jobRequisitionCtl.addAlert(currentUserId, jobId, req.body);
 
   res.json(new Response(data, data?'alert_saved_successful':'not_found', res));
 }

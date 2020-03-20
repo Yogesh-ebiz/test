@@ -68,6 +68,18 @@ const applicationSchema = Joi.object({
 });
 
 
+const jobAlertSchema = Joi.object({
+  jobId: Joi.number().optional(),
+  partyId: Joi.number().optional(),
+  city: Joi.string().optional(),
+  state: Joi.string().optional(),
+  country: Joi.string().optional(),
+  level: Joi.string().optional(),
+  employmentType: Joi.string().optional(),
+  distance: Joi.number().optional()
+});
+
+
 
 module.exports = {
   importJobs,
@@ -533,7 +545,8 @@ async function removeBookmark(currentUserId, jobId) {
 
 
 
-async function addAlert(currentUserId, jobId) {
+async function addAlert(currentUserId, jobId, alert) {
+  alert = await Joi.validate(alert, jobAlertSchema, { abortEarly: false });
 
   if(currentUserId==null || jobId==null){
     return null;
@@ -555,7 +568,9 @@ async function addAlert(currentUserId, jobId) {
         result = await findAlertByUserIdAndJobId(currentParty.id, jobId);
 
         if(!result) {
-          result = await addAlertById(currentParty.id, jobId);
+          alert.partyId = currentParty.id;
+          alert.jobId = job.jobId;
+          result = await addAlertById(currentParty.id, alert);
         }
 
       }

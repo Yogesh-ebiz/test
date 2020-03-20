@@ -15,15 +15,16 @@ function findAlertByUserIdAndJobId(userId, jobId) {
   return JobAlert.findOne({partyId: userId, jobId: jobId});
 }
 
-function addAlertById(userId, jobId) {
+function addAlertById(userId, alert) {
   let data = null;
 
-  if(userId==null || jobId==null){
+  if(userId==null || alert==null){
     return;
   }
+  console.log(alert)
 
-  let bookmark = {partyId: userId, jobId: jobId, createdDate: Date().now};
-  return new JobAlert(bookmark).save();
+  alert.createdDate = Date().now;
+  return new JobAlert(alert).save();
 }
 
 

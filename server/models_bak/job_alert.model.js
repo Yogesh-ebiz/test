@@ -22,11 +22,11 @@ const JobAlertSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  jobLevel: {
+  level: {
     type: String,
     required: false
   },
-  jobType: {
+  employmentType: {
     type: String,
     required: false
   },
@@ -42,7 +42,7 @@ const JobAlertSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  createdAt: {
+  createdDate: {
     type: Date,
     default: Date.now
   },
