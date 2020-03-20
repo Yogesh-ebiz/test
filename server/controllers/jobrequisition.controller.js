@@ -6,7 +6,7 @@ const partyEnum = require('../const/partyEnum');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
-const {findApplicationById, applyJob} = require('../services/application.service');
+const {findApplicationByUserIdAndJobId, findApplicationById, applyJob} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById} = require('../services/bookmark.service');
 
 
@@ -127,6 +127,13 @@ async function getJobById(currentUserId, jobId, locale) {
         // console.log('jobSkils', jobSkills)
 
 
+        let hasSaved = await findBookById(currentParty.id, job.jobId);
+        job.hasSaved = (hasSaved)?true:false;
+
+        let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
+        job.hasApplied = (hasApplied)?true:false;
+
+
         //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
         let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
 
@@ -228,11 +235,9 @@ async function searchJob(req) {
   let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-  console.log(listOfCompanyIds)
 
   let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
   let foundCompanies = res.data.data.content;
-  console.log(foundCompanies)
 
   _.forEach(result.docs, function(job){
 
@@ -293,28 +298,114 @@ async function getLatestJobs(req) {
 
 
 
-async function getSimilarCompanyJobs(filter) {
+// async function getSimilarCompanyJobs(filter) {
+//
+//   let foundJob = null;
+//   let select = '-description -qualifications -responsibilities -skills ';
+//
+//   if(filter.id){
+//     foundJob = await JobRequisition.findOne({jobId: filter.id});
+//
+//     if(!foundJob){
+//       return null;
+//     }
+//
+//     filter.level = foundJob.level;
+//     filter.jobFunction=foundJob.jobFunction;
+//   }
+//
+//
+//
+//
+//   let similarCompanies = await JobRequisition.aggregate([{$match: {level: foundJob.level}}, { $group: {_id: '$company'} }  ]);
+//
+//
+//   let res = await searchParties(_.uniq(_.map(similarCompanies, '_id')), partyEnum.COMPANY);
+//   let companies = res.data.data.content;
+//   return companies;
+//
+// }
 
-  let foundJob = null;
-  let select = '-description -qualifications -responsibilities -skills ';
 
-  if(filter.id){
-    foundJob = await JobRequisition.findOne({jobId: filter.id});
 
-    if(!foundJob){
-      return null;
-    }
 
-    filter.level = foundJob.level;
-    filter.jobFunction=foundJob.jobFunction;
+
+
+async function getSimilarCompanyJobs(currentUserId, jobId, filter) {
+
+  if(currentUserId==null || jobId==null || filter==null){
+    return null;
   }
 
-  let similarCompanies = await JobRequisition.aggregate([{$match: {level: foundJob.level}}, { $group: {_id: '$company'} }  ]);
+  let result = null;
+
+  try {
+
+    let foundJob = await JobRequisition.findOne({jobId: filter.id});
+
+    if(foundJob && foundJob.status==statusEnum.ACTIVE){
 
 
-  let res = await searchParties(_.uniq(_.map(similarCompanies, '_id')), partyEnum.COMPANY);
-  let companies = res.data.data.content;
-  return companies;
+      let response = await getPartyById(currentUserId);
+      let currentParty = response.data.data;
+
+
+      if(!isPartyActive(currentParty)) {
+        console.debug('User Not Active: ', currentUserId);
+        return null;
+      }
+
+      let currentAttendee = await getAttendeeById(eventId, currentUserId);
+      console.log('currentAttendee', currentAttendee);
+
+      let isOrganizer = (currentAttendee && currentAttendee.isOrganizer)?true:false;
+      let guestCanSeeOtherGuests = foundEvent.guestCanSeeOtherGuests;
+      let isAllowToUpdate = (isOrganizer || (currentAttendee && guestCanSeeOtherGuests))? true : false;
+
+      console.log('status', isAllowToUpdate, isOrganizer, guestCanSeeOtherGuests);
+
+      if(isAllowToUpdate){
+        console.log('guestCanSeeOtherGuests')
+        let foundAttendees = null;
+        let select = '';
+        let limit = (filter.size && filter.size>0) ? filter.size:20;
+        let page = (filter.page && filter.page==0) ? filter.page:1;
+        let sortBy = {};
+        sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+        let options = {
+          select:   select,
+          sort:     sortBy,
+          lean:     true,
+          limit:    limit,
+          page: parseInt(filter.page)+1
+        };
+
+        filter.eventId = eventId;
+
+        result = await Attendee.paginate(new SearchParam(filter), options);
+        let activeAttendees = result.docs;
+        let attendees = _.map(activeAttendees, 'partyId');
+
+        let response = await searchParties(attendees);
+        let foundUsers = response.data.data.content;
+        let found = [];
+
+        for (var i = 0; i < activeAttendees.length; i++) {
+          for (var j = 0; j < foundUsers.length; j++) {
+            if (activeAttendees[i].partyId == foundUsers[j].id) {
+              let userMerge = _.merge(activeAttendees[i], foundUsers[j]);
+              found.push(userMerge);
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
 
 }
 
@@ -342,7 +433,7 @@ async function applyJobById(currentUserId, application) {
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
 
-        result = await findApplicationById(currentParty.id, application.jobId);
+        result = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
         if(!result){
           application.attachment = application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf");
           result = await applyJob(application);

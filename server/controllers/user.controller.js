@@ -37,7 +37,7 @@ async function getApplicationsByUserId(currentUserId, filter) {
 
 
       if(isPartyActive(currentParty)) {
-        console.debug('isActive')
+        console.debug('isActive', currentParty)
         let select = '';
         let limit = (filter.size && filter.size > 0) ? filter.size : 20;
         let page = (filter.page && filter.page == 0) ? filter.page : 1;
@@ -80,7 +80,7 @@ async function getBookmarksByUserId(currentUserId, filter) {
 
 
     if(isPartyActive(currentParty)) {
-      console.debug('isActive')
+      console.debug('isActive', currentParty.id)
       let select = '';
       let limit = (filter.size && filter.size > 0) ? filter.size : 20;
       let page = (filter.page && filter.page == 0) ? filter.page : 1;

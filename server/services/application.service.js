@@ -17,7 +17,7 @@ function findApplicationByUserId(userId) {
 }
 
 
-function findApplicationById(userId, jobId) {
+function findApplicationByUserIdAndJobId(userId, jobId) {
   let data = null;
 
   if(userId==null || jobId==null){
@@ -45,6 +45,6 @@ function applyJob(application) {
 
 module.exports = {
   findApplicationByUserId: findApplicationByUserId,
-  findApplicationById: findApplicationById,
+  findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   applyJob: applyJob
 }
