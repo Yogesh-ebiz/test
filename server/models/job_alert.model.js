@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const JobAlertSchema = new mongoose.Schema({
   id: {
@@ -53,6 +55,15 @@ const JobAlertSchema = new mongoose.Schema({
 }, {
   versionKey: false
 });
+
+
+JobAlertSchema.plugin(autoIncrement, {
+  model: 'JobAlert',
+  field: 'jobAlertId',
+  startAt: 100000,
+  incrementBy: 1
+});
+JobAlertSchema.plugin(mongoosePaginate);
 
 
 module.exports = mongoose.model('JobAlert', JobAlertSchema);

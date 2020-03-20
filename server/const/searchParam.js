@@ -5,6 +5,12 @@ function SearchParam(filter) {
   this.query = {};
 
 
+  if(filter.partyId){
+
+    this.query.partyId =  { $eq: filter.partyId };
+  }
+
+
   if(filter.id){
     let ids = _.reduce(filter.id.split(','), function(res, i){
       res.push(parseInt(i));
