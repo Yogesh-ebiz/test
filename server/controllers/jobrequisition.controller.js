@@ -8,6 +8,7 @@ const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkil
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById} = require('../services/bookmark.service');
+const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
 
 
 
@@ -77,7 +78,9 @@ module.exports = {
   getSimilarCompanyJobs,
   applyJobById,
   addBookmark,
-  removeBookmark
+  removeBookmark,
+  addAlert,
+  removeAlert
 }
 
 async function insert(job) {
@@ -526,4 +529,83 @@ async function removeBookmark(currentUserId, jobId) {
   }
 
   return result;
+}
+
+
+
+async function addAlert(currentUserId, jobId) {
+
+  if(currentUserId==null || jobId==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+    job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+
+    if(job) {
+      let response = await getPersonById(currentUserId);
+      let currentParty = response.data.data;
+      // console.log('currentParty', currentParty)
+
+      //Security Check if user is part of meeting attendees that is ACTIVE.
+      if (isPartyActive(currentParty)) {
+
+        result = await findAlertByUserIdAndJobId(currentParty.id, jobId);
+
+        if(!result) {
+          result = await addAlertById(currentParty.id, jobId);
+        }
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+
+async function removeAlert(currentUserId, jobId) {
+
+  if(currentUserId==null || jobId==null){
+    return null;
+  }
+
+
+  let found;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    //Security Check if user is part of meeting attendees that is ACTIVE.
+    if (isPartyActive(currentParty)) {
+      found = await findAlertByUserIdAndJobId(currentParty.id, jobId);
+
+      console.log('found', found)
+      if(found){
+        let deleted = await removeAlertByUserIdAndJobId(currentParty.id, jobId);
+
+
+        if(deleted && deleted.deletedCount>0){
+          found.status=statusEnum.DELETED;
+        } else {
+          found = null;
+        }
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return found;
 }

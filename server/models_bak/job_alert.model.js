@@ -13,11 +13,12 @@ const JobAlertSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  distance: {
-    type: Number,
-    required: false
+  status: {
+    type: String,
+    required: true,
+    default: "ACTIVE"
   },
-  jobId: {
+  distance: {
     type: Number,
     required: false
   },
@@ -25,22 +26,29 @@ const JobAlertSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  repeats: {
+  jobType: {
     type: String,
     required: false
   },
-  location: {
-    type: Object,
+  city: {
+    type: String,
+    required: false
+  },
+  state: {
+    type: String,
+    required: false
+  },
+  country: {
+    type: String,
     required: false
   },
   createdAt: {
     type: Date,
     default: Date.now
   },
-  status: {
+  repeats: {
     type: String,
-    required: true,
-    default: "ACTIVE"
+    required: false
   }
 }, {
   versionKey: false

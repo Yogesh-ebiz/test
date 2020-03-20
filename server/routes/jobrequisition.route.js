@@ -19,9 +19,12 @@ router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
 router.route('/:id/similar/company').get(asyncHandler(getSimilarCompanyJobs));
 
 router.route('/:id/apply').post(asyncHandler(applyJobById));
+
 router.route('/:id/bookmark').post(asyncHandler(addBookmark));
 router.route('/:id/bookmark').delete(asyncHandler(removeBookmark));
 
+router.route('/:id/alert').post(asyncHandler(addAlert));
+router.route('/:id/alert').delete(asyncHandler(removeAlert));
 
 
 async function insert(req, res) {
@@ -128,4 +131,30 @@ async function removeBookmark(req, res) {
   let data = await jobRequisitionCtl.removeBookmark(currentUserId, jobId);
 
   res.json(new Response(data, data?'bookmark_removed_successful':'not_found', res));
+}
+
+
+async function addAlert(req, res) {
+
+  // console.log('currentUserId: ', req.header('UserId'))
+  // console.log('JobID: ', req.params.id)
+  // console.log('locale', res.locale);
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
+  let data = await jobRequisitionCtl.addAlert(currentUserId, jobId);
+
+  res.json(new Response(data, data?'alert_saved_successful':'not_found', res));
+}
+
+
+async function removeAlert(req, res) {
+
+  // console.log('currentUserId: ', req.header('UserId'))
+  // console.log('JobID: ', req.params.id)
+  // console.log('locale', res.locale);
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
+  let data = await jobRequisitionCtl.removeAlert(currentUserId, jobId);
+
+  res.json(new Response(data, data?'alert_removed_successful':'not_found', res));
 }

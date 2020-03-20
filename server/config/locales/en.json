@@ -8,10 +8,14 @@
 	"bad_input": "Bad Input",
 	"application_submit_successful": "Application submitted successfully",
 	"bookmark_saved_successful": "Bookmark saved successfully",
-	"bookmark_removed_successful": "Bookmark removed successfully",
+	"bookmark_removed_successful": "Job Removed",
 	"applications_retrieved_successful": "applications_retrieved_successful",
 	"bookmarks_retrieved_successful": "bookmarks_retrieved_successful",
+	"bookmark_added_successful": "Job Saved",
+	"alert_added_successful": "Alert Saved",
+	"alert_removed_successful": "Alert Removed",
 	"skilltypes_retrieved_successful": "Skill types retrieved successful",
 	"event_retrieved_successful": "event_retrieved_successful",
-	"jobs_retrieved_successful": "jobs_retrieved_successful"
+	"jobs_retrieved_successful": "jobs_retrieved_successful",
+	"alert_saved_successful": "alert_saved_successful"
 }
