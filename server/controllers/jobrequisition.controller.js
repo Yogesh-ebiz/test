@@ -88,6 +88,7 @@ module.exports = {
   insert,
   getJobById,
   searchJob,
+  getSimilarJobs,
   getLatestJobs,
   getSimilarCompanyJobs,
   applyJobById,
@@ -210,7 +211,103 @@ async function addToUser(id, locale) {
 }
 
 
-async function searchJob(currentUserId, filter) {
+async function searchJob(currentUserId, jobId, filter) {
+
+  if(currentUserId==null || filter==null){
+    return null;
+  }
+
+  let foundJob = null;
+  let select = '-description -qualifications -responsibilities';
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+
+  if(jobId){
+    console.log('ID', jobId)
+    foundJob = await JobRequisition.findOne({jobId:jobId});
+    //
+    // if(!foundJob){
+    //   return new Pagination(null);
+    // }
+
+
+
+    filter.similarId = foundJob.jobId;
+    //filter.query = foundJob.title;
+    filter.level = foundJob.level;
+    filter.jobFunction=foundJob.jobFunction;
+    filter.employmentType=foundJob.employmentType;
+    filter.employmentType=null;
+  }
+
+
+
+  // let select = 'title createdDate';
+
+  // if(filter.id && !result.content.length)
+
+
+  let result = await JobRequisition.paginate(new SearchParam(filter), options);
+  let docs = [];
+
+  let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+  let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+
+  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
+
+  let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
+  let foundCompanies = res.data.data.content;
+
+
+  let hasSaves = await findBookByUserId(currentUserId);
+
+
+  _.forEach(result.docs, function(job){
+
+    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+    job.company = _.find(foundCompanies, {id: job.company});
+    var skills = _.reduce(job.skills, function(res, skill){
+      let find = _.filter(listOfSkills, { 'skillTypeId': skill});
+      if(find){
+        res.push(find[0]);
+      }
+      return res;
+    }, [])
+
+    job.skills = skills;
+  })
+
+
+  // if(filter.id && !result.content.length){
+  //   filter.employmentType=null;
+  //
+  //
+  //   //Assuring similar Job always have data
+  //   result = await JobRequisition.paginate(new SearchParam(filter), options, function(err, result) {
+  //     console.log('result', result)
+  //     return new PaginationModel(result);
+  //   });
+  // }
+
+
+  return new Pagination(result);
+
+}
+
+
+
+async function getSimilarJobs(currentUserId, filter) {
 
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';

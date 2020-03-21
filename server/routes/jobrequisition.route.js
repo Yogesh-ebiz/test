@@ -54,7 +54,7 @@ async function getJobById(req, res) {
 async function searchJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let filter = req.query;
-  let data = await jobRequisitionCtl.searchJob(currentUserId, filter);
+  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
@@ -72,13 +72,12 @@ async function getSimilarJobs(req, res) {
     res.json(new Response(null, res));
   }
 
-
-
   let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
   let filter = req.query;
-  filter.id=req.params.id;
+  console.log('jobId', jobId)
 
-  let data = await jobRequisitionCtl.searchJob(currentUserId, filter);
+  let data = await jobRequisitionCtl.searchJob(currentUserId, jobId, filter);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
