@@ -6,7 +6,7 @@ const partyEnum = require('../const/partyEnum');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
-const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByUserIdAndJobId} = require('../services/application.service');
+const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
 const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
 const filterService = require('../services/filter.service');
@@ -152,7 +152,7 @@ async function getJobById(currentUserId, jobId, locale) {
         job.hasApplied = (hasApplied)?true:false;
 
 
-        let noApplied = await findAppliedCountByUserIdAndJobId(currentParty.id, job.jobId);
+        let noApplied = await findAppliedCountByJobId(job.jobId);
         job.noApplied = noApplied;
 
 

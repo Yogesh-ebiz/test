@@ -14,14 +14,14 @@ function findApplicationById(applicationid) {
   return Application.findOne({applicationId: applicationid});
 }
 
-function findAppliedCountByUserIdAndJobId(userId, jobId) {
+function findAppliedCountByJobId(jobId) {
   let data = null;
 
-  if(userId==null || jobId==null){
+  if(jobId==null){
     return;
   }
 
-  return Application.find({partyId: userId, jobId: jobId}).count();
+  return Application.find({jobId: jobId}).count();
 }
 
 function findApplicationByUserId(userId) {
@@ -79,6 +79,6 @@ module.exports = {
   findApplicationById: findApplicationById,
   findApplicationByUserId: findApplicationByUserId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
-  findAppliedCountByUserIdAndJobId: findAppliedCountByUserIdAndJobId,
+  findAppliedCountByJobId: findAppliedCountByJobId,
   applyJob: applyJob
 }
