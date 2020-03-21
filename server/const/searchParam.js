@@ -11,13 +11,13 @@ function SearchParam(filter) {
   }
 
 
-  if(filter.id){
-    let ids = _.reduce(filter.id.split(','), function(res, i){
-      res.push(parseInt(i));
-      return res;
-    }, []);
-    this.query.jobId =  { $in: ids };
-  }
+  // if(filter.id){
+  //   let ids = _.reduce(filter.id.split(','), function(res, i){
+  //     res.push(parseInt(i));
+  //     return res;
+  //   }, []);
+  //   this.query.jobId =  { $in: ids };
+  // }
 
   if (filter.query && filter.query!="") {
     this.query.title =  { $regex: filter.query, $options: 'i' };

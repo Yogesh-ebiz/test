@@ -4,6 +4,26 @@ const statusEnum = require('../const/statusEnum');
 const Application = require('../models/application.model');
 
 
+function findApplicationById(applicationid) {
+  let data = null;
+
+  if(applicationid==null){
+    return;
+  }
+
+  return Application.findOne({applicationId: applicationid});
+}
+
+function findAppliedCountByUserIdAndJobId(userId, jobId) {
+  let data = null;
+
+  if(userId==null || jobId==null){
+    return;
+  }
+
+  return Application.find({partyId: userId, jobId: jobId}).count();
+}
+
 function findApplicationByUserId(userId) {
   let data = null;
 
@@ -37,6 +57,8 @@ function findAppliedCountByUserIdAndJobId(userId, jobId) {
   return Application.find({partyId: userId, jobId: jobId}).count();
 }
 
+
+
 function applyJob(application) {
   let data = null;
 
@@ -54,6 +76,7 @@ function applyJob(application) {
 
 
 module.exports = {
+  findApplicationById: findApplicationById,
   findApplicationByUserId: findApplicationByUserId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findAppliedCountByUserIdAndJobId: findAppliedCountByUserIdAndJobId,

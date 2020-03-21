@@ -187,6 +187,8 @@ async function getAlertsByUserId(currentUserId, filter) {
     let currentParty = response.data.data;
 
 
+
+
     if(isPartyActive(currentParty)) {
       console.debug('isActive', currentParty.id)
       let select = '';
@@ -207,7 +209,17 @@ async function getAlertsByUserId(currentUserId, filter) {
 
       result = await JobAlert.paginate(new SearchParam(filter), options);
 
+      let companyIds = _.map(result.docs, 'company');
+
+      let res = await searchParties(companyIds, partyEnum.COMPANY);
+      let foundCompanies = res.data.data.content;
+
+      _.forEach(result.docs, function(alert) {
+        alert.company = _.find(foundCompanies, {id: alert.company});
+      })
+
     }
+
 
   } catch (error) {
     console.log(error);

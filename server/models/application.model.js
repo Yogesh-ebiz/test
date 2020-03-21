@@ -27,7 +27,8 @@ const ApplicationSchema = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    required: false
+    required: false,
+    default: Date.now()
   },
   lastUpdatedDate: {
     type: Number,

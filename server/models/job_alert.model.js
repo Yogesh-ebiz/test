@@ -23,7 +23,7 @@ const JobAlertSchema = new mongoose.Schema({
   title: {
     type: String,
     required: false,
-    default: '',
+    default: ''
   },
   company: {
     type: Number,

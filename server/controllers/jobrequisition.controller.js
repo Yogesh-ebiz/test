@@ -77,7 +77,8 @@ const jobAlertSchema = Joi.object({
   country: Joi.string().optional(),
   level: Joi.string().optional(),
   employmentType: Joi.string().optional(),
-  distance: Joi.number().optional()
+  distance: Joi.number().optional(),
+  company: Joi.number().optional()
 });
 
 
@@ -229,17 +230,19 @@ async function searchJob(currentUserId, filter) {
 
   if(filter.id){
     console.log('ID', filter.id)
-    //foundJob = await JobRequisition.findOne({jobId: filter.id});
+    foundJob = await JobRequisition.findOne({jobId: filter.id});
     //
     // if(!foundJob){
     //   return new Pagination(null);
     // }
 
+
+
     //filter.query = foundJob.title;
-    // filter.level = foundJob.level;
-    // filter.jobFunction=foundJob.jobFunction;
-    // filter.employmentType=foundJob.employmentType;
-    // filter.employmentType=null;
+    filter.level = foundJob.level;
+    filter.jobFunction=foundJob.jobFunction;
+    filter.employmentType=foundJob.employmentType;
+    filter.employmentType=null;
   }
 
 
@@ -580,6 +583,7 @@ async function addAlert(currentUserId, jobId, alert) {
         if(!result) {
           alert.partyId = currentParty.id;
           alert.jobId = job.jobId;
+          alert.company = job.company;
 
           console.log('alert', alert);
           result = await addAlertById(currentParty.id, alert);
@@ -614,12 +618,8 @@ async function removeAlert(currentUserId, jobId) {
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
       found = await findAlertByUserIdAndJobId(currentParty.id, jobId);
-
-      console.log('found', found)
       if(found){
         let deleted = await removeAlertByUserIdAndJobId(currentParty.id, jobId);
-
-
         if(deleted && deleted.deletedCount>0){
           found.status=statusEnum.DELETED;
         } else {
