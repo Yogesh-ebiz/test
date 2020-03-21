@@ -28,21 +28,21 @@ async function getApplicationById(currentUserId, applicationId) {
 
   let application;
   try {
-    application = await findApplicationById(applicationId);
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
 
-    if(application) {
 
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
-      // console.log('currentParty', response.data)
-
+    console.log('currentUserId', currentParty.id)
+    if(isPartyActive(currentParty)) {
+      application = await findApplicationById(applicationId);
       //Security Check if user is part of meeting attendees that is ACTIVE.
-      if (isPartyActive(currentParty)) {
+      if (application && application.partyId==currentParty.id) {
         let job = await findJobId(application.jobId);
-
         response = await getCompanyById(job.company);
         job.company = response.data.data;
 
+      } else {
+        application=null;
       }
     }
 
