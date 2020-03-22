@@ -104,7 +104,6 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   promotion: {
     type: Object,
-    default: null,
     required: false
   },
   hasSaved: {

@@ -25,5 +25,6 @@
 	"workflow_added_successful": "workflow_added_successful",
 	"workflow_retrieved_successful": "workflow_retrieved_successful",
 	"workflows_retrieved_successful": "workflows_retrieved_successful",
-	"workflow_removed_successful": "workflow_removed_successful"
+	"workflow_removed_successful": "workflow_removed_successful",
+	"job_created_successful": "job_created_successful"
 }

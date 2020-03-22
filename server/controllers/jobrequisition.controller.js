@@ -29,11 +29,11 @@ let SearchParam = require('../const/searchParam');
 const jobRequisitionSchema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
-  durationMonths: Joi.any(),
-  minMonthExperience: Joi.number(),
-  maxMonthExperience: Joi.number(),
+  durationMonths: Joi.number().optional(),
+  minMonthExperience: Joi.number().optional(),
+  maxMonthExperience: Joi.number().optional(),
   lastCurrencyUom: Joi.string(),
-  noOfResources: Joi.any(),
+  noOfResources: Joi.number(),
   type: Joi.string(),
   jobFunction: Joi.string(),
   expirationDate: Joi.number(),
@@ -47,16 +47,14 @@ const jobRequisitionSchema = Joi.object({
   skills: Joi.array(),
   industry: Joi.string(),
   employmentType: Joi.string(),
-  promotion: Joi.object(),
-  hasSaved: Joi.boolean(),
-  company: Joi.object(),
-  connection: Joi.object(),
+  promotion: Joi.object().optional(),
+  company: Joi.number(),
   city: Joi.string(),
   state: Joi.string(),
   country: Joi.string(),
-  isExternal: Joi.boolean(),
   externalUrl: Joi.string(),
-  hasApplied: Joi.boolean()
+  hasApplied: Joi.boolean(),
+  workflowId: Joi.number().required()
 });
 
 const applicationSchema = Joi.object({
@@ -142,6 +140,8 @@ async function getJobById(currentUserId, jobId, locale) {
         partySkills = _.map(partySkills, "skillTypeId");
         // console.log('partyskills', partySkills)
 
+
+        console.log('skills', job.skills)
         let jobSkills = await getListofSkillTypes(job.skills);
         // console.log('jobSkils', jobSkills)
 
