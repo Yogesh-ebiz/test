@@ -5,14 +5,20 @@ const _ = require('lodash');
 const Application = require('../models/application.model');
 const Bookmark = require('../models/bookmark.model');
 const JobAlert = require('../models/job_alert.model');
+const PartySKill = require('../models/partyskill.model');
+
 
 
 
 const partyEnum = require('../const/partyEnum');
+const statusEnum = require('../const/statusEnum');
+
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
+
+const {findPartySkillByUserIdAndSkillTypeId, findPartySkillsById, findPartySkillsByUserId, addUserPartySkill, removePartySkillById} = require('../services/partyskill.service');
 
 
 let Pagination = require('../utils/pagination');
@@ -25,11 +31,140 @@ const {findApplicationByUserId} = require('../services/application.service');
 
 
 
+const partySkillSchema = Joi.object({
+  partyId: Joi.number(),
+  skillTypeId: Joi.number(),
+  noOfMonths: Joi.number()
+});
+
+
 module.exports = {
+  addPartySkill,
+  removePartySkill,
+  getPartySkillsByUserId,
   getApplicationsByUserId,
   getBookmarksByUserId,
   getAlertsByUserId
 }
+
+
+
+async function getPartySkillsByUserId(currentUserId, filter) {
+
+  if(currentUserId==null || filter==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if(isPartyActive(currentParty)) {
+      let select = '';
+      let limit = (filter.size && filter.size > 0) ? filter.size : 20;
+      let page = (filter.page && filter.page == 0) ? filter.page : 1;
+      let sortBy = {};
+      sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+
+      let options = {
+        select: select,
+        sort: sortBy,
+        lean: true,
+        limit: limit,
+        page: parseInt(filter.page) + 1
+      };
+
+      filter.partyId=currentParty.id;
+
+      result = await PartySKill.paginate(new SearchParam(filter), options);
+      
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+
+}
+
+async function addPartySkill(currentUserId, partySkill) {
+  partySkill = await Joi.validate(partySkill, partySkillSchema, { abortEarly: false });
+
+  if(currentUserId==null || partySkill==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findPartySkillByUserIdAndSkillTypeId(currentParty.id, partySkill.skillTypeId);
+
+      if(!found){
+        result = await addUserPartySkill(partySkill);
+      } else {
+        let lastUpdatedDate = Date.now();
+        found.noOfMonths = partySkill.noOfMonths;
+        found.lastUpdatedDate = Date.now();
+        result = await found.save();
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+async function removePartySkill(currentUserId, partySkillId) {
+
+  if(currentUserId==null || partySkillId==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findPartySkillsById(partySkillId);
+
+      if(found){
+        let deleted = await removePartySkillById(partySkillId);
+
+        if(deleted && deleted.deletedCount==1){
+          found.status = statusEnum.DELETED;
+          result = found;
+        }
+
+
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
 
 
 

@@ -18,7 +18,7 @@ const JobRequisition = require('../models/jobrequisition.model');
 const Skilltype = require('../models/skilltype.model');
 const JobFunction = require('../models/jobfunctions.model');
 const Bookmark = require('../models/bookmark.model');
-const PartySkill = require('../models/party_skill.model');
+const PartySkill = require('../models/partyskill.model');
 const Application = require('../models/application.model');
 
 
@@ -140,11 +140,8 @@ async function getJobById(currentUserId, jobId, locale) {
         partySkills = _.map(partySkills, "skillTypeId");
         // console.log('partyskills', partySkills)
 
-
-        console.log('skills', job.skills)
         let jobSkills = await getListofSkillTypes(job.skills);
         // console.log('jobSkils', jobSkills)
-
 
         let hasSaved = await findBookById(currentParty.id, job.jobId);
         job.hasSaved = (hasSaved)?true:false;

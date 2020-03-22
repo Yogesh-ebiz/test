@@ -6,7 +6,7 @@ function SearchParam(filter) {
 
 
   if(filter.partyId){
-
+    console.log('partyId', filter.partyId)
     this.query.partyId =  { $eq: filter.partyId };
   }
 

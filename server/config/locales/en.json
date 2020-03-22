@@ -26,5 +26,7 @@
 	"workflow_retrieved_successful": "workflow_retrieved_successful",
 	"workflows_retrieved_successful": "workflows_retrieved_successful",
 	"workflow_removed_successful": "workflow_removed_successful",
-	"job_created_successful": "job_created_successful"
+	"job_created_successful": "job_created_successful",
+	"skill_added_successful": "skill_added_successful",
+	"skills_retrieved_successful": "skills_retrieved_successful"
 }
