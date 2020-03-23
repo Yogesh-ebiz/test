@@ -16,7 +16,7 @@ router.route('/latest').get(asyncHandler(getLatestJobs));
 router.route('/:id').get(asyncHandler(getJobById));
 
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
-router.route('/:id/similar/company').get(asyncHandler(getSimilarCompanyJobs));
+router.route('/:id/similar/company').get(asyncHandler(getSimilarCompany));
 
 router.route('/:id/apply').post(asyncHandler(applyJobById));
 
@@ -54,7 +54,7 @@ async function getJobById(req, res) {
 async function searchJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let filter = req.query;
-  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter);
+  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
@@ -82,16 +82,14 @@ async function getSimilarJobs(req, res) {
 }
 
 
-async function getSimilarCompanyJobs(req, res) {
-  if(!req.params.id){
-    res.json(new Response(null, res));
-  }
+async function getSimilarCompany(req, res) {
 
-  let query = req.query;
-  query.id=req.params.id;
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
 
-
-  let data = await jobRequisitionCtl.getSimilarCompanyJobs(query);
+  let filter = req.query;
+  console.log('route getSimilarCompany');
+  let data = await jobRequisitionCtl.getSimilarCompany(currentUserId, jobId, filter);
 
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }

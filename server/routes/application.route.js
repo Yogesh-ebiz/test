@@ -13,15 +13,13 @@ router.route('/:id').get(asyncHandler(getApplicationById));
 router.route('/:id/upload/cv').post(asyncHandler(uploadCV));
 
 
-
-
 async function getApplicationById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = parseInt(req.params.id);
   let data = await applicationCtl.getApplicationById(currentUserId, applicationId);
 
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'application_retrieved_successful':'not_found', res));
 }
 
 
@@ -30,7 +28,7 @@ async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = parseInt(req.params.id);
 
-  let data = await applicationCtl.uploadCV(currentUserId, applicationId, req);
-  res.json(new Response(data, data?'experiencelevel_retrieved_successful':'not_found', res));
+  let data = await applicationCtl.uploadCV(currentUserId, applicationId, req.files);
+  res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
 }
 

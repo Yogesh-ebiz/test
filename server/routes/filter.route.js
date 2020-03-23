@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const _ = require('lodash');
 const asyncHandler = require('express-async-handler');
 const industryCtl = require('../controllers/industry.controller')
 const experienceLevelCtl = require('../controllers/experiencelevel.controller');
@@ -7,6 +8,7 @@ const employmentTypeCtl = require('../controllers/employmenttypes.controller');
 const skillTypeCtl = require('../controllers/skilltype.controller');
 const jobFunctionCtl = require('../controllers/jobfunction.controller');
 const jobRequisitionCtl = require('../controllers/jobrequisition.controller');
+const filterService = require('../services/filter.service');
 
 
 let Response = require('../const/response');
@@ -34,13 +36,19 @@ router.route('/skilltypes/search').get(asyncHandler(getAllSkillTypes));
 router.use('/jobfunctions/search', getAllJobFunctions);
 router.route('/jobfunctions/:id').get(asyncHandler(getJobFunctionById));
 
+router.route('/locations/search').get(asyncHandler(getAllJobLocations));
 
 
 
 async function getAllJobLocations(req, res) {
   let filter = req.query;
-  let data = await jobRequisitionCtl.getAllJobLocations(filter);
-  console.log('data', data)
+  let data = await filterService.getAllJobLocations(filter);
+  data = _.reduce(data, function(res, item){
+      let temp = item._id;
+      temp.count = item.count;
+      res.push(temp);
+      return res;
+  }, [])
   res.json(new Response(data, data?'locations_retrieved_successful':'not_found', res));
 
 }
@@ -103,4 +111,3 @@ async function getJobFunctionById(req, res) {
   let data = await jobFunctionCtl.getJobFunctionById(req.params.id, res.locale);
   res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
 }
-

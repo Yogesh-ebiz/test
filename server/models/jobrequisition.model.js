@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
+const statusEnum = require('../const/statusEnum');
+
 
 const JobRequisitionSchema = new mongoose.Schema({
 
@@ -11,6 +13,10 @@ const JobRequisitionSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true
+  },
+  status: {
+    type: String,
+    default: statusEnum.ACTIVE
   },
   description: {
     type: String,
@@ -75,7 +81,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: 0
   },
   level: {
-    type: String,
+    type: Object,
     required: false
   },
   jobFunction: {
@@ -99,7 +105,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: Date.now
   },
   employmentType: {
-    type: String,
+    type: Object,
     required: true
   },
   promotion: {

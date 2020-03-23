@@ -6,6 +6,8 @@ const Application = require('../models/application.model');
 const Bookmark = require('../models/bookmark.model');
 const JobAlert = require('../models/job_alert.model');
 const PartySKill = require('../models/partyskill.model');
+const Skilltype = require('../models/skilltype.model');
+
 
 
 
@@ -17,6 +19,9 @@ const statusEnum = require('../const/statusEnum');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
+const {getListofSkillTypes} = require('../services/skilltype.service');
+const {getEmploymentTypes} = require('../services/employmenttype.service');
+const {getExperienceLevels} = require('../services/experiencelevel.service');
 
 const {findPartySkillByUserIdAndSkillTypeId, findPartySkillsById, findPartySkillsByUserId, addUserPartySkill, removePartySkillById} = require('../services/partyskill.service');
 
@@ -49,7 +54,7 @@ module.exports = {
 
 
 
-async function getPartySkillsByUserId(currentUserId, filter) {
+async function getPartySkillsByUserId(currentUserId, filter, locale) {
 
   if(currentUserId==null || filter==null){
     return null;
@@ -80,7 +85,19 @@ async function getPartySkillsByUserId(currentUserId, filter) {
       filter.partyId=currentParty.id;
 
       result = await PartySKill.paginate(new SearchParam(filter), options);
-      
+      let skills = _.uniq(_.flatten(_.map(result.docs, 'skillTypeId')));
+      // let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+      let listOfSkills = await getListofSkillTypes(skills, locale);
+
+      result.docs = _.reduce(result.docs, function(res, skill) {
+
+        var found = _.find(listOfSkills, {skillTypeId: skill.skillTypeId})
+        skill.name = found.name;
+
+        delete skill.id;
+        res.push(skill);
+        return res;
+      }, []);
     }
 
   } catch (error) {
@@ -170,7 +187,7 @@ async function removePartySkill(currentUserId, partySkillId) {
 
 
 
-async function getApplicationsByUserId(currentUserId, filter) {
+async function getApplicationsByUserId(currentUserId, filter, locale) {
 
   if(currentUserId==null || filter==null){
     return null;
@@ -204,12 +221,13 @@ async function getApplicationsByUserId(currentUserId, filter) {
         result = await Application.paginate(new ApplicationSearchParam(filter), options);
         let jobIds = _.map(result.docs, 'jobId');
 
-        console.log(jobIds)
 
         let jobs = await findJobIds(jobIds);
-        console.log(jobs)
 
         let companyIds = _.map(jobs, 'company');
+
+        let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
+        let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
 
 
         let res = await searchParties(companyIds, partyEnum.COMPANY);
@@ -228,6 +246,9 @@ async function getApplicationsByUserId(currentUserId, filter) {
           job.hasApplied = true;
           job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
 
+          job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+          job.level = _.find(experienceLevels, {shortCode: job.level});
+
         })
 
         result.docs = jobs;
@@ -242,7 +263,7 @@ async function getApplicationsByUserId(currentUserId, filter) {
 
 }
 
-async function getBookmarksByUserId(currentUserId, filter) {
+async function getBookmarksByUserId(currentUserId, filter, locale) {
 
   if(currentUserId==null || filter==null){
     return null;
@@ -282,6 +303,8 @@ async function getBookmarksByUserId(currentUserId, filter) {
       let res = await searchParties(companyIds, partyEnum.COMPANY);
       let foundCompanies = res.data.data.content;
 
+      let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
+      let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
 
       _.forEach(jobs, function(job){
         job.hasSaved=true;
@@ -291,6 +314,8 @@ async function getBookmarksByUserId(currentUserId, filter) {
         job.skills = [];
         job.connection = {noConnection: 0, list: []};
         job.company = _.find(foundCompanies, {id: job.company});
+        job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+        job.level = _.find(experienceLevels, {shortCode: job.level});
 
       })
 

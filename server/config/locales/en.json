@@ -28,5 +28,7 @@
 	"workflow_removed_successful": "workflow_removed_successful",
 	"job_created_successful": "job_created_successful",
 	"skill_added_successful": "skill_added_successful",
-	"skills_retrieved_successful": "skills_retrieved_successful"
+	"skills_retrieved_successful": "skills_retrieved_successful",
+	"experiencelevel_retrieved_successful": "experiencelevel_retrieved_successful",
+	"resume_uploaded_successful": "resume_uploaded_successful"
 }

@@ -38,9 +38,24 @@ function removeByJobId(userId, jobId) {
   return JobAlert.remove({partyId: userId, jobId: jobId});
 }
 
+function getCountsGroupByCompany(match){
+
+  if(!match){
+    return;
+  }
+
+  let res = JobRequisition.aggregate([
+    {$match: match},
+    { $group: {_id:{company:"$company"}, count:{$sum:1} } }
+  ]);
+
+  return res;
+}
+
 
 module.exports = {
   findJobId: findJobId,
   findJobIds: findJobIds,
-  removeByJobId: removeByJobId
+  removeByJobId: removeByJobId,
+  getCountsGroupByCompany
 }

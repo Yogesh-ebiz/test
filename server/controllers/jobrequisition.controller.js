@@ -9,6 +9,12 @@ const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
 const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
+const {getEmploymentTypes} = require('../services/employmenttype.service');
+const {getExperienceLevels} = require('../services/experiencelevel.service');
+const {getCountsGroupByCompany} = require('../services/jobrequisition.service');
+
+
+
 const filterService = require('../services/filter.service');
 
 
@@ -20,6 +26,9 @@ const JobFunction = require('../models/jobfunctions.model');
 const Bookmark = require('../models/bookmark.model');
 const PartySkill = require('../models/partyskill.model');
 const Application = require('../models/application.model');
+const EmploymentType = require('../models/employmenttypes.model');
+const ExperienceLevel = require('../models/experiencelevel.model');
+
 
 
 
@@ -88,13 +97,12 @@ module.exports = {
   searchJob,
   getSimilarJobs,
   getLatestJobs,
-  getSimilarCompanyJobs,
+  getSimilarCompany,
   applyJobById,
   addBookmark,
   removeBookmark,
   addAlert,
-  removeAlert,
-  getAllJobLocations
+  removeAlert
 }
 
 async function insert(job) {
@@ -153,7 +161,11 @@ async function getJobById(currentUserId, jobId, locale) {
         let noApplied = await findAppliedCountByJobId(job.jobId);
         job.noApplied = noApplied;
 
+        let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
+        job.employmentType = employmentType[0];
 
+        let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
+        job.level = experienceLevel[0];
 
         //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
         let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
@@ -208,7 +220,7 @@ async function addToUser(id, locale) {
 }
 
 
-async function searchJob(currentUserId, jobId, filter) {
+async function searchJob(currentUserId, jobId, filter, locale) {
 
   if(currentUserId==null || filter==null){
     return null;
@@ -258,8 +270,12 @@ async function searchJob(currentUserId, jobId, filter) {
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
   let docs = [];
 
+
   let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
   let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+  let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
+  let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
+
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 
@@ -271,9 +287,12 @@ async function searchJob(currentUserId, jobId, filter) {
 
 
   _.forEach(result.docs, function(job){
-
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
     job.company = _.find(foundCompanies, {id: job.company});
+    job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+    job.level = _.find(experienceLevels, {shortCode: job.level});
+
+
     var skills = _.reduce(job.skills, function(res, skill){
       let find = _.filter(listOfSkills, { 'skillTypeId': skill});
       if(find){
@@ -285,17 +304,6 @@ async function searchJob(currentUserId, jobId, filter) {
     job.skills = skills;
   })
 
-
-  // if(filter.id && !result.content.length){
-  //   filter.employmentType=null;
-  //
-  //
-  //   //Assuring similar Job always have data
-  //   result = await JobRequisition.paginate(new SearchParam(filter), options, function(err, result) {
-  //     console.log('result', result)
-  //     return new PaginationModel(result);
-  //   });
-  // }
 
 
   return new Pagination(result);
@@ -419,41 +427,7 @@ async function getLatestJobs(req) {
 }
 
 
-
-// async function getSimilarCompanyJobs(filter) {
-//
-//   let foundJob = null;
-//   let select = '-description -qualifications -responsibilities -skills ';
-//
-//   if(filter.id){
-//     foundJob = await JobRequisition.findOne({jobId: filter.id});
-//
-//     if(!foundJob){
-//       return null;
-//     }
-//
-//     filter.level = foundJob.level;
-//     filter.jobFunction=foundJob.jobFunction;
-//   }
-//
-//
-//
-//
-//   let similarCompanies = await JobRequisition.aggregate([{$match: {level: foundJob.level}}, { $group: {_id: '$company'} }  ]);
-//
-//
-//   let res = await searchParties(_.uniq(_.map(similarCompanies, '_id')), partyEnum.COMPANY);
-//   let companies = res.data.data.content;
-//   return companies;
-//
-// }
-
-
-
-
-
-
-async function getSimilarCompanyJobs(currentUserId, jobId, filter) {
+async function getSimilarCompany(currentUserId, jobId, filter) {
 
   if(currentUserId==null || jobId==null || filter==null){
     return null;
@@ -463,71 +437,33 @@ async function getSimilarCompanyJobs(currentUserId, jobId, filter) {
 
   try {
 
-    let foundJob = await JobRequisition.findOne({jobId: filter.id});
-
+    let foundJob = await JobRequisition.findOne({jobId: jobId});
     if(foundJob && foundJob.status==statusEnum.ACTIVE){
 
+      let match = {level: foundJob.level, jobFunction: foundJob.jobFunction};
+      // let match = {level: foundJob.level};
 
-      let response = await getPartyById(currentUserId);
-      let currentParty = response.data.data;
+      let group = await getCountsGroupByCompany(match);
+      group = _.reduce(group, function(res, item){
+        console.log('item', item)
+        res.push(item._id.company);
+        return res;
+      }, []);
 
+      let companies = await searchParties(group, partyEnum.COMPANY, 20, filter.page);
+      result = (companies.data)? companies.data.data : null;
 
-      if(!isPartyActive(currentParty)) {
-        console.debug('User Not Active: ', currentUserId);
-        return null;
-      }
+      _.forEach(result.content, function(res){
+        res.hasFollowed = false;
+        console.log(res);
+      })
 
-      let currentAttendee = await getAttendeeById(eventId, currentUserId);
-      console.log('currentAttendee', currentAttendee);
-
-      let isOrganizer = (currentAttendee && currentAttendee.isOrganizer)?true:false;
-      let guestCanSeeOtherGuests = foundEvent.guestCanSeeOtherGuests;
-      let isAllowToUpdate = (isOrganizer || (currentAttendee && guestCanSeeOtherGuests))? true : false;
-
-      console.log('status', isAllowToUpdate, isOrganizer, guestCanSeeOtherGuests);
-
-      if(isAllowToUpdate){
-        console.log('guestCanSeeOtherGuests')
-        let foundAttendees = null;
-        let select = '';
-        let limit = (filter.size && filter.size>0) ? filter.size:20;
-        let page = (filter.page && filter.page==0) ? filter.page:1;
-        let sortBy = {};
-        sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
-
-        let options = {
-          select:   select,
-          sort:     sortBy,
-          lean:     true,
-          limit:    limit,
-          page: parseInt(filter.page)+1
-        };
-
-        filter.eventId = eventId;
-
-        result = await Attendee.paginate(new SearchParam(filter), options);
-        let activeAttendees = result.docs;
-        let attendees = _.map(activeAttendees, 'partyId');
-
-        let response = await searchParties(attendees);
-        let foundUsers = response.data.data.content;
-        let found = [];
-
-        for (var i = 0; i < activeAttendees.length; i++) {
-          for (var j = 0; j < foundUsers.length; j++) {
-            if (activeAttendees[i].partyId == foundUsers[j].id) {
-              let userMerge = _.merge(activeAttendees[i], foundUsers[j]);
-              found.push(userMerge);
-            }
-          }
-        }
-      }
     }
   } catch (error) {
     console.log(error);
   }
 
-  return new Pagination(result);
+  return result;
 
 }
 
@@ -536,7 +472,9 @@ async function getSimilarCompanyJobs(currentUserId, jobId, filter) {
 
 async function applyJobById(currentUserId, application) {
 
+
   application = await Joi.validate(application, applicationSchema, { abortEarly: false });
+
 
   if(currentUserId==null || application==null){
     return null;
@@ -544,10 +482,10 @@ async function applyJobById(currentUserId, application) {
 
   let result;
   try {
-    job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+    let job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-
+      console.debug('job', job.jobId);
       let response = await getPersonById(currentUserId);
       let currentParty = response.data.data;
       // console.log('currentParty', currentParty)
@@ -729,12 +667,4 @@ async function removeAlert(currentUserId, jobId) {
   }
 
   return found;
-}
-
-
-async function getAllJobLocations(query, locale) {
-  let data = await filterService.getAllJobLocations(query, locale);
-
-  data = _.uniqBy(data, 'city');
-  return data;
 }

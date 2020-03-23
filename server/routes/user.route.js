@@ -35,7 +35,7 @@ async function addPartySkill(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let partySkill = req.body;
   partySkill.partyId = currentUserId;
-  let data = await userCtl.addPartySkill(currentUserId, partySkill);
+  let data = await userCtl.addPartySkill(currentUserId, partySkill, res.locale);
 
   res.json(new Response(data, data?'skill_added_successful':'not_found', res));
 }
@@ -56,7 +56,7 @@ async function getApplicationsByUserId(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let filter = req.query;
-  let data = await userCtl.getApplicationsByUserId(currentUserId, filter);
+  let data = await userCtl.getApplicationsByUserId(currentUserId, filter, res.locale);
 
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
@@ -66,7 +66,7 @@ async function getBookmarksByUserId(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let filter = req.query;
-  let data = await userCtl.getBookmarksByUserId(currentUserId, filter);
+  let data = await userCtl.getBookmarksByUserId(currentUserId, filter, res.locale);
 
   res.json(new Response(data, data?'bookmarks_retrieved_successful':'not_found', res));
 }

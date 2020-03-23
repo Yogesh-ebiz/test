@@ -13,6 +13,8 @@ const swaggerDocument = require('./swagger.json');
 const routes = require('../routes/index.route');
 const config = require('./config');
 const passport = require('./passport');
+const multipart = require('connect-multiparty');
+
 const i18n = require('./i18n');
 let Response = require('../const/response');
 
@@ -57,6 +59,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
+app.use(multipart());
+
 
 // secure apps by setting various HTTP headers
 app.use(helmet());

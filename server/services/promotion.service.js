@@ -1,17 +1,17 @@
 const _ = require('lodash');
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
-const Application = require('../models/application.model');
+const Promotion = require('../models/promotion.model');
 
 
-function findApplicationById(applicationId) {
+function findPromotionById(promotionId) {
   let data = null;
 
-  if(applicationId==null){
+  if(promotionId==null){
     return;
   }
 
-  return Application.findOne({applicationId: applicationId});
+  return Application.findOne({promotionId: promotionId});
 }
 
 function findAppliedCountByJobId(jobId) {

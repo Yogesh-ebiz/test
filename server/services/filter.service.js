@@ -28,15 +28,28 @@ function getAllJobLocations(filter) {
   return data;
 }
 
-function getAllExperienceLevels(locale) {
-  let localeStr = locale? locale : 'en';
-  let propLocale = '$name.'+localeStr;
-  let data = ExperienceLevel.aggregate([
-    { $project: {id: 1, shortCode: 1, description: 1, sequence: 1, icon: 1, name: propLocale } }
-  ]);
+function getAllExperienceLevels(filter, locale) {
+  let localeStr = locale? locale.toLowerCase() : 'en';
+  let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
+  let data = null;
 
+  let propLocale = '$name.'+localeStr;
+  if(keyword){
+    let match = {};
+    match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
+    data = EmploymentTypes.aggregate([
+      { $match: match },
+      { $project: {shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+    ]);
+  }else {
+    data = ExperienceLevel.aggregate([
+      { $project: {shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+    ]);
+  }
   return data;
 }
+
+
 
 function getAllJobFunctions(filter, locale) {
   let localeStr = locale? locale.toLowerCase() : 'en';
@@ -125,11 +138,20 @@ function getAllSkillTypes(locale) {
 
 
 
+function getAllJobLocations(filter) {
+  let data = JobRequisition.aggregate([{ $group: {_id:{city:"$city", state: '$state', country: '$country'}, count:{$sum:1} } } ]);
+  return data;
+}
+
+
+
+
 module.exports = {
   getAllJobLocations: getAllJobLocations,
   getAllExperienceLevels: getAllExperienceLevels,
   getAllJobFunctions: getAllJobFunctions,
   getAllEmploymentTypes: getAllEmploymentTypes,
   getAllIndustries: getAllIndustries,
-  getAllSkillTypes: getAllSkillTypes
+  getAllSkillTypes: getAllSkillTypes,
+  getAllJobLocations:getAllJobLocations
 }
