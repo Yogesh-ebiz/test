@@ -9,7 +9,7 @@
   {"id" : 5, "name" : { "en" : "Driver" }, "shortCode" : "DRI", "icon" : "driver.png", "parent" : null, "sequence" : 0 },
   {"id" : 3, "name" : { "en" : "Management" }, "shortCode" : "MNGR", "icon" : "management.png", "parent" : null, "sequence" : 0 },
   {"id" : 10, "name" : { "en" : "Communications" }, "shortCode" : "COM", "icon" : "communication.png", "parent" : null, "sequence" : 0 },
-  {"id" : 13, "name" : { "en" : "Informatino & Technology" }, "shortCode" : "TECH", "icon" : "technology.png", "parent" : null, "sequence" : 0 },
+  {"id" : 13, "name" : { "en" : "Information & Technology" }, "shortCode" : "TECH", "icon" : "technology.png", "parent" : null, "sequence" : 0 },
   {"id" : 11, "name" : { "en" : "Finance Management" }, "shortCode" : "FNMN", "icon" : "finance.png", "parent" : null, "sequence" : 0 },
   {"id" : 12, "name" : { "en" : "Travel & Tourism" }, "shortCode" : "TOUR", "icon" : "tour.png", "parent" : null, "sequence" : 0 }
 ]

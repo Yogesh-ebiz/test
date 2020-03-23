@@ -1,0 +1,8 @@
+[
+  {"experienceLevelId" : 1, "name" : { "en" : "Junior" }, "shortCode" : "JUNIOR"},
+  {"experienceLevelId" : 2, "name" : { "en" : "Mid" }, "shortCode" : "MID"},
+  {"experienceLevelId" : 3, "name" : { "en" : "Senior" }, "shortCode" : "SENIOR"},
+  {"experienceLevelId" : 4, "name" : { "en" : "Manager" }, "shortCode" : "MANAGER"},
+  {"experienceLevelId" : 5, "name" : { "en" : "Director" }, "shortCode" : "DIRECTOR"},
+  {"experienceLevelId" : 6, "name" : { "en" : "Executive" }, "shortCode" : "EXECUTIVE"}
+]

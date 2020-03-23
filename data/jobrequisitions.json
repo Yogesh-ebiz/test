@@ -1,6 +1,7 @@
 [
   {
     "jobId": 100000,
+    "status": "ACTIVE",
     "title": "VP, Business Technology",
     "description": "Vice President of Business Technology (Information Technology and Business Systems) leads a team that creates and delivers internal infrastructure and systems to improve the overall value and performance of the organisation. The Vice President will be responsible for planning and delivering the function's strategy, goals, budget, services, processes, projects, infrastructure and assets ensuring consistent alignment with, and facilitation of, Marqeta's business strategy. The ideal candidate will be a strong technical leader with sound business acumen and executive presence, able to drive focus and accountability to business commitments.",
     "durationMonths": null,
@@ -16,7 +17,7 @@
     "externalUrl": "https://www.amazon.jobs/en/jobs/1059086/software-development-manager?cmpid=SPLICX0248M&utm_source=linkedin.com&utm_campaign=cxro&utm_medium=social_media&utm_content=job_posting&ss=paid",
     "noOfResources": 1,
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 65000,
@@ -61,14 +62,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100001,
+    "status": "ACTIVE",
     "title": "Senior Software Engineer",
     "description": "This opportunity is to work for the Payments Group in eBay. We support all activities on eBay that require money movement and beyond. We build critical software that has immediate impact on millions of eBay users throughout the world. We are seeking a seasoned software engineer who is passionate about utilizing latest technologies to bring the best user experience to our customers. The candidate will work closely with the various business units, product management, architecture and operations as well as third party software vendors. The candidate is expected to be a self-starter and a team player, a strong driver for results.Collaborate with engineers, business units, product management, architects, and operations teams to build solutions in the Payments domain. Lead and estimate engineering effort, plan implementations, and rollout for applications integrating with cross-functional components. Design, develop and test major features while working in an Agile Scrum team. Utilize Java, Oracle DB, NoSQL and other technologies eBay is using, such as NodeJS, HTML, Javascript, CSS, AJAX&hellip;etc.",
     "durationMonths": null,
@@ -82,7 +84,7 @@
     "externalUrl": "https://www.amazon.jobs/en/jobs/1014881/software-development-manager?cmpid=SPLICX0248M&utm_source=linkedin.com&utm_campaign=cxro&utm_medium=social_media&utm_content=job_posting&ss=paid",
     "noOfResources": 1,
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 143000,
@@ -118,14 +120,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100002,
+    "status": "ACTIVE",
     "title": "Sr. Software Engineer, Full Stack",
     "description": "The Payments Seller Experience Product Development team is looking to hire an outstanding Full Stack Engineer to help build great products for our Sellers at eBay. Who we are:We are a team focused on building new capabilities that enable our sellers to better manage their Finances on eBay. We work across the tech stack - UI (NodeJS, React, Angular), Backend (Java, Kafka, NoSQL).",
     "durationMonths": null,
@@ -138,7 +141,7 @@
     "isExternal": true,
     "externalUrl": "https://track.talentbrew.com/?jobmediaid=449168&typeid=1",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 140000,
@@ -174,14 +177,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100003,
+    "status": "ACTIVE",
     "title": "Senior Product Manager",
     "description": "About Our Team :  Core Technology (CT) is a global team responsible for the end-to-end eBay technology platform. This platform runs our entire infrastructure and all the services that come together to form ebay.com.We are looking for an experienced and strategic Senior Product Manager to help design, shape, and drive product capabilities for the eBay’s Payments Platform. We believe that the end customer experience is a derivative of our platform capabilities. Developing a platform to support multiple geographies carries with it many challenges. The ideal candidate will have previously developed global product strategies that enable and drive innovation and go-to-market efficiency. He or she will work closely with in-country and regional business leaders, product and domain leads to identify and build core capabilities, maximize utility of features common to multiple partners, and efficiently solve for local functionalities critical to market success. Additionally, he or she will have a proven ability to build relationships and influence across the organization at all levels, as well as superior communication and presentation abilities.",
     "durationMonths": null,
@@ -196,7 +200,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 170000,
@@ -232,14 +236,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100004,
+    "status": "ACTIVE",
     "title": "Sr. Technical Product Manager-Buyer Payments",
     "description": "Looking for a company that encourages passion, courage and creativity, where you can be part of the team crafting the future of global commerce? Want to shape how millions of people buy, sell, connect, and share around the world? If you’re passionate about joining a purpose driven community that is dedicated to creating an ambitious and versatile work environment, join eBay – a company you can be proud to be a part of. eBay is one of the top global marketplaces with the mission to connect millions of buyers and sellers around the world, empowering people and creating economic opportunity for all.About Our Team :eBay is looking for an experienced Product Manager to help design, shape, and drive product capabilities for the eBay’s Payments Buyer Experience. We believe that the end customer experience is a derivative of our platform capabilities. Developing a platform to support multiple geographies carries with it many challenges. You will have previously developed global product strategies that enable and drive innovation and go-to-market efficiency. He or she will work closely with in-country and regional business leaders, product and domain leads to identify and build core capabilities, maximize utility of features common to multiple partners, and efficiently tackle for local functionalities critical to market success. Additionally, you have the ability to establish relationships and influence across the organization at all levels, as well as superior communication and presentation abilities.",
     "durationMonths": null,
@@ -252,7 +257,7 @@
     "isExternal": true,
     "externalUrl": "https://track.talentbrew.com/?jobmediaid=449168&typeid=1",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 163000,
@@ -288,14 +293,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100005,
+    "status": "ACTIVE",
     "title": "Software Development Manager - Fire TV",
     "description": "Want to re-invent how 10s of millions of people watch TV?  Fire TV remains the #1 best-selling streaming media player in the U.S. As we continue to involve the customer experiences on our products, we are looking for an experienced TPM to lead initiatives on Fire TV.In this role, you will help develop and drive the Core/Live Tv experience roadmap and product vision and you will have a high degree of ownership in critical features and user experiences. The role is inherently cross-functional -- you will work closely with UX, software engineering, device marketing, customer service, and executive stakeholders. We are looking for someone with deep customer focus as well as passion for and an established track record delivering products to customers that are both cloud and device software stacks. A successful candidate should be able to manage the tactical tasks of delivering products while simultaneously defining and driving strategic product planning for forward looking initiatives.",
     "durationMonths": null,
@@ -308,7 +314,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 163000,
@@ -344,14 +350,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100006,
+    "status": "ACTIVE",
     "title": "Director, Software Development",
     "description": "WAs a Director of Software Development for Embedded Devices, you will lead your team to design, architect and deliver low level software for our embedded devices. You will engage with technology partners and lead long term development with a focus on architecture, performance, power, and integration. In this position you will lead requirements and roadmap definition, specification development and execution.",
     "durationMonths": null,
@@ -364,7 +371,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 199000,
@@ -401,14 +408,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100007,
+    "status": "ACTIVE",
     "title": "Software Development Manager",
     "description": "The Amazon Devices Software and Services team is looking for an experienced software development manager to lead an engineering team that is building an innovative new AWS service for the CES manufacturing industry. As a Software Development Manager, you will be responsible for leading a team of engineers in the design, development, test, and deployment of our software and services. The successful candidate will have an established background in developing complex systems, a strong technical background, excellent project management skills, great communication skills, and a motivation to achieve results in a fast paced environment.",
     "durationMonths": null,
@@ -421,7 +429,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 173000,
@@ -458,14 +466,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100008,
+    "status": "ACTIVE",
     "title": "Sr Database Engineering Manager - Aurora and MySQL",
     "description": "At Amazon Web Services (AWS), we are the public cloud. AWS commands a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -478,7 +487,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 155000,
@@ -515,14 +524,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100009,
+    "status": "ACTIVE",
     "title": "Database Manager - NoSQL and MySQL",
     "description": "At Amazon Web Services (AWS), we are the public cloud. AWS commands a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -535,7 +545,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 165000,
@@ -572,14 +582,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100010,
+    "status": "ACTIVE",
     "title": "Software Engineering Manager, Engineering Productivity",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -592,7 +603,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 165000,
@@ -629,14 +640,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100011,
+    "status": "ACTIVE",
     "title": "Application Engineering Manager",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -649,7 +661,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 185000,
@@ -686,14 +698,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100012,
+    "status": "ACTIVE",
     "title": "Software Engineering Manager, Platforms",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -706,7 +719,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 185000,
@@ -743,14 +756,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100013,
+    "status": "ACTIVE",
     "title": "Director, Engineering Search Platforms",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -763,7 +777,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 185000,
@@ -800,14 +814,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100014,
+    "status": "ACTIVE",
     "title": "Director of Engineering, Payments, Computer Vision/Machine Learning",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -820,7 +835,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 215000,
@@ -857,14 +872,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100015,
+    "status": "ACTIVE",
     "title": "Director of Engineering Productivity, Storage/Databases",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -877,7 +893,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 215000,
@@ -914,14 +930,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100016,
+    "status": "ACTIVE",
     "title": "Software Engineering Manager, G Suite",
     "description": "At Google Web Services, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -934,7 +951,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 215000,
@@ -971,14 +988,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100017,
+    "status": "ACTIVE",
     "title": "Senior AI Program Manager",
     "description": "At Microsoft, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -991,7 +1009,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 209000,
@@ -1028,14 +1046,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100018,
+    "status": "ACTIVE",
     "title": "Principal Software Engineering Manager",
     "description": "At Microsoft, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -1048,7 +1067,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 219000,
@@ -1085,14 +1104,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100019,
+    "status": "ACTIVE",
     "title": "Senior Program Manager",
     "description": "At Microsoft, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -1105,7 +1125,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 189000,
@@ -1142,14 +1162,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100020,
+    "status": "ACTIVE",
     "title": "Principal Program Manager",
     "description": "At Microsoft, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -1162,7 +1183,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 219000,
@@ -1199,14 +1220,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100021,
+    "status": "ACTIVE",
     "title": "Principal Software Engineer",
     "description": "At Microsoft, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -1219,7 +1241,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 219000,
@@ -1256,14 +1278,15 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   },
   {
     "jobId": 100022,
+    "status": "ACTIVE",
     "title": "Sr.  Sales Representative",
     "description": "At Microsoft, we are the public cloud. Manages a majority of the world's public cloud traffic, serving over 1 million customers, and this volume is growing exponentially every day. At Amazon/AWS, we take databases to their limits. Due to our scale, we see issues that no other RDBMS customers see. We are creatively and disruptively solving some of the most complex database problems related to immense growth, scaling, leveraging the cloud, extremely high performance and high availability requirements. Do these types of challenges excite you? if so .... AWS Database Services is currently looking for a talented Senior Database Engineering Manager for its Seattle, Palo Alto or Vancouver office. The manager will own administration and engineering for thousands of production database systems. The ideal candidate will be responsible for fast-paced complex distributed database environments supporting our MySQL family of products. Successful candidates will have the ability to work directly with customers to rapidly troubleshoot complex technical problems under pressure.",
     "durationMonths": null,
@@ -1276,7 +1299,7 @@
     "isExternal": false,
     "externalUrl": "",
     "noOfResources": 1,
-    "employmentType": "Full Time",
+    "employmentType": "FULLTIME",
     "expirationDate": 1580545602,
     "requiredOnDate": 1581755202,
     "salaryRangeLow": 219000,
@@ -1316,9 +1339,9 @@
     "connection": {
       "noConnection": 3,
       "list": [
-        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "user1.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
-        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "user2.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
-        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "user3.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
+        { "id": 1, "firstname": "John", "lastname": "Mandelin", "imageUrl": "profile.png", "title": "Sr. Development Manager", "permissions": [{"message": true}]},
+        { "id": 2, "firstname": "Linda", "lastname": "Chan", "imageUrl": "profile.png", "title": "Enginnering Director", "permissions": [{"email": true}]},
+        { "id": 3, "firstname": "Elizabeth", "lastname": "Remington", "imageUrl": "profile.png", "title": "Sr. Recruiter", "permissions": [{"connect": true}]}
       ]
     }
   }
