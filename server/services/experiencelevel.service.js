@@ -14,7 +14,6 @@ function getExperienceLevels(list, locale) {
 
   let propLocale = '$name.'+localeStr;
 
-  console.log(list, locale)
   let match = { shortCode: {$in: list} };
   data = ExperienceLevel.aggregate([
     { $match: match },

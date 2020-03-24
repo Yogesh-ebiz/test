@@ -290,7 +290,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
   let industries = await getIndustry(_.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
 
-  console.log(industries)
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 

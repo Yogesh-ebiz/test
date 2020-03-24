@@ -40,6 +40,10 @@ function SearchParam(filter) {
     this.query.employmentType =  { $in: filter.employmentType.split(',') };
   }
 
+  if (filter.industry && filter.industry!="") {
+    this.query.industry =  { $in: filter.industry.split(',') };
+  }
+
   if (filter.company && filter.company!="") {
 
     let company = _.reduce(filter.company.split(','), function(result, value, key) {
