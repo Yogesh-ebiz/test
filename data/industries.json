@@ -1,0 +1,16 @@
+[
+  { "industryId" : 4, "name" : { "en" : "Banking & Financial Services", "vi" : "Dịch Vụ Tài Chính Ngân Hàng" }, "shortCode" : "BANK", "icon" : "bank.png", "sequence" : 0 },
+  { "industryId" : 1, "name" : { "en" : "Information Technology", "vi" : "Công Nghệ Thông Tin" }, "shortCode" : "TECH", "icon" : "tech.png", "sequence" : 0 },
+  { "industryId" : 3, "name" : { "en" : "Accounting & Legal", "vi" : "Kế toán & Pháp lý" }, "shortCode" : "ACTLG", "icon" : "actlg.png", "sequence" : 0 },
+  { "industryId" : 5, "name" : { "en" : "Consulting", "vi" : "Dịch Vụ" }, "shortCode" : "CONS", "icon" : "cons.png", "sequence" : 0 },
+  { "industryId" : 6, "name" : { "en" : "Education & Schools", "vi" : "Giáo Dục & Trường Học" }, "shortCode" : "EDU", "icon" : "edu.png", "sequence" : 0 },
+  { "industryId" : 2, "name" : { "en" : "Engineering", "vi" : "Kỹ Thuật" }, "shortCode" : "ENG", "icon" : "eng.png", "sequence" : 0 },
+  { "industryId" : 8, "name" : { "en" : "Marketing & Advertising", "vi" : "Quảng Cáo Tiếp Thị" }, "shortCode" : "MAD", "icon" : "mad.png", "sequence" : 0 },
+  { "industryId" : 7, "name" : { "en" : "Health Care & Hospitals", "vi" : "Sức Khỏe & Bệnh Viện" }, "shortCode" : "HEAL", "icon" : "heal.png", "sequence" : 0 },
+  { "industryId" : 9, "name" : { "en" : "Construction", "vi" : "Xây Dựng" }, "shortCode" : "CSTR", "icon" : "cstr.png", "sequence" : 0 },
+  { "industryId" : 12, "name" : { "en" : "Automotive", "vi" : "Ô Tô" }, "shortCode" : "AUTO", "icon" : "auto.png", "sequence" : 0 },
+  { "industryId" : 10, "name" : { "en" : "Government", "vi" : "Chính Phủ" }, "shortCode" : "GOV", "icon" : "gov.png", "sequence" : 0 },
+  { "industryId" : 13, "name" : { "en" : "Arts & Entertainment", "vi" : "Nghệ Thuật & Giải Trí" }, "shortCode" : "ART", "icon" : "art.png", "sequence" : 0 },
+  { "industryId" : 11, "name" : { "en" : "Retail", "vi" : "Buôn Bán" }, "shortCode" : "SALES", "icon" : "sales.png", "sequence" : 0 },
+  { "industryId" : 14, "name" : { "en" : "Biotech & Pharmaceuticals", "vi" : "Công nghệ Sinh Học & Dược Phẩm" }, "shortCode" : "BIO", "icon" : "bio.png", "sequence" : 0 }
+]
