@@ -23,6 +23,8 @@ const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
+const {getIndustry} = require('../services/industry.service');
+
 const {findJobViewByUserId} = require('../services/jobview.service');
 
 
@@ -205,7 +207,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
 
       if(isPartyActive(currentParty)) {
-        console.debug('isActive', currentParty)
+        // console.debug('isActive', currentParty)
         let select = '';
         let limit = (filter.size && filter.size > 0) ? filter.size : 20;
         let page = (filter.page && filter.page == 0) ? filter.page : 1;
@@ -233,6 +235,9 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
         let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
 
+        let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
+
+
 
         let res = await searchParties(companyIds, partyEnum.COMPANY);
         let foundCompanies = res.data.data.content;
@@ -240,7 +245,10 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
         let hasSaves = await findBookByUserId(currentParty.id);
 
-        _.forEach(jobs, function(job){
+
+        _.forEach(result.docs, function(application){
+
+          let job = _.find(jobs, {jobId: application.jobId});
           job.description = null;
           job.responsibilities=[];
           job.qualifications = [];
@@ -253,13 +261,22 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
           job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
           job.level = _.find(experienceLevels, {shortCode: job.level});
 
-          let application = _.find(result.docs, {jobId: job.jobId});
-          job.appliedDate =application.createdDate;
-          job.applicationId = application.applicationId;
+          let industry = _.reduce(industries, function(res, item){
+            if(_.includes(job.industry, item.shortCode)){
+              res.push(item);
+            }
+            return res;
+          }, []);
 
-        })
+          job.industry = industry;
 
-        result.docs = jobs;
+
+          application.job = job;
+
+
+        });
+
+        // result.docs = jobs;
 
       }
 
@@ -285,7 +302,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
 
     if(isPartyActive(currentParty)) {
-      console.debug('isActive', currentParty.id)
+
       let select = '';
       let limit = (filter.size && filter.size > 0) ? filter.size : 20;
       let page = (filter.page && filter.page == 0) ? filter.page : 1;
@@ -313,6 +330,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
       let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
+      let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
 
       _.forEach(jobs, function(job){
         job.hasSaved=true;
@@ -324,6 +342,16 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
         job.company = _.find(foundCompanies, {id: job.company});
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
+
+        let industry = _.reduce(industries, function(res, item){
+          if(_.includes(job.industry, item.shortCode)){
+            res.push(item);
+          }
+          return res;
+        }, []);
+
+        job.industry = industry;
+
 
       })
 
@@ -435,7 +463,6 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       let jobIds = _.map(result.docs, 'jobId');
 
-      console.log(jobIds)
 
       let jobs = await findJobIds(jobIds);
       let companyIds = _.map(jobs, 'company');

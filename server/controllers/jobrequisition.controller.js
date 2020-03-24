@@ -11,6 +11,8 @@ const {findBookById, addBookById, removeBookById, findBookByUserId} = require('.
 const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
+const {getIndustry} = require('../services/industry.service');
+
 const {getCountsGroupByCompany} = require('../services/jobrequisition.service');
 const {addJobViewByUserId} = require('../services/jobview.service');
 
@@ -30,6 +32,7 @@ const PartySkill = require('../models/partyskill.model');
 const Application = require('../models/application.model');
 const EmploymentType = require('../models/employmenttypes.model');
 const ExperienceLevel = require('../models/experiencelevel.model');
+const Industry = require('../models/industry.model');
 
 
 
@@ -46,6 +49,7 @@ const jobRequisitionSchema = Joi.object({
   lastCurrencyUom: Joi.string(),
   noOfResources: Joi.number(),
   type: Joi.string(),
+  industry: Joi.array().optional(),
   jobFunction: Joi.string(),
   expirationDate: Joi.number(),
   requiredOnDate: Joi.number(),
@@ -56,7 +60,7 @@ const jobRequisitionSchema = Joi.object({
   responsibilities: Joi.array(),
   qualifications: Joi.array(),
   skills: Joi.array(),
-  industry: Joi.string(),
+  industry: Joi.array().optional(),
   employmentType: Joi.string(),
   promotion: Joi.number().optional(),
   company: Joi.number(),
@@ -167,7 +171,6 @@ async function getJobById(currentUserId, jobId, locale) {
         let noApplied = await findAppliedCountByJobId(job.jobId);
         job.noApplied = noApplied;
 
-        console.debug(job.employmentType);
         let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
         job.employmentType = employmentType[0];
 
@@ -176,6 +179,9 @@ async function getJobById(currentUserId, jobId, locale) {
 
         //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
         let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
+
+        let industry = await getIndustry(job.industry, locale);
+        job.industry = industry;
 
 
         skills = _.reduce(jobSkills, function(res, skill, key){
@@ -282,12 +288,15 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
+  let industries = await getIndustry(_.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
 
+  console.log(industries)
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 
   let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
   let foundCompanies = res.data.data.content;
+
 
 
   let hasSaves = await findBookByUserId(currentUserId);
@@ -299,6 +308,14 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
 
+    let industry = _.reduce(industries, function(res, item){
+      if(_.includes(job.industry, item.shortCode)){
+        res.push(item);
+      }
+      return res;
+    }, []);
+
+    job.industry = industry;
 
     var skills = _.reduce(job.skills, function(res, skill){
       let find = _.filter(listOfSkills, { 'skillTypeId': skill});

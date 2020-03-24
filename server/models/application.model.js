@@ -13,6 +13,10 @@ const ApplicationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  job: {
+    type: Object,
+    required: false
+  },
   partyId: {
     type: Number,
     required: true
@@ -49,6 +53,11 @@ const ApplicationSchema = new mongoose.Schema({
   attachment: {
     type: String,
     required: false
+  },
+  progress: {
+    type: Array,
+    required: false,
+    default: []
   }
 
 }, {

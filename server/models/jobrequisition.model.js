@@ -80,6 +80,14 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  appliedDate: {
+    type: Number,
+    required: false
+  },
+  applicationId: {
+    type: Number,
+    required: false
+  },
   level: {
     type: Object,
     required: false
@@ -107,6 +115,11 @@ const JobRequisitionSchema = new mongoose.Schema({
   employmentType: {
     type: Object,
     required: true
+  },
+  industry: {
+    type: Array,
+    required: false,
+    default: []
   },
   promotion: {
     type: Object,

@@ -30,5 +30,6 @@
 	"skill_added_successful": "skill_added_successful",
 	"skills_retrieved_successful": "skills_retrieved_successful",
 	"experiencelevel_retrieved_successful": "experiencelevel_retrieved_successful",
-	"resume_uploaded_successful": "resume_uploaded_successful"
+	"resume_uploaded_successful": "resume_uploaded_successful",
+	"jobviews_retrieved_successful": "jobviews_retrieved_successful"
 }
