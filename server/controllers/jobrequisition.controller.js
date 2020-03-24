@@ -12,6 +12,8 @@ const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = r
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getCountsGroupByCompany} = require('../services/jobrequisition.service');
+const {addJobViewByUserId} = require('../services/jobview.service');
+
 
 
 
@@ -56,7 +58,7 @@ const jobRequisitionSchema = Joi.object({
   skills: Joi.array(),
   industry: Joi.string(),
   employmentType: Joi.string(),
-  promotion: Joi.object().optional(),
+  promotion: Joi.number().optional(),
   company: Joi.number(),
   city: Joi.string(),
   state: Joi.string(),
@@ -72,7 +74,8 @@ const applicationSchema = Joi.object({
   phoneNumber: Joi.string().required(),
   email: Joi.string().required(),
   availableDate: Joi.number().required(),
-  attachment: Joi.string().allow('').optional()
+  attachment: Joi.string().allow('').optional(),
+  follow: Joi.boolean().optional()
 });
 
 
@@ -144,6 +147,9 @@ async function getJobById(currentUserId, jobId, locale) {
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
+
+        await addJobViewByUserId(currentParty.id, jobId);
+
         let partySkills = await PartySkill.find({partyId: currentParty.id});
         partySkills = _.map(partySkills, "skillTypeId");
         // console.log('partyskills', partySkills)
@@ -161,6 +167,7 @@ async function getJobById(currentUserId, jobId, locale) {
         let noApplied = await findAppliedCountByJobId(job.jobId);
         job.noApplied = noApplied;
 
+        console.debug(job.employmentType);
         let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
         job.employmentType = employmentType[0];
 
