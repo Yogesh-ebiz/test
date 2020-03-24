@@ -17,6 +17,8 @@ router.route('/:userId/skills/:partySkillId').delete(asyncHandler(removePartySki
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
 router.route('/:userId/bookmarks').get(asyncHandler(getBookmarksByUserId));
 router.route('/:userId/alerts').get(asyncHandler(getAlertsByUserId));
+router.route('/:userId/jobviews').get(asyncHandler(getJobViewsByUserId));
+
 
 
 async function getPartySkillsByUserId(req, res) {
@@ -79,4 +81,14 @@ async function getAlertsByUserId(req, res) {
   let data = await userCtl.getAlertsByUserId(currentUserId, filter);
 
   res.json(new Response(data, data?'bookmarks_retrieved_successful':'not_found', res));
+}
+
+
+async function getJobViewsByUserId(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let filter = req.query;
+  let data = await userCtl.getJobViewsByUserId(currentUserId, filter, res.locale);
+
+  res.json(new Response(data, data?'jobviews_retrieved_successful':'not_found', res));
 }
