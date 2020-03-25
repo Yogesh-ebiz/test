@@ -8,7 +8,7 @@ const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkil
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
-const {findAlertByUserIdAndJobId, addAlertById, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
+const {findAlertByUserIdAndJobId, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
@@ -83,18 +83,6 @@ const applicationSchema = Joi.object({
 });
 
 
-const jobAlertSchema = Joi.object({
-  jobId: Joi.number().optional(),
-  partyId: Joi.number().optional(),
-  city: Joi.string().optional(),
-  state: Joi.string().optional(),
-  country: Joi.string().optional(),
-  level: Joi.string().optional(),
-  employmentType: Joi.string().optional(),
-  distance: Joi.number().optional(),
-  company: Joi.number().optional()
-});
-
 
 
 module.exports = {
@@ -107,9 +95,7 @@ module.exports = {
   getSimilarCompany,
   applyJobById,
   addBookmark,
-  removeBookmark,
-  addAlert,
-  removeAlert
+  removeBookmark
 }
 
 async function insert(job) {
@@ -182,6 +168,13 @@ async function getJobById(currentUserId, jobId, locale) {
 
         let industry = await getIndustry(job.industry, locale);
         job.industry = industry;
+
+        job.promotion = {
+          "id": 1,
+          "type": "HOT",
+          "createdDate": 1578887589,
+          "hasExpired": true
+        };
 
 
         skills = _.reduce(jobSkills, function(res, skill, key){
@@ -306,6 +299,13 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     job.company = _.find(foundCompanies, {id: job.company});
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
+
+    job.promotion = {
+      "id": 1,
+      "type": "HOT",
+      "createdDate": 1578887589,
+      "hasExpired": true
+    };
 
     let industry = _.reduce(industries, function(res, item){
       if(_.includes(job.industry, item.shortCode)){
@@ -518,6 +518,7 @@ async function applyJobById(currentUserId, application) {
 
         result = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
         if(!result){
+          application.job = job._id;
           application.attachment = application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf");
           result = await applyJob(application);
         }
@@ -612,82 +613,3 @@ async function removeBookmark(currentUserId, jobId) {
 }
 
 
-
-async function addAlert(currentUserId, jobId, alert) {
-  alert = await Joi.validate(alert, jobAlertSchema, { abortEarly: false });
-
-  if(currentUserId==null || jobId==null){
-    return null;
-  }
-
-
-  let result;
-  try {
-    job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
-
-    if(job) {
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
-      // console.log('currentParty', currentParty)
-
-      //Security Check if user is part of meeting attendees that is ACTIVE.
-      if (isPartyActive(currentParty)) {
-
-        result = await findAlertByUserIdAndJobId(currentParty.id, jobId);
-
-        if(!result) {
-          alert.partyId = currentParty.id;
-          alert.jobId = job.jobId;
-          alert.company = job.company;
-
-          console.log('alert', alert);
-          result = await addAlertById(currentParty.id, alert);
-        }
-
-      }
-    }
-
-  } catch (error) {
-    console.log(error);
-    return result;
-  }
-
-  return result;
-}
-
-
-
-async function removeAlert(currentUserId, jobId) {
-
-  if(currentUserId==null || jobId==null){
-    return null;
-  }
-
-
-  let found;
-  try {
-
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
-
-    //Security Check if user is part of meeting attendees that is ACTIVE.
-    if (isPartyActive(currentParty)) {
-      found = await findAlertByUserIdAndJobId(currentParty.id, jobId);
-      if(found){
-        let deleted = await removeAlertByUserIdAndJobId(currentParty.id, jobId);
-        if(deleted && deleted.deletedCount>0){
-          found.status=statusEnum.DELETED;
-        } else {
-          found = null;
-        }
-      }
-
-    }
-
-  } catch (error) {
-    console.log(error);
-    return result;
-  }
-
-  return found;
-}

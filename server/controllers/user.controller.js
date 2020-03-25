@@ -15,7 +15,10 @@ const JobView = require('../models/jobview.model');
 
 const partyEnum = require('../const/partyEnum');
 const statusEnum = require('../const/statusEnum');
+const alertEnum = require('../const/alertEnum');
 
+
+const {upload} = require('../services/aws.service');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
@@ -24,6 +27,7 @@ const {getListofSkillTypes} = require('../services/skilltype.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
+const {addAlertByUserId, findJobAlertById, removeAlertById} = require('../services/jobalert.service');
 
 const {findJobViewByUserId} = require('../services/jobview.service');
 
@@ -48,15 +52,85 @@ const partySkillSchema = Joi.object({
 });
 
 
+
+const jobAlertSchema = Joi.object({
+  jobId: Joi.number().optional(),
+  partyId: Joi.number().optional(),
+  title: Joi.string().optional(),
+  city: Joi.string().optional(),
+  state: Joi.string().optional(),
+  country: Joi.string().optional(),
+  level: Joi.string().optional(),
+  industry: Joi.string().optional(),
+  employmentType: Joi.string().optional(),
+  distance: Joi.array().optional(),
+  company: Joi.array().optional(),
+  companySize: Joi.number().optional(),
+  repeat: Joi.string().allow('').optional(),
+  notification: Joi.array().optional(),
+  status: Joi.string().optional()
+});
+
+
 module.exports = {
+  uploadCV,
   addPartySkill,
   removePartySkill,
   getPartySkillsByUserId,
   getApplicationsByUserId,
   getBookmarksByUserId,
   getAlertsByUserId,
+  addPartyAlert,
+  removePartyAlert,
+  updatePartyAlert,
   getJobViewsByUserId
 }
+
+
+
+/**
+ * Upload User CV
+ *
+ * @param {HTTP} currentUserId
+ * @param {HTTP} files
+ */
+async function uploadCV(currentUserId, files) {
+
+  if(currentUserId==null || files==null){
+    return null;
+  }
+
+  let application = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      let file = files.file;
+      let fileExt = file.originalFilename.split('.');
+      let timestamp = Date.now();
+      let name = currentParty.firstName  + currentParty.lastName + '_' + currentParty.id + '_' + timestamp + '.' + fileExt[fileExt.length - 1];
+
+      let path = 'user/' + currentParty.id + '/resumes/' + name;
+      let res = await upload(path, file);
+      console.log('upload done')
+
+      //await application.save();
+
+
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
+
+}
+
 
 
 
@@ -189,10 +263,6 @@ async function removePartySkill(currentUserId, partySkillId) {
 }
 
 
-
-
-
-
 async function getApplicationsByUserId(currentUserId, filter, locale) {
 
   if(currentUserId==null || filter==null){
@@ -257,6 +327,12 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
           job.company = _.find(foundCompanies, {id: job.company});
           job.hasApplied = true;
           job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+          job.promotion = {
+            "id": 1,
+            "type": "HOT",
+            "createdDate": 1578887589,
+            "hasExpired": true
+          };
 
           job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
           job.level = _.find(experienceLevels, {shortCode: job.level});
@@ -342,6 +418,12 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
         job.company = _.find(foundCompanies, {id: job.company});
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
+        job.promotion = {
+          "id": 1,
+          "type": "HOT",
+          "createdDate": 1578887589,
+          "hasExpired": true
+        };
 
         let industry = _.reduce(industries, function(res, item){
           if(_.includes(job.industry, item.shortCode)){
@@ -424,6 +506,131 @@ async function getAlertsByUserId(currentUserId, filter) {
   return new Pagination(result);
 
 }
+
+
+async function addPartyAlert(currentUserId, alert) {
+  alert = await Joi.validate(alert, jobAlertSchema, { abortEarly: false });
+
+  if(currentUserId==null || alert==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+    // console.log('currentParty', currentParty)
+
+    //Security Check if user is part of meeting attendees that is ACTIVE.
+    if (isPartyActive(currentParty)) {
+
+      // result = await findAlertByUserIdAndJobId(currentParty.id, jobId);
+
+      // if(!result) {
+        alert.partyId = currentParty.id;
+
+        console.log('alert', alert);
+        result = await addAlertByUserId(currentParty.id, alert);
+      // }
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+
+async function removePartyAlert(currentUserId, alertId) {
+
+  if(currentUserId==null || alertId==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findJobAlertById(alertId);
+
+      if(found){
+        let deleted = await removeAlertById(alertId);
+
+        if(deleted && deleted.deletedCount==1){
+          found.status = statusEnum.DELETED;
+          result = found;
+        }
+
+
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+async function updatePartyAlert(currentUserId, alertId, alert) {
+
+  if(currentUserId==null || alertId==null || alert==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findJobAlertById(alertId);
+
+      if(found){
+        found.title = alert.title;
+        found.company = alert.company;
+        found.companySize = alert.companySize;
+        found.distance = alert.distance;
+        found.employmentType = alert.employmentType;
+        found.city = alert.city;
+        found.state = alert.state;
+        found.country = alert.country;
+        found.repeat = alert.repeat;
+        found.industry = alert.industry;
+        found.notification = alert.notification;
+
+        found.status = (alert.status && alert.status==statusEnum.ACTIVE)?statusEnum.ACTIVE : statusEnum.INACTIVE;
+
+        result = await found.save();
+
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
 
 
 async function getJobViewsByUserId(currentUserId, filter, locale) {

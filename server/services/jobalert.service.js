@@ -1,8 +1,19 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const alertEnum = require('../const/alertEnum');
+
 const JobAlert = require('../models/job_alert.model');
 
 
+function findJobAlertById(jobAlertId) {
+  let data = null;
+
+  if(jobAlertId==null){
+    return;
+  }
+
+  return JobAlert.findOne({jobAlertId: jobAlertId});
+}
 
 
 function findAlertByUserIdAndJobId(userId, jobId) {
@@ -15,7 +26,7 @@ function findAlertByUserIdAndJobId(userId, jobId) {
   return JobAlert.findOne({partyId: userId, jobId: jobId});
 }
 
-function addAlertById(userId, alert) {
+function addAlertByUserId(userId, alert) {
   let data = null;
 
   if(userId==null || alert==null){
@@ -24,6 +35,8 @@ function addAlertById(userId, alert) {
   console.log(alert)
 
   alert.createdDate = Date().now;
+  alert.notification = [alertEnum.EMAIL, alertEnum.NOTIFICATION];
+  alert.repeat = alertEnum.DAILY;
   return new JobAlert(alert).save();
 }
 
@@ -38,9 +51,22 @@ function removeAlertByUserIdAndJobId(userId, jobId) {
   return JobAlert.remove({partyId: userId, jobId: jobId});
 }
 
+function removeAlertById(alertId) {
+  let data = null;
+
+  if(alertId==null){
+    return;
+  }
+
+  return JobAlert.remove({jobAlertId: alertId});
+}
+
+
 
 module.exports = {
+  findJobAlertById:findJobAlertById,
   findAlertByUserIdAndJobId: findAlertByUserIdAndJobId,
-  addAlertById: addAlertById,
-  removeAlertByUserIdAndJobId: removeAlertByUserIdAndJobId
+  addAlertByUserId: addAlertByUserId,
+  removeAlertByUserIdAndJobId: removeAlertByUserIdAndJobId,
+  removeAlertById:removeAlertById
 }

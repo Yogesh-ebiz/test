@@ -2,6 +2,7 @@ const _ = require('lodash');
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const Application = require('../models/application.model');
+const ApplicationProgress = require('../models/applicationprogress.model');
 
 
 function findApplicationById(applicationId) {
@@ -11,7 +12,7 @@ function findApplicationById(applicationId) {
     return;
   }
 
-  return Application.findOne({applicationId: applicationId});
+  return Application.findOne({applicationId: applicationId}).populate('job');
 }
 
 function findAppliedCountByJobId(jobId) {
@@ -62,7 +63,6 @@ function findAppliedCountByUserIdAndJobId(userId, jobId) {
 function applyJob(application) {
   let data = null;
 
-  console.debug('applyJob', application)
   if(application==null){
     return;
   }
@@ -70,6 +70,25 @@ function applyJob(application) {
   application.createdDate = Date().now;
   application.attachment = '';
   application.status = applicationEnum.APPLIED;
+
+  // return new Application(application).save();
+
+  // let saveApplication = new Application(application).save(function (err) {
+  //   if (err) return handleError(err);
+  //
+  //   console.log('saved', this._id);
+  //   const applicationProgress = new ApplicationProgress({
+  //     status: applicationEnum.APPLIED,
+  //     application: this._id
+  //   });
+  //
+  //   applicationProgress.save(function (err) {
+  //     if (err) return handleError(err);
+  //   });
+  //
+  //
+  // });
+  // return saveApplication;
 
   return new Application(application).save();
 }

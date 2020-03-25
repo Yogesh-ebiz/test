@@ -1,0 +1,7 @@
+module.exports = {
+  NONE: "NONE",
+  DAILY: "DAILY",
+  WEEKLY: "WEEKLY",
+  EMAIL: 'EMAIL',
+  NOTIFICATION: 'NOTIFICATION'
+};

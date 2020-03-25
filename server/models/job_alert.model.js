@@ -26,6 +26,11 @@ const JobAlertSchema = new mongoose.Schema({
     default: ''
   },
   company: {
+    type: Array,
+    required: false,
+    default: []
+  },
+  companySize: {
     type: Number,
     required: false
   },
@@ -33,7 +38,7 @@ const JobAlertSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  level: {
+  industry: {
     type: String,
     required: false,
     default: '',
@@ -62,10 +67,19 @@ const JobAlertSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  repeats: {
+  repeat: {
     type: String,
     required: false,
     default: ''
+  },
+  notification: {
+    type: Array,
+    required: false,
+    default: []
+  },
+  noJobs: {
+    type: Number,
+    required: false
   }
 }, {
   versionKey: false

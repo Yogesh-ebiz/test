@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const statusEnum = require('../const/statusEnum');
@@ -163,7 +164,8 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
-  }
+  },
+  application: { type: Schema.Types.ObjectId, ref: 'Application' }
 }, {
   versionKey: false
 });
