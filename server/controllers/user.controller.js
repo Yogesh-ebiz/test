@@ -27,7 +27,7 @@ const {getListofSkillTypes} = require('../services/skilltype.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
-const {addAlertByUserId, findJobAlertById, removeAlertById} = require('../services/jobalert.service');
+const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = require('../services/jobalert.service');
 
 const {findJobViewByUserId} = require('../services/jobview.service');
 
@@ -68,7 +68,10 @@ const jobAlertSchema = Joi.object({
   companySize: Joi.number().optional(),
   repeat: Joi.string().allow('').optional(),
   notification: Joi.array().optional(),
-  status: Joi.string().optional()
+  status: Joi.string().optional(),
+  remote: Joi.boolean().optional(),
+  lt: Joi.number().optional(),
+  gt: Joi.number().optional()
 });
 
 
@@ -488,12 +491,22 @@ async function getAlertsByUserId(currentUserId, filter) {
       result = await JobAlert.paginate(new SearchParam(filter), options);
 
       let companyIds = _.map(result.docs, 'company');
-
       let res = await searchParties(companyIds, partyEnum.COMPANY);
       let foundCompanies = res.data.data.content;
 
-      _.forEach(result.docs, function(alert) {
+      // _.forEach(result.docs, function(alert) {
+      //   alert.company = _.find(foundCompanies, {id: alert.company});
+      //
+      //   alert.noJobs = await getAlertCount(filter);
+      // })
+
+      const loadPromises = result.docs.map(alert => getAlertCount(alert));
+      let count = await Promise.all(loadPromises);
+
+      _.forEach(result.docs, function(alert, idx) {
         alert.company = _.find(foundCompanies, {id: alert.company});
+
+        alert.noJobs = count[idx];
       })
 
     }
@@ -613,6 +626,7 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
         found.repeat = alert.repeat;
         found.industry = alert.industry;
         found.notification = alert.notification;
+        found.remote = alert.remote;
 
         found.status = (alert.status && alert.status==statusEnum.ACTIVE)?statusEnum.ACTIVE : statusEnum.INACTIVE;
 

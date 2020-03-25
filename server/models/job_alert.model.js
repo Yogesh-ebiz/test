@@ -79,6 +79,11 @@ const JobAlertSchema = new mongoose.Schema({
   },
   noJobs: {
     type: Number,
+    required: false,
+    default: 0
+  },
+  remote: {
+    type: Boolean,
     required: false
   }
 }, {

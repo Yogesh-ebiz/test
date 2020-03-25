@@ -32,5 +32,6 @@
 	"experiencelevel_retrieved_successful": "experiencelevel_retrieved_successful",
 	"resume_uploaded_successful": "resume_uploaded_successful",
 	"jobviews_retrieved_successful": "jobviews_retrieved_successful",
-	"application_retrieved_successful": "application_retrieved_successful"
+	"application_retrieved_successful": "application_retrieved_successful",
+	"alerts_retrieved_successful": "alerts_retrieved_successful"
 }

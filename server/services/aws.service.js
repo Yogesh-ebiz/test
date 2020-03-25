@@ -15,7 +15,7 @@ const s3bucket = new AWS.S3({
 
 const BUCKET_NAME = "accessed";
 
-exports.upload = async function(path, file){
+exports.upload = function(path, file){
 
   fs.readFile(file.path, function (err, data) {
     if (err) throw err; // Something went wrong!
