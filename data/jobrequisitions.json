@@ -53,12 +53,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 2,
     "company": 16,
     "connection": {
       "noConnection": 3,
@@ -112,12 +107,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 15,
     "connection": {
       "noConnection": 3,
@@ -170,12 +160,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "PARTTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 2,
     "company": 15,
     "connection": {
       "noConnection": 3,
@@ -230,12 +215,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     "employmentType": "FREELANCE",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 15,
     "connection": {
       "noConnection": 3,
@@ -288,12 +268,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 2,
     "company": 15,
     "connection": {
       "noConnection": 3,
@@ -346,12 +321,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 16,
     "connection": {
       "noConnection": 3,
@@ -405,12 +375,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 16,
     "connection": {
       "noConnection": 3,
@@ -464,12 +429,7 @@
     ],
       "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 16,
     "connection": {
       "noConnection": 3,
@@ -523,12 +483,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FREELANCE",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 16,
     "connection": {
       "noConnection": 3,
@@ -582,12 +537,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -641,12 +591,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -700,12 +645,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FREELANCE",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -759,12 +699,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -818,12 +753,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -877,12 +807,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -936,12 +861,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "PARTTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -995,12 +915,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FREELANCE",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 17,
     "connection": {
       "noConnection": 3,
@@ -1054,12 +969,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "PARTTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 18,
     "connection": {
       "noConnection": 3,
@@ -1113,12 +1023,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 18,
     "connection": {
       "noConnection": 3,
@@ -1172,12 +1077,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 18,
     "connection": {
       "noConnection": 3,
@@ -1231,12 +1131,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FREELANCE",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 24,
     "connection": {
       "noConnection": 3,
@@ -1290,12 +1185,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "PARTTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 18,
     "connection": {
       "noConnection": 3,
@@ -1352,12 +1242,7 @@
     ],
     "skills": [2, 3, 4, 5, 6, 7, 8, 9],
     "employmentType": "FULLTIME",
-    "promotion": {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    },
+    "promotion": 1,
     "company": 18,
     "connection": {
       "noConnection": 3,

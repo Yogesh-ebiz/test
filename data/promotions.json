@@ -1,0 +1,4 @@
+[
+  { "promotionId": 1, "type": "HOT", "name": { "en": "Hot" }, "createdDate": 1585192803, "startDate": 1585194023, "endDate": 1587871203, "status": "ACTIVE" },
+  { "promotionId": 2, "type": "NEW", "name": { "en": "New"}, "createdDate": 1585192803, "startDate": 1585194023, "endDate": 1587871203, "status": "ACTIVE" }
+]
