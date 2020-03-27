@@ -57,16 +57,16 @@ const partySkillSchema = Joi.object({
 const jobAlertSchema = Joi.object({
   jobId: Joi.number().optional(),
   partyId: Joi.number().optional(),
-  title: Joi.string().optional(),
-  city: Joi.string().optional(),
-  state: Joi.string().optional(),
-  country: Joi.string().optional(),
-  level: Joi.string().optional(),
-  industry: Joi.string().optional(),
-  employmentType: Joi.string().optional(),
-  distance: Joi.string().optional(),
+  title: Joi.string().allow('').optional(),
+  city: Joi.string().allow('').optional(),
+  state: Joi.string().allow('').optional(),
+  country: Joi.string().allow('').optional(),
+  level: Joi.string().allow('').optional(),
+  industry: Joi.string().allow('').optional(),
+  employmentType: Joi.string().allow('').optional(),
+  distance: Joi.string().allow('').optional(),
   company: Joi.string().allow('').optional(),
-  companySize: Joi.string().optional(),
+  companySize: Joi.string().allow('').optional(),
   repeat: Joi.string().allow('').optional(),
   notification: Joi.array().optional(),
   status: Joi.string().optional(),
@@ -506,7 +506,8 @@ async function getAlertsByUserId(currentUserId, filter) {
       let count = await Promise.all(loadPromises);
 
       _.forEach(result.docs, function(alert, idx) {
-        alert.company = _.find(foundCompanies, {id: alert.company});
+        console.log(alert.company)
+        // alert.company = _.find(foundCompanies, {id: alert.company});
 
         alert.noJobs = count[idx];
       })

@@ -47,7 +47,7 @@ async function getJobById(req, res) {
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.getJobById(currentUserId, jobId, res.locale);
 
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
 

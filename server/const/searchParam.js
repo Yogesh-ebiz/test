@@ -31,18 +31,16 @@ function SearchParam(filter) {
     start.setHours(0,0,0,0);
 
     end = new Date();
-    end.setHours(0,0,0,0);
-
 
     switch (filter.createdDate) {
       case dateEnum.PASTDAY:
         start.setDate(start.getDate() - 1);
         break;
       case dateEnum.PASTWEEK:
-        start.setDate(state.getDate() - 7);
+        start.setDate(start.getDate() - 7);
         break;
       case dateEnum.PASTBIWEEK:
-        start.setDate(state.getDate() - 14);
+        start.setDate(start.getDate() - 14);
         break;
       case dateEnum.PASTMONTH:
         start.setDate(start.getDate() - 30);

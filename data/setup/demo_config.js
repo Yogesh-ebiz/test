@@ -3,9 +3,11 @@ const config = {
   user: [1,2,3,4,5,6,7,8,9,10,11,12,13,14],
   employmentType: ["FULLTIME", "PARTTIME", "FREELANCE", "CONSULT", "REMOTE", "INTERN"],
   level: ["JUNIOR", "MID", "SENIOR", "MANAGER", "DIRECTOR", "EXECUTIVE"],
-  //jobFunction: ["SNM", "MNFT", "DATA", "CUST", "ADM", "ANAT", "DRI", "MNGR", "COM", "TECH", "FNMN", "TOUR"],
-  jobFunction: ["TECH"],
+  jobFunction: ["SNM", "MNFT", "DATA", "CUST", "ADM", "ANAT", "DRI", "MNGR", "COM", "TECH", "FNMN", "TOUR"],
+  // jobFunction: ["TECH"],
+  promotion: [1,2],
   skill: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+  industry: ["TECH", "CONS", "ACCT", "BANK", "EDU", "ENG", "HEALTH", "CSTR", "MARKET", "GOV", "ART", "BIO", "AUTO", "SALES"],
   job: {
     // SNM: {
     //   JUNIOR: ["Sales Operations Manager", "Sales Strategy & Operations"],
@@ -13,20 +15,19 @@ const config = {
     //   MANAGER: ["Global Field Sales Manager, Brand Advocacy and Sales", "Sales and Marketing Operations Manager", "Onboarding & Sales Enablement Manager", "Regional Sales Manager", "Educational Sales Manager", "Ecommerce Sales & Marketing Manager"]
     // },
     TECH: {
-      JUNIOR: ["iOS Developer", "Python Developer", "Android Developer", ],
+      JUNIOR: ["iOS Developer", "Python Developer", "Android Developer"],
+      MID: ["iOS Developer", "Python Developer", "Android Developer"],
       SENIOR: ["Staff Software Engineer, iOS", "Senior Android Engineer, Gold", "Sr. Android Developer", "iOS Senior Engineer, Mobile Developer Experience", "Senior Fullstack Engineer, Platform Adoption", "Senior Mobile Engineer, iOS", "Technical Lead", "Engineering Portfolio Lead",],
       MANAGER: ["Software Development Manager", "Technology Manager", "Sr Manager, Engineering - Platform", "Manager, Business Development", "Head of Technology", "Sr Director, Product Security Engineering & Operations", "Senior Director, Platform Development"],
       DIRECTOR: ["Business Development Executive", "Director, Technology Strategy", "Director, Technology", "Director, Studio Engineering", "Senior Director Of Engineering", "VP of Product Management - Platform"],
       EXECUTIVE: ["VP of Engineering", "Chief Technology Officer", "CTO"]
     }
   },
-  location: {
-    US: {
-      ["Chicago", "San Jose"]
-},
-    Vietnam: [],
-    China: [],
-    Japan: []
+  country: ["US", "VN"],
+  location: [
+    {US: [{city: "Chicago", state: "Illinois"}, {city: "San Jose", state: "California"}, {city: "San Francisco", state: "California"}, {city: "San Diego", state: "California"}, {city: "Seattle", state: "Washing"}, {city: "Brooklyn", state: "New York"}, {city: "Philadelphia", state: "Pennsylvvania"}]},
+    {VN: [{city: "Quan 1", state: "Ho Chi Minh"}, {city: "Quan 2", state: "Ho Chi Minh"}, {city: "Quan 3", state: "Ho Chi Minh"}, {city: "Quan 4", state: "Ho Chi Minh"}, {city: "Quan 5", state: "Ho Chi Minh"}, {city: "Quan Binh Thanh", state: "Ho Chi Minh"}, {city: "Quan Hoan Kiem", state: "Hanoi"}, {city: "Quan Ba Dinh", state: "Hanoi"}, {city: "Quan Dong Da", state: "Hanoi"}, {city: "Quan Hai Ba Trung", state: "Hanoi"}]}
+  ],
   responsibility: {
     TECH: [
       "Experience partnering with product and design teams, as well as proficiency with UI/UX paradigms to build elegant user experiences",

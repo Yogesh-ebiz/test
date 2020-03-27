@@ -34,5 +34,6 @@
 	"jobviews_retrieved_successful": "jobviews_retrieved_successful",
 	"application_retrieved_successful": "application_retrieved_successful",
 	"alerts_retrieved_successful": "alerts_retrieved_successful",
-	"alert_updated_successful": "alert_updated_successful"
+	"alert_updated_successful": "alert_updated_successful",
+	"job_retrieved_successful": "job_retrieved_successful"
 }
