@@ -1,4 +1,5 @@
 const _ = require('lodash');
+
 const statusEnum = require('../const/statusEnum');
 const alertEnum = require('../const/alertEnum');
 
@@ -73,7 +74,10 @@ function getAlertCount(alert) {
   let city = [alert.city];
   let state = [alert.state];
   let country = [alert.country];
-  let company = alert.company;
+  let company = _.reduce(alert.company.split(','), function(res, item){
+    res.push(parseInt(item));
+    return res;
+  }, []);
 
 
   let res = JobRequisition.find({employmentType: {$in: employmentType}, industry: {$in: industry},

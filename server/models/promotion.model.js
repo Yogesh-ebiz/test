@@ -9,15 +9,15 @@ const PromotionSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  jobId: {
-    type: Number,
-    required: true
-  },
   partyId: {
     type: Number,
     required: true
   },
   status: {
+    type: String,
+    required: false
+  },
+  type: {
     type: String,
     required: false
   },
@@ -34,8 +34,15 @@ const PromotionSchema = new mongoose.Schema({
   lastUpdatedDate: {
     type: Number,
     required: false
+  },
+  startdDate: {
+    type: Number,
+    required: true
+  },
+  endDate: {
+    type: Number,
+    required: true
   }
-
 }, {
   versionKey: false
 });

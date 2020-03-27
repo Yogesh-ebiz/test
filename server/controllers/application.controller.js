@@ -26,23 +26,6 @@ module.exports = {
 
 
 
-const BUCKET_NAME = "accessed";
-// const IAM_USER_KEY = "AKIASNQAGO5FTKNYNQYC";
-// const IAM_USER_SECRET = "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";
-//
-//
-// const s3bucket = new AWS.S3({
-//   accessKeyId: IAM_USER_KEY,
-//   secretAccessKey: IAM_USER_SECRET
-// });
-
-const s3bucket = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-});
-
-
-
 async function getApplicationById(currentUserId, applicationId) {
 
   if(!applicationId || !currentUserId){

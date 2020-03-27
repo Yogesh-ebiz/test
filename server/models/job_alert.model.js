@@ -26,9 +26,9 @@ const JobAlertSchema = new mongoose.Schema({
     default: ''
   },
   company: {
-    type: Array,
+    type: String,
     required: false,
-    default: []
+    default: ''
   },
   companySize: {
     type: Number,
@@ -37,6 +37,11 @@ const JobAlertSchema = new mongoose.Schema({
   distance: {
     type: Number,
     required: false
+  },
+  level: {
+    type: String,
+    required: false,
+    default: '',
   },
   industry: {
     type: String,

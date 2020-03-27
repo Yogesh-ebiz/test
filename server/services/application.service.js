@@ -60,7 +60,7 @@ function findAppliedCountByUserIdAndJobId(userId, jobId) {
 
 
 
-function applyJob(application) {
+async function applyJob(application) {
   let data = null;
 
   if(application==null){
@@ -90,7 +90,21 @@ function applyJob(application) {
   // });
   // return saveApplication;
 
-  return new Application(application).save();
+  // return new Application(application).save();
+
+  console.log(application)
+  application = await new Application(application).save();
+
+  const applicationProgress = await new ApplicationProgress({
+    status: applicationEnum.APPLIED,
+    application: application._id
+  });
+
+  console.log('progress', applicationProgress)
+
+
+  return application;
+
 }
 
 

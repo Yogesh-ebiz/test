@@ -55,15 +55,29 @@ function SearchParam(filter) {
   }
 
   if (filter.city && filter.city!="") {
-    this.query.city =  { $regex: filter.city, $options: 'i' };
+    let city = _.reduce(filter.city.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+
+    this.query.city =  { $in: city};
   }
 
   if (filter.state && filter.state!="") {
-    this.query.state =  { $regex: filter.state, $options: 'i' };
+    let state = _.reduce(filter.state.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+    this.query.state =  { $in: state};
   }
 
   if (filter.country && filter.country!="") {
-    this.query.country =  { $regex: filter.country, $options: 'i' };
+    let country = _.reduce(filter.country.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+
+    this.query.country =  { $in: country};
   }
 
   // console.log('query', this.query);

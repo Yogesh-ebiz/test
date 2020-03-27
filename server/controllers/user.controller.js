@@ -28,6 +28,7 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = require('../services/jobalert.service');
+const {getPromotions, findPromotionById} = require('../services/promotion.service');
 
 const {findJobViewByUserId} = require('../services/jobview.service');
 
@@ -64,7 +65,7 @@ const jobAlertSchema = Joi.object({
   industry: Joi.string().optional(),
   employmentType: Joi.string().optional(),
   distance: Joi.array().optional(),
-  company: Joi.array().optional(),
+  company: Joi.string().allow('').optional(),
   companySize: Joi.number().optional(),
   repeat: Joi.string().allow('').optional(),
   notification: Joi.array().optional(),
@@ -315,7 +316,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         let res = await searchParties(companyIds, partyEnum.COMPANY);
         let foundCompanies = res.data.data.content;
 
-
+        let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
         let hasSaves = await findBookByUserId(currentParty.id);
 
 
@@ -330,12 +331,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
           job.company = _.find(foundCompanies, {id: job.company});
           job.hasApplied = true;
           job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-          job.promotion = {
-            "id": 1,
-            "type": "HOT",
-            "createdDate": 1578887589,
-            "hasExpired": true
-          };
+          job.promotion = _.find(promotions, {promotionId: job.promotion});
 
           job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
           job.level = _.find(experienceLevels, {shortCode: job.level});
@@ -411,6 +407,8 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
       let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
       let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
 
+      let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
+
       _.forEach(jobs, function(job){
         job.hasSaved=true;
         job.description = null;
@@ -421,12 +419,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
         job.company = _.find(foundCompanies, {id: job.company});
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
-        job.promotion = {
-          "id": 1,
-          "type": "HOT",
-          "createdDate": 1578887589,
-          "hasExpired": true
-        };
+        job.promotion = _.find(promotions, {promotionId: job.promotion});
 
         let industry = _.reduce(industries, function(res, item){
           if(_.includes(job.industry, item.shortCode)){
@@ -684,6 +677,8 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       let jobIds = _.map(result.docs, 'jobId');
 
+      let hasSaves = await findBookByUserId(currentUserId);
+
 
       let jobs = await findJobIds(jobIds);
       let companyIds = _.map(jobs, 'company');
@@ -693,8 +688,11 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
       let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
 
+      let promotionIds = _.map(jobs, 'promotion');
+      let promotions = await getPromotions(promotionIds);
+
       _.forEach(jobs, function(job){
-        job.hasSaved=true;
+        job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
         job.description = null;
         job.responsibilities=[];
         job.qualifications = [];
@@ -703,6 +701,10 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
         job.company = _.find(foundCompanies, {id: job.company});
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
+
+
+        console.log(job.promotion, _.find(promotions, {promotionId: job.promotion}));
+        job.promotion = _.find(promotions, {promotionId: job.promotion});
 
       })
 

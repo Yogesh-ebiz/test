@@ -8,12 +8,12 @@ const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkil
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
-const {findAlertByUserIdAndJobId, removeAlertByUserIdAndJobId} = require('../services/jobalert.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
+const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 
-const {getCountsGroupByCompany} = require('../services/jobrequisition.service');
+const {findJobId, getCountsGroupByCompany} = require('../services/jobrequisition.service');
 const {addJobViewByUserId} = require('../services/jobview.service');
 
 
@@ -100,9 +100,17 @@ module.exports = {
 
 async function insert(job) {
   job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
-  if(job) {
-    //job.skills = await Skilltype.find({id: {$in: job.skills}});
+
+
+  //job.skills = await Skilltype.find({id: {$in: job.skills}});
+  let promotion;
+  if(job.promotion){
+    promotion = await findPromotionById(job.promotion);
+    job.promotion = (promotion)?promotion.promotionId:null;
+    console.log('promo', promotion, job.promotion);
+
   }
+
   return await new JobRequisition(job).save();
 }
 
@@ -124,7 +132,10 @@ async function getJobById(currentUserId, jobId, locale) {
   let job;
   try {
     let localeStr = locale? locale : 'en';
-    job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+    let propLocale = '$name.'+localeStr;
+    console.log('prop', propLocale)
+    // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
+    job = await findJobId(jobId, locale);
 
     if(job) {
 
@@ -169,12 +180,14 @@ async function getJobById(currentUserId, jobId, locale) {
         let industry = await getIndustry(job.industry, locale);
         job.industry = industry;
 
-        job.promotion = {
-          "id": 1,
-          "type": "HOT",
-          "createdDate": 1578887589,
-          "hasExpired": true
-        };
+        // let promotion = await findPromotionByObjectId(job.promotion);
+        // job.promotion = promotion;
+
+        let promotion = await findPromotionById(job.promotion);
+        job.promotion = promotion[0];
+
+        // let promotion = await JobRequisition.populate(job, 'promotion')
+
 
 
         skills = _.reduce(jobSkills, function(res, skill, key){
@@ -282,7 +295,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
   let industries = await getIndustry(_.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
-
+  let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 
@@ -300,12 +313,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
 
-    job.promotion = {
-      "id": 1,
-      "type": "HOT",
-      "createdDate": 1578887589,
-      "hasExpired": true
-    };
+    job.promotion = _.find(promotions, {promotionId: job.promotion});
 
     let industry = _.reduce(industries, function(res, item){
       if(_.includes(job.industry, item.shortCode)){
@@ -521,6 +529,7 @@ async function applyJobById(currentUserId, application) {
           application.job = job._id;
           application.attachment = application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf");
           result = await applyJob(application);
+
         }
       }
     }
@@ -537,7 +546,6 @@ async function applyJobById(currentUserId, application) {
 
 async function addBookmark(currentUserId, jobId) {
 
-  console.log('saveJobById')
   if(currentUserId==null || jobId==null){
     return null;
   }
@@ -572,7 +580,6 @@ async function addBookmark(currentUserId, jobId) {
 
   return result;
 }
-
 
 
 async function removeBookmark(currentUserId, jobId) {

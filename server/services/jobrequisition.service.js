@@ -2,18 +2,30 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
+const Promotion = require('../models/promotion.model');
 
 
 
 
-function findJobId(jobId) {
+function findJobId(jobId, locale) {
   let data = null;
 
   if(jobId==null){
     return;
   }
+  let localeStr = locale? locale.toLowerCase() : 'en';
+  let propLocale = '$name.'+localeStr;
 
-  return JobRequisition.findOne({jobId: jobId});
+  let match = {jobId: jobId};
+
+  data = JobRequisition.findOne(match);
+
+  // Promotion.populate(data, {path: "promotion"});
+
+
+  return data;
+
+  // return JobRequisition.findOne({jobId: jobId});
 }
 
 function findJobIds(jobIds) {
