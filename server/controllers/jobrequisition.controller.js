@@ -106,8 +106,7 @@ async function insert(job) {
   let promotion;
   if(job.promotion){
     promotion = await findPromotionById(job.promotion);
-    job.promotion = (promotion)?promotion.promotionId:null;
-    console.log('promo', promotion, job.promotion);
+    job.promotion = (promotion)?promotion[0].promotionId:null;
 
   }
 
@@ -183,8 +182,11 @@ async function getJobById(currentUserId, jobId, locale) {
         // let promotion = await findPromotionByObjectId(job.promotion);
         // job.promotion = promotion;
 
-        let promotion = await findPromotionById(job.promotion);
-        job.promotion = promotion[0];
+        if(job.promotion){
+          let promotion = await findPromotionById(job.promotion);
+          job.promotion = promotion[0];
+        }
+
 
         // let promotion = await JobRequisition.populate(job, 'promotion')
 

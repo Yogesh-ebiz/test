@@ -85,7 +85,7 @@ class Pagination {
         empty: false
       },
       pageSize: data.limit,
-      pageNumber: --data.page,
+      pageNumber: page,
       offset: data.offset,
       paged: data.docs.length?true:false,
       unpaged: false
@@ -93,7 +93,8 @@ class Pagination {
 
 
 
-    this.last  = data.hasNextPage  || false;
+    console.log('hasNextPage', data.hasNextPage);
+    this.last  = !data.hasNextPage  || false;
     this.totalPages = data.totalPages;
     this.totalElements = data.totalDocs;
     this.first = (data.page-1 == 0) ? true:false;
