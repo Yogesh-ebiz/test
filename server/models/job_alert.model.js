@@ -69,7 +69,8 @@ const JobAlertSchema = new mongoose.Schema({
     default: '',
   },
   createdDate: {
-    type: Number
+    type: Number,
+    default: Date.now
   },
   repeat: {
     type: String,

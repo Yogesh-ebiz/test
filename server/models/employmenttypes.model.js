@@ -22,7 +22,7 @@ const EmploymentTypeSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  createdAt: {
+  createdDate: {
     type: Number,
     default: Date.now
   },

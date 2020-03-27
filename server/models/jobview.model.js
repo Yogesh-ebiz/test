@@ -21,7 +21,8 @@ const JobViewSchema = new mongoose.Schema({
     default: 1
   },
   createdDate: {
-    type: Number
+    type: Number,
+    default: Date.now
   }
 }, {
   versionKey: false

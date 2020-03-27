@@ -32,8 +32,7 @@ function addBookById(userId, jobId) {
     return;
   }
 
-  let timestamp = Date.now();
-  let bookmark = {partyId: userId, jobId: jobId, createdDate: timestamp};
+  let bookmark = {partyId: userId, jobId: jobId};
   return new BookMark(bookmark).save();
 }
 

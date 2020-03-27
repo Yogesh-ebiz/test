@@ -28,8 +28,7 @@ const PromotionSchema = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    required: false,
-    default: Date.now()
+    default: Date.now
   },
   lastUpdatedDate: {
     type: Number,

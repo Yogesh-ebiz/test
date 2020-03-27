@@ -28,28 +28,28 @@ function SearchParam(filter) {
 
 
     start = new Date();
-    setHours(0,0,0,0);
+    start.setHours(0,0,0,0);
 
-    end = new Date(thruDate);
+    end = new Date();
+    end.setHours(0,0,0,0);
 
 
     switch (filter.createdDate) {
       case dateEnum.PASTDAY:
-        start.setDate(d.getDate() - 1);
+        start.setDate(start.getDate() - 1);
         break;
       case dateEnum.PASTWEEK:
-        start.setDate(d.getDate() - 7);
+        start.setDate(state.getDate() - 7);
         break;
       case dateEnum.PASTBIWEEK:
-        start.setDate(d.getDate() - 14);
+        start.setDate(state.getDate() - 14);
         break;
       case dateEnum.PASTMONTH:
-        start.setDate(d.getDate() - 30);
+        start.setDate(start.getDate() - 30);
         break;
     }
 
-    console.log(start.getTime(), end.getTime())
-    this.query.createdDate =  { start: { $gte: start, $lte: end }  };
+    this.query.createdDate =  { $gte: start.getTime(), $lte: end.getTime() };
   }
 
 

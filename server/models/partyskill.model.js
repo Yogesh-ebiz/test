@@ -40,8 +40,8 @@ const PartySKillSchema = new mongoose.Schema({
     required: false
   },
   createdDate: {
-    type: Date,
-    default: Date.now()
+    type: Number,
+    default: Date.now
   },
   lastUpdatedDate: {
     type: Date,

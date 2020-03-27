@@ -35,7 +35,6 @@ function addAlertByUserId(userId, alert) {
     return;
   }
 
-  alert.createdDate = Date.now();
   alert.notification = [alertEnum.EMAIL, alertEnum.NOTIFICATION];
   alert.repeat = alertEnum.DAILY;
   return new JobAlert(alert).save();
