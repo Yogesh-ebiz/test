@@ -12,6 +12,16 @@ function findJobViewByUserId(userId) {
     return;
   }
 
+  return JobView.findOne({partyId: userId});
+}
+
+function findJobViewByUserIdAndJobId(userId, jobId) {
+  let data = null;
+
+  if(userId==null || jobId==null){
+    return;
+  }
+
   return JobView.findOne({partyId: userId, jobId: jobId});
 }
 
@@ -22,13 +32,17 @@ function addJobViewByUserId(userId, jobId) {
     return;
   }
 
-  console.log(userId, jobId)
-  let jobView = {partyId: userId, jobId: jobId, createdDate: Date().now}
+
+  let timestamp = Date.now();
+
+  console.log(timestamp)
+  let jobView = {partyId: userId, jobId: jobId, createdDate: timestamp}
   return new JobView(jobView).save();
 }
 
 
 module.exports = {
   findJobViewByUserId: findJobViewByUserId,
+  findJobViewByUserIdAndJobId:findJobViewByUserIdAndJobId,
   addJobViewByUserId: addJobViewByUserId
 }

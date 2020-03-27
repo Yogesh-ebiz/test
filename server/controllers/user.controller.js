@@ -64,9 +64,9 @@ const jobAlertSchema = Joi.object({
   level: Joi.string().optional(),
   industry: Joi.string().optional(),
   employmentType: Joi.string().optional(),
-  distance: Joi.array().optional(),
+  distance: Joi.string().optional(),
   company: Joi.string().allow('').optional(),
-  companySize: Joi.number().optional(),
+  companySize: Joi.string().optional(),
   repeat: Joi.string().allow('').optional(),
   notification: Joi.array().optional(),
   status: Joi.string().optional(),
@@ -286,8 +286,11 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         let limit = (filter.size && filter.size > 0) ? filter.size : 20;
         let page = (filter.page && filter.page == 0) ? filter.page : 1;
         let sortBy = {};
-        sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+        filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+        filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+        sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
+        console.log(sortBy)
         let options = {
           select: select,
           sort: sortBy,
@@ -320,22 +323,18 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         let hasSaves = await findBookByUserId(currentParty.id);
 
 
-        _.forEach(result.docs, function(application){
-
+        _.forEach(result.docs, function(application, idx) {
           let job = _.find(jobs, {jobId: application.jobId});
+          job.hasSaved = true;
           job.description = null;
           job.responsibilities=[];
           job.qualifications = [];
           job.skills = [];
           job.connection = {noConnection: 0, list: []};
           job.company = _.find(foundCompanies, {id: job.company});
-          job.hasApplied = true;
-          job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-          job.promotion = _.find(promotions, {promotionId: job.promotion});
-
           job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
           job.level = _.find(experienceLevels, {shortCode: job.level});
-
+          job.promotion = _.find(promotions, {promotionId: job.promotion});
           let industry = _.reduce(industries, function(res, item){
             if(_.includes(job.industry, item.shortCode)){
               res.push(item);
@@ -345,11 +344,11 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
           job.industry = industry;
 
-
           application.job = job;
 
 
-        });
+
+        })
 
         // result.docs = jobs;
 
@@ -382,7 +381,9 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
       let limit = (filter.size && filter.size > 0) ? filter.size : 20;
       let page = (filter.page && filter.page == 0) ? filter.page : 1;
       let sortBy = {};
-      sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+      filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+      filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+      sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
       let options = {
         select: select,
@@ -409,8 +410,10 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
 
-      _.forEach(jobs, function(job){
-        job.hasSaved=true;
+
+      _.forEach(result.docs, function(bookmark, idx) {
+        let job = _.find(jobs, {jobId: bookmark.jobId});
+        job.hasSaved = true;
         job.description = null;
         job.responsibilities=[];
         job.qualifications = [];
@@ -420,7 +423,6 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
         job.promotion = _.find(promotions, {promotionId: job.promotion});
-
         let industry = _.reduce(industries, function(res, item){
           if(_.includes(job.industry, item.shortCode)){
             res.push(item);
@@ -430,10 +432,15 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
         job.industry = industry;
 
+        bookmark.job = job;
+
+
 
       })
 
-      result.docs = jobs;
+
+
+      // result.docs = jobs;
 
     }
 
@@ -469,7 +476,9 @@ async function getAlertsByUserId(currentUserId, filter) {
       let limit = (filter.size && filter.size > 0) ? filter.size : 20;
       let page = (filter.page && filter.page == 0) ? filter.page : 1;
       let sortBy = {};
-      sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+      filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+      filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+      sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
       let options = {
         select: select,
@@ -532,14 +541,9 @@ async function addPartyAlert(currentUserId, alert) {
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
 
-      // result = await findAlertByUserIdAndJobId(currentParty.id, jobId);
+      alert.partyId = currentParty.id;
+      result = await addAlertByUserId(currentParty.id, alert);
 
-      // if(!result) {
-        alert.partyId = currentParty.id;
-
-        console.log('alert', alert);
-        result = await addAlertByUserId(currentParty.id, alert);
-      // }
 
     }
 
@@ -608,20 +612,21 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
       found = await findJobAlertById(alertId);
 
       if(found){
-        found.title = alert.title;
-        found.company = alert.company;
-        found.companySize = alert.companySize;
-        found.distance = alert.distance;
-        found.employmentType = alert.employmentType;
-        found.city = alert.city;
-        found.state = alert.state;
-        found.country = alert.country;
-        found.repeat = alert.repeat;
-        found.industry = alert.industry;
-        found.notification = alert.notification;
-        found.remote = alert.remote;
+        found.title = alert.title?alert.title:found.title;
+        found.company = alert.company?alert.company:found.company;
+        found.companySize = alert.companySize?alert.companySize:found.companySize;
+        found.distance = alert.distance?alert.distance:found.distance;
+        found.employmentType = alert.employmentType?alert.employmentType:found.employmentType;
+        found.city = alert.city?alert.city:found.city;
+        found.state = alert.state?alert.state:found.state;
+        found.country = alert.country?alert.country:found.country;
+        found.repeat = alert.repeat?alert.repeat:found.repeat;
+        found.industry = alert.industry?alert.industry:found.industry;
+        found.notification = alert.notification?alert.notification:found.notification;
+        found.remote = alert.remote?alert.remote:false;
+        found.level = alert.level?alert.level:found.level;
 
-        found.status = (alert.status && alert.status==statusEnum.ACTIVE)?statusEnum.ACTIVE : statusEnum.INACTIVE;
+        found.status = alert.status?alert.status : found.status;
 
         result = await found.save();
 
@@ -656,12 +661,14 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
 
     if(isPartyActive(currentParty)) {
-      console.debug('isActive', currentParty.id)
+      // console.debug('isActive', currentParty.id)
       let select = '';
       let limit = (filter.size && filter.size > 0) ? filter.size : 20;
       let page = (filter.page && filter.page == 0) ? filter.page : 1;
       let sortBy = {};
-      sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
+      filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+      filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+      sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
       let options = {
         select: select,
@@ -691,7 +698,10 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
       let promotionIds = _.map(jobs, 'promotion');
       let promotions = await getPromotions(promotionIds);
 
-      _.forEach(jobs, function(job){
+
+      _.forEach(result.docs, function(view, idx) {
+        let job = _.find(jobs, {jobId: view.jobId});
+        console.log('job', job)
         job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
         job.description = null;
         job.responsibilities=[];
@@ -701,14 +711,14 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
         job.company = _.find(foundCompanies, {id: job.company});
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
-
-
-        console.log(job.promotion, _.find(promotions, {promotionId: job.promotion}));
         job.promotion = _.find(promotions, {promotionId: job.promotion});
+
+        view.job = job;
+
+
 
       })
 
-      result.docs = jobs;
 
     }
 

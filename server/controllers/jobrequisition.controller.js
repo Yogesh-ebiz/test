@@ -14,7 +14,7 @@ const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 
 const {findJobId, getCountsGroupByCompany} = require('../services/jobrequisition.service');
-const {addJobViewByUserId} = require('../services/jobview.service');
+const {addJobViewByUserId, findJobViewByUserIdAndJobId} = require('../services/jobview.service');
 
 
 
@@ -148,7 +148,14 @@ async function getJobById(currentUserId, jobId, locale) {
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
 
-        await addJobViewByUserId(currentParty.id, jobId);
+        let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
+        if(!jobView){
+          await addJobViewByUserId(currentParty.id, jobId);
+        } else {
+          jobView.viewCount++
+          await jobView.save();
+        }
+
 
         let partySkills = await PartySkill.find({partyId: currentParty.id});
         partySkills = _.map(partySkills, "skillTypeId");
@@ -252,7 +259,9 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let limit = (filter.size && filter.size>0) ? filter.size:20;
   let page = (filter.page && filter.page==0) ? filter.page:1;
   let sortBy = {};
-  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+  filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+  filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+  sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
   let options = {
     select:   select,
@@ -310,10 +319,12 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
 
   _.forEach(result.docs, function(job){
+    console.log(job.jobId, job.employmentType)
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
     job.company = _.find(foundCompanies, {id: job.company});
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
+
 
     job.promotion = _.find(promotions, {promotionId: job.promotion});
 

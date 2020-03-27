@@ -93,7 +93,6 @@ class Pagination {
 
 
 
-    console.log('hasNextPage', data.hasNextPage);
     this.last  = !data.hasNextPage  || false;
     this.totalPages = data.totalPages;
     this.totalElements = data.totalDocs;

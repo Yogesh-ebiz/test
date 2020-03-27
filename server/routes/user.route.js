@@ -120,7 +120,7 @@ async function updatePartyAlert(req, res) {
   let alert = req.body;
   let data = await userCtl.updatePartyAlert(currentUserId, alertId, alert);
 
-  res.json(new Response(data, data?'alert_removed_successful':'not_found', res));
+  res.json(new Response(data, data?'alert_updated_successful':'not_found', res));
 }
 
 

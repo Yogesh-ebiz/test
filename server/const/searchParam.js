@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const dateEnum = require('../const/dateEnum')
 
 
 function SearchParam(filter) {
@@ -19,8 +20,36 @@ function SearchParam(filter) {
   }
 
   if(filter.similarId){
-    console.log('similar', filter.similarId)
     this.query.jobId =  { $nin: [filter.similarId] };
+  }
+
+  if(filter.createdDate){
+    let start, end;
+
+
+    start = new Date();
+    setHours(0,0,0,0);
+
+    end = new Date(thruDate);
+
+
+    switch (filter.createdDate) {
+      case dateEnum.PASTDAY:
+        start.setDate(d.getDate() - 1);
+        break;
+      case dateEnum.PASTWEEK:
+        start.setDate(d.getDate() - 7);
+        break;
+      case dateEnum.PASTBIWEEK:
+        start.setDate(d.getDate() - 14);
+        break;
+      case dateEnum.PASTMONTH:
+        start.setDate(d.getDate() - 30);
+        break;
+    }
+
+    console.log(start.getTime(), end.getTime())
+    this.query.createdDate =  { start: { $gte: start, $lte: end }  };
   }
 
 
@@ -78,6 +107,15 @@ function SearchParam(filter) {
     }, []);
 
     this.query.country =  { $in: country};
+  }
+
+  if (filter.distance && filter.distance!="") {
+    let distance = _.reduce(filter.distance.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+
+    this.query.distance =  { $in: distance};
   }
 
   // console.log('query', this.query);

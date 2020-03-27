@@ -34,9 +34,8 @@ function addAlertByUserId(userId, alert) {
   if(userId==null || alert==null){
     return;
   }
-  console.log(alert)
 
-  alert.createdDate = Date().now;
+  alert.createdDate = Date.now();
   alert.notification = [alertEnum.EMAIL, alertEnum.NOTIFICATION];
   alert.repeat = alertEnum.DAILY;
   return new JobAlert(alert).save();

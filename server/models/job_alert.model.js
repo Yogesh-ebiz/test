@@ -31,11 +31,11 @@ const JobAlertSchema = new mongoose.Schema({
     default: ''
   },
   companySize: {
-    type: Number,
+    type: String,
     required: false
   },
   distance: {
-    type: Number,
+    type: String,
     required: false
   },
   level: {
@@ -69,8 +69,7 @@ const JobAlertSchema = new mongoose.Schema({
     default: '',
   },
   createdDate: {
-    type: Date,
-    default: Date.now
+    type: Number
   },
   repeat: {
     type: String,

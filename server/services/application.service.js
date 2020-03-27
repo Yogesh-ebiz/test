@@ -67,7 +67,7 @@ async function applyJob(application) {
     return;
   }
 
-  application.createdDate = Date().now;
+  application.createdDate = Date.now();
   application.attachment = '';
   application.status = applicationEnum.APPLIED;
 
