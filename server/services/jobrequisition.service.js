@@ -6,6 +6,20 @@ const Promotion = require('../models/promotion.model');
 
 
 
+function searchTitle(keyword) {
+  let data = null;
+
+  if(keyword==null){
+    return;
+  }
+  var regex = new RegExp(keyword, 'i');
+  return JobRequisition.aggregate([
+    { $match: {title: regex} },
+    { $group: {_id:{title:'$title'}} },
+    { $project: {_id: 0, keyword: '$_id.title'}}
+  ])
+}
+
 
 function findJobId(jobId, locale) {
   let data = null;
@@ -66,6 +80,7 @@ function getCountsGroupByCompany(match){
 
 
 module.exports = {
+  searchTitle: searchTitle,
   findJobId: findJobId,
   findJobIds: findJobIds,
   removeByJobId: removeByJobId,

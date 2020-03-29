@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+const axiosInstance = require('../services/api.service');
+
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
 
@@ -15,15 +17,10 @@ const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../
 
 const {findJobId, getCountsGroupByCompany} = require('../services/jobrequisition.service');
 const {addJobViewByUserId, findJobViewByUserIdAndJobId} = require('../services/jobview.service');
-
-
-
+const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 
 const filterService = require('../services/filter.service');
 
-
-
-//const pagination = require('../const/pagination');
 const JobRequisition = require('../models/jobrequisition.model');
 const Skilltype = require('../models/skilltype.model');
 const JobFunction = require('../models/jobfunctions.model');
@@ -254,6 +251,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     return null;
   }
 
+
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
   let limit = (filter.size && filter.size>0) ? filter.size:20;
@@ -271,6 +269,9 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
+
+
+  let history = await  saveSearch(currentUserId, filter.query);
 
   if(jobId){
     console.log('ID', jobId)
@@ -319,7 +320,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
 
   _.forEach(result.docs, function(job){
-    console.log(job.jobId, job.employmentType)
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
     job.company = _.find(foundCompanies, {id: job.company});
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
@@ -514,7 +514,7 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
 
 
-async function applyJobById(currentUserId, application) {
+async function applyJobById(currentUserId, application ) {
 
 
   application = await Joi.validate(application, applicationSchema, { abortEarly: false });
@@ -542,6 +542,11 @@ async function applyJobById(currentUserId, application) {
           application.job = job._id;
           application.attachment = application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf");
           result = await applyJob(application);
+
+          //TODO: Call Follow API
+          // if(application.follow){
+          //   await axiosInstance.post('http://localhost:90/api/party/' + job.company + '/follow' + "?source=job");
+          // }
 
         }
       }

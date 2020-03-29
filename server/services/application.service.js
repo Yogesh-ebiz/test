@@ -99,7 +99,7 @@ async function applyJob(application) {
     application: application._id
   });
 
-  console.log('progress', applicationProgress)
+  // console.log('progress', applicationProgress)
 
 
   return application;

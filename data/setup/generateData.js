@@ -60,9 +60,13 @@ for(var i=0; i<1000; i++) {
 
   let promotion = config.promotion[getRandomInt(config.promotion.length - 1)];
 
+  let date = new Date();
+  date.setDate(date.getDate() - getRandomInt(30));
+
   // console.log(company, user, employmentType, level, jobFunction, skill, title, location, cityState, responsibility, qualification)
 
   let job = {
+    createdDate: date.getTime(),
     title: title,
     company: company,
     employmentType: employmentType,
@@ -88,8 +92,8 @@ for(var i=0; i<1000; i++) {
     salaryFixed: null,
   }
 
-  console.log(i, job.title);
-  jobs.push(job);
+  // console.log(i, job.title);
+  // jobs.push(job);
   new JobRequisition(job).save();
 
 }
