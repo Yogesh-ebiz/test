@@ -25,7 +25,6 @@ async function getSuggestion(currentUserId, keyword) {
     data = await findSearchHistoryByKeyword(keyword);
 
     if(!data.length){
-      console.log('none')
       data = await searchTitle(keyword);
     }
 

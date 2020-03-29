@@ -129,90 +129,89 @@ async function getJobById(currentUserId, jobId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    console.log('prop', propLocale)
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
     job = await findJobId(jobId, locale);
 
     if(job) {
 
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
-      // console.log('currentParty', response.data)
-
+      
       response = await getCompanyById(job.company);
       job.company = response.data.data;
 
-      //Security Check if user is part of meeting attendees that is ACTIVE.
-      if (isPartyActive(currentParty)) {
+      let jobSkills = await getListofSkillTypes(job.skills);
+      // console.log('jobSkils', jobSkills)
+      
 
-        let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
-        if(!jobView){
-          await addJobViewByUserId(currentParty.id, jobId);
-        } else {
-          jobView.viewCount++
-          await jobView.save();
-        }
+      let noApplied = await findAppliedCountByJobId(job.jobId);
+      job.noApplied = noApplied;
 
+      let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
+      job.employmentType = employmentType[0];
 
-        let partySkills = await PartySkill.find({partyId: currentParty.id});
-        partySkills = _.map(partySkills, "skillTypeId");
-        // console.log('partyskills', partySkills)
+      let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
+      job.level = experienceLevel[0];
 
-        let jobSkills = await getListofSkillTypes(job.skills);
-        // console.log('jobSkils', jobSkills)
+      //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
+      let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
 
-        let hasSaved = await findBookById(currentParty.id, job.jobId);
-        job.hasSaved = (hasSaved)?true:false;
+      let industry = await getIndustry(job.industry, locale);
+      job.industry = industry;
 
-        let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
-        job.hasApplied = (hasApplied)?true:false;
+      // let promotion = await findPromotionByObjectId(job.promotion);
+      // job.promotion = promotion;
 
+      if(job.promotion){
+        let promotion = await findPromotionById(job.promotion);
+        job.promotion = promotion[0];
+      }
+      
+      // let promotion = await JobRequisition.populate(job, 'promotion')
 
-        let noApplied = await findAppliedCountByJobId(job.jobId);
-        job.noApplied = noApplied;
+      let currentParty, partySkills=[];
+      if(currentUserId){
 
-        let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
-        job.employmentType = employmentType[0];
+        let response = await getPersonById(currentUserId);
+        currentParty = response.data.data;
 
-        let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
-        job.level = experienceLevel[0];
-
-        //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-        let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
-
-        let industry = await getIndustry(job.industry, locale);
-        job.industry = industry;
-
-        // let promotion = await findPromotionByObjectId(job.promotion);
-        // job.promotion = promotion;
-
-        if(job.promotion){
-          let promotion = await findPromotionById(job.promotion);
-          job.promotion = promotion[0];
-        }
-
-
-        // let promotion = await JobRequisition.populate(job, 'promotion')
-
-
-
-        skills = _.reduce(jobSkills, function(res, skill, key){
-          let temp = _.clone(skill);
-
-          if(_.includes(partySkills, skill.skillTypeId)){
-            temp.hasSkill=true;
+        if (isPartyActive(currentParty)) {
+          let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
+          if(!jobView){
+            await addJobViewByUserId(currentParty.id, jobId);
           } else {
-            temp.hasSkill=false;
+            jobView.viewCount++
+            await jobView.save();
           }
 
-          res.push(temp);
-          return res;
-        }, []);
+          let hasSaved = await findBookById(currentParty.id, job.jobId);
+          job.hasSaved = (hasSaved)?true:false;
 
-        job.skills = skills;
-        job.jobFunction=jobFunction[0];
+          let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
+          job.hasApplied = (hasApplied)?true:false;
+
+          partySkills = await PartySkill.find({partyId: currentParty.id});
+          partySkills = _.map(partySkills, "skillTypeId");
+        }
+
 
       }
+
+      skills = _.reduce(jobSkills, function(res, skill, key){
+        let temp = _.clone(skill);
+
+        if(_.includes(partySkills, skill.skillTypeId)){
+          temp.hasSkill=true;
+        } else {
+          temp.hasSkill=false;
+        }
+
+        res.push(temp);
+        return res;
+      }, []);
+
+      job.skills = skills;
+      job.jobFunction=jobFunction[0];
+
+
     }
 
   } catch (error) {
@@ -247,7 +246,7 @@ async function addToUser(id, locale) {
 
 async function searchJob(currentUserId, jobId, filter, locale) {
 
-  if(currentUserId==null || filter==null){
+  if(filter==null){
     return null;
   }
 
@@ -316,7 +315,12 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
 
 
-  let hasSaves = await findBookByUserId(currentUserId);
+
+  let hasSaves = [];
+
+  if(currentUserId){
+    hasSaves=await findBookByUserId(currentUserId);
+  }
 
 
   _.forEach(result.docs, function(job){
