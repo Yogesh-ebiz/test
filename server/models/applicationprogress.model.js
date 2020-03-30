@@ -10,27 +10,55 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  application: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
+  applicationId: {
+    type: Number,
+    required: true
+  },
   status: {
     type: String,
     required: false
   },
+  candidateComment: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  note: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  requiredAction: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
   type: {
     type: String,
-    required: false
+    required: true
   },
+  schedule: { type: Schema.Types.ObjectId, ref: 'Event' },
   createdDate: {
     type: Number,
     required: false,
-    default: Date.now()
+    default: Date.now
   },
   lastUpdatedDate: {
     type: Number,
     required: false
   },
   attachment: {
-    type: String,
+    type: Object,
     required: false
+  },
+  candidateAttachment: {
+    type: Object,
+    required: false
+  },
+  comments: {
+    type: Array,
+    required: false,
+    default: []
   }
 
 }, {

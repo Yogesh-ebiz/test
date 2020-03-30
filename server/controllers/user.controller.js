@@ -119,7 +119,6 @@ async function uploadCV(currentUserId, files) {
 
       let path = 'user/' + currentParty.id + '/resumes/' + name;
       let res = await upload(path, file);
-      console.log('upload done')
 
       //await application.save();
 
@@ -290,7 +289,6 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
         sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
-        console.log(sortBy)
         let options = {
           select: select,
           sort: sortBy,
@@ -506,7 +504,6 @@ async function getAlertsByUserId(currentUserId, filter) {
       let count = await Promise.all(loadPromises);
 
       _.forEach(result.docs, function(alert, idx) {
-        console.log(alert.company)
         // alert.company = _.find(foundCompanies, {id: alert.company});
 
         alert.noJobs = count[idx];
@@ -702,7 +699,6 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       _.forEach(result.docs, function(view, idx) {
         let job = _.find(jobs, {jobId: view.jobId});
-        console.log('job', job)
         job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
         job.description = null;
         job.responsibilities=[];

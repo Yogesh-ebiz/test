@@ -23,11 +23,11 @@ async function saveSearch(userId, keyword) {
 
   let match = {keyword: keyword, partyId: userId}
 
-  console.log('match', match)
-  data =  SearchHistory.aggregate( [
-    { $match: {keyword: "ios"} },
-    { $merge: { into: "searchhistory", on: "_id", whenMatched: "replace", whenNotMatched: "insert" } }
-  ] )
+  // console.log('match', match)
+  // data =  SearchHistory.aggregate( [
+  //   { $match: {keyword: "ios"} },
+  //   { $merge: { into: "searchhistory", on: "_id", whenMatched: "replace", whenNotMatched: "insert" } }
+  // ] )
 
   return data;
 

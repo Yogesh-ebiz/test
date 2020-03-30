@@ -1,6 +1,6 @@
 [
-  {"workflowId": 0, "title": "Master Workflow", "workflow":["APPLY", "PHONE_SCREEN", "TEST", "INTERVIEW", "SECOND_INTERVIEW", "OFFER"], "isMaster": true, "status": "ACTIVE"},
-  {"workflowId": 1, "title": "Sales Team Workflow", "workflow":["APPLY", "PHONE_SCREEN", "TEST", "INTERVIEW", "SECOND_INTERVIEW", "OFFER"], "isMaster": false, "status": "ACTIVE", "isPrimary": true, "function": "SNM", "partyId": 1, "companyId": 19},
-  {"workflowId": 2, "title": "Development Workflow", "workflow":["APPLY", "PHONE_SCREEN", "TEST", "INTERVIEW", "OFFER"], "isMaster": false, "status": "ACTIVE", "isPrimary": true, "function": "SNM", "partyId": 2, "companyId": 19}
+  {"workflowId": 100001, "title": "Master Workflow", "workflow":["APPLY", "PHONESCREEN", "TEST", "INTERVIEW", "OFFER"], "isMaster": true, "status": "ACTIVE"},
+  {"workflowId": 100002, "title": "Sales Team Workflow", "workflow":["APPLY", "PHONESCREEN", "TEST", "INTERVIEW", "OFFER"], "isMaster": false, "status": "ACTIVE", "isPrimary": true, "function": "SNM", "partyId": 1, "companyId": 19},
+  {"workflowId": 100003, "title": "Development Workflow", "workflow":["APPLY", "PHONESCREEN", "TEST", "INTERVIEW", "OFFER"], "isMaster": false, "status": "ACTIVE", "isPrimary": true, "function": "SNM", "partyId": 2, "companyId": 19}
 ]
 

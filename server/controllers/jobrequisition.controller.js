@@ -5,10 +5,14 @@ const axiosInstance = require('../services/api.service');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
+const applicationEnum = require('../const/applicationEnum');
+
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
+const {findApplicationByCurrentStatus, findApplicationProgresssById, addApplicationProgress} = require('../services/applicationprogress.service');
+const {findApplicationHistoryById, addApplicationHistory} = require('../services/applicationhistory.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
@@ -134,13 +138,13 @@ async function getJobById(currentUserId, jobId, locale) {
 
     if(job) {
 
-      
+
       response = await getCompanyById(job.company);
       job.company = response.data.data;
 
       let jobSkills = await getListofSkillTypes(job.skills);
       // console.log('jobSkils', jobSkills)
-      
+
 
       let noApplied = await findAppliedCountByJobId(job.jobId);
       job.noApplied = noApplied;
@@ -164,7 +168,7 @@ async function getJobById(currentUserId, jobId, locale) {
         let promotion = await findPromotionById(job.promotion);
         job.promotion = promotion[0];
       }
-      
+
       // let promotion = await JobRequisition.populate(job, 'promotion')
 
       let currentParty, partySkills=[];
@@ -273,7 +277,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let history = await  saveSearch(currentUserId, filter.query);
 
   if(jobId){
-    console.log('ID', jobId)
     foundJob = await JobRequisition.findOne({jobId:jobId});
     //
     // if(!foundJob){
@@ -379,7 +382,6 @@ async function getSimilarJobs(currentUserId, filter) {
 
 
   if(filter.id){
-    console.log('ID', filter.id)
     foundJob = await JobRequisition.findOne({jobId: filter.id});
     //
     // if(!foundJob){
@@ -544,13 +546,24 @@ async function applyJobById(currentUserId, application ) {
         result = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
         if(!result){
           application.job = job._id;
-          application.attachment = application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf");
+          // application.candidateAttachment = {type: 'PDF', url: application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf") };
           result = await applyJob(application);
 
-          //TODO: Call Follow API
-          // if(application.follow){
-          //   await axiosInstance.post('http://localhost:90/api/party/' + job.company + '/follow' + "?source=job");
-          // }
+          if(result){
+            await  addApplicationHistory({applicationId: result.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
+            let progress = await  addApplicationProgress({applicationId: result.applicationId, status: applicationEnum.APPLIED, type: 'APPLY'});
+            result.progress.push(progress._id)
+            await result.save();
+
+            //TODO: Call Follow API
+            // if(application.follow){
+            //   await axiosInstance.post('http://localhost:90/api/party/' + job.company + '/follow' + "?source=job");
+            // }
+          }
+
+
+
+
 
         }
       }
@@ -578,7 +591,6 @@ async function addBookmark(currentUserId, jobId) {
     job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-      console.log('job', job)
       let response = await getPersonById(currentUserId);
       let currentParty = response.data.data;
       // console.log('currentParty', currentParty)

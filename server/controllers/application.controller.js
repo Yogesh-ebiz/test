@@ -5,23 +5,26 @@ const _ = require('lodash');
 const fs = require('fs');
 const AWS = require('aws-sdk');
 
-//const pagination = require('../const/pagination');
-const Application = require('../models/application.model');
 const partyEnum = require('../const/partyEnum');
+const applicationEnum = require('../const/applicationEnum');
+
+const Application = require('../models/application.model');
+const ApplicationProgress = require('../models/applicationprogress.model');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {findJobId} = require('../services/jobrequisition.service');
 const {upload} = require('../services/aws.service');
-
-
-
-const {findApplicationByUserId, findApplicationById} = require('../services/application.service');
+const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
+const {findWorkflowById} = require('../services/workflow.service');
 
 
 
 module.exports = {
   getApplicationById,
-  uploadCV
+  uploadCV,
+  accept,
+  decline,
+  addProgress
 }
 
 
@@ -42,10 +45,13 @@ async function getApplicationById(currentUserId, applicationId) {
     if(isPartyActive(currentParty)) {
       application = await findApplicationById(applicationId);
       if (application && application.partyId==currentParty.id) {
-        let job = await findJobId(application.jobId);
+        // let job = await findJobId(application.jobId);
 
-        response = await getCompanyById(job.company);
+        response = await getCompanyById(application.job.company);
         application.job.company = response.data.data;
+        application.job.responsibilities=[];
+        application.job.qualifications = [];
+        application.job.skills = []
 
         // application.job = job;
 
@@ -78,19 +84,36 @@ async function uploadCV(currentUserId, applicationId, files) {
     if (isPartyActive(currentParty)) {
 
       application = await findApplicationById(applicationId);
-      console.log(applicationId, application)
       if (application && application.partyId == currentUserId) {
-        console.debug('application', application.applicationId);
 
+        let progress = application.progress[0];
         let file = files.file;
-        let fileExt = file.originalFilename.split('.');
+        let fileName = file.originalFilename.split('.');
+        let fileExt = fileName[fileName.length - 1];
         let timestamp = Date.now();
-        let name = application.jobId + '_' + application.partyId + '_' + application.applicationId + '_' + timestamp + '.' + fileExt[fileExt.length - 1];
+        let name = application.jobId + '_' + application.partyId + '_' + application.applicationId + '_' + timestamp + '.' + fileExt;
 
         let path = 'applications/' + application.jobId + '/' + name;
         let res = await upload(path, file);
 
-        application.attachment = name;
+
+        let type;
+        switch(fileExt){
+          case 'pdf':
+            type='PDF';
+            break;
+          case 'doc':
+            type='WORD';
+            break;
+          case 'docx':
+            type='WORD';
+            break;
+
+        }
+
+        progress.candidateAttachment = { url: name, type: type};
+        await progress.save();
+
         await application.save();
 
       }
@@ -103,4 +126,141 @@ async function uploadCV(currentUserId, applicationId, files) {
 
   return application;
 
+}
+
+
+
+async function accept(currentUserId, applicationId, applicationProgressId, action) {
+
+  if(!applicationId || !applicationProgressId || !currentUserId || !action){
+    return null;
+  }
+
+  let result;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if(isPartyActive(currentParty)) {
+      application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
+      if (application) {
+
+        let progresses = application.progress;
+
+        if(progresses){
+          let currentProgress = progresses[progresses.length -1 ];
+          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && action.accept && currentProgress.requiredAction){
+
+            if(_.includes(['PHONE_SCREEN', 'TEST', 'INTERVIEW', 'SECOND_INTERVIEW', 'OFFER'], action.type)){
+              currentProgress.status = applicationEnum.ACCEPTED;
+              currentProgress.candidateComment = action.candidateComment;
+              currentProgress.requiredAction = false;
+              currentProgress.lastUpdatedDate = Date.now();
+              currentProgress = await currentProgress.save()
+            }
+          }
+        }
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function decline(currentUserId, applicationId, applicationProgressId, action) {
+
+  if(!applicationId || !applicationProgressId || !currentUserId || !action){
+    return null;
+  }
+
+  let result;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if(isPartyActive(currentParty)) {
+      application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
+      if (application) {
+
+        let progresses = application.progress;
+        console.log('all', progresses)
+        if(progresses){
+          let currentProgress = progresses[progresses.length -1 ];
+          console.log('current', currentProgress)
+          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && !action.accept && currentProgress.requiredAction){
+
+            if(_.includes(['PHONE_SCREEN', 'TEST', 'INTERVIEW', 'SECOND_INTERVIEW', 'OFFER'], action.type)){
+              currentProgress.status = applicationEnum.DECLINED;
+              currentProgress.requiredAction = false;
+              currentProgress.candidateComment = action.candidateComment;
+              currentProgress.lastUpdatedDate = Date.now();
+              currentProgress = await currentProgress.save()
+            }
+          }
+        }
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function addProgress(currentUserId, applicationId, progress) {
+
+  if(!applicationId || !currentUserId || !progress){
+    return null;
+  }
+
+  let result;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if(isPartyActive(currentParty)) {
+      let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
+      let workflow = await findWorkflowById(application.job.workflowId);
+      workflow = workflow.workflow
+
+      if (application) {
+
+        let progresses = application.progress;
+        if(progresses) {
+          let currentProgress = progresses[progresses.length - 1];
+          let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];
+
+
+          if(nextProgress && nextProgress!='OFFER'){
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED"}).save();
+            application.progress.push(nextProgress);
+            result = await application.save();
+          } else if (nextProgress && nextProgress=='OFFER') {
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFER"}).save();
+            application.progress.push(nextProgress);
+            result = await application.save();
+          }
+
+
+
+
+        }
+
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
 }
