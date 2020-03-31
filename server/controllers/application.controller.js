@@ -217,21 +217,22 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
       application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
       if (application) {
 
+        let workflow = await findWorkflowById(application.job.workflowId);
+        console.log('workflow', workflow)
+
         let progresses = application.progress;
 
         if(progresses){
           let currentProgress = progresses[progresses.length -1 ];
           if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && action.accept && currentProgress.requiredAction){
 
-            console.log('accept', action)
-            if(_.includes(['PHONE_SCREEN', 'TEST', 'INTERVIEW', 'SECOND_INTERVIEW', 'OFFER'], action.type)){
-              currentProgress.status = applicationEnum.ACCEPTED;
-              currentProgress.candidateComment = action.candidateComment;
-              currentProgress.requiredAction = false;
-              currentProgress.lastUpdatedDate = Date.now();
-              currentProgress = await currentProgress.save();
-              result = currentProgress;
-            }
+            currentProgress.status = applicationEnum.ACCEPTED;
+            currentProgress.candidateComment = action.candidateComment;
+            currentProgress.requiredAction = false;
+            currentProgress.lastUpdatedDate = Date.now();
+            currentProgress = await currentProgress.save();
+            result = currentProgress;
+
           }
         }
       }
