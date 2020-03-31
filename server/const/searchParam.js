@@ -53,6 +53,7 @@ function SearchParam(filter) {
 
   if (filter.query && filter.query!="") {
     this.query.title =  { $regex: filter.query, $options: 'i' };
+    // this.query.$text = { $search: filter.query, $caseSensitive: true };
   }
 
   if (filter.level && filter.level!="") {
@@ -128,7 +129,7 @@ function SearchParam(filter) {
     this.query.distance =  { $in: distance};
   }
 
-  // console.log('query', this.query);
+  console.log('query', this.query);
   return this.query;
 }
 

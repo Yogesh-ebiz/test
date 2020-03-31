@@ -7,6 +7,8 @@ const AWS = require('aws-sdk');
 
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
+const workflowEnum = require('../const/workflowEnum');
+
 
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
@@ -53,6 +55,12 @@ async function getApplicationById(currentUserId, applicationId) {
         application.job.qualifications = [];
         application.job.skills = []
 
+        application.progress = _.reduce(application.progress, function(res, item){
+          item.label = workflowEnum[item.type]['en'];
+          res.push(item);
+          return res;
+        }, [])
+
         // application.job = job;
 
       } else {
@@ -95,6 +103,7 @@ async function uploadCV(currentUserId, applicationId, files) {
         let name = 'Resume_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
 
         let path = basePath + 'JOB_' +application.jobId + '/resumes/' + name;
+
         let res = await upload(path, file);
 
 
@@ -214,12 +223,14 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
           let currentProgress = progresses[progresses.length -1 ];
           if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && action.accept && currentProgress.requiredAction){
 
+            console.log('accept', action)
             if(_.includes(['PHONE_SCREEN', 'TEST', 'INTERVIEW', 'SECOND_INTERVIEW', 'OFFER'], action.type)){
               currentProgress.status = applicationEnum.ACCEPTED;
               currentProgress.candidateComment = action.candidateComment;
               currentProgress.requiredAction = false;
               currentProgress.lastUpdatedDate = Date.now();
-              currentProgress = await currentProgress.save()
+              currentProgress = await currentProgress.save();
+              result = currentProgress;
             }
           }
         }
@@ -260,7 +271,8 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
               currentProgress.requiredAction = false;
               currentProgress.candidateComment = action.candidateComment;
               currentProgress.lastUpdatedDate = Date.now();
-              currentProgress = await currentProgress.save()
+              currentProgress = await currentProgress.save();
+              result = currentProgress;
             }
           }
         }
@@ -307,7 +319,7 @@ async function addProgress(currentUserId, applicationId, progress) {
             application.progress.push(nextProgress);
             await application.save();
           } else if (nextProgress && nextProgress=='OFFER') {
-            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFER"}).save();
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFERED"}).save();
             application.progress.push(nextProgress);
             await application.save();
           }

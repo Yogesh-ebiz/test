@@ -10,6 +10,11 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  label: {
+    type: String,
+    required: false,
+    default: '',
+  },
   applicationId: {
     type: Number,
     required: true
