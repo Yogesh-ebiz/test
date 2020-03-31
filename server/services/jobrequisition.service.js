@@ -87,7 +87,7 @@ function getJobCount(filter) {
     return;
   }
 
-  filter = {jobId: filter.jobId, level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
+  filter = {title: filter.title, jobId: filter.jobId, level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
   let search = new SearchParam(filter);
 
   let res = JobRequisition.find(search).count();
