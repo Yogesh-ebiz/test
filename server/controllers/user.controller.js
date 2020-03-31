@@ -625,6 +625,7 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
         found.notification = alert.notification?alert.notification:found.notification;
         found.remote = alert.remote?alert.remote:false;
         found.level = alert.level?alert.level:found.level;
+        found.jobFunction = alert.jobFunction?alert.jobFunction:found.jobFunction;
 
         found.status = alert.status?alert.status : found.status;
 
