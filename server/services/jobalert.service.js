@@ -61,29 +61,6 @@ function removeAlertById(alertId) {
   return JobAlert.remove({jobAlertId: alertId});
 }
 
-function getAlertCount(alert) {
-  let data = null;
-
-  if(alert==null){
-    return;
-  }
-  let employmentType = [alert.employmentType];
-  let industry = [alert.industry];
-  let city = [alert.city];
-  let state = [alert.state];
-  let country = [alert.country];
-  let company = _.reduce(alert.company.split(','), function(res, item){
-    res.push(parseInt(item));
-    return res;
-  }, []);
-
-
-  let res = JobRequisition.find({employmentType: {$in: employmentType}, industry: {$in: industry},
-    city: {$in: city}, state: {$in: state}, country: {$in: country}, company: {$in: company} }).count();
-  return res;
-}
-
-
 
 
 module.exports = {
@@ -91,6 +68,5 @@ module.exports = {
   findAlertByUserIdAndJobId: findAlertByUserIdAndJobId,
   addAlertByUserId: addAlertByUserId,
   removeAlertByUserIdAndJobId: removeAlertByUserIdAndJobId,
-  removeAlertById:removeAlertById,
-  getAlertCount:getAlertCount
+  removeAlertById:removeAlertById
 }

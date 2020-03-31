@@ -48,6 +48,11 @@ const JobAlertSchema = new mongoose.Schema({
     required: false,
     default: '',
   },
+  jobFunction: {
+    type: String,
+    required: false,
+    default: '',
+  },
   employmentType: {
     type: String,
     required: false,

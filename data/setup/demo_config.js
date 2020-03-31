@@ -25,7 +25,7 @@ const config = {
   },
   country: ["US", "VN"],
   location: [
-    {US: [{city: "Chicago", state: "Illinois"}, {city: "San Jose", state: "California"}, {city: "San Francisco", state: "California"}, {city: "San Diego", state: "California"}, {city: "Seattle", state: "Washing"}, {city: "Brooklyn", state: "New York"}, {city: "Philadelphia", state: "Pennsylvvania"}]},
+    {US: [{city: "Chicago", state: "Illinois"}, {city: "San Jose", state: "California"}, {city: "San Francisco", state: "California"}, {city: "San Diego", state: "California"}, {city: "Seattle", state: "Washington"}, {city: "Brooklyn", state: "New York"}, {city: "Philadelphia", state: "Pennsylvvania"}]},
     {VN: [{city: "Quan 1", state: "Ho Chi Minh"}, {city: "Quan 2", state: "Ho Chi Minh"}, {city: "Quan 3", state: "Ho Chi Minh"}, {city: "Quan 4", state: "Ho Chi Minh"}, {city: "Quan 5", state: "Ho Chi Minh"}, {city: "Quan Binh Thanh", state: "Ho Chi Minh"}, {city: "Quan Hoan Kiem", state: "Hanoi"}, {city: "Quan Ba Dinh", state: "Hanoi"}, {city: "Quan Dong Da", state: "Hanoi"}, {city: "Quan Hai Ba Trung", state: "Hanoi"}]}
   ],
   responsibility: {

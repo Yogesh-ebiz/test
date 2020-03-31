@@ -28,6 +28,8 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = require('../services/jobalert.service');
+const {getJobCount} = require('../services/jobrequisition.service');
+
 const {getPromotions, findPromotionById} = require('../services/promotion.service');
 
 const {findJobViewByUserId} = require('../services/jobview.service');
@@ -63,6 +65,7 @@ const jobAlertSchema = Joi.object({
   country: Joi.string().allow('').optional(),
   level: Joi.string().allow('').optional(),
   industry: Joi.string().allow('').optional(),
+  jobFunction: Joi.string().allow('').optional(),
   employmentType: Joi.string().allow('').optional(),
   distance: Joi.string().allow('').optional(),
   company: Joi.string().allow('').optional(),
@@ -70,9 +73,8 @@ const jobAlertSchema = Joi.object({
   repeat: Joi.string().allow('').optional(),
   notification: Joi.array().optional(),
   status: Joi.string().optional(),
-  remote: Joi.boolean().optional(),
-  lt: Joi.number().optional(),
-  gt: Joi.number().optional()
+  remote: Joi.boolean().optional()
+
 });
 
 
@@ -500,7 +502,7 @@ async function getAlertsByUserId(currentUserId, filter) {
       //   alert.noJobs = await getAlertCount(filter);
       // })
 
-      const loadPromises = result.docs.map(alert => getAlertCount(alert));
+      const loadPromises = result.docs.map(alert => getJobCount(alert));
       let count = await Promise.all(loadPromises);
 
       _.forEach(result.docs, function(alert, idx) {

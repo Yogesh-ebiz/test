@@ -3,6 +3,7 @@ const statusEnum = require('../const/statusEnum');
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
 const Promotion = require('../models/promotion.model');
+let SearchParam = require('../const/searchParam');
 
 
 
@@ -79,10 +80,28 @@ function getCountsGroupByCompany(match){
 }
 
 
+function getJobCount(filter) {
+  let data = null;
+
+  if(filter==null){
+    return;
+  }
+
+  filter = {jobId: filter.jobId, level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
+  let search = new SearchParam(filter);
+
+  let res = JobRequisition.find(search).count();
+  return res;
+}
+
+
+
+
 module.exports = {
   searchTitle: searchTitle,
   findJobId: findJobId,
   findJobIds: findJobIds,
   removeByJobId: removeByJobId,
-  getCountsGroupByCompany
+  getCountsGroupByCompany,
+  getJobCount:getJobCount
 }

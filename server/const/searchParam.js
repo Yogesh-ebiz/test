@@ -6,10 +6,10 @@ function SearchParam(filter) {
   this.query = {};
 
 
-  if(filter.partyId){
-    console.log('partyId', filter.partyId)
-    this.query.partyId =  { $eq: filter.partyId };
-  }
+  // if(filter.partyId){
+  //   console.log('partyId', filter.partyId)
+  //   this.query.partyId =  { $eq: filter.partyId };
+  // }
 
   if(filter.id){
     let ids = _.reduce(filter.id.split(','), function(res, i){
@@ -60,15 +60,27 @@ function SearchParam(filter) {
   }
 
   if (filter.jobFunction && filter.jobFunction!="") {
-    this.query.jobFunction =  { $in: filter.jobFunction.split(',') };
+    let jobFunctions = _.reduce(filter.jobFunction.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+    this.query.jobFunction =  { $in: jobFunctions };
   }
 
   if (filter.employmentType && filter.employmentType!="") {
-    this.query.employmentType =  { $in: filter.employmentType.split(',') };
+    let employmentType = _.reduce(filter.employmentType.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+    this.query.employmentType =  { $in: employmentType};
   }
 
   if (filter.industry && filter.industry!="") {
-    this.query.industry =  { $in: filter.industry.split(',') };
+    let industry = _.reduce(filter.industry.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+    this.query.industry =  { $in: industry };
   }
 
   if (filter.company && filter.company!="") {
