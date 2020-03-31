@@ -22,6 +22,7 @@ const {findWorkflowById} = require('../services/workflow.service');
 module.exports = {
   getApplicationById,
   uploadCV,
+  uploadOffer,
   accept,
   decline,
   addProgress
@@ -41,7 +42,6 @@ async function getApplicationById(currentUserId, applicationId) {
     let currentParty = response.data.data;
 
 
-    console.log('currentUserId', currentParty.id)
     if(isPartyActive(currentParty)) {
       application = await findApplicationById(applicationId);
       if (application && application.partyId==currentParty.id) {
@@ -76,6 +76,7 @@ async function uploadCV(currentUserId, applicationId, files) {
   }
 
   let application = null;
+  let basePath = 'applications/';
   try {
     let response = await getPersonById(currentUserId);
     let currentParty = response.data.data;
@@ -91,9 +92,71 @@ async function uploadCV(currentUserId, applicationId, files) {
         let fileName = file.originalFilename.split('.');
         let fileExt = fileName[fileName.length - 1];
         let timestamp = Date.now();
-        let name = application.jobId + '_' + application.partyId + '_' + application.applicationId + '_' + timestamp + '.' + fileExt;
+        let name = 'Resume_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
 
-        let path = 'applications/' + application.jobId + '/' + name;
+        let path = basePath + 'JOB_' +application.jobId + '/resumes/' + name;
+        let res = await upload(path, file);
+
+
+        let type;
+        switch(fileExt){
+          case 'pdf':
+            type='PDF';
+            break;
+          case 'doc':
+            type='WORD';
+            break;
+          case 'docx':
+            type='WORD';
+            break;
+
+        }
+
+        progress.candidateAttachment = { url: name, type: type};
+        await progress.save();
+
+        await application.save();
+
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
+
+}
+
+
+async function uploadOffer(currentUserId, applicationId, files) {
+
+  if(currentUserId==null || applicationId==null || files==null){
+    return null;
+  }
+
+  let application = null;
+  let basePath = 'applications/';
+
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      application = await findApplicationById(applicationId);
+      if (application && application.partyId == currentUserId) {
+
+        let progress = application.progress[0];
+        let file = files.file;
+        let fileName = file.originalFilename.split('.');
+        let fileExt = fileName[fileName.length - 1];
+        let timestamp = Date.now();
+        let name = 'Offer_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
+
+        let path = basePath + 'JOB_' + application.jobId + '/offers/' + name;
         let res = await upload(path, file);
 
 
@@ -188,10 +251,8 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
       if (application) {
 
         let progresses = application.progress;
-        console.log('all', progresses)
         if(progresses){
           let currentProgress = progresses[progresses.length -1 ];
-          console.log('current', currentProgress)
           if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && !action.accept && currentProgress.requiredAction){
 
             if(_.includes(['PHONE_SCREEN', 'TEST', 'INTERVIEW', 'SECOND_INTERVIEW', 'OFFER'], action.type)){
@@ -228,7 +289,9 @@ async function addProgress(currentUserId, applicationId, progress) {
 
     if(isPartyActive(currentParty)) {
       let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
-      let workflow = await findWorkflowById(application.job.workflowId);
+
+      let job = application.job;
+      let workflow = await findWorkflowById(job.workflowId);
       workflow = workflow.workflow
 
       if (application) {
@@ -242,12 +305,13 @@ async function addProgress(currentUserId, applicationId, progress) {
           if(nextProgress && nextProgress!='OFFER'){
             nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED"}).save();
             application.progress.push(nextProgress);
-            result = await application.save();
+            await application.save();
           } else if (nextProgress && nextProgress=='OFFER') {
             nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFER"}).save();
             application.progress.push(nextProgress);
-            result = await application.save();
+            await application.save();
           }
+          result = nextProgress;
 
 
 

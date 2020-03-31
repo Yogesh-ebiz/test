@@ -79,7 +79,6 @@ function getAllEmploymentTypes(filter, locale) {
 
   let propLocale = '$name.'+localeStr;
   if(keyword){
-    console.log('key', keyword)
     let match = {};
     match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
     data = EmploymentTypes.aggregate([
@@ -102,7 +101,6 @@ function getAllIndustries(filter, locale) {
 
   let propLocale = '$name.'+localeStr;
   if(keyword){
-    console.log('key', keyword)
     let match = {};
     match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
     data = Industry.aggregate([

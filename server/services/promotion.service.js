@@ -49,7 +49,6 @@ function findPromotionByObjectId(id, locale) {
 
 
 function getPromotions(list, locale) {
-  console.log('list', list)
   let localeStr = locale? locale.toLowerCase() : 'en';
   let data = null;
 

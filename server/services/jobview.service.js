@@ -35,7 +35,6 @@ function addJobViewByUserId(userId, jobId) {
 
   let timestamp = Date.now();
 
-  console.log(timestamp)
   let jobView = {partyId: userId, jobId: jobId, createdDate: timestamp}
   return new JobView(jobView).save();
 }

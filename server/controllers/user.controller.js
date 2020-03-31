@@ -323,7 +323,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
         _.forEach(result.docs, function(application, idx) {
           let job = _.find(jobs, {jobId: application.jobId});
-          job.hasSaved = true;
+          job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
           job.description = null;
           job.responsibilities=[];
           job.qualifications = [];

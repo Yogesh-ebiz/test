@@ -37,5 +37,6 @@
 	"alert_updated_successful": "alert_updated_successful",
 	"job_retrieved_successful": "job_retrieved_successful",
 	"suggestion_retrieved_successful": "suggestion_retrieved_successful",
-	"progress_added_successful": "progress_added_successful"
+	"progress_added_successful": "progress_added_successful",
+	"offer_uploaded_successful": "offer_uploaded_successful"
 }

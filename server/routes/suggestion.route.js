@@ -16,7 +16,6 @@ async function getSuggestion(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let query = req.query.query;
-  console.log('query', query)
   let data = await suggestionCtl.getSuggestion(currentUserId, query);
 
   res.json(new Response(data, data?'suggestion_retrieved_successful':'not_found', res));

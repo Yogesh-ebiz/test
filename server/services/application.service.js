@@ -12,8 +12,11 @@ function findApplicationById(applicationId) {
     return;
   }
 
-  console.log('applicationId', applicationId)
-  return Application.findOne({applicationId: applicationId}).populate('job').populate([
+  return Application.findOne({applicationId: applicationId}).populate([
+    {
+      path: 'job',
+      model: 'JobRequisition'
+    },
     {
       path: 'progress',
       model: 'ApplicationProgress',
@@ -43,7 +46,6 @@ function findApplicationByUserId(userId) {
     return;
   }
 
-  console.log('userId', userId);
 
   return Application.find({partyId: userId});
 }
@@ -57,7 +59,11 @@ function findApplicationByIdAndUserId(applicationId, userId) {
   }
 
 
-  return Application.findOne({applicationId: applicationId, partyId: userId}).populate('job').populate([
+  return Application.findOne({applicationId: applicationId, partyId: userId}).populate([
+    {
+      path: 'job',
+      model: 'JobRequisition'
+    },
     {
       path: 'progress',
       model: 'ApplicationProgress',
@@ -124,7 +130,6 @@ function applyJob(application) {
 
   // return new Application(application).save();
 
-  console.log('applyJob', application)
   application = new Application(application).save();
 
   // const applicationProgress = await new ApplicationProgress({

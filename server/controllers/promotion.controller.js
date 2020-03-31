@@ -211,7 +211,6 @@ async function searchPromotions(currentUserId, jobId, filter, locale) {
 
 
   if(jobId){
-    console.log('ID', jobId)
     foundJob = await JobRequisition.findOne({jobId:jobId});
     //
     // if(!foundJob){
