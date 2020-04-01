@@ -471,7 +471,6 @@ async function getAlertsByUserId(currentUserId, filter) {
 
 
     if(isPartyActive(currentParty)) {
-      console.debug('isActive', currentParty.id)
       let select = '';
       let limit = (filter.size && filter.size > 0) ? filter.size : 20;
       let page = (filter.page && filter.page == 0) ? filter.page : 1;

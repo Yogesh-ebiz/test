@@ -17,7 +17,6 @@ const requestHandler = (request) => {
     request.headers['accessed-token'] = 'GET TOKEN'
   }
 
-  console.log('url', request.url);
   // request.url = request.url + (request.url.includes('?')? '':'?');
 
   return request

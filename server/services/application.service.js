@@ -61,10 +61,6 @@ function findApplicationByIdAndUserId(applicationId, userId) {
 
   return Application.findOne({applicationId: applicationId, partyId: userId}).populate([
     {
-      path: 'job',
-      model: 'JobRequisition'
-    },
-    {
       path: 'progress',
       model: 'ApplicationProgress',
       //select: 'id applicationId status',  //return all fields

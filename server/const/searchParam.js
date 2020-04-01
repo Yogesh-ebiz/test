@@ -6,10 +6,9 @@ function SearchParam(filter) {
   this.query = {};
 
 
-  // if(filter.partyId){
-  //   console.log('partyId', filter.partyId)
-  //   this.query.partyId =  { $eq: filter.partyId };
-  // }
+  if(filter.partyId){
+    this.query.partyId =  { $eq: filter.partyId };
+  }
 
   if(filter.id){
     let ids = _.reduce(filter.id.split(','), function(res, i){
@@ -129,7 +128,6 @@ function SearchParam(filter) {
     this.query.distance =  { $in: distance};
   }
 
-  console.log('query', this.query);
   return this.query;
 }
 

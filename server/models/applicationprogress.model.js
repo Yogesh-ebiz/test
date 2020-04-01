@@ -42,7 +42,10 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  schedule: { type: Schema.Types.ObjectId, ref: 'Event' },
+  event: {
+    type: Object,
+    required: false
+  },
   createdDate: {
     type: Number,
     required: false,

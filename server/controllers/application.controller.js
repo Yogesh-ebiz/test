@@ -19,6 +19,8 @@ const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
 const {findWorkflowById} = require('../services/workflow.service');
 
+const {createEvent} = require('../services/calendar.service');
+
 
 
 module.exports = {
@@ -266,15 +268,13 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
         if(progresses){
           let currentProgress = progresses[progresses.length -1 ];
           if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && !action.accept && currentProgress.requiredAction){
+            currentProgress.status = applicationEnum.DECLINED;
+            currentProgress.requiredAction = false;
+            currentProgress.candidateComment = action.candidateComment;
+            currentProgress.lastUpdatedDate = Date.now();
+            currentProgress = await currentProgress.save();
+            result = currentProgress;
 
-            if(_.includes(['PHONE_SCREEN', 'TEST', 'INTERVIEW', 'SECOND_INTERVIEW', 'OFFER'], action.type)){
-              currentProgress.status = applicationEnum.DECLINED;
-              currentProgress.requiredAction = false;
-              currentProgress.candidateComment = action.candidateComment;
-              currentProgress.lastUpdatedDate = Date.now();
-              currentProgress = await currentProgress.save();
-              result = currentProgress;
-            }
           }
         }
       }
@@ -303,20 +303,140 @@ async function addProgress(currentUserId, applicationId, progress) {
     if(isPartyActive(currentParty)) {
       let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
 
-      let job = application.job;
-      let workflow = await findWorkflowById(job.workflowId);
-      workflow = workflow.workflow
+
+
+
+
 
       if (application) {
+        let job = await Application.populate(application, 'job');
+
+        let workflow = await findWorkflowById(application.job.workflowId);
+        workflow = workflow.workflow
+
+        let organizer = job.partyId;
+        console.log('organizer', organizer);
+
+        let progresses = application.progress;
+
+        if(progresses) {
+          let currentProgress = progresses[progresses.length - 1];
+          let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];
+
+          if(nextProgress && nextProgress!='OFFER'){
+
+            let dayAway = Math.floor(Math.random() * Math.floor(10));
+
+            let start = new Date();
+            start.setDate(start.getDate() + dayAway);
+            start.setHours(9,0,0,0);
+
+            let end = new Date();
+            end.setDate(end.getDate() + dayAway);
+            end.setHours(10,0,0.0)
+
+
+            let event = {
+              eventTopic: {name: "WORK", background: "#BC9EC1"},
+              summary: (nextProgress.charAt(0).toUpperCase() + nextProgress.slice(1)) + ' Scheduled',
+              description: "Schedule Date for " + (nextProgress.charAt(0).toUpperCase() + nextProgress.slice(1)),
+              organizer: organizer,
+              attendees: [application.partyId],
+              start: start.toISOString(),
+              end: end.toISOString(),
+              phoneNumber: "+84 123456789",
+              meetingUrl: "http://skype.com"
+            }
+
+            let response = await createEvent(event);
+            event = response.data.data;
+            
+
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED", event: {eventId: event.eventId, start: event.start}}).save();
+            application.progress.push(nextProgress);
+            await application.save();
+          } else if (nextProgress && nextProgress=='OFFER') {
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFERED"}).save();
+            application.progress.push(nextProgress);
+            await application.save();
+          }
+          result = nextProgress;
+
+
+
+
+        }
+
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function addProgress2(currentUserId, applicationId, progress) {
+
+  if(!applicationId || !currentUserId || !progress){
+    return null;
+  }
+
+  let result;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if(isPartyActive(currentParty)) {
+      let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
+
+
+      if (application) {
+        // let job = await findJobId(application.jobId);
+        let workflow = await findWorkflowById(application.job.workflowId);
+        workflow = workflow.workflow
+
+        let organizer = application._doc.job._doc.partyId;
 
         let progresses = application.progress;
         if(progresses) {
           let currentProgress = progresses[progresses.length - 1];
           let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];
 
-
           if(nextProgress && nextProgress!='OFFER'){
-            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED"}).save();
+
+            let dayAway = Math.floor(Math.random() * Math.floor(10));
+
+            let start = new Date();
+            start.setDate(start.getDate() + dayAway);
+            start.setHours(9,0,0,0);
+
+            let end = new Date();
+            end.setDate(end.getDate() + dayAway);
+            end.setHours(10,0,0.0)
+
+
+            let event = {
+              eventTopic: {name: "WORK", background: "#BC9EC1"},
+              summary: nextProgress.toString().toUpperCase() + ' Scheduled',
+              description: "Schedule Date",
+              organizer: organizer,
+              attendees: [application.partyId],
+              start: start.toISOString(),
+              end: end.toISOString(),
+              phoneNumber: "+84 123456789",
+              meetingUrl: "http://skype.com"
+            }
+
+            // let response = await createEvent(event);
+            // event = response.data.data;
+
+
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED", event: {eventId: 100673, start: "2020-04-08T02:00:00.000Z"}}).save();
             application.progress.push(nextProgress);
             await application.save();
           } else if (nextProgress && nextProgress=='OFFER') {

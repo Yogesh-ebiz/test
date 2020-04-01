@@ -23,7 +23,7 @@ async function insert(employmenttype) {
 async function getEmploymentTypes(query, locale) {
   let localeStr = locale? locale : 'en';
 
-  console.log('getEmploymentTypes', query)
+
   let data = await filterService.getAllEmploymentTypes(query, locale)
   return data;
 }
