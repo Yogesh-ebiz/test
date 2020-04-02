@@ -228,7 +228,6 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
 
           let currentProgress = progresses[progresses.length -1 ];
 
-          console.log('currentProgress', currentProgress)
           if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && currentProgress.type==action.type && action.accept && currentProgress.requiredAction){
 
             currentProgress.status = applicationEnum.ACCEPTED;
@@ -236,12 +235,9 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
             currentProgress.requiredAction = false;
             currentProgress.lastUpdatedDate = Date.now();
             let saved = await currentProgress.save();
-            console.log('saved', saved)
             if(saved){
               result = saved;
-
               let event = acceptEvent(currentParty.id, currentProgress.event.eventId);
-              console.log('event', event);
             }
 
 
@@ -277,13 +273,16 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
         let progresses = application.progress;
         if(progresses){
           let currentProgress = progresses[progresses.length -1 ];
-          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && !action.accept && currentProgress.requiredAction){
+          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && currentProgress.type==action.type && !action.accept && currentProgress.requiredAction){
             currentProgress.status = applicationEnum.DECLINED;
             currentProgress.requiredAction = false;
             currentProgress.candidateComment = action.candidateComment;
             currentProgress.lastUpdatedDate = Date.now();
-            currentProgress = await currentProgress.save();
-            result = currentProgress;
+            let saved = await currentProgress.save();
+            if(saved){
+              result = saved;
+              let event = declineEvent(currentParty.id, currentProgress.event.eventId);
+            }
 
           }
         }
