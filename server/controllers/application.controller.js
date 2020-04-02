@@ -106,7 +106,46 @@ async function uploadCV(currentUserId, applicationId, files) {
 
         let path = basePath + 'JOB_' +application.jobId + '/resumes/' + name;
 
-        let res = await upload(path, file);
+        // let res = await upload(path, file);
+
+
+        AWS.config.update({region: 'us-west-2'});
+        const s3bucket = new AWS.S3({
+          accessKeyId: process.env.AWS_ACCESS_KEY,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        });
+
+        const BUCKET_NAME = "accessed";
+
+        await fs.readFile(file.path, function (err, data) {
+          if (err) throw err; // Something went wrong!
+          var s3bucket = new AWS.S3({params: {Bucket: BUCKET_NAME}});
+
+          var params = {
+            Key: path,
+            Body: data
+          };
+          return s3bucket.upload(params, function (err, data) {
+            // Whether there is an error or not, delete the temp file
+            fs.unlink(file.path, function (err) {
+              if (err) {
+                console.error(err);
+              }
+              console.log('Temp File Delete');
+            });
+
+            // console.log("PRINT FILE:", file);
+            if (err) {
+              console.log('ERROR MSG: ', err);
+            }
+
+            return data;
+
+
+
+          });
+
+        });
 
 
         let type;
@@ -357,90 +396,6 @@ async function addProgress(currentUserId, applicationId, progress) {
 
 
             nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED", event: {eventId: event.eventId, start: event.start}}).save();
-            application.progress.push(nextProgress);
-            await application.save();
-          } else if (nextProgress && nextProgress=='OFFER') {
-            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFERED"}).save();
-            application.progress.push(nextProgress);
-            await application.save();
-          }
-          result = nextProgress;
-
-
-
-
-        }
-
-
-      }
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  return result;
-}
-
-
-
-async function addProgress2(currentUserId, applicationId, progress) {
-
-  if(!applicationId || !currentUserId || !progress){
-    return null;
-  }
-
-  let result;
-  try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
-
-    if(isPartyActive(currentParty)) {
-      let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
-
-
-      if (application) {
-        // let job = await findJobId(application.jobId);
-        let workflow = await findWorkflowById(application.job.workflowId);
-        workflow = workflow.workflow
-
-        let organizer = application._doc.job._doc.partyId;
-
-        let progresses = application.progress;
-        if(progresses) {
-          let currentProgress = progresses[progresses.length - 1];
-          let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];
-
-          if(nextProgress && nextProgress!='OFFER'){
-
-            let dayAway = Math.floor(Math.random() * Math.floor(10));
-
-            let start = new Date();
-            start.setDate(start.getDate() + dayAway);
-            start.setHours(9,0,0,0);
-
-            let end = new Date();
-            end.setDate(end.getDate() + dayAway);
-            end.setHours(10,0,0.0)
-
-
-            let event = {
-              eventTopic: {name: "WORK", background: "#BC9EC1"},
-              summary: nextProgress.toString().toUpperCase() + ' Scheduled',
-              description: "Schedule Date",
-              organizer: organizer,
-              attendees: [application.partyId],
-              start: start.toISOString(),
-              end: end.toISOString(),
-              phoneNumber: "+84 123456789",
-              meetingUrl: "http://skype.com"
-            }
-
-            // let response = await createEvent(event);
-            // event = response.data.data;
-
-
-            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED", event: {eventId: 100673, start: "2020-04-08T02:00:00.000Z"}}).save();
             application.progress.push(nextProgress);
             await application.save();
           } else if (nextProgress && nextProgress=='OFFER') {
