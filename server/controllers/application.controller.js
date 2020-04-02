@@ -19,7 +19,7 @@ const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
 const {findWorkflowById} = require('../services/workflow.service');
 
-const {createEvent} = require('../services/calendar.service');
+const {createEvent, acceptEvent, declineEvent} = require('../services/calendar.service');
 
 
 
@@ -219,21 +219,31 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
       application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
       if (application) {
 
-        let workflow = await findWorkflowById(application.job.workflowId);
-        console.log('workflow', workflow)
+        // let workflow = await findWorkflowById(application.job.workflowId);
+        // console.log('workflow', workflow)
 
         let progresses = application.progress;
 
         if(progresses){
+
           let currentProgress = progresses[progresses.length -1 ];
-          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && action.accept && currentProgress.requiredAction){
+
+          console.log('currentProgress', currentProgress)
+          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && currentProgress.type==action.type && action.accept && currentProgress.requiredAction){
 
             currentProgress.status = applicationEnum.ACCEPTED;
             currentProgress.candidateComment = action.candidateComment;
             currentProgress.requiredAction = false;
             currentProgress.lastUpdatedDate = Date.now();
-            currentProgress = await currentProgress.save();
-            result = currentProgress;
+            let saved = await currentProgress.save();
+            console.log('saved', saved)
+            if(saved){
+              result = saved;
+
+              let event = acceptEvent(currentParty.id, currentProgress.event.eventId);
+              console.log('event', event);
+            }
+
 
           }
         }
@@ -303,19 +313,14 @@ async function addProgress(currentUserId, applicationId, progress) {
     if(isPartyActive(currentParty)) {
       let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
 
-
-
-
-
-
       if (application) {
-        let job = await Application.populate(application, 'job');
+        application = await Application.populate(application, 'job');
+
 
         let workflow = await findWorkflowById(application.job.workflowId);
         workflow = workflow.workflow
 
-        let organizer = job.partyId;
-        console.log('organizer', organizer);
+        let organizer = application.job.partyId;
 
         let progresses = application.progress;
 
@@ -338,8 +343,8 @@ async function addProgress(currentUserId, applicationId, progress) {
 
             let event = {
               eventTopic: {name: "WORK", background: "#BC9EC1"},
-              summary: (nextProgress.charAt(0).toUpperCase() + nextProgress.slice(1)) + ' Scheduled',
-              description: "Schedule Date for " + (nextProgress.charAt(0).toUpperCase() + nextProgress.slice(1)),
+              summary: workflowEnum[nextProgress] + ' Scheduled',
+              description: 'Scheduled Event',
               organizer: organizer,
               attendees: [application.partyId],
               start: start.toISOString(),
@@ -350,7 +355,7 @@ async function addProgress(currentUserId, applicationId, progress) {
 
             let response = await createEvent(event);
             event = response.data.data;
-            
+
 
             nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED", event: {eventId: event.eventId, start: event.start}}).save();
             application.progress.push(nextProgress);

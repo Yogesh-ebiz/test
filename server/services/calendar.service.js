@@ -26,3 +26,30 @@ function createEvent(event) {
 module.exports = {
   createEvent: createEvent
 }
+
+
+function acceptEvent(userId, eventId) {
+  if(userId==null || eventId==null){
+    return;
+  }
+
+  return axios.post('http://accessed-calendar-service.us-west-2.elasticbeanstalk.com/api/calendars/'+userId+ '/events/' + eventId + '/accept', {}, {headers: {"UserId":userId}})
+}
+
+
+function declineEvent(userId, eventId) {
+  if(userId==null || eventId==null){
+    return;
+  }
+
+  return axios.post('http://accessed-calendar-service.us-west-2.elasticbeanstalk.com/api/calendars/'+userId+ '/events/' + eventId + '/accept', null, {headers: {"UserId":userId}})
+}
+
+
+module.exports = {
+  createEvent: createEvent,
+  acceptEvent: acceptEvent,
+  declineEvent:declineEvent
+}
+
+

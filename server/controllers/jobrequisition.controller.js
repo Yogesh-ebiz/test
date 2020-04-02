@@ -88,7 +88,7 @@ const applicationSchema = Joi.object({
 
 module.exports = {
   importJobs,
-  insert,
+  createJob,
   getJobById,
   searchJob,
   getSimilarJobs,
@@ -99,19 +99,34 @@ module.exports = {
   removeBookmark
 }
 
-async function insert(job) {
-  job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
+async function createJob(currentUserId, job) {
 
-
-  //job.skills = await Skilltype.find({id: {$in: job.skills}});
-  let promotion;
-  if(job.promotion){
-    promotion = await findPromotionById(job.promotion);
-    job.promotion = (promotion)?promotion[0].promotionId:null;
-
+  if(!job || !currentUserId){
+    return null;
   }
 
-  return await new JobRequisition(job).save();
+  let result;
+
+  job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
+
+  let response = await getPersonById(currentUserId);
+  currentParty = response.data.data;
+
+  if (isPartyActive(currentParty)) {
+
+    //job.skills = await Skilltype.find({id: {$in: job.skills}});
+    let promotion;
+    if (job.promotion) {
+      promotion = await findPromotionById(job.promotion);
+      job.promotion = (promotion) ? promotion[0].promotionId : null;
+
+    }
+
+    job.partyId=currentParty.id;
+    result = await new JobRequisition(job).save();
+  }
+
+  return result;
 }
 
 async function importJobs(type, jobs) {

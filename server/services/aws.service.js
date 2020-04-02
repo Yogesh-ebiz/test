@@ -50,3 +50,64 @@ exports.upload = function(path, file){
 
   });
 }
+
+//
+//
+// exports.upload = function(path, file){
+//
+//   fs.readFile(file.path, function (err, data) {
+//     if (err) throw err; // Something went wrong!
+//     var s3bucket = new AWS.S3({params: {Bucket: BUCKET_NAME}});
+//     // s3bucket.createBucket(function () {
+//
+//
+//
+//     var params = {
+//       Key: path,
+//       Body: data
+//     };
+//     return s3bucket.upload(params, function (err, data) {
+//       // Whether there is an error or not, delete the temp file
+//       fs.unlink(file.path, function (err) {
+//         if (err) {
+//           console.error(err);
+//         }
+//         console.log('Temp File Delete');
+//       });
+//
+//       // console.log("PRINT FILE:", file);
+//       if (err) {
+//         console.log('ERROR MSG: ', err);
+//       }
+//
+//       return data;
+//
+//
+//
+//     });
+//
+//   });
+// }
+//
+//
+// export function uploadToS3(fileName: string): Promise<any> {
+//   const readStream = fs.createReadStream(fileName);
+//
+//   const params = {
+//     Bucket: BUCKET_NAME,
+//     Key: "myapp" + "/" + fileName,
+//     Body: readStream
+//   };
+//
+//   return new Promise((resolve, reject) => {
+//     s3bucket.upload(params, function(err, data) {
+//       readStream.destroy();
+//
+//       if (err) {
+//         return reject(err);
+//       }
+//
+//       return resolve(data);
+//     });
+//   });
+// }

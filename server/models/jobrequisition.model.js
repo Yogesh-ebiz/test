@@ -11,6 +11,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  partyId: {
+    type: Number,
+    required: true
+  },
   title: {
     type: String,
     required: true

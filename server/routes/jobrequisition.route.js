@@ -28,8 +28,9 @@ router.route('/:id/alert').delete(asyncHandler(removeAlert));
 
 
 async function insert(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
   let map = {"message": "Created successfully", "status": 200, data: null };
-  let data = await jobRequisitionCtl.insert(req.body);
+  let data = await jobRequisitionCtl.createJob(currentUserId, req.body);
   res.json(new Response(data, data?'job_created_successful':'not_found', res));
 }
 
@@ -40,9 +41,6 @@ async function importJobs(req, res) {
 
 async function getJobById(req, res) {
 
-  console.log('currentUserId: ', req.header('UserId'))
-  console.log('JobID: ', req.params.id)
-  console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.getJobById(currentUserId, jobId, res.locale);

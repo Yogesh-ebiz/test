@@ -13,7 +13,8 @@ const workflow = {
     vi: 'Kiểm tra theo lịch trình'
   },
   INTERVIEW: {
-    en: 'Phỏng vấn theo lịch trình'
+    en: 'Interview',
+    vi: 'Phỏng vấn theo lịch trình'
   },
   OFFER: {
     en: 'Offer',
