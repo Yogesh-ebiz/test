@@ -40,5 +40,7 @@
 	"progress_added_successful": "progress_added_successful",
 	"offer_uploaded_successful": "offer_uploaded_successful",
 	"application_accepted_successful": "application_accepted_successful",
-	"application_decline_successful": "application_decline_successful"
+	"application_decline_successful": "application_decline_successful",
+	"experiences_updated_successful": "experiences_updated_successful",
+	"experiences_retrieved_successful": "experiences_retrieved_successful"
 }

@@ -72,6 +72,7 @@
     "@angular/cli": "^8.3.20",
     "@angular/compiler-cli": "^8.2.14",
     "@angular/language-service": "^8.2.14",
+    "@maxmind/geoip2-node": "^1.4.0",
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~12.12.14",

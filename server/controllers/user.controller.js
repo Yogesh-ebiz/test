@@ -20,7 +20,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
@@ -29,6 +29,9 @@ const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = require('../services/jobalert.service');
 const {getJobCount} = require('../services/jobrequisition.service');
+const {findEmploymentById, findEmploymentByUserId, addEmploymentsByUserId, updateEmploymentByUserId} = require('../services/employment.service');
+const {findEducationById, findEducationByUserId, addEducationsByUserId, updateEducationByUserId} = require('../services/education.service');
+
 
 const {getPromotions, findPromotionById} = require('../services/promotion.service');
 
@@ -77,9 +80,25 @@ const jobAlertSchema = Joi.object({
 
 });
 
+const employmentSchema = Joi.object({
+  employmentId: Joi.number().optional(),
+  partyId: Joi.number(),
+  company: Joi.number().required(),
+  employmentTitle: Joi.string().required(),
+  description: Joi.string().optional(),
+  startDate: Joi.number().required(),
+  thruDate: Joi.number().required(),
+  terminationReason: Joi.string().allow('').optional(),
+  terminationType: Joi.string().allow('').optional(),
+  isCurrent: Joi.string().allow('').optional()
+});
+
+
 
 module.exports = {
   uploadCV,
+  getUserExperiences,
+  updateUserExperiences,
   addPartySkill,
   removePartySkill,
   getPartySkillsByUserId,
@@ -100,13 +119,12 @@ module.exports = {
  * @param {HTTP} currentUserId
  * @param {HTTP} files
  */
-async function uploadCV(currentUserId, files) {
-
-  if(currentUserId==null || files==null){
+async function uploadCV(currentUserId, file) {
+  if(currentUserId==null || file==null){
     return null;
   }
 
-  let application = null;
+  let result = null;
   try {
     let response = await getPersonById(currentUserId);
     let currentParty = response.data.data;
@@ -114,13 +132,76 @@ async function uploadCV(currentUserId, files) {
 
     if (isPartyActive(currentParty)) {
 
-      let file = files.file;
       let fileExt = file.originalFilename.split('.');
       let timestamp = Date.now();
       let name = currentParty.firstName  + currentParty.lastName + '_' + currentParty.id + '_' + timestamp + '.' + fileExt[fileExt.length - 1];
 
       let path = 'user/' + currentParty.id + '/resumes/' + name;
-      let res = await upload(path, file);
+
+
+      result = await upload(path, file);
+
+      result = {
+        employments: [
+          {
+            "employmentTitle": "Sr. Android Developer",
+            "fromDate": 1554080400000,
+            "description": "Lead a team of 5 mobile developers",
+            "isCurrent": false,
+            "terminationReason": '',
+            "terminationType": '',
+            "company": {
+              "id": 15,
+              "partyType": "ORGANIZATION",
+              "groupName": "eBay"
+            }
+          },
+          {
+            "employmentTitle": "Android Developer",
+            "fromDate": 1483232400000,
+            "thruDate": 1554080400000,
+            "description": "Developed first app",
+            "isCurrent": false,
+            "terminationReason": '',
+            "terminationType": '',
+            "company": {
+              "partyType": "ORGANIZATION",
+              "groupName": "FPT"
+            }
+          }
+
+        ],
+        educations: [
+          {
+            "typeOfDegree": "Bachelor of Science",
+            "major": "CIS",
+            "fromDate": 1320123740000,
+            "thruDate": 1398920540000,
+            "hasGraduated": true,
+            "isCurrent": false,
+            "school": {
+              "id": 27,
+              "partyType": "INSTITUTE",
+              "groupName": "Temple University"
+            },
+          },
+          {
+            "typeOfDegree": "Bachelor of Science",
+            "major": "MIS",
+            "fromDate": 1320123740000,
+            "thruDate": 1398920540000,
+            "hasGraduated": true,
+            "isCurrent": false,
+            "school": {
+              "partyType": "INSTITUTE",
+              "groupName": "Ohio University"
+            },
+
+          },
+        ]
+
+      }
+      console.log('result', result)
 
       //await application.save();
 
@@ -132,12 +213,136 @@ async function uploadCV(currentUserId, files) {
     console.log(error);
   }
 
-  return application;
+  return result;
 
 }
 
+async function getUserExperiences(currentUserId) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let result = {employments: [], educations: []};
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
 
 
+    if (isPartyActive(currentParty)) {
+
+      result.employments = await findEmploymentByUserId(currentParty.id);
+      result.educations = await findEducationByUserId(currentParty.id);
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function updateUserExperiences(currentUserId, data) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      result = {employments: [], educations: []};
+      let newEmployments = [], updateEmployments=[], newEducations = [], updateEducations=[], companies = [];
+
+      let employments = data.employments;
+      let educations = data.educations;
+
+
+      _.forEach(employments, function(item){
+
+        if(!item.company.id){
+          companies.push(item.company);
+        }
+
+        item.company= (item.company.id) ? item.company.id:0;
+        item.partyId = currentParty.id;
+        if(item.employmentId){
+          updateEmployments.push(item);
+        } else {
+          newEmployments.push(item);
+        }
+
+
+
+      });
+
+      try{
+
+        // console.log('companies', companies);
+        // let loadPromises = companies.map(company => {
+        //   console.log('company', company)
+        //   addCompany(currentParty.id, company)
+        // });
+        // companies = await Promise.all(loadPromises);
+        //
+        // console.log(companies);
+      } catch(e){
+        console.debug('Add Company Error: ', e);
+      }
+
+      try {
+        let loadPromises = newEmployments.map(employment => addEmploymentsByUserId(currentParty.id, employment));
+        newEmployments = await Promise.all(loadPromises);
+
+        loadPromises = updateEmployments.map(employment => updateEmploymentByUserId(currentParty.id, employment));
+        updateEmployments = await Promise.all(loadPromises);
+        result.employments = _.orderBy(newEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
+
+      }catch (e) {
+        console.debug('Update Experiences Error: ', e)
+      }
+
+
+      _.forEach(educations, function(item){
+        item.institute= (item.institute.id) ? item.institute.id:0;
+        item.partyId = currentParty.id;
+        if(item.educationId){
+          updateEducations.push(item);
+        } else {
+          newEducations.push(item);
+        }
+
+      });
+
+      try {
+        let loadPromises = newEducations.map(education => addEducationsByUserId(currentParty.id, education));
+        newEducations = await Promise.all(loadPromises);
+
+        loadPromises = updateEducations.map(education => updateEducationByUserId(currentParty.id, education));
+        updateEducations = await Promise.all(loadPromises);
+        result.educations = _.orderBy(newEducations.concat(updateEducations), ['fromDate'], ['desc']);
+
+      } catch (e) {
+        console.debug('Update Education Error: ', e)
+      }
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
 
 async function getPartySkillsByUserId(currentUserId, filter, locale) {
 

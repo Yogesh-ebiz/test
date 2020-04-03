@@ -8,12 +8,13 @@ AWS.config.update({region: 'us-west-2'});
 // Create S3 service object
 // s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
+const BUCKET_NAME = "accessed";
+AWS.config.update({region: 'us-west-2'});
 const s3bucket = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  params: {Bucket: BUCKET_NAME}
 });
-
-const BUCKET_NAME = "accessed";
 
 // exports.upload = function(path, file){
 //
@@ -53,60 +54,57 @@ const BUCKET_NAME = "accessed";
 
 
 exports.upload = function(path, file){
+  let data = fs.readFileSync(file.path);
 
-  fs.readFile(file.path, function (err, data) {
-    if (err) throw err; // Something went wrong!
-    var s3bucket = new AWS.S3({params: {Bucket: BUCKET_NAME}});
-    // s3bucket.createBucket(function () {
+  var params = {
+    Key: path,
+    Body: data
+  };
+  return s3bucket.upload(params, function (err, data) {
+
+    // console.log("PRINT FILE:", file);
+    if (err) {
+      console.log('ERROR MSG: ', err);
+    }
 
 
-
-    var params = {
-      Key: path,
-      Body: data
-    };
-    return s3bucket.upload(params, function (err, data) {
-      // Whether there is an error or not, delete the temp file
-      fs.unlink(file.path, function (err) {
-        if (err) {
-          console.error(err);
-        }
-        console.log('Temp File Delete');
-      });
-
-      // console.log("PRINT FILE:", file);
+    // Whether there is an error or not, delete the temp file
+    fs.unlink(file.path, function (err) {
       if (err) {
-        console.log('ERROR MSG: ', err);
+        console.error(err);
       }
-
-      return data;
-
-
-
+      console.log('Temp File Delete');
     });
 
+
+
+    return data;
+
+
+
+  });
+
+}
+
+
+exports.uploadToS3 = async function(path, fileName) {
+  const readStream = fs.createReadStream(fileName);
+
+  const params = {
+    Bucket: BUCKET_NAME,
+    Key: path,
+    Body: readStream
+  };
+
+  return new Promise((resolve, reject) => {
+    s3bucket.upload(params, function(err, data) {
+      readStream.destroy();
+
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(data);
+    });
   });
 }
-//
-//
-// export function uploadToS3(fileName: string): Promise<any> {
-//   const readStream = fs.createReadStream(fileName);
-//
-//   const params = {
-//     Bucket: BUCKET_NAME,
-//     Key: "myapp" + "/" + fileName,
-//     Body: readStream
-//   };
-//
-//   return new Promise((resolve, reject) => {
-//     s3bucket.upload(params, function(err, data) {
-//       readStream.destroy();
-//
-//       if (err) {
-//         return reject(err);
-//       }
-//
-//       return resolve(data);
-//     });
-//   });
-// }

@@ -510,7 +510,6 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
       let group = await getCountsGroupByCompany(match);
       group = _.reduce(group, function(res, item){
-        console.log('item', item)
         res.push(item._id.company);
         return res;
       }, []);
@@ -520,7 +519,6 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
       _.forEach(result.content, function(res){
         res.hasFollowed = false;
-        console.log(res);
       })
 
     }

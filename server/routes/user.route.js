@@ -9,7 +9,11 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
-router.route('/:userId/upload/cv').post(asyncHandler(uploadCV));
+router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
+
+router.route('/:userId/experiences').get(asyncHandler(getUserExperiences));
+router.route('/:userId/experiences').post(asyncHandler(updateUserExperiences));
+
 
 router.route('/:userId/skills').get(asyncHandler(getPartySkillsByUserId));
 router.route('/:userId/skills').post(asyncHandler(addPartySkill));
@@ -17,17 +21,34 @@ router.route('/:userId/skills/:partySkillId').delete(asyncHandler(removePartySki
 
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
 router.route('/:userId/bookmarks').get(asyncHandler(getBookmarksByUserId));
+
 router.route('/:userId/alerts').get(asyncHandler(getAlertsByUserId));
 router.route('/:userId/alerts').post(asyncHandler(addPartyAlert));
 router.route('/:userId/alerts/:alertId').delete(asyncHandler(removePartyAlert));
 router.route('/:userId/alerts/:alertId').put(asyncHandler(updatePartyAlert));
+
 router.route('/:userId/jobviews').get(asyncHandler(getJobViewsByUserId));
 
 
 async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
-  let data = await userCtl.uploadCV(currentUserId, req.files);
+  let data = await userCtl.uploadCV(currentUserId, req.files.file);
   res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
+}
+
+async function getUserExperiences(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let data = await userCtl.getUserExperiences(currentUserId);
+  res.json(new Response(data, data?'experiences_retrieved_successful':'not_found', res));
+}
+
+async function updateUserExperiences(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let body = req.body;
+
+  console.log('currentUserId', currentUserId);
+  let data = await userCtl.updateUserExperiences(currentUserId, body);
+  res.json(new Response(data, data?'experiences_updated_successful':'not_found', res));
 }
 
 

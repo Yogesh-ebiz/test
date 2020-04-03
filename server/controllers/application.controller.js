@@ -85,7 +85,7 @@ async function uploadCV(currentUserId, applicationId, files) {
     return null;
   }
 
-  let application = null;
+  let result = null;
   let basePath = 'applications/';
   try {
     let response = await getPersonById(currentUserId);
@@ -94,7 +94,7 @@ async function uploadCV(currentUserId, applicationId, files) {
 
     if (isPartyActive(currentParty)) {
 
-      application = await findApplicationById(applicationId);
+      let application = await findApplicationById(applicationId);
       if (application && application.partyId == currentUserId) {
 
         let progress = application.progress[0];
@@ -106,48 +106,8 @@ async function uploadCV(currentUserId, applicationId, files) {
 
         let path = basePath + 'JOB_' +application.jobId + '/resumes/' + name;
 
-        // let res = await upload(path, file);
-
-
-        AWS.config.update({region: 'us-west-2'});
-        const s3bucket = new AWS.S3({
-          accessKeyId: process.env.AWS_ACCESS_KEY,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-        });
-
-        const BUCKET_NAME = "accessed";
-
-        await fs.readFile(file.path, function (err, data) {
-          if (err) throw err; // Something went wrong!
-          var s3bucket = new AWS.S3({params: {Bucket: BUCKET_NAME}});
-
-          var params = {
-            Key: path,
-            Body: data
-          };
-          return s3bucket.upload(params, function (err, data) {
-            // Whether there is an error or not, delete the temp file
-            fs.unlink(file.path, function (err) {
-              if (err) {
-                console.error(err);
-              }
-              console.log('Temp File Delete');
-            });
-
-            // console.log("PRINT FILE:", file);
-            if (err) {
-              console.log('ERROR MSG: ', err);
-            }
-
-            return data;
-
-
-
-          });
-
-        });
-
-
+        let response = await upload(path, file);
+        console.log('uploading')
         let type;
         switch(fileExt){
           case 'pdf':
@@ -163,9 +123,8 @@ async function uploadCV(currentUserId, applicationId, files) {
         }
 
         progress.candidateAttachment = { url: name, type: type};
-        await progress.save();
+        result = await progress.save();
 
-        await application.save();
 
       }
 
@@ -175,7 +134,7 @@ async function uploadCV(currentUserId, applicationId, files) {
     console.log(error);
   }
 
-  return application;
+  return result;
 
 }
 
@@ -186,7 +145,7 @@ async function uploadOffer(currentUserId, applicationId, files) {
     return null;
   }
 
-  let application = null;
+  let result = null;
   let basePath = 'applications/';
 
   try {
@@ -196,38 +155,48 @@ async function uploadOffer(currentUserId, applicationId, files) {
 
     if (isPartyActive(currentParty)) {
 
-      application = await findApplicationById(applicationId);
-      if (application && application.partyId == currentUserId) {
+      let application = await findApplicationById(applicationId);
+      console.log('application', application.partyId, currentUserId)
 
-        let progress = application.progress[0];
-        let file = files.file;
-        let fileName = file.originalFilename.split('.');
-        let fileExt = fileName[fileName.length - 1];
-        let timestamp = Date.now();
-        let name = 'Offer_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
+      if (application) {
 
-        let path = basePath + 'JOB_' + application.jobId + '/offers/' + name;
-        let res = await upload(path, file);
+        application = await Application.populate(application, 'job');
+        let job = application.job;
+        let currentProgress = _.find(application.progress, {type: 'OFFER'});
 
 
-        let type;
-        switch(fileExt){
-          case 'pdf':
-            type='PDF';
-            break;
-          case 'doc':
-            type='WORD';
-            break;
-          case 'docx':
-            type='WORD';
-            break;
+        if(application.partyId == currentUserId || job.partyId==currentParty.id){
+          let file = files.file;
+          let fileName = file.originalFilename.split('.');
+          let fileExt = fileName[fileName.length - 1];
+          let timestamp = Date.now();
+          let name = 'Offer_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
 
+          let path = basePath + 'JOB_' + application.jobId + '/offers/' + name;
+          let res = await upload(path, file);
+
+
+          let type;
+          switch(fileExt){
+            case 'pdf':
+              type='PDF';
+              break;
+            case 'doc':
+              type='WORD';
+              break;
+            case 'docx':
+              type='WORD';
+              break;
+
+          }
+
+          if(currentParty.id==application.partyId){
+            currentProgress.candidateAttachment = { url: name, type: type};
+          } else if(currentParty.id==job.partyId){
+            currentProgress.attachment = { url: name, type: type};
+          }
+          result = await currentProgress.save();
         }
-
-        progress.candidateAttachment = { url: name, type: type};
-        await progress.save();
-
-        await application.save();
 
       }
 
@@ -237,7 +206,7 @@ async function uploadOffer(currentUserId, applicationId, files) {
     console.log(error);
   }
 
-  return application;
+  return result;
 
 }
 
@@ -349,10 +318,11 @@ async function addProgress(currentUserId, applicationId, progress) {
     let currentParty = response.data.data;
 
     if(isPartyActive(currentParty)) {
-      let application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
+      let application = await findApplicationById(applicationId);
 
+      console.log('application', application)
       if (application) {
-        application = await Application.populate(application, 'job');
+        // application = await Application.populate(application, 'job');
 
 
         let workflow = await findWorkflowById(application.job.workflowId);
@@ -362,6 +332,7 @@ async function addProgress(currentUserId, applicationId, progress) {
 
         let progresses = application.progress;
 
+        console.log('progresses')
         if(progresses) {
           let currentProgress = progresses[progresses.length - 1];
           let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];

@@ -20,7 +20,7 @@ function createEvent(event) {
     data: event
   };
 
-  return axios.post('http://localhost:8082/api/calendars/1/events', event, {headers: {"UserId":event.organizer}})
+  return axios.post('http://accessed-calendar-service.us-west-2.elasticbeanstalk.com/api/calendars/1/events', event, {headers: {"UserId":event.organizer}})
 }
 
 module.exports = {
@@ -33,7 +33,7 @@ function acceptEvent(userId, eventId) {
     return;
   }
 
-  return axios.post('http://localhost:8082/api/calendars/'+userId+ '/events/' + eventId + '/accept', {}, {headers: {"UserId":userId}})
+  return axios.post('http://accessed-calendar-service.us-west-2.elasticbeanstalk.com/api/calendars/'+userId+ '/events/' + eventId + '/accept', {}, {headers: {"UserId":userId}})
 }
 
 
@@ -42,7 +42,7 @@ function declineEvent(userId, eventId) {
     return;
   }
 
-  return axios.post('http://localhost:8082/api/calendars/'+userId+ '/events/' + eventId + '/decline', null, {headers: {"UserId":userId}})
+  return axios.post('http://accessed-calendar-service.us-west-2.elasticbeanstalk.com/api/calendars/'+userId+ '/events/' + eventId + '/decline', null, {headers: {"UserId":userId}})
 }
 
 

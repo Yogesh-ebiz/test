@@ -36,7 +36,7 @@ const PartySKillSchema = new mongoose.Schema({
     default: 0
   },
   endorsements: {
-    type: Object,
+    type: Array,
     required: false
   },
   createdDate: {
