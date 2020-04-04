@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
+const Schema = mongoose.Schema;
+
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const statusEnum = require('../const/statusEnum');
 
@@ -9,19 +11,32 @@ const PartySKillSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  partySkillId: {
+    type: Number,
+    required: true
+  },
   partyId: {
     type: Number,
     required: true
   },
   skillTypeId: {
     type: Number,
+    required: true
+  },
+  name: {
+    type: String,
     required: false
   },
   noOfMonths: {
     type: Number,
     required: false
   },
-  rating: {
+  selfRating: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  averageEndorsedRating: {
     type: Number,
     required: false,
     default: 0
@@ -35,17 +50,22 @@ const PartySKillSchema = new mongoose.Schema({
     required: false,
     default: 0
   },
-  endorsements: {
-    type: Array,
-    required: false
+  endorsements: [{ type: Schema.Types.ObjectId, ref: 'Endorsement' }],
+  highlySkilledEndorsers: {
+    type: Object,
+    default: null
+  },
+  mutaulEndorser: {
+    type: Object,
+    default: null
   },
   createdDate: {
     type: Number,
     default: Date.now
   },
   lastUpdatedDate: {
-    type: Date,
-    default: Date.now()
+    type: Number,
+    default: Date.now
   },
   status: {
     type: String,

@@ -20,7 +20,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany} = require('../services/party.service');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany, populateParties} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes} = require('../services/skilltype.service');
@@ -31,6 +31,10 @@ const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = req
 const {getJobCount} = require('../services/jobrequisition.service');
 const {findEmploymentById, findEmploymentByUserId, addEmploymentsByUserId, updateEmploymentByUserId} = require('../services/employment.service');
 const {findEducationById, findEducationByUserId, addEducationsByUserId, updateEducationByUserId} = require('../services/education.service');
+const {addEndorsementByUserId, removeEndorsementById, findEndorsementByEndorserIdAndPartySkillId, getEndorsementCount, getTop3SkillsEndorsement} = require('../services/endorsement.service');
+const {findCertificationByUserId} = require('../services/partycertification.service');
+const {findPublicationByUserId} = require('../services/partypublication.service');
+const {findLanguageByUserId} = require('../services/partylanguage.service');
 
 
 const {getPromotions, findPromotionById} = require('../services/promotion.service');
@@ -38,7 +42,7 @@ const {getPromotions, findPromotionById} = require('../services/promotion.servic
 const {findJobViewByUserId} = require('../services/jobview.service');
 
 
-const {findPartySkillByUserIdAndSkillTypeId, findPartySkillsById, findPartySkillsByUserId, addUserPartySkill, removePartySkillById} = require('../services/partyskill.service');
+const {findPartySkillByUserIdAndSkillTypeId, findPartySkillById, findPartySkillsByUserId, addUserPartySkill, removePartySkillById, getEndorsersHighlySkillBySkillTypeId} = require('../services/partyskill.service');
 
 
 let Pagination = require('../utils/pagination');
@@ -94,14 +98,25 @@ const employmentSchema = Joi.object({
 });
 
 
+const endorsementSchema = Joi.object({
+  partySkillId: Joi.number().required(),
+  endorserId: Joi.number().required(),
+  rating: Joi.number().required(),
+  relationship: Joi.string().allow('').optional()
+});
+
+
 
 module.exports = {
+  getUserDetail,
   uploadCV,
   getUserExperiences,
   updateUserExperiences,
   addPartySkill,
   removePartySkill,
   getPartySkillsByUserId,
+  addEndorsement,
+  removeEndorsement,
   getApplicationsByUserId,
   getBookmarksByUserId,
   getAlertsByUserId,
@@ -111,6 +126,86 @@ module.exports = {
   getJobViewsByUserId
 }
 
+
+
+
+async function getUserDetail(currentUserId, userId, locale) {
+
+  if(currentUserId==null || userId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    let response = await searchParties([currentUserId, userId], partyEnum.PERSON, 2, 0);
+    let users = response.data.data.content;
+
+    let currentParty = _.find(users, {id: currentUserId});
+    let foundUser = _.find(users, {id: userId});
+
+    if(isPartyActive(currentParty) && isPartyActive(foundUser)) {
+
+      result = {};
+
+      //Skills-----------------------------------------------------
+      let partySkills = await findPartySkillsByUserId(foundUser.id);
+      let skills = _.uniq(_.flatten(_.map(partySkills, 'skillTypeId')));
+      let listOfSkills = await getListofSkillTypes(_.uniq(_.flatten(_.map(partySkills, 'skillTypeId'))), locale);
+
+
+      let partySkillIds = _.uniq(_.flatten(_.map(partySkills, 'partySkillId')));
+      let top3SkillsEndorsement = await getTop3SkillsEndorsement(partySkillIds);
+
+      let loadPromises = top3SkillsEndorsement.map(partySkillEndorsed => {
+        let partySkill = _.find(partySkills, {partySkillId: partySkillEndorsed.partySkillId});
+        let endorserIds = _.map(partySkillEndorsed.endorsers, 'endorserId');
+
+        return getEndorsersHighlySkillBySkillTypeId(partySkill.skillTypeId, endorserIds)
+      })
+      let topEndorsers = await Promise.all(loadPromises);
+      topEndorsers = _.reduce(topEndorsers, function(res, item){
+        res.push(item[0])
+        return res;
+      }, [])
+
+      topEndorsers = await populateParties(topEndorsers);
+
+      partySkills = _.reduce(partySkills, function(res, skill) {
+
+        var found = _.find(listOfSkills, {skillTypeId: skill.skillTypeId})
+        skill.name = found.name;
+
+        skill.highlySkilledEndorsers = _.find(topEndorsers, {skillTypeId: skill.skillTypeId});
+        skill.mutual = '';
+        skill.noOfEndorsement = skill.endorsements.length;
+        skill.endorsements = [];
+        res.push(skill);
+        return res;
+      }, []);
+      
+      result.skills = partySkills;
+
+      //Employments-----------------------------------------------------
+      result.employments = await findEmploymentByUserId(foundUser.id);
+
+      //Educations-----------------------------------------------------
+      result.educations = await findEducationByUserId(foundUser.id);
+
+      //Accomplishments-----------------------------------------------------
+      result.languages = await findLanguageByUserId(foundUser.id);
+      result.publications = await findPublicationByUserId(foundUser.id);
+      result.certificates = await findCertificationByUserId(foundUser.id);
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
 
 
 /**
@@ -344,9 +439,9 @@ async function updateUserExperiences(currentUserId, data) {
 
 }
 
-async function getPartySkillsByUserId(currentUserId, filter, locale) {
+async function getTop3PartySkillsByUserId(currentUserId, locale) {
 
-  if(currentUserId==null || filter==null){
+  if(currentUserId==null || locale==null){
     return null;
   }
 
@@ -358,28 +453,13 @@ async function getPartySkillsByUserId(currentUserId, filter, locale) {
 
 
     if(isPartyActive(currentParty)) {
-      let select = '';
-      let limit = (filter.size && filter.size > 0) ? filter.size : 20;
-      let page = (filter.page && filter.page == 0) ? filter.page : 1;
-      let sortBy = {};
-      sortBy[filter.sortBy] = (filter.direction && filter.direction == "DESC") ? -1 : 1;
 
-      let options = {
-        select: select,
-        sort: sortBy,
-        lean: true,
-        limit: limit,
-        page: parseInt(filter.page) + 1
-      };
 
-      filter.partyId=currentParty.id;
-
-      result = await PartySKill.paginate(new SearchParam(filter), options);
-      let skills = _.uniq(_.flatten(_.map(result.docs, 'skillTypeId')));
-      // let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+      result = await findPartySkillsByUserId(currentParty.id);
+      let skills = _.uniq(_.flatten(_.map(result, 'skillTypeId')));
       let listOfSkills = await getListofSkillTypes(skills, locale);
 
-      result.docs = _.reduce(result.docs, function(res, skill) {
+      result = _.reduce(result, function(res, skill) {
 
         var found = _.find(listOfSkills, {skillTypeId: skill.skillTypeId})
         skill.name = found.name;
@@ -394,7 +474,46 @@ async function getPartySkillsByUserId(currentUserId, filter, locale) {
     console.log(error);
   }
 
-  return new Pagination(result);
+  return result;
+
+}
+
+async function getPartySkillsByUserId(currentUserId, filter, locale) {
+
+  if(currentUserId==null || filter==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if(isPartyActive(currentParty)) {
+
+
+      result = await findPartySkillsByUserId(currentParty.id);
+      let skills = _.uniq(_.flatten(_.map(result, 'skillTypeId')));
+      let listOfSkills = await getListofSkillTypes(skills, locale);
+
+      result = _.reduce(result, function(res, skill) {
+
+        var found = _.find(listOfSkills, {skillTypeId: skill.skillTypeId})
+        skill.name = found.name;
+
+        delete skill.id;
+        res.push(skill);
+        return res;
+      }, []);
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
 
 }
 
@@ -449,7 +568,7 @@ async function removePartySkill(currentUserId, partySkillId) {
     let currentParty = response.data.data;
 
     if (isPartyActive(currentParty)) {
-      found = await findPartySkillsById(partySkillId);
+      found = await findPartySkillById(partySkillId);
 
       if(found){
         let deleted = await removePartySkillById(partySkillId);
@@ -460,6 +579,103 @@ async function removePartySkill(currentUserId, partySkillId) {
         }
 
 
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+async function addEndorsement(currentUserId, endorsement) {
+  endorsement = await Joi.validate(endorsement, endorsementSchema, { abortEarly: false });
+
+  if(currentUserId==null || endorsement==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findPartySkillById(endorsement.partySkillId);
+      if(found && found.partyId!=currentParty.id){
+
+        let foundEndorsement = await findEndorsementByEndorserIdAndPartySkillId(endorsement.endorserId, endorsement.partySkillId);
+
+        if(foundEndorsement){
+          foundEndorsement.rating = endorsement.rating;
+          foundEndorsement.relationship = endorsement.relationship;
+          foundEndorsement.lastUpdatedDate = Date.now();
+          result = await foundEndorsement.save();
+        } else {
+          result = await addEndorsementByUserId(endorsement);
+
+          // let endorsementCount = await getEndorsementCount([result.partySkillId]);
+          // found.averageEndorsedRating = endorsementCount[0].averageEndorsedRating;
+
+          found.endorsements.push(result);
+          // await found.save();
+        }
+
+        if(result){
+          let endorsementCount = await getEndorsementCount([result.partySkillId]);
+          found.averageEndorsedRating = endorsementCount[0].averageEndorsedRating;
+          await found.save();
+        }
+
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+async function removeEndorsement(currentUserId, partySkillId) {
+
+  if(currentUserId==null || partySkillId==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findPartySkillById(partySkillId);
+      if(found){
+        let foundEndorsement = await findEndorsementByEndorserIdAndPartySkillId(currentParty.id, partySkillId);
+        if(foundEndorsement){
+          let deleted = await foundEndorsement.remove();
+
+          if(deleted){
+            result = {status: statusEnum.DELETED};
+            let index = _.indexOf(found.endorsements, deleted._id);
+
+            let endorsementCount = await getEndorsementCount([result.partySkillId]);
+
+            found.averageEndorsedRating = endorsementCount[0].averageEndorsedRating;
+            found.endorsements.splice(index, 1);
+            await found.save();
+          }
+        }
       }
 
     }
@@ -657,9 +873,6 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
 }
 
-
-
-
 async function getAlertsByUserId(currentUserId, filter) {
 
   if(currentUserId==null || filter==null){
@@ -726,7 +939,6 @@ async function getAlertsByUserId(currentUserId, filter) {
 
 }
 
-
 async function addPartyAlert(currentUserId, alert) {
   alert = await Joi.validate(alert, jobAlertSchema, { abortEarly: false });
 
@@ -759,8 +971,6 @@ async function addPartyAlert(currentUserId, alert) {
 
   return result;
 }
-
-
 
 async function removePartyAlert(currentUserId, alertId) {
 
@@ -846,9 +1056,6 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
 
   return result;
 }
-
-
-
 
 async function getJobViewsByUserId(currentUserId, filter, locale) {
 

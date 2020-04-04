@@ -42,5 +42,9 @@
 	"application_accepted_successful": "application_accepted_successful",
 	"application_decline_successful": "application_decline_successful",
 	"experiences_updated_successful": "experiences_updated_successful",
-	"experiences_retrieved_successful": "experiences_retrieved_successful"
+	"experiences_retrieved_successful": "experiences_retrieved_successful",
+	"endorsement_added_successful": "endorsement_added_successful",
+	"endorsement_remove_successful": "endorsement_remove_successful",
+	"languages_retrieved_successful": "languages_retrieved_successful",
+	"user_retrieved_successful": "user_retrieved_successful"
 }

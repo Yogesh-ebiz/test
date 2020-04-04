@@ -9,6 +9,18 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
+router.route('/:userId/detail').get(asyncHandler(getUserDetail));
+
+
+async function getUserDetail(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let userId = parseInt(req.params.userId);
+  let data = await userCtl.getUserDetail(currentUserId, userId, res.locale);
+  res.json(new Response(data, data?'user_retrieved_successful':'not_found', res));
+}
+
+
 router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
 
 router.route('/:userId/experiences').get(asyncHandler(getUserExperiences));
@@ -18,6 +30,9 @@ router.route('/:userId/experiences').post(asyncHandler(updateUserExperiences));
 router.route('/:userId/skills').get(asyncHandler(getPartySkillsByUserId));
 router.route('/:userId/skills').post(asyncHandler(addPartySkill));
 router.route('/:userId/skills/:partySkillId').delete(asyncHandler(removePartySkill));
+router.route('/:userId/skills/:partySkillId/endorsement').post(asyncHandler(addEndorsement));
+router.route('/:userId/skills/:partySkillId/endorsement/:endorsementId').delete(asyncHandler(removeEndorsement));
+
 
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
 router.route('/:userId/bookmarks').get(asyncHandler(getBookmarksByUserId));
@@ -46,7 +61,6 @@ async function updateUserExperiences(req, res) {
   let currentUserId = parseInt(req.params.userId);
   let body = req.body;
 
-  console.log('currentUserId', currentUserId);
   let data = await userCtl.updateUserExperiences(currentUserId, body);
   res.json(new Response(data, data?'experiences_updated_successful':'not_found', res));
 }
@@ -80,10 +94,31 @@ async function removePartySkill(req, res) {
   let partySkillId = req.params.partySkillId;
   let data = await userCtl.removePartySkill(currentUserId, partySkillId);
 
-  res.json(new Response(data, data?'skill_added_successful':'not_found', res));
+  res.json(new Response(data, data?'skill_removed_successful':'not_found', res));
 }
 
 
+
+async function addEndorsement(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let partySkillId = parseInt(req.params.partySkillId);
+  let endorsement = req.body;
+  endorsement.endorserId = currentUserId;
+  endorsement.partySkillId = partySkillId;
+  let data = await userCtl.addEndorsement(currentUserId, endorsement);
+
+  res.json(new Response(data, data?'endorsement_added_successful':'not_found', res));
+}
+
+async function removeEndorsement(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let partySkillId = parseInt(req.params.partySkillId);
+  let data = await userCtl.removeEndorsement(currentUserId, partySkillId);
+
+  res.json(new Response(data, data?'endorsement_remove_successful':'not_found', res));
+}
 
 
 async function getApplicationsByUserId(req, res) {

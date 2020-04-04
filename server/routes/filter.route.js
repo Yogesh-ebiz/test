@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const ISO6391 = require('iso-639-1')
 const _ = require('lodash');
 const asyncHandler = require('express-async-handler');
 const industryCtl = require('../controllers/industry.controller')
@@ -20,6 +21,7 @@ module.exports = router;
 
 router.route('/').post(asyncHandler(insert));
 
+router.use('/languages/search', getLanguages);
 
 router.use('/locations/search', getAllJobLocations);
 
@@ -39,6 +41,28 @@ router.route('/jobfunctions/:id').get(asyncHandler(getJobFunctionById));
 router.route('/locations/search').get(asyncHandler(getAllJobLocations));
 
 
+
+async function getLanguages(req, res) {
+  let keyword = req.query.query;
+  let data = null;
+  if(keyword){
+
+    data = [];
+    let languages = ISO6391.getAllNativeNames();
+    for (var i = 0; i < languages.length; i++) {
+      console.log(keyword.toLowerCase(), languages[i].toLowerCase(), languages[i].match(keyword));
+      if (languages[i].match(keyword)) {
+        data.push(languages[i]);
+      }
+    }
+
+  } else {
+    data = ISO6391.getAllNativeNames();
+  }
+
+  res.json(new Response(data, data?'languages_retrieved_successful':'not_found', res));
+
+}
 
 async function getAllJobLocations(req, res) {
   let filter = req.query;

@@ -24,19 +24,20 @@ router.get('/health-check', (req, res) =>
 );
 
 router.use('/auth', authRoutes);
-router.use('/jobfunctions', jobFunctionsRoutes);
-router.use('/jobs', jobRequisitionRoutes);
-router.use('/skilltypes', skillTypeRoutes);
-router.use('/experiencelevels', experienceLevelRoutes);
-router.use('/industries', industryRoutes);
-router.use('/employmenttypes', employmentTypeRoutes);
-router.use('/users', userRoutes);
-router.use('/applications', applicationRoutes);
-router.use('/workflows', workflowRoutes);
-router.use('/promotion', promotionRoutes);
-router.use('/suggestions', suggestionRoutes);
 
+
+router.use('/applications', applicationRoutes);
+router.use('/employmenttypes', employmentTypeRoutes);
+router.use('/experiencelevels', experienceLevelRoutes);
 router.use('/filters', filterRoutes);
+router.use('/industries', industryRoutes);
+router.use('/jobs', jobRequisitionRoutes);
+router.use('/jobfunctions', jobFunctionsRoutes);
+router.use('/promotion', promotionRoutes);
+router.use('/skilltypes', skillTypeRoutes);
+router.use('/suggestions', suggestionRoutes);
+router.use('/users', userRoutes);
+router.use('/workflows', workflowRoutes);
 
 
 

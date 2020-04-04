@@ -73,6 +73,22 @@ function addCompany(userId, company) {
   return axios.post('http://localhost:8080/api/company/register', company, {headers: {"UserId":userId}})
 }
 
+async function populateParties(list) {
+  let data = [];
+
+  if(list==null){
+    return;
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    let result = await getPersonById(list[i].partyId);
+    list[i].party = result.data.data;
+  }
+
+  return list;
+
+}
+
 
 module.exports = {
   getPartyById: getPartyById,
@@ -81,5 +97,6 @@ module.exports = {
   isPartyActive: isPartyActive,
   searchParties:searchParties,
   getPartySkills: getPartySkills,
-  addCompany: addCompany
+  addCompany: addCompany,
+  populateParties:populateParties
 }

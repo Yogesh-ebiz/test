@@ -12,7 +12,6 @@ function getListofSkillTypes(list, locale) {
     return [];
   }
 
-  console.log('list', list)
   let propLocale = '$name.'+localeStr;
   let match = { skillTypeId: {$in: list} };
   // match['name.'+localeStr] = { $regex: keyword, $options: 'i'};

@@ -7,6 +7,7 @@ const EmploymentType = require('../models/employmenttypes.model');
 const JobRequisition = require('../models/jobrequisition.model');
 
 
+
 function getAllJobLocations(filter) {
   let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
   let data = null;
