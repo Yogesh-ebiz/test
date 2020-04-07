@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+const ISO6391 = require('iso-639-1');
+
+
 //const pagination = require('../const/pagination');
 const Application = require('../models/application.model');
 const Bookmark = require('../models/bookmark.model');
@@ -8,6 +11,7 @@ const JobAlert = require('../models/job_alert.model');
 const PartySKill = require('../models/partyskill.model');
 const Skilltype = require('../models/skilltype.model');
 const JobView = require('../models/jobview.model');
+const CompanySalary = require('../models/companysalary.model');
 
 
 
@@ -20,21 +24,24 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany, populateParties} = require('../services/party.service');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany, populateParties, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
-const {getListofSkillTypes} = require('../services/skilltype.service');
+const {getListofSkillTypes, addSkillType} = require('../services/skilltype.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = require('../services/jobalert.service');
 const {getJobCount} = require('../services/jobrequisition.service');
-const {findEmploymentById, findEmploymentByUserId, addEmploymentsByUserId, updateEmploymentByUserId} = require('../services/employment.service');
-const {findEducationById, findEducationByUserId, addEducationsByUserId, updateEducationByUserId} = require('../services/education.service');
-const {addEndorsementByUserId, removeEndorsementById, findEndorsementByEndorserIdAndPartySkillId, getEndorsementCount, getTop3SkillsEndorsement} = require('../services/endorsement.service');
-const {findCertificationByUserId} = require('../services/partycertification.service');
-const {findPublicationByUserId} = require('../services/partypublication.service');
-const {findLanguageByUserId} = require('../services/partylanguage.service');
+const {findPartyEmploymentById, findPartyEmploymentByUserId, addPartyEmploymentByUserId, addEmploymentByUserId, updateEmploymentByUserId} = require('../services/partyemployment.service');
+const {findPartyEducationById, findPartyEducationByUserId, addPartyEducationsByUserId, updateEducationByUserId} = require('../services/partyeducation.service');
+const {addEndorsementByUserId, removeEndorsementById, findEndorsementByEndorserIdAndPartySkillId, findEndorsementsByEndorserIdAndListOfPartySkillIds, getEndorsementCount, getTop3SkillsEndorsement, findEndorsementsByEndorseId} = require('../services/endorsement.service');
+
+const {findPartyCertificationByUserId, findPartyCertificationByIdAndUserId, addPartyCertificationByUserId, updatePartyCertificationByUserId} = require('../services/partycertification.service');
+const {findPartyPublicationByUserId, addPartyPublicationByUserId, findPartyPublicationByIdAndUserId, updatePartyPublicationByUserId}  = require('../services/partypublication.service');
+const {findPartyLanguageByUserId, addLanguagesByUserId} = require('../services/partylanguage.service');
+const {getFieldOfStudyListByShortCode} = require('../services/filter.service');
+const {addCompanySalary} = require('../services/company.service');
 
 
 const {getPromotions, findPromotionById} = require('../services/promotion.service');
@@ -42,7 +49,7 @@ const {getPromotions, findPromotionById} = require('../services/promotion.servic
 const {findJobViewByUserId} = require('../services/jobview.service');
 
 
-const {findPartySkillByUserIdAndSkillTypeId, findPartySkillById, findPartySkillsByUserId, addUserPartySkill, removePartySkillById, getEndorsersHighlySkillBySkillTypeId} = require('../services/partyskill.service');
+const {findPartySkillByUserIdAndSkillTypeId, findPartySkillById, findPartySkillsByUserId, addPartySkillByUserId, updatePartySkillByUserId, removePartySkillBySkillTypeIdAndUserId, getEndorsersHighlySkillBySkillTypeId} = require('../services/partyskill.service');
 
 
 let Pagination = require('../utils/pagination');
@@ -105,16 +112,49 @@ const endorsementSchema = Joi.object({
   relationship: Joi.string().allow('').optional()
 });
 
+const partyPublicationSchema = Joi.object({
+  partyPublicationId: Joi.number().optional(),
+  partyId: Joi.number().required(),
+  title: Joi.string().required(),
+  author: Joi.string().required(),
+  date: Joi.number().optional(),
+  publisher: Joi.string().allow('').optional(),
+  publishedDate: Joi.string().allow('').optional(),
+  url: Joi.string().allow('').optional(),
+  description: Joi.string().allow('').optional(),
+  isbn: Joi.string().allow('').optional()
+});
+
+
+const partyCertificationSchema = Joi.object({
+  partyCertificationId: Joi.number().optional(),
+  partyId: Joi.number().required(),
+  certificationId: Joi.string().optional(),
+  company: Joi.number().optional(),
+  title: Joi.string().optional(),
+  issuedDate: Joi.number().optional(),
+  expirationDate: Joi.number().allow('').optional(),
+  url: Joi.string().allow('').optional(),
+  description: Joi.string().allow('').optional()
+});
+
 
 
 module.exports = {
   getUserDetail,
   uploadCV,
-  getUserExperiences,
-  updateUserExperiences,
+  getPartyExperiences,
+  updatePartyExperiences,
+  getPartyEducations,
+  updatePartyEducations,
+  updateSkillsAndAccomplishments,
   addPartySkill,
-  removePartySkill,
+  updatePartySkills,
+  updatePartySkillById,
+  removePartySkillById,
   getPartySkillsByUserId,
+  getPartyLanguages,
+  updatePartyLanguages,
   addEndorsement,
   removeEndorsement,
   getApplicationsByUserId,
@@ -123,9 +163,14 @@ module.exports = {
   addPartyAlert,
   removePartyAlert,
   updatePartyAlert,
-  getJobViewsByUserId
+  getJobViewsByUserId,
+  getPartyPublications,
+  addPartyPublication,
+  updatePartyPublications,
+  getPartyCertifications,
+  addPartyCertification,
+  updatePartyCertifications
 }
-
 
 
 
@@ -155,8 +200,9 @@ async function getUserDetail(currentUserId, userId, locale) {
 
 
       let partySkillIds = _.uniq(_.flatten(_.map(partySkills, 'partySkillId')));
-      let top3SkillsEndorsement = await getTop3SkillsEndorsement(partySkillIds);
 
+      //Get Top 3 Skills Endorsed
+      let top3SkillsEndorsement = await getTop3SkillsEndorsement(partySkillIds);
       let loadPromises = top3SkillsEndorsement.map(partySkillEndorsed => {
         let partySkill = _.find(partySkills, {partySkillId: partySkillEndorsed.partySkillId});
         let endorserIds = _.map(partySkillEndorsed.endorsers, 'endorserId');
@@ -165,37 +211,67 @@ async function getUserDetail(currentUserId, userId, locale) {
       })
       let topEndorsers = await Promise.all(loadPromises);
       topEndorsers = _.reduce(topEndorsers, function(res, item){
-        res.push(item[0])
+        if(item.length>0){
+          res.push(item[0])
+        }
+
         return res;
       }, [])
-
       topEndorsers = await populateParties(topEndorsers);
+
+      let endorsementByCurrentUser = await findEndorsementsByEndorserIdAndListOfPartySkillIds(currentParty.id, partySkillIds);
 
       partySkills = _.reduce(partySkills, function(res, skill) {
 
         var found = _.find(listOfSkills, {skillTypeId: skill.skillTypeId})
         skill.name = found.name;
 
-        skill.highlySkilledEndorsers = _.find(topEndorsers, {skillTypeId: skill.skillTypeId});
-        skill.mutual = '';
+        let highlySkilledEndorsers = _.find(topEndorsers, {skillTypeId: skill.skillTypeId});
+
+        skill.hasEndorsed = _.find(endorsementByCurrentUser, {partySkillId: skill.partySkillId})?true:false;
+        skill.highlySkilledEndorsers = highlySkilledEndorsers?highlySkilledEndorsers:null;
+
+        //temporary
+        skill.mutaulEndorser = highlySkilledEndorsers? { noOfMutualEndorsers: 1, skillTypeId: skill.skillTypeId, party: highlySkilledEndorsers.party}:null;
         skill.noOfEndorsement = skill.endorsements.length;
         skill.endorsements = [];
         res.push(skill);
         return res;
       }, []);
-      
+
       result.skills = partySkills;
 
       //Employments-----------------------------------------------------
-      result.employments = await findEmploymentByUserId(foundUser.id);
+      let employments = await findPartyEmploymentByUserId(foundUser.id);
+
+      console.log(_.uniq(_.map(employments, 'employmentType')))
+      let employmentTypes = await getEmploymentTypes(_.uniq(_.map(employments, 'employmentType')));
+      console.log('type', employmentTypes)
+      result.employments = await populateCompany(employments);
+
+
+
 
       //Educations-----------------------------------------------------
-      result.educations = await findEducationByUserId(foundUser.id);
+      let educations = await findPartyEducationByUserId(foundUser.id);
+      let fieldOfStudies = _.uniq(_.flatten(_.map(educations, 'fieldOfStudy')));
+      fieldOfStudies = await getFieldOfStudyListByShortCode(fieldOfStudies);
+      educations = _.reduce(educations, function(res, item){
+        item.fieldOfStudy = _.find(fieldOfStudies, {shortCode: item.fieldOfStudy});
+        res.push(item);
+        return res;
+      }, [])
+      result.educations = await populateInstitute(educations);
 
       //Accomplishments-----------------------------------------------------
-      result.languages = await findLanguageByUserId(foundUser.id);
-      result.publications = await findPublicationByUserId(foundUser.id);
-      result.certificates = await findCertificationByUserId(foundUser.id);
+      let userLanguages = await findPartyLanguageByUserId(foundUser.id);
+      userLanguages = _.reduce(userLanguages, function(res, item){
+        res.push(ISO6391.getName(item.language));
+        return res;
+      }, []);
+      result.languages = userLanguages;
+      result.publications = await findPartyPublicationByUserId(foundUser.id);
+      result.certificates = await findPartyCertificationByUserId(foundUser.id);
 
     }
 
@@ -206,7 +282,6 @@ async function getUserDetail(currentUserId, userId, locale) {
   return result;
 
 }
-
 
 /**
  * Upload User CV
@@ -296,9 +371,11 @@ async function uploadCV(currentUserId, file) {
         ]
 
       }
-      console.log('result', result)
 
-      //await application.save();
+
+
+      // console.log('result', result)
+
 
 
 
@@ -312,23 +389,21 @@ async function uploadCV(currentUserId, file) {
 
 }
 
-async function getUserExperiences(currentUserId) {
+async function getPartyExperiences(currentUserId) {
 
   if(currentUserId==null){
     return null;
   }
 
-  let result = {employments: [], educations: []};
+  let result = null;
   try {
     let response = await getPersonById(currentUserId);
     let currentParty = response.data.data;
 
 
     if (isPartyActive(currentParty)) {
-
-      result.employments = await findEmploymentByUserId(currentParty.id);
-      result.educations = await findEducationByUserId(currentParty.id);
-
+      let employments = await findPartyEmploymentByUserId(currentParty.id);
+      result = await populateCompany(employments);
     }
 
 
@@ -340,7 +415,7 @@ async function getUserExperiences(currentUserId) {
 
 }
 
-async function updateUserExperiences(currentUserId, data) {
+async function updatePartyExperiences(currentUserId, data) {
 
   if(currentUserId==null || data==null){
     return null;
@@ -354,30 +429,60 @@ async function updateUserExperiences(currentUserId, data) {
 
     if (isPartyActive(currentParty)) {
 
-      result = {employments: [], educations: []};
-      let newEmployments = [], updateEmployments=[], newEducations = [], updateEducations=[], companies = [];
-
       let employments = data.employments;
-      let educations = data.educations;
+      let addEmployments = [], updateEmployments=[], deleteEmployments = [], companies = [], newSalaries=[];
+
+      let currentEmployments = await findPartyEmploymentByUserId(currentParty.id);
+      if(!currentEmployments.length){
+        employments = _.reduce(employments, function(res, item){
+          item.company = item.company.id?item.company.id:16;
+          item.partyId = currentParty.id;
+          newSalaries.push(item);
+          res.push(item);
+          return res;
+        }, []);
+        addEmployments = employments;
+      } else if(!employments.length){
+        deleteEmployments = currentEmployments;
+      } else {
+
+        for (var i = 0; i < employments.length; i++) {
 
 
-      _.forEach(employments, function(item){
+          let exist = _.find(currentEmployments, {partyEmploymentId: employments[i].partyEmploymentId})
+          if (exist) {
+            console.log('exist', employments[i].employmentType)
+            exist.company = employments[i].company.id ? employments[i].company.id : 16;
+            exist.fromDate = employments[i].fromDate;
+            exist.thruDate = employments[i].thruDate;
+            exist.employmentTitle = employments[i].employmentTitle;
+            exist.employmentType = employments[i].employmentType;
+            exist.terminationReason = employments[i].terminationReason;
+            exist.terminationType = employments[i].terminationType;
+            exist.isCurrent = employments[i].isCurrent;
+            exist.description = employments[i].description;
+            exist.city = employments[i].city;
+            exist.state = employments[i].state;
+            exist.country = employments[i].country;
 
-        if(!item.company.id){
-          companies.push(item.company);
+            updateEmployments.push(exist);
+          } else {
+            employments[i].partyId = currentParty.id;
+            employments[i].company = employments[i].company.id ? employments[i].company.id : 16;
+            newSalaries.push(employments[i]);
+            addEmployments.push(employments[i]);
+          }
+
         }
 
-        item.company= (item.company.id) ? item.company.id:0;
-        item.partyId = currentParty.id;
-        if(item.employmentId){
-          updateEmployments.push(item);
-        } else {
-          newEmployments.push(item);
+        for (var i = 0; i < currentEmployments.length; i++) {
+          let exist = _.find(employments, {partyEmploymentId: currentEmployments[i].partyEmploymentId})
+          if (!exist) {
+            deleteEmployments.push(currentEmployments[i]);
+          }
+
         }
-
-
-
-      });
+      }
 
       try{
 
@@ -394,39 +499,31 @@ async function updateUserExperiences(currentUserId, data) {
       }
 
       try {
-        let loadPromises = newEmployments.map(employment => addEmploymentsByUserId(currentParty.id, employment));
-        newEmployments = await Promise.all(loadPromises);
+        let loadPromises = addEmployments.map(employment => addPartyEmploymentByUserId(currentParty.id, employment));
+        addEmployments = await Promise.all(loadPromises);
 
         loadPromises = updateEmployments.map(employment => updateEmploymentByUserId(currentParty.id, employment));
         updateEmployments = await Promise.all(loadPromises);
-        result.employments = _.orderBy(newEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
+
+        loadPromises = deleteEmployments.map(employment => employment.remove());
+
+        result = _.orderBy(addEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
+
+        newSalaries = _.reduce(newSalaries, function(res, item){
+          let exist = _.find(result, {fromDate: item.fromDate, thruDate: item.thruDate});
+
+          if(exist && item.salary){
+            item.company=exist.company;
+            res.push(item);
+          }
+          return res;
+        }, []);
+
+        loadPromises = newSalaries.map(salary => addCompanySalary({baseSalary: salary.salary, company: salary.company, employmentTitle: salary.employmentTitle, partyId: currentParty.id, city: salary.city, state: salary.state, country: salary.country}));
+        await Promise.all(loadPromises);
 
       }catch (e) {
         console.debug('Update Experiences Error: ', e)
-      }
-
-
-      _.forEach(educations, function(item){
-        item.institute= (item.institute.id) ? item.institute.id:0;
-        item.partyId = currentParty.id;
-        if(item.educationId){
-          updateEducations.push(item);
-        } else {
-          newEducations.push(item);
-        }
-
-      });
-
-      try {
-        let loadPromises = newEducations.map(education => addEducationsByUserId(currentParty.id, education));
-        newEducations = await Promise.all(loadPromises);
-
-        loadPromises = updateEducations.map(education => updateEducationByUserId(currentParty.id, education));
-        updateEducations = await Promise.all(loadPromises);
-        result.educations = _.orderBy(newEducations.concat(updateEducations), ['fromDate'], ['desc']);
-
-      } catch (e) {
-        console.debug('Update Education Error: ', e)
       }
     }
 
@@ -439,36 +536,353 @@ async function updateUserExperiences(currentUserId, data) {
 
 }
 
-async function getTop3PartySkillsByUserId(currentUserId, locale) {
+async function getPartyEducations(currentUserId) {
 
-  if(currentUserId==null || locale==null){
+  if(currentUserId==null){
     return null;
   }
 
   let result = null;
   try {
-
     let response = await getPersonById(currentUserId);
     let currentParty = response.data.data;
 
 
-    if(isPartyActive(currentParty)) {
-
-
-      result = await findPartySkillsByUserId(currentParty.id);
-      let skills = _.uniq(_.flatten(_.map(result, 'skillTypeId')));
-      let listOfSkills = await getListofSkillTypes(skills, locale);
-
-      result = _.reduce(result, function(res, skill) {
-
-        var found = _.find(listOfSkills, {skillTypeId: skill.skillTypeId})
-        skill.name = found.name;
-
-        delete skill.id;
-        res.push(skill);
-        return res;
-      }, []);
+    if (isPartyActive(currentParty)) {
+      let educations = await findPartyEducationByUserId(currentParty.id);
+      result = await populateInstitute(educations);
     }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function updatePartyEducations(currentUserId, data) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      let educations = data.educations;
+      let addEducations = [], updateEducations=[], deleteEducations = [], institutes = [];
+
+      let currentEducations = await findPartyEducationByUserId(currentParty.id);
+
+
+      if(!currentEducations.length){
+        educations = _.reduce(educations, function(res, item){
+          item.partyId = currentParty.id;
+          item.institute = item.institute.id?item.institute.id:27;
+          res.push(item);
+          return res;
+        }, []);
+        addEducations = educations;
+      } else if(!educations.length){
+        deleteEducations = currentEducations;
+      } else {
+
+        for(var i=0; i<educations.length; i++){
+
+
+          let exist = _.find(currentEducations, {partyEducationId: educations[i].partyEducationId})
+          if(exist){
+
+            exist.institute = educations[i].institute.id?educations[i].institute.id:27;
+            exist.fromDate = educations[i].fromDate;
+            exist.thruDate = educations[i].thruDate;
+            exist.fieldOfStudy = educations[i].fieldOfStudy;
+            exist.degree = educations[i].degree;
+            exist.gpa = educations[i].gpa;
+            exist.hasGraduated = educations[i].hasGraduated;
+            exist.isCurrent = educations[i].isCurrent;
+            exist.city = educations[i].city;
+            exist.state = educations[i].state;
+            exist.country = educations[i].country;
+            updateEducations.push(exist);
+          }else {
+            educations[i].partyId = currentParty.id;
+            educations[i].institute = educations[i].institute.id?educations[i].institute.id:27;
+            addEducations.push(educations[i]);
+          }
+
+        }
+
+        for (var i = 0; i < currentEducations.length; i++) {
+          let exist = _.find(educations, {partyEducationId: currentEducations[i].partyEducationId})
+          if (!exist) {
+            deleteEducations.push(currentEducations[i]);
+          }
+
+        }
+
+      }
+
+
+      try{
+
+        // console.log('companies', companies);
+        // let loadPromises = companies.map(company => {
+        //   console.log('company', company)
+        //   addCompany(currentParty.id, company)
+        // });
+        // companies = await Promise.all(loadPromises);
+        //
+        // console.log(companies);
+      } catch(e){
+        console.debug('Add Company Error: ', e);
+      }
+
+      try {
+        let loadPromises = addEducations.map(education => addPartyEducationsByUserId(currentParty.id, education));
+        addEducations = await Promise.all(loadPromises);
+
+        loadPromises = updateEducations.map(education => updateEducationByUserId(currentParty.id, education));
+        updateEducations = await Promise.all(loadPromises);
+
+        loadPromises = deleteEducations.map(education => education.remove());
+
+        result = _.orderBy(addEducations.concat(updateEducations), ['fromDate'], ['desc']);
+
+        loadPromises = deleteEducations.map(education => education.remove());
+
+      }catch (e) {
+        console.debug('Update Experiences Error: ', e)
+      }
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function updatePartySkills(currentUserId, data, locale) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  locale = locale?locale: 'en';
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      let partySkills = data.skills;
+
+
+      let currentSkills = await findPartySkillsByUserId(currentParty.id);
+      let addSkills = [], updateSkills=[], deleteSkills=[], newSkills=[];
+
+      if(!currentSkills.length){
+        for(var i=0; i<partySkills.length; i++){
+          if(partySkills[i].skillTypeId) {
+            addSkills.push(partySkills[i]);
+          } else if(partySkills[i].name!=''){
+            newSkills.push(partySkills[i]);
+          }
+        }
+      } else if(!partySkills.length){
+        deleteSkills = currentSkills;
+      } else {
+
+        for(var i=0; i<partySkills.length; i++){
+
+          if(!partySkills[i].skillTypeId){
+            if(partySkills[i].name!=''){
+              newSkills.push(partySkills[i]);
+            }
+
+          }else {
+            let exist = _.find(currentSkills, {skillTypeId: partySkills[i].skillTypeId})
+            if(exist){
+              exist.noOfMonths = partySkills[i].noOfMonths;
+              exist.skillTypeId = partySkills[i].skillTypeId;
+              exist.selfRating = partySkills[i].selfRating;
+              updateSkills.push(exist);
+            }else {
+              addSkills.push(partySkills[i]);
+            }
+          }
+        }
+
+        for (var i = 0; i < currentSkills.length; i++) {
+          let exist = _.find(partySkills, {partySkillId: currentSkills[i].partySkillId})
+          if (!exist) {
+            deleteSkills.push(currentSkills[i]);
+          }
+
+        }
+
+      }
+
+      try{
+        let loadPromises =newSkills.map(skillType => addSkillType(skillType));
+        newSkills = await Promise.all(loadPromises);
+
+        newSkills.forEach(function(skill, index){
+          let found = _.find(partySkills, {locale: skill.locale});
+
+          if(found){
+            found.skillTypeId = skill._doc.skillTypeId;
+            found.partyId = currentParty.id;
+            addSkills.push(found)
+          }
+        })
+
+        loadPromises = addSkills.map(partySkill => addPartySkillByUserId(currentParty.id, {partyId: currentParty.id, skillTypeId: partySkill.skillTypeId, noOfMonths: partySkill.noOfMonths}));
+        addSkills = await Promise.all(loadPromises);
+
+        loadPromises = updateSkills.map(partySkill => partySkill.save())
+        updateSkills = await Promise.all(loadPromises);
+        loadPromises = deleteSkills.map(partySkill => partySkill.remove());
+        result = addSkills.concat(updateSkills);
+
+      } catch(e){
+        console.debug('Update Skills Error: ', e);
+      }
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function updateSkillsAndAccomplishments(currentUserId, data, locale) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  locale = locale?locale: 'en';
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      result = {skills: [], languages: [], certificates: [], publications: []};
+      let partySkills = data.skills;
+
+      let certificates = data.certificates;
+      let publications = data.publications;
+
+      let currentSkills = await findPartySkillsByUserId(currentParty.id);
+      let addSkills = [], updateSkills=[], deleteSkills=[], newSkills=[];
+
+      if(!currentSkills.length){
+        for(var i=0; i<partySkills.length; i++){
+          if(partySkills[i].skillTypeId) {
+            addSkills.push(partySkills[i]);
+          } else {
+            newSkills.push(partySkills[i]);
+          }
+        }
+      } else if(!partySkills.length){
+        deleteSkills = currentSkills;
+      } else {
+
+        for(var i=0; i<partySkills.length; i++){
+
+          if(!partySkills[i].skillTypeId){
+            newSkills.push(partySkills[i]);
+          }else {
+            let exist = _.find(currentSkills, {skillTypeId: partySkills[i].skillTypeId})
+            if(exist){
+              updateSkills.push(exist);
+            }else {
+              addSkills.push(partySkills[i]);
+            }
+          }
+        }
+        deleteSkills = _.differenceBy(currentSkills, partySkills, 'skillTypeId')
+      }
+
+
+      try{
+        let loadPromises =newSkills.map(skillType => addSkillType(skillType));
+        newSkills = await Promise.all(loadPromises);
+
+        newSkills.forEach(function(skill, index){
+          let found = _.find(partySkills, {locale: skill.locale});
+
+          if(found){
+            found.skillTypeId = skill._doc.skillTypeId;
+            found.partyId = currentParty.id;
+            addSkills.push(found)
+          }
+        })
+
+        loadPromises = addSkills.map(partySkill => addPartySkillByUserId({partyId: currentParty.id, skillTypeId: partySkill.skillTypeId, noOfMonths: partySkill.noOfMonths}));
+        addSkills = await Promise.all(loadPromises);
+
+        loadPromises = updateSkills.map(partySkill => partySkill.save())
+        updateSkills = await Promise.all(loadPromises);
+        loadPromises = deleteSkills.map(partySkill => partySkill.remove());
+        result.skills = addSkills.concat(updateSkills);
+
+      } catch(e){
+        console.debug('Update Skills Error: ', e);
+      }
+
+
+
+      try {
+
+        let languages = data.languages;
+        languages = _.reduce(languages, function(res, item){
+          res.push(ISO6391.getCode(item))
+          return res;
+        }, []);
+
+        let currentPartyLanguage = await findLanguageByUserId(currentParty.id);
+
+        if(currentPartyLanguage){
+          currentPartyLanguage.languages = languages;
+          result.languages = currentPartyLanguage.save();
+        } else {
+          result.languages = await addLanguagesByUserId(currentParty.id, {partyId: currentParty.id, languages: languages});
+        }
+
+      }catch (e) {
+        console.debug('Update Languages Error: ', e)
+      }
+
+
+      try {
+
+
+
+      } catch (e) {
+        console.debug('Update Education Error: ', e)
+      }
+    }
+
 
   } catch (error) {
     console.log(error);
@@ -492,7 +906,6 @@ async function getPartySkillsByUserId(currentUserId, filter, locale) {
 
 
     if(isPartyActive(currentParty)) {
-
 
       result = await findPartySkillsByUserId(currentParty.id);
       let skills = _.uniq(_.flatten(_.map(result, 'skillTypeId')));
@@ -535,7 +948,8 @@ async function addPartySkill(currentUserId, partySkill) {
       found = await findPartySkillByUserIdAndSkillTypeId(currentParty.id, partySkill.skillTypeId);
 
       if(!found){
-        result = await addUserPartySkill(partySkill);
+        console.log('new')
+        result = await addPartySkillByUserId(currentParty.id, partySkill);
       } else {
         let lastUpdatedDate = Date.now();
         found.noOfMonths = partySkill.noOfMonths;
@@ -553,8 +967,40 @@ async function addPartySkill(currentUserId, partySkill) {
   return result;
 }
 
+async function updatePartySkillById(currentUserId, partySkill) {
 
-async function removePartySkill(currentUserId, partySkillId) {
+  if(currentUserId==null || partySkill==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      found = await findPartySkillById(partySkill.partySkillId);
+
+      if(found && found.partyId==currentParty.id){
+
+        found.noOfMonths=partySkill.noOfMonths;
+        found.selfRating=partySkill.selfRating;
+        result = await found.save();
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+async function removePartySkillById(currentUserId, partySkillId) {
 
   if(currentUserId==null || partySkillId==null){
     return null;
@@ -591,6 +1037,119 @@ async function removePartySkill(currentUserId, partySkillId) {
   return result;
 }
 
+async function getPartyLanguages(currentUserId, locale) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if(isPartyActive(currentParty)) {
+
+      let userLanguages = await findPartyLanguageByUserId(currentParty.id);
+      console.log('userLanguage', userLanguages)
+
+      userLanguages = _.reduce(userLanguages, function(res, item){
+        item.language = ISO6391.getName(item.language);
+        res.push(item);
+        return res;
+      }, []);
+      result = userLanguages;
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function updatePartyLanguages(currentUserId, data, locale) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  locale = locale?locale: 'en';
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      let languages = data.languages;
+
+
+      let currentPartyLanguage = await findPartyLanguageByUserId(currentParty.id);
+      let addLanguages = [], updateLanguages=[], deleteLanguages=[];
+
+
+      if(!currentPartyLanguage.length){
+        addLanguages = languages;
+      } else if(!languages.length){
+        deleteLanguages = currentPartyLanguage;
+      } else {
+
+        for(var i=0; i<languages.length; i++){
+
+
+          let exist = _.find(currentPartyLanguage, {language: languages[i].language})
+          if(exist){
+            exist.level = languages[i].level;
+            exist.language = languages[i].language;
+            updateLanguages.push(exist);
+          }else {
+            addLanguages.push(languages[i]);
+          }
+
+        }
+
+        for (var i = 0; i < currentPartyLanguage.length; i++) {
+          let exist = _.find(languages, {language: currentPartyLanguage[i].language})
+          if (!exist) {
+            deleteLanguages.push(currentPartyLanguage[i]);
+          }
+
+        }
+
+      }
+
+      try{
+
+
+        loadPromises = addLanguages.map(language => addLanguagesByUserId(currentParty.id, {partyId: currentParty.id, language: language.language, level: language.level}));
+        addLanguages = await Promise.all(loadPromises);
+
+        loadPromises = updateLanguages.map(language => language.save())
+        updateLanguages = await Promise.all(loadPromises);
+
+        loadPromises = deleteLanguages.map(language => language.remove());
+
+        result = addLanguages.concat(updateLanguages);
+
+
+      } catch(e){
+        console.debug('Update Language Error: ', e);
+      }
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
 
 async function addEndorsement(currentUserId, endorsement) {
   endorsement = await Joi.validate(endorsement, endorsementSchema, { abortEarly: false });
@@ -687,7 +1246,6 @@ async function removeEndorsement(currentUserId, partySkillId) {
 
   return result;
 }
-
 
 async function getApplicationsByUserId(currentUserId, filter, locale) {
 
@@ -1142,3 +1700,332 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
 }
 
+
+
+
+async function getPartyPublications(currentUserId) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+      result = await findPartyPublicationByUserId(currentParty.id);
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function addPartyPublication(currentUserId, publication) {
+  publication = await Joi.validate(publication, partyPublicationSchema, { abortEarly: false });
+
+  if(currentUserId==null || publication==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      let found;
+      if(publication.publicationId){
+        found = await findPartyPublicationByIdAndUserId(currentParty.id, publication.partyPublicationId);
+      }
+
+
+      if(!found){
+        console.log('add new')
+        result = await addPublicationByUserId(publication);
+      } else {
+        let lastUpdatedDate = Date.now();
+        found.title = partySkill.title;
+        found.author = partySkill.author;
+        found.date = partySkill.date;
+        found.publisher = partySkill.publisher;
+        found.url = partySkill.url;
+        found.description = partySkill.description;
+        found.isbn = partySkill.isbn;
+
+        found.lastUpdatedDate = Date.now();
+        result = await found.save();
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+async function updatePartyPublications(currentUserId, data) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      let newPublications = [], updatePublications=[], deletePublications=[];
+      let publications = data.publications;
+
+      let currentPublications = await findPartyPublicationByUserId(currentParty.id)
+      if (!currentPublications.length) {
+        publications = _.reduce(publications, function (res, item) {
+          item.partyId = currentParty.id;
+          res.push(item);
+          return res;
+        }, []);
+        newPublications = publications;
+      } else if (!publications.length) {
+        deletePublications = currentPublications;
+      } else {
+
+        for (var i = 0; i < publications.length; i++) {
+
+          let exist = _.find(currentPublications, {partyPublicationId: publications[i].partyPublicationId})
+          if (exist) {
+            exist.title = publications[i].title;
+            exist.author = publications[i].author;
+            exist.publisher = publications[i].publisher;
+            exist.publishedDate = publications[i].publishedDate;
+            exist.url = publications[i].url;
+            exist.description = publications[i].description;
+            exist.isbn = publications[i].isbn;
+
+            updatePublications.push(exist);
+          } else {
+            publications[i].partyId = currentParty.id;
+            newPublications.push(publications[i]);
+          }
+
+        }
+
+        for (var i = 0; i < currentPublications.length; i++) {
+          let exist = _.find(publications, {partyPublicationId: currentPublications[i].partyPublicationId})
+          if (!exist) {
+            deletePublications.push(currentPublications[i]);
+          }
+
+        }
+
+
+      }
+      try {
+        let loadPromises = newPublications.map(publication => addPartyPublicationByUserId(currentParty.id, publication));
+        newPublications = await Promise.all(loadPromises);
+
+        loadPromises = updatePublications.map(publication => updatePartyPublicationByUserId(currentParty.id, publication));
+        updatePublications = await Promise.all(loadPromises);
+
+
+        if(deletePublications){
+          loadPromises = deletePublications.map(publication => publication.remove());
+        }
+
+
+        result = _.orderBy(newPublications.concat(updatePublications), ['createdDate'], ['desc']);
+
+      }catch (e) {
+        console.debug('Update Publications Error: ', e)
+      }
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
+async function getPartyCertifications(currentUserId) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+      result = await findPartyCertificationByUserId(currentParty.id);
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function addPartyCertification(currentUserId, certification) {
+  certification = await Joi.validate(certification, partyCertificationSchema, { abortEarly: false });
+
+  if(currentUserId==null || certification==null){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+    if (isPartyActive(currentParty)) {
+      let found;
+      if(certification.partyCertificationId){
+        found = await findPartyCertificationByIdAndUserId(currentParty.id, certification.partyCertificationId);
+      }
+
+
+      if(!found){
+        result = await addCertificationByUserId(certification);
+      } else {
+        let lastUpdatedDate = Date.now();
+        found.title = certification.title;
+        found.author = certification.author;
+        found.date = certification.date;
+        found.publisher = certification.publisher;
+        found.url = certification.url;
+        found.description = certification.description;
+        found.isbn = certification.isbn;
+        found.certificatinoId= certification.certificationId;
+        found.lastUpdatedDate = Date.now();
+        result = await found.save();
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+async function updatePartyCertifications(currentUserId, data) {
+
+  if(currentUserId==null || data==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let response = await getPersonById(currentUserId);
+    let currentParty = response.data.data;
+
+
+    if (isPartyActive(currentParty)) {
+
+      let newCertifications = [], updateCertifications = [], deleteCertifications = [];
+      let certifications = data.certifications;
+
+      let currentCertifications = await findPartyCertificationByUserId(currentParty.id)
+
+      if (!currentCertifications.length) {
+        certifications = _.reduce(certifications, function (res, item) {
+          item.partyId = currentParty.id;
+          item.company = item.company.id ? item.company.id : 27;
+          res.push(item);
+          return res;
+        }, []);
+        newCertifications = certifications;
+      } else if (!certifications.length) {
+        deleteCertifications = currentCertifications;
+      } else {
+
+        for (var i = 0; i < certifications.length; i++) {
+
+
+          let exist = _.find(currentCertifications, {partyCertificationId: certifications[i].partyCertificationId})
+          if (exist) {
+            exist.company = certifications[i].company.id ? certifications[i].company.id : 27;
+            exist.expirationDate = certifications[i].expirationDate;
+            exist.issuedDate = certifications[i].issuedDate;
+            exist.certificationId = certifications[i].certificationId;
+            exist.title = certifications[i].title;
+            exist.url = certifications[i].url;
+            exist.description = certifications[i].description;
+            exist.city = certifications[i].city;
+            exist.state = certifications[i].state;
+            exist.country = certifications[i].country;
+
+            updateCertifications.push(exist);
+          } else {
+            certifications[i].partyId = currentParty.id;
+            certifications[i].company = certifications[i].company.id ? certifications[i].company.id : 27;
+            newCertifications.push(certifications[i]);
+          }
+
+        }
+
+        for (var i = 0; i < currentCertifications.length; i++) {
+          let exist = _.find(certifications, {partyCertificationId: currentCertifications[i].partyCertificationId})
+          if (!exist) {
+            deleteCertifications.push(currentCertifications[i]);
+          }
+
+        }
+
+      }
+      try {
+        let loadPromises = newCertifications.map(certification => addPartyCertificationByUserId(currentParty.id, certification));
+        newCertifications = await Promise.all(loadPromises);
+
+        loadPromises = updateCertifications.map(certification => updatePartyCertificationByUserId(currentParty.id, certification));
+        updateCertifications = await Promise.all(loadPromises);
+
+        if(deleteCertifications){
+          loadPromises = deleteCertifications.map(certification => certification.remove());
+        }
+
+
+        result = _.orderBy(newCertifications.concat(updateCertifications), ['createdDate'], ['desc']);
+
+      }catch (e) {
+        console.debug('Update Certifications Error: ', e)
+      }
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}

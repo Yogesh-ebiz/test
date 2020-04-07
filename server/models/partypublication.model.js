@@ -23,12 +23,12 @@ const PartyPublicationSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  date: {
-    type: Number,
-    required: false
-  },
   publisher: {
     type: String,
+    required: false
+  },
+  publishedDate: {
+    type: Number,
     required: false
   },
   url: {

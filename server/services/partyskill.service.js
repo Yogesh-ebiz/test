@@ -48,7 +48,7 @@ function findPartySkillsByUserId(userId) {
   return PartySkill.find({partyId: userId});
 }
 
-function addUserPartySkill(partySKill) {
+async function addPartySkillByUserId(userId, partySKill) {
   let data = null;
 
   if(partySKill==null){
@@ -56,6 +56,22 @@ function addUserPartySkill(partySKill) {
   }
 
   return new PartySkill(partySKill).save();
+}
+
+function updatePartySkillByUserId(userId, skill) {
+  let data = null;
+
+  if(userId==null || skill==null){
+    return;
+  }
+
+  return PartySkill.update({partyId: userId, skillTypeId: skill.skillTypeId}, {$set: {
+        partyId: userId,
+        skillTypeId: skill.skillTypeId,
+        noOfMonths: skill.noOfMonths,
+        selfRating: skill.selfRating?skill.selfRating:0
+  }},
+    {upsert: true, new: true});
 }
 
 
@@ -69,8 +85,6 @@ function addUserPartySkillEndorsement(endorsement) {
   return new Endorsement(endorsement).save();
 }
 
-
-
 function removePartySkillById(partySkillId) {
   let data = null;
 
@@ -80,6 +94,17 @@ function removePartySkillById(partySkillId) {
 
   return PartySkill.remove({partySkillId: partySkillId});
 }
+
+function removePartySkillBySkillTypeIdAndUserId(userId, skillTypeId) {
+  let data = null;
+
+  if(userId==null || skillTypeId==null){
+    return;
+  }
+
+  return PartySkill.remove({partyId: userId, skillTypeId: skillTypeId});
+}
+
 
 function getEndorsersHighlySkillBySkillTypeId(skillTypeId, listOfUserId) {
   let data = null;
@@ -99,7 +124,9 @@ module.exports = {
   findPartySkillById: findPartySkillById,
   findPartySkillByUserIdAndSkillTypeId: findPartySkillByUserIdAndSkillTypeId,
   findPartySkillsByUserId: findPartySkillsByUserId,
-  addUserPartySkill: addUserPartySkill,
+  addPartySkillByUserId: addPartySkillByUserId,
+  updatePartySkillByUserId: updatePartySkillByUserId,
   removePartySkillById: removePartySkillById,
+  removePartySkillBySkillTypeIdAndUserId:removePartySkillBySkillTypeIdAndUserId,
   getEndorsersHighlySkillBySkillTypeId:getEndorsersHighlySkillBySkillTypeId
 }

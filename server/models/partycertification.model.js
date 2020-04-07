@@ -45,6 +45,21 @@ const PartyCertificationSchema = new mongoose.Schema({
     required: false,
     default: ''
   },
+  city: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  state: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  country: {
+    type: String,
+    required: false,
+    default: ''
+  },
   createdDate: {
     type: Number,
     default: Date.now

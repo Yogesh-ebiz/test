@@ -1,7 +1,10 @@
 const _ = require('lodash');
 const confirmEnum = require('../const/confirmEnum');
 const statusEnum = require('../const/statusEnum');
+
+const partyTypeEnum = require('../const/partyEnum');
 const axiosInstance = require('../services/api.service');
+
 
 const axios = require('axios');
 const instance = axios.create();
@@ -89,6 +92,41 @@ async function populateParties(list) {
 
 }
 
+async function populateCompany(list) {
+  let data = [];
+
+  if(list==null){
+    return;
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    let id = _.includes([16,17,18,19,20,21,22,23,24,25], list[i].company)?list[i].company: 17;
+    let result = await getCompanyById(id);
+    list[i].company = result.data.data;
+  }
+
+  return list;
+
+}
+
+async function populateInstitute(list) {
+  let data = [];
+
+  if(list==null){
+    return;
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    let id = _.includes([27,28], list[i].institute)?list[i].institute: 27;
+    let result = await searchParties([id], partyTypeEnum.INSTITUTE, 1,0);
+    list[i].institute = result.data.data.content[0];
+  }
+
+  return list;
+
+}
+
+
 
 module.exports = {
   getPartyById: getPartyById,
@@ -98,5 +136,7 @@ module.exports = {
   searchParties:searchParties,
   getPartySkills: getPartySkills,
   addCompany: addCompany,
-  populateParties:populateParties
+  populateParties:populateParties,
+  populateCompany:populateCompany,
+  populateInstitute:populateInstitute
 }

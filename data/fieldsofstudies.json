@@ -1,0 +1,40 @@
+[
+  { "fieldStudyId" : 100001, "locale" : { "en" : "Aeronautics and Aviation Science"}, "shortCode" : "AERO", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100002, "locale" : { "en" : "Anthropology"}, "shortCode" : "ANTH", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100003, "locale" : { "en" : "Art"}, "shortCode" : "ART", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100004, "locale" : { "en" : "Business Administration"}, "shortCode" : "BUS", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100005, "locale" : { "en" : "Chemistry"}, "shortCode" : "CHEM", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100006, "locale" : { "en" : "Economics"}, "shortCode" : "ECON", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100007, "locale" : { "en" : "Education"}, "shortCode" : "EDU", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100008, "locale" : { "en" : "Engineering"}, "shortCode" : "ENG", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100009, "locale" : { "en" : "Environmental Science and Health"}, "shortCode" : "ENV", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100010, "locale" : { "en" : "Journalism and Mass Communication"}, "shortCode" : "COM", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100011, "locale" : { "en" : "Music"}, "shortCode" : "MUSIC", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100012, "locale" : { "en" : "Nursing"}, "shortCode" : "NURSE", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100013, "locale" : { "en" : "Oceanography"}, "shortCode" : "OCEAN", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100014, "locale" : { "en" : "Pharmacy"}, "shortCode" : "PHARM", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100015, "locale" : { "en" : "Photography"}, "shortCode" : "PHOTO", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100016, "locale" : { "en" : "Physical Therapy"}, "shortCode" : "THERAPY", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100017, "locale" : { "en" : "Political Science and International Relations"}, "shortCode" : "POLITICAL", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100018, "locale" : { "en" : "Psychology"}, "shortCode" : "PSYCH", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100019, "locale" : { "en" : "Public Relations and Administration"}, "shortCode" : "ADMIN", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100020, "locale" : { "en" : "Statistics"}, "shortCode" : "STAT", "icon" : "", "sequence" : 0 },
+  { "fieldStudyId" : 100021, "locale" : { "en" : "Urban Planning"}, "shortCode" : "URBAN", "icon" : "", "sequence" : 0 }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

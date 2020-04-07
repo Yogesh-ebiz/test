@@ -23,13 +23,27 @@ async function getUserDetail(req, res) {
 
 router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
 
-router.route('/:userId/experiences').get(asyncHandler(getUserExperiences));
-router.route('/:userId/experiences').post(asyncHandler(updateUserExperiences));
+router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
+router.route('/:userId/experiences').post(asyncHandler(updatePartyExperiences));
+
+router.route('/:userId/educations').get(asyncHandler(getPartyEducations));
+router.route('/:userId/educations').post(asyncHandler(updatePartyEducations));
+
+
+router.route('/:userId/accomplishments').post(asyncHandler(updateSkillsAndAccomplishments));
 
 
 router.route('/:userId/skills').get(asyncHandler(getPartySkillsByUserId));
+
 router.route('/:userId/skills').post(asyncHandler(addPartySkill));
-router.route('/:userId/skills/:partySkillId').delete(asyncHandler(removePartySkill));
+router.route('/:userId/skills').put(asyncHandler(updatePartySkills));
+router.route('/:userId/skills/:partySkillId').delete(asyncHandler(removePartySkillById));
+
+
+router.route('/:userId/languages').get(asyncHandler(getPartyLanguages));
+router.route('/:userId/languages').post(asyncHandler(updatePartyLanguages));
+
+
 router.route('/:userId/skills/:partySkillId/endorsement').post(asyncHandler(addEndorsement));
 router.route('/:userId/skills/:partySkillId/endorsement/:endorsementId').delete(asyncHandler(removeEndorsement));
 
@@ -44,6 +58,15 @@ router.route('/:userId/alerts/:alertId').put(asyncHandler(updatePartyAlert));
 
 router.route('/:userId/jobviews').get(asyncHandler(getJobViewsByUserId));
 
+router.route('/:userId/publications').get(asyncHandler(getPartyPublications));
+router.route('/:userId/publications').post(asyncHandler(addPartyPublication));
+router.route('/:userId/publications').put(asyncHandler(updatePartyPublications));
+
+
+router.route('/:userId/certifications').get(asyncHandler(getPartyCertifications));
+router.route('/:userId/certifications').post(asyncHandler(addPartyCertification));
+router.route('/:userId/certifications').put(asyncHandler(updatePartyCertifications));
+
 
 async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -51,20 +74,44 @@ async function uploadCV(req, res) {
   res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
 }
 
-async function getUserExperiences(req, res) {
+async function getPartyExperiences(req, res) {
   let currentUserId = parseInt(req.params.userId);
-  let data = await userCtl.getUserExperiences(currentUserId);
+  let data = await userCtl.getPartyExperiences(currentUserId);
   res.json(new Response(data, data?'experiences_retrieved_successful':'not_found', res));
 }
 
-async function updateUserExperiences(req, res) {
+async function updatePartyExperiences(req, res) {
   let currentUserId = parseInt(req.params.userId);
   let body = req.body;
 
-  let data = await userCtl.updateUserExperiences(currentUserId, body);
+  let data = await userCtl.updatePartyExperiences(currentUserId, body);
   res.json(new Response(data, data?'experiences_updated_successful':'not_found', res));
 }
 
+async function getPartyEducations(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let data = await userCtl.getPartyEducations(currentUserId);
+  res.json(new Response(data, data?'educations_retrieved_successful':'not_found', res));
+}
+
+
+async function updatePartyEducations(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let body = req.body;
+
+  let data = await userCtl.updatePartyEducations(currentUserId, body);
+  res.json(new Response(data, data?'educations_updated_successful':'not_found', res));
+}
+
+
+
+async function updateSkillsAndAccomplishments(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let body = req.body;
+
+  let data = await userCtl.updateSkillsAndAccomplishments(currentUserId, body, res.locale);
+  res.json(new Response(data, data?'accomplishments_updated_successful':'not_found', res));
+}
 
 
 async function getPartySkillsByUserId(req, res) {
@@ -73,10 +120,18 @@ async function getPartySkillsByUserId(req, res) {
   let filter = req.query;
   let data = await userCtl.getPartySkillsByUserId(currentUserId, filter);
 
-  res.json(new Response(data, data?'skills_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'partyskills_retrieved_successful':'not_found', res));
 }
 
 
+async function updatePartySkills(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let partySkills = req.body;
+  let data = await userCtl.updatePartySkills(currentUserId, partySkills, res.locale);
+
+  res.json(new Response(data, data?'partyskills_updated_successful':'not_found', res));
+}
 
 async function addPartySkill(req, res) {
 
@@ -85,18 +140,47 @@ async function addPartySkill(req, res) {
   partySkill.partyId = currentUserId;
   let data = await userCtl.addPartySkill(currentUserId, partySkill, res.locale);
 
-  res.json(new Response(data, data?'skill_added_successful':'not_found', res));
+  res.json(new Response(data, data?'partyskill_added_successful':'not_found', res));
 }
 
-async function removePartySkill(req, res) {
+async function updatePartySkillById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
-  let partySkillId = req.params.partySkillId;
-  let data = await userCtl.removePartySkill(currentUserId, partySkillId);
+  let partySkill = req.body;
+  partySkill.partySkillId = parseInt(req.params.partySkillId);
+  let data = await userCtl.updatePartySkillById(currentUserId, partySkillId);
 
-  res.json(new Response(data, data?'skill_removed_successful':'not_found', res));
+  res.json(new Response(data, data?'partyskill_updated_successful':'not_found', res));
 }
 
+
+async function removePartySkillById(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let partySkillId = parseInt(req.params.partySkillId);
+  let data = await userCtl.removePartySkillById(currentUserId, partySkillId);
+
+  res.json(new Response(data, data?'partyskill_removed_successful':'not_found', res));
+}
+
+
+
+async function getPartyLanguages(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await userCtl.getPartyLanguages(currentUserId);
+
+  res.json(new Response(data, data?'partylanguages_retrieved_successful':'not_found', res));
+}
+
+
+async function updatePartyLanguages(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let body = req.body;
+
+  let data = await userCtl.updatePartyLanguages(currentUserId, body);
+  res.json(new Response(data, data?'partylanguages_updated_successful':'not_found', res));
+}
 
 
 async function addEndorsement(req, res) {
@@ -187,4 +271,66 @@ async function getJobViewsByUserId(req, res) {
   let data = await userCtl.getJobViewsByUserId(currentUserId, filter, res.locale);
 
   res.json(new Response(data, data?'jobviews_retrieved_successful':'not_found', res));
+}
+
+
+
+
+async function getPartyPublications(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await userCtl.getPartyPublications(currentUserId);
+
+  res.json(new Response(data, data?'partypublications_retrieved_successful':'not_found', res));
+}
+
+
+async function addPartyPublication(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let publication = req.body;
+  publication.partyId = currentUserId;
+  let data = await userCtl.addPartyPublication(currentUserId, publication);
+
+  res.json(new Response(data, data?'publication_added_successful':'not_found', res));
+}
+
+
+async function updatePartyPublications(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let publications = req.body;
+  let data = await userCtl.updatePartyPublications(currentUserId, publications);
+
+  res.json(new Response(data, data?'publications_updated_successful':'not_found', res));
+}
+
+
+async function getPartyCertifications(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await userCtl.getPartyCertifications(currentUserId);
+
+  res.json(new Response(data, data?'partycertifications_retrieved_successful':'not_found', res));
+}
+
+
+async function addPartyCertification(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let certification = req.body;
+  certification.partyId = currentUserId;
+  let data = await userCtl.addPartyCertification(currentUserId, certification);
+
+  res.json(new Response(data, data?'certification_added_successful':'not_found', res));
+}
+
+
+async function updatePartyCertifications(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let certifications = req.body;
+  let data = await userCtl.updatePartyCertifications(currentUserId, certifications);
+
+  res.json(new Response(data, data?'certifications_updated_successful':'not_found', res));
 }

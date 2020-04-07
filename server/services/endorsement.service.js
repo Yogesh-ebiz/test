@@ -25,6 +25,25 @@ function findEndorseementByUserId(userId) {
   return Endorsement.find({partyId: userId}).sort({fromDate: -1});
 }
 
+function findEndorsementsByEndorseId(endorserId) {
+  let data = null;
+
+  if(endorserId==null){
+    return;
+  }
+
+  return Endorsement.find({endorserId: endorserId}).sort({fromDate: -1});
+}
+
+function findEndorsementsByEndorserIdAndListOfPartySkillIds(endorserId, listOfPartySKills) {
+  let data = null;
+
+  if(endorserId==null || listOfPartySKills==null){
+    return;
+  }
+
+  return Endorsement.find({endorserId: endorserId, partySkillId: {$in: listOfPartySKills}});
+}
 
 function findEndorsementByEndorserIdAndPartySkillId(endorserId, partySkillId) {
   let data = null;
@@ -56,6 +75,16 @@ function removeEndorsementById(endorserId, endorsementId) {
   }
 
   return Endorsement.remove({endorseId: userId, endorsementId: endorsementId});
+}
+
+function removeEndorsementByEndorserIdAndPartySkillId(endorserId, partySkillId) {
+  let data = null;
+
+  if(endorserId==null || partySkillId==null){
+    return;
+  }
+
+  return Endorsement.remove({endorseId: userId, partySkillId: partySkillId});
 }
 
 function getEndorsementCount(partySkillIds) {
@@ -93,8 +122,12 @@ module.exports = {
   findEndorsementById: findEndorsementById,
   findEndorseementByUserId: findEndorseementByUserId,
   findEndorsementByEndorserIdAndPartySkillId: findEndorsementByEndorserIdAndPartySkillId,
+  findEndorsementsByEndorserIdAndListOfPartySkillIds:findEndorsementsByEndorserIdAndListOfPartySkillIds,
   addEndorsementByUserId: addEndorsementByUserId,
   removeEndorsementById: removeEndorsementById,
+  removeEndorsementByEndorserIdAndPartySkillId:removeEndorsementByEndorserIdAndPartySkillId,
   getEndorsementCount:getEndorsementCount,
-  getTop3SkillsEndorsement: getTop3SkillsEndorsement
+  getTop3SkillsEndorsement: getTop3SkillsEndorsement,
+  findEndorsementsByEndorseId:findEndorsementsByEndorseId,
+  findEndorsementByEndorserIdAndPartySkillId:findEndorsementByEndorserIdAndPartySkillId
 }

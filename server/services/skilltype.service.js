@@ -12,7 +12,7 @@ function getListofSkillTypes(list, locale) {
     return [];
   }
 
-  let propLocale = '$name.'+localeStr;
+  let propLocale = '$locale.'+localeStr;
   let match = { skillTypeId: {$in: list} };
   // match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
   data = Skilltype.aggregate([
@@ -20,10 +20,31 @@ function getListofSkillTypes(list, locale) {
     { $project: {parent: 1, skillTypeId: 1, description: 1, icon: 1, name: propLocale } }
   ]);
 
+
   return data;
 }
 
 
+function addSkillType(skillType, locale) {
+  let localeStr = locale? locale.toLowerCase() : 'en';
+
+  if(!skillType){
+    return null;
+  }
+
+
+  if(typeof skillType.name=='string'){
+    locale = {};
+    locale[localeStr] = skillType.name;
+    delete skillType.name;
+    skillType.locale=locale;
+    console.log('addSkillType', skillType);
+  }
+  return new Skilltype(skillType).save();
+}
+
+
 module.exports = {
-  getListofSkillTypes: getListofSkillTypes
+  getListofSkillTypes: getListofSkillTypes,
+  addSkillType:addSkillType
 }

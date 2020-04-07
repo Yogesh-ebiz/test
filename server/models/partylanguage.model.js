@@ -15,10 +15,13 @@ const PartyLanguageSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  languages: {
-    type: Array,
-    required: false,
-    default: []
+  language: {
+    type: String,
+    required: true
+  },
+  level: {
+    type: String,
+    required: false
   },
   createdDate: {
     type: Number,

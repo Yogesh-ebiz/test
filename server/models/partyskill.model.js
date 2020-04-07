@@ -45,6 +45,11 @@ const PartySKillSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  hasEndorsed: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
   noOfEndorsement: {
     type: Number,
     required: false,

@@ -4,9 +4,17 @@ const PartyPublication = require('../models/partypublication.model');
 const Joi = require('joi');
 
 
+function findPartyPublicationById(partyPublicationId) {
+  let data = null;
 
+  if(partyPublicationId==null){
+    return;
+  }
 
-function findPartyPublicationById(userId, partyPublicationId) {
+  return PartyPublication.findOne({partyPublicationId: partyPublicationId});
+}
+
+function findPartyPublicationByIdAndUserId(userId, partyPublicationId) {
   let data = null;
 
   if(userId==null || partyPublicationId==null){
@@ -16,7 +24,7 @@ function findPartyPublicationById(userId, partyPublicationId) {
   return PartyPublication.findOne({partyId: userId, partyPublicationId: partyPublicationId});
 }
 
-function findPublicationByUserId(userId) {
+function findPartyPublicationByUserId(userId) {
   let data = null;
 
   if(userId==null){
@@ -27,11 +35,11 @@ function findPublicationByUserId(userId) {
 }
 
 
-function addPublicationByUserId(userId, publication) {
+function addPartyPublicationByUserId(userId, publication) {
   let data = null;
 
 
-  if(userId==null || publication==null){
+  if(publication==null){
     return;
   }
 
@@ -39,7 +47,7 @@ function addPublicationByUserId(userId, publication) {
 }
 
 
-function updatePublicationByUserId(userId, publication) {
+function updatePartyPublicationByUserId(userId, publication) {
   let data = null;
 
 
@@ -47,16 +55,17 @@ function updatePublicationByUserId(userId, publication) {
     return;
   }
 
-  return PartyPublication.findOneAndUpdate({partyId: userId, employmentId: employment.employmentId},
-    {$set: {partyId: publication.partyId, company: publication.company, employmentTitle: publication.employmentTitle, description: publication.description,
-        fromDate: publication.fromDate, thruDate: publication.thruDate, isCurrent: publication.isCurrent}},
+  return PartyPublication.findOneAndUpdate({partyId: userId, partyPublicationId: publication.partyPublicationId},
+    {$set: {partyId: publication.partyId, title: publication.title, author: publication.author, date: publication.date,
+        publisher: publication.publisher, publishedDate: publication.publishedDate, url: publication.url, description: publication.description, isbn: publication.isbn}},
     {upsert: true, new: true});
 }
 
 
 module.exports = {
   findPartyPublicationById: findPartyPublicationById,
-  findPublicationByUserId: findPublicationByUserId,
-  addPublicationByUserId: addPublicationByUserId,
-  updatePublicationByUserId: updatePublicationByUserId
+  findPartyPublicationByIdAndUserId:findPartyPublicationByIdAndUserId,
+  findPartyPublicationByUserId: findPartyPublicationByUserId,
+  addPartyPublicationByUserId: addPartyPublicationByUserId,
+  updatePartyPublicationByUserId: updatePartyPublicationByUserId
 }

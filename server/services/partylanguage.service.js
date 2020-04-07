@@ -16,26 +16,26 @@ function findPartyLanguageById(userId, partyLanguageId) {
   return PartyLanguage.findOne({partyId: userId, partyLanguageId: partyLanguageId});
 }
 
-function findLanguageByUserId(userId) {
+function findPartyLanguageByUserId(userId) {
   let data = null;
 
   if(userId==null){
     return;
   }
 
-  return PartyLanguage.findOne({partyId: userId}).sort({fromDate: -1});
+  return PartyLanguage.find({partyId: userId}).sort({fromDate: -1});
 }
 
 
-function addLanguageByUserId(userId, language) {
+function addLanguagesByUserId(userId, languages) {
   let data = null;
 
 
-  if(userId==null || language==null){
+  if(userId==null || languages==null){
     return;
   }
 
-  return new PartyLanguage(language).save();
+  return new PartyLanguage(languages).save();
 }
 
 
@@ -56,7 +56,7 @@ function updateLanguageByUserId(userId, language) {
 
 module.exports = {
   findPartyLanguageById: findPartyLanguageById,
-  findLanguageByUserId: findLanguageByUserId,
-  addLanguageByUserId: addLanguageByUserId,
+  findPartyLanguageByUserId: findPartyLanguageByUserId,
+  addLanguagesByUserId: addLanguagesByUserId,
   updateLanguageByUserId: updateLanguageByUserId
 }

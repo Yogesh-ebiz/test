@@ -6,7 +6,17 @@ const Joi = require('joi');
 
 
 
-function findPartyCertificationById(userId, partyCertificationId) {
+function findPartyCertificationById(partyCertificationId) {
+  let data = null;
+
+  if(partyCertificationId==null){
+    return;
+  }
+
+  return PartyCertification.findOne({partyCertificationId: partyCertificationId});
+}
+
+function findPartyCertificationByIdAndUserId(userId, partyCertificationId) {
   let data = null;
 
   if(userId==null || partyCertificationId==null){
@@ -16,7 +26,7 @@ function findPartyCertificationById(userId, partyCertificationId) {
   return PartyCertification.findOne({partyId: userId, partyCertificationId: partyCertificationId});
 }
 
-function findCertificationByUserId(userId) {
+function findPartyCertificationByUserId(userId) {
   let data = null;
 
   if(userId==null){
@@ -27,11 +37,11 @@ function findCertificationByUserId(userId) {
 }
 
 
-function addCertificationByUserId(userId, certification) {
+function addPartyCertificationByUserId(userId, certification) {
   let data = null;
 
 
-  if(userId==null || certification==null){
+  if(certification==null){
     return;
   }
 
@@ -39,7 +49,7 @@ function addCertificationByUserId(userId, certification) {
 }
 
 
-function updateCertificationByUserId(userId, certification) {
+function updatePartyCertificationByUserId(userId, certification) {
   let data = null;
 
 
@@ -47,16 +57,17 @@ function updateCertificationByUserId(userId, certification) {
     return;
   }
 
-  return PartyCertification.findOneAndUpdate({partyId: userId, employmentId: employment.employmentId},
-    {$set: {partyId: certification.partyId, company: certification.company, employmentTitle: certification.employmentTitle, description: certification.description,
-        fromDate: certification.fromDate, thruDate: certification.thruDate, isCurrent: certification.isCurrent}},
-    {upsert: true, new: true});
+  return PartyCertification.findOneAndUpdate({partyId: userId, partyCertificationId: certification.partyCertificationId},
+    {$set: {partyId: certification.partyId, company: certification.company, title: certification.title,
+        issuedDate: certification.issuedDate, expirationDate: certification.expirationDate, url: certification.url, description:certification.description}},
+    {new: true});
 }
 
 
 module.exports = {
   findPartyCertificationById: findPartyCertificationById,
-  findCertificationByUserId: findCertificationByUserId,
-  addCertificationByUserId: addCertificationByUserId,
-  updateCertificationByUserId: updateCertificationByUserId
+  findPartyCertificationByIdAndUserId:findPartyCertificationByIdAndUserId,
+  findPartyCertificationByUserId: findPartyCertificationByUserId,
+  addPartyCertificationByUserId: addPartyCertificationByUserId,
+  updatePartyCertificationByUserId: updatePartyCertificationByUserId
 }

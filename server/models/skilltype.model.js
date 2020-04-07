@@ -9,20 +9,30 @@ const SkillTypeSchema = new mongoose.Schema({
   },
   name: {
     type: String,
+    required: false
+  },
+  locale: {
+    type: Object,
     required: true
   },
   parent: {
-    type: String,
-    required: false
+    type: Number,
+    required: false,
+    default: 1
   },
   description: {
     type: String,
     required: false
   },
+  sequence: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   createdDate: {
     type: Number,
     required: false
-  },
+  }
 
 }, {
   versionKey: false

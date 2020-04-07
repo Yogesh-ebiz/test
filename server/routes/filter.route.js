@@ -21,6 +21,11 @@ module.exports = router;
 
 router.route('/').post(asyncHandler(insert));
 
+router.use('/countries/search', getAllCountries);
+router.use('/states/search', getAllStates);
+router.use('/cities/search', getAllCities);
+
+
 router.use('/languages/search', getLanguages);
 
 router.use('/locations/search', getAllJobLocations);
@@ -40,7 +45,48 @@ router.route('/jobfunctions/:id').get(asyncHandler(getJobFunctionById));
 
 router.route('/locations/search').get(asyncHandler(getAllJobLocations));
 
+router.route('/fieldstudy/search').get(asyncHandler(getAllFieldStudy));
 
+
+
+async function getAllCountries(req, res) {
+  let filter = req.query;
+  let data = await filterService.getAllCountries(filter, res.locale);
+
+  res.json(new Response(data, data?'countries_retrieved_successful':'not_found', res));
+}
+
+
+async function getAllStates(req, res) {
+  let filter = req.query;
+
+  let data;
+  if(filter.country_code){
+    data = await filterService.getAllStates(filter, res.locale);
+
+    statusMessage = 'states_retrieved_successful';
+  } else {
+    statusMessage = 'country_code_missing';
+  }
+
+  res.json(new Response(data, data?statusMessage:'not_found', res));
+}
+
+
+async function getAllCities(req, res) {
+  let filter = req.query;
+
+  let data;
+  if(filter.state_code || filter.country_code){
+    console.log(filter)
+    data = await filterService.getAllCities(filter, res.locale);
+    statusMessage = 'cities_retrieved_successful';
+  } else {
+    statusMessage = 'state_code_missing';
+  }
+
+  res.json(new Response(data, data?statusMessage:'not_found', res));
+}
 
 async function getLanguages(req, res) {
   let keyword = req.query.query;
@@ -57,7 +103,7 @@ async function getLanguages(req, res) {
     }
 
   } else {
-    data = ISO6391.getAllNativeNames();
+    data = ISO6391.getAllNames();
   }
 
   res.json(new Response(data, data?'languages_retrieved_successful':'not_found', res));
@@ -133,4 +179,12 @@ async function getAllJobFunctions(req, res) {
 async function getJobFunctionById(req, res) {
   let data = await jobFunctionCtl.getJobFunctionById(req.params.id, res.locale);
   res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
+}
+
+
+async function getAllFieldStudy(req, res) {
+  let filter = req.query;
+  let data = await filterService.getAllFieldStudy(filter, res.locale);
+
+  res.json(new Response(data, data?'fieldstudy_retrieved_successful':'not_found', res));
 }
