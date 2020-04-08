@@ -24,7 +24,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany, populateParties, populateCompany, populateInstitute} = require('../services/party.service');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany, populateParties, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes, addSkillType} = require('../services/skilltype.service');
@@ -217,7 +217,7 @@ async function getUserDetail(currentUserId, userId, locale) {
 
         return res;
       }, [])
-      topEndorsers = await populateParties(topEndorsers);
+      topEndorsers = await populateParty(topEndorsers);
 
       let endorsementByCurrentUser = await findEndorsementsByEndorserIdAndListOfPartySkillIds(currentParty.id, partySkillIds);
 
@@ -244,9 +244,7 @@ async function getUserDetail(currentUserId, userId, locale) {
       //Employments-----------------------------------------------------
       let employments = await findPartyEmploymentByUserId(foundUser.id);
 
-      console.log(_.uniq(_.map(employments, 'employmentType')))
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(employments, 'employmentType')));
-      console.log('type', employmentTypes)
       result.employments = await populateCompany(employments);
 
 
@@ -403,7 +401,7 @@ async function getPartyExperiences(currentUserId) {
 
     if (isPartyActive(currentParty)) {
       let employments = await findPartyEmploymentByUserId(currentParty.id);
-      result = await populateCompany(employments);
+      result = await populateParty(employments);
     }
 
 
@@ -557,7 +555,7 @@ async function getPartyEducations(currentUserId) {
         res.push(item);
         return res;
       }, [])
-      result = await populateInstitute(educations);
+      result = await populateParty(educations);
     }
 
 
@@ -1886,6 +1884,7 @@ async function getPartyCertifications(currentUserId) {
 
     if (isPartyActive(currentParty)) {
       result = await findPartyCertificationByUserId(currentParty.id);
+      result = await populateParty(result);
     }
 
   } catch (error) {

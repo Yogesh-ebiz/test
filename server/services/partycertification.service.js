@@ -59,7 +59,8 @@ function updatePartyCertificationByUserId(userId, certification) {
 
   return PartyCertification.findOneAndUpdate({partyId: userId, partyCertificationId: certification.partyCertificationId},
     {$set: {partyId: certification.partyId, company: certification.company, title: certification.title,
-        issuedDate: certification.issuedDate, expirationDate: certification.expirationDate, url: certification.url, description:certification.description}},
+        issuedDate: certification.issuedDate, expirationDate: certification.expirationDate, url: certification.url, description:certification.description,
+      city: certification.city, state: certification.state, country: certification.country}},
     {new: true});
 }
 

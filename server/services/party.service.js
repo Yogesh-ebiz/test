@@ -76,7 +76,33 @@ function addCompany(userId, company) {
   return axios.post('http://localhost:8080/api/company/register', company, {headers: {"UserId":userId}})
 }
 
-async function populateParties(list) {
+
+
+async function populateParty(list) {
+  let data = [];
+
+  if(list==null){
+    return;
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    let id = list[i].company? list[i].company: list[i].institute? list[i].institute:list[i].partyId? list[i].partyId:null;
+    if(id){
+      let result = await getPartyById(id);
+      if(list[i].company){
+        list[i].company = result.data;
+      } else if(list[i].institute){
+        list[i].institute = result.data;
+      }
+
+    }
+  }
+
+  return list;
+
+}
+
+async function populatePerson(list) {
   let data = [];
 
   if(list==null){
@@ -136,7 +162,8 @@ module.exports = {
   searchParties:searchParties,
   getPartySkills: getPartySkills,
   addCompany: addCompany,
-  populateParties:populateParties,
+  populatePerson:populatePerson,
+  populateParty:populateParty,
   populateCompany:populateCompany,
   populateInstitute:populateInstitute
 }
