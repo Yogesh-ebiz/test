@@ -40,11 +40,12 @@ async function getCompanySalaries(req, res) {
 }
 
 async function getCompanySalaryByEmploymentTitle(req, res) {
+
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let employmentTitle = req.query.employmentTitle;
   let data = await companyCtl.getCompanySalaryByEmploymentTitle(currentUserId, company, employmentTitle, req.locale);
-  res.json(new Response(data, data?'companyreview_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'companysalary_employmenttitle_retrieved_successful':'not_found', res));
 }
 
 

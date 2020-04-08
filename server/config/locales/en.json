@@ -71,5 +71,6 @@
 	"salary_added_successful": "salary_added_successful",
 	"companyreview_added_successful": "companyreview_added_successful",
 	"companyreviews_retrieved_successful": "companyreviews_retrieved_successful",
-	"companyreview_retrieved_successful": "companyreview_retrieved_successful"
+	"companyreview_retrieved_successful": "companyreview_retrieved_successful",
+	"companysalary_employmenttitle_retrieved_successful": "companysalary_employmenttitle_retrieved_successful"
 }

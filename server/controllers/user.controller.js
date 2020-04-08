@@ -550,6 +550,13 @@ async function getPartyEducations(currentUserId) {
 
     if (isPartyActive(currentParty)) {
       let educations = await findPartyEducationByUserId(currentParty.id);
+      let fieldOfStudies = _.uniq(_.flatten(_.map(educations, 'fieldOfStudy')));
+      fieldOfStudies = await getFieldOfStudyListByShortCode(fieldOfStudies);
+      educations = _.reduce(educations, function(res, item){
+        item.fieldOfStudy = _.find(fieldOfStudies, {shortCode: item.fieldOfStudy});
+        res.push(item);
+        return res;
+      }, [])
       result = await populateInstitute(educations);
     }
 

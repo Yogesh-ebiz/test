@@ -92,6 +92,7 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 
 async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, employmentTitle) {
 
+  console.log('getCompanySalaryByEmploymentTitle', currentUserId, companyId, employmentTitle)
   if(currentUserId==null || companyId==null || employmentTitle==null){
     return null;
   }
