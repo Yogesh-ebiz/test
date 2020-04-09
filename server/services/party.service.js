@@ -135,7 +135,7 @@ async function populateCompany(list) {
   }
 
   for (let i = 0; i < list.length; i++) {
-    let id = _.includes([15, 16,17,18,19,20,21,22,23,24,25], list[i].company)?list[i].company: 17;
+    let id = list[i].company;
     let result = await getCompanyById(id);
     list[i].company = result.data.data;
   }

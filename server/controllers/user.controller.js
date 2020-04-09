@@ -245,7 +245,8 @@ async function getUserDetail(currentUserId, userId, locale) {
       let employments = await findPartyEmploymentByUserId(foundUser.id);
 
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(employments, 'employmentType')));
-      result.employments = await populateParty(employments);
+
+      result.employments = await populateCompany(employments);
 
 
 
