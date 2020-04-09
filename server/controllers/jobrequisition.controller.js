@@ -43,6 +43,7 @@ let SearchParam = require('../const/searchParam');
 
 const jobRequisitionSchema = Joi.object({
   title: Joi.string().required(),
+  requiredResume: Joi.boolean().optional(),
   description: Joi.string().required(),
   durationMonths: Joi.number().optional(),
   minMonthExperience: Joi.number().optional(),

@@ -65,15 +65,24 @@ function getPartySkills(partyId) {
 }
 
 function addCompany(userId, company) {
-  console.log('add company', company)
   if(company==null){
     return;
   }
 
+  company = {
+    companyName: company.groupName,
+    officeSiteName: '',
+    annualRevenue: null,
+    groupSize: null,
+    tickerSymbol: '',
+    industry: '',
+    website: '',
+    mission: '',
+    yearFounded: null,
+    city: '', state: '', country: ''}
 
-  company = {type: 'ORGANIZATION', companyName: company.companyName, officeSiteName: '', annualRevenue: 0, groupSize: 0,
-    tickerSymbol: '', industry: '', website: '', mission: '', yearFounded: 2020, city: '', state: '', country: ''}
-  return axios.post('http://localhost:8080/api/company/register', company, {headers: {"UserId":userId}})
+  return axios.post('http://localhost:8080/api/company/register', company, {headers: {"UserId":userId}});
+
 }
 
 
@@ -126,7 +135,7 @@ async function populateCompany(list) {
   }
 
   for (let i = 0; i < list.length; i++) {
-    let id = _.includes([16,17,18,19,20,21,22,23,24,25], list[i].company)?list[i].company: 17;
+    let id = _.includes([15, 16,17,18,19,20,21,22,23,24,25], list[i].company)?list[i].company: 17;
     let result = await getCompanyById(id);
     list[i].company = result.data.data;
   }

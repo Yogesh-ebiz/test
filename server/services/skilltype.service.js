@@ -33,13 +33,6 @@ function addSkillType(skillType, locale) {
   }
 
 
-  if(typeof skillType.name=='string'){
-    locale = {};
-    locale[localeStr] = skillType.name;
-    delete skillType.name;
-    skillType.locale=locale;
-    console.log('addSkillType', skillType);
-  }
   return new Skilltype(skillType).save();
 }
 

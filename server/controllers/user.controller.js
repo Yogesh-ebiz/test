@@ -245,7 +245,7 @@ async function getUserDetail(currentUserId, userId, locale) {
       let employments = await findPartyEmploymentByUserId(foundUser.id);
 
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(employments, 'employmentType')));
-      result.employments = await populateCompany(employments);
+      result.employments = await populateParty(employments);
 
 
 
@@ -264,12 +264,13 @@ async function getUserDetail(currentUserId, userId, locale) {
       //Accomplishments-----------------------------------------------------
       let userLanguages = await findPartyLanguageByUserId(foundUser.id);
       userLanguages = _.reduce(userLanguages, function(res, item){
-        res.push(ISO6391.getName(item.language));
+        res.push({language: ISO6391.getName(item.language), level: item.level});
         return res;
       }, []);
       result.languages = userLanguages;
       result.publications = await findPartyPublicationByUserId(foundUser.id);
       result.certificates = await findPartyCertificationByUserId(foundUser.id);
+      result.certificates = await populateCompany(result.certificates);
 
     }
 
@@ -322,7 +323,10 @@ async function uploadCV(currentUserId, file) {
               "id": 15,
               "partyType": "ORGANIZATION",
               "groupName": "eBay"
-            }
+            },
+            "city": "San Jose",
+            "state": "California",
+            "country": "US"
           },
           {
             "employmentTitle": "Android Developer",
@@ -335,7 +339,10 @@ async function uploadCV(currentUserId, file) {
             "company": {
               "partyType": "ORGANIZATION",
               "groupName": "FPT"
-            }
+            },
+            "city": "Seattle",
+            "state": "Washington",
+            "country": "US"
           }
 
         ],
@@ -428,47 +435,82 @@ async function updatePartyExperiences(currentUserId, data) {
     if (isPartyActive(currentParty)) {
 
       let employments = data.employments;
-      let addEmployments = [], updateEmployments=[], deleteEmployments = [], companies = [], newSalaries=[];
+      let newEmployments = [], updateEmployments=[], deleteEmployments = [], companies = [], newSalaries=[];
 
       let currentEmployments = await findPartyEmploymentByUserId(currentParty.id);
       if(!currentEmployments.length){
-        employments = _.reduce(employments, function(res, item){
-          item.company = item.company.id?item.company.id:16;
-          item.partyId = currentParty.id;
-          newSalaries.push(item);
-          res.push(item);
-          return res;
-        }, []);
-        addEmployments = employments;
+
+        for(let employment of employments){
+          let company = employment.company;
+          try{
+            if(company.id==null){
+              company = await addCompany(currentParty.id, company);
+              company=company.data.data;
+            }
+          } catch(e){
+            console.log('Adding Company Error: ', e);
+          }
+
+          employment.company = company.id;
+          employment.partyId = currentParty.id;
+          newEmployments.push(employment);
+          newSalaries.push(employment);
+        }
+
+
       } else if(!employments.length){
         deleteEmployments = currentEmployments;
       } else {
 
-        for (var i = 0; i < employments.length; i++) {
+        for(let employment of employments) {
 
+          // if(!employments[i].company.id){
+          //   companies.push(employments[i].company);
+          // }
 
-          let exist = _.find(currentEmployments, {partyEmploymentId: employments[i].partyEmploymentId})
+          let exist = _.find(currentEmployments, {partyEmploymentId: employment.partyEmploymentId})
           if (exist) {
-            console.log('exist', employments[i].employmentType)
-            exist.company = employments[i].company.id ? employments[i].company.id : 16;
-            exist.fromDate = employments[i].fromDate;
-            exist.thruDate = employments[i].thruDate;
-            exist.employmentTitle = employments[i].employmentTitle;
-            exist.employmentType = employments[i].employmentType;
-            exist.terminationReason = employments[i].terminationReason;
-            exist.terminationType = employments[i].terminationType;
-            exist.isCurrent = employments[i].isCurrent;
-            exist.description = employments[i].description;
-            exist.city = employments[i].city;
-            exist.state = employments[i].state;
-            exist.country = employments[i].country;
+
+            let company = employment.company;
+
+            try{
+              if(!company.id){
+                company = await addCompany(currentParty.id, company);
+                company=company.data.data;
+
+              }
+            } catch(e){
+              console.log('Adding Company Error: ', e);
+            }
+            exist.company = company.id;
+            exist.fromDate = employment.fromDate;
+            exist.thruDate = employment.thruDate;
+            exist.employmentTitle = employment.employmentTitle;
+            exist.employmentType = employment.employmentType;
+            exist.terminationReason = employment.terminationReason;
+            exist.terminationType = employment.terminationType;
+            exist.isCurrent = employment.isCurrent;
+            exist.description = employment.description;
+            exist.city = employment.city;
+            exist.state = employment.state;
+            exist.country = employment.country;
 
             updateEmployments.push(exist);
           } else {
-            employments[i].partyId = currentParty.id;
-            employments[i].company = employments[i].company.id ? employments[i].company.id : 16;
-            newSalaries.push(employments[i]);
-            addEmployments.push(employments[i]);
+
+            let company = employment.company;
+            try{
+              if(!company.id){
+                company = await addCompany(currentParty.id, company);
+                company=company.data.data;
+              }
+            } catch(e){
+              console.log('Adding Company Error: ', e);
+            }
+            employment.company = company.id;
+            employment.partyId = currentParty.id;
+            newSalaries.push(employment);
+            newEmployments.push(employment);
           }
 
         }
@@ -482,30 +524,17 @@ async function updatePartyExperiences(currentUserId, data) {
         }
       }
 
-      try{
-
-        // console.log('companies', companies);
-        // let loadPromises = companies.map(company => {
-        //   console.log('company', company)
-        //   addCompany(currentParty.id, company)
-        // });
-        // companies = await Promise.all(loadPromises);
-        //
-        // console.log(companies);
-      } catch(e){
-        console.debug('Add Company Error: ', e);
-      }
 
       try {
-        let loadPromises = addEmployments.map(employment => addPartyEmploymentByUserId(currentParty.id, employment));
-        addEmployments = await Promise.all(loadPromises);
+        let loadPromises = newEmployments.map(employment => addPartyEmploymentByUserId(currentParty.id, employment));
+        newEmployments = await Promise.all(loadPromises);
 
         loadPromises = updateEmployments.map(employment => updateEmploymentByUserId(currentParty.id, employment));
         updateEmployments = await Promise.all(loadPromises);
 
         loadPromises = deleteEmployments.map(employment => employment.remove());
 
-        result = _.orderBy(addEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
+        result = _.orderBy(newEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
 
         newSalaries = _.reduce(newSalaries, function(res, item){
           let exist = _.find(result, {fromDate: item.fromDate, thruDate: item.thruDate});
@@ -703,7 +732,9 @@ async function updatePartySkills(currentUserId, data, locale) {
           if(partySkills[i].skillTypeId) {
             addSkills.push(partySkills[i]);
           } else if(partySkills[i].name!=''){
-            newSkills.push(partySkills[i]);
+            let skill = {locale: {}};
+            skill.locale[locale]=partySkills[i].name;
+            newSkills.push(skill);
           }
         }
       } else if(!partySkills.length){
@@ -714,7 +745,9 @@ async function updatePartySkills(currentUserId, data, locale) {
 
           if(!partySkills[i].skillTypeId){
             if(partySkills[i].name!=''){
-              newSkills.push(partySkills[i]);
+              let skill = {locale: {}};
+              skill.locale[locale]=partySkills[i].name;
+              newSkills.push(skill);
             }
 
           }else {
@@ -741,11 +774,13 @@ async function updatePartySkills(currentUserId, data, locale) {
       }
 
       try{
+
         let loadPromises =newSkills.map(skillType => addSkillType(skillType));
         newSkills = await Promise.all(loadPromises);
 
         newSkills.forEach(function(skill, index){
-          let found = _.find(partySkills, {locale: skill.locale});
+
+          let found = _.find(partySkills, {name: skill.locale[locale]});
 
           if(found){
             found.skillTypeId = skill._doc.skillTypeId;
@@ -754,7 +789,7 @@ async function updatePartySkills(currentUserId, data, locale) {
           }
         })
 
-        loadPromises = addSkills.map(partySkill => addPartySkillByUserId(currentParty.id, {partyId: currentParty.id, skillTypeId: partySkill.skillTypeId, noOfMonths: partySkill.noOfMonths}));
+        loadPromises = addSkills.map(partySkill => addPartySkillByUserId(currentParty.id, {partyId: currentParty.id, selfRating: partySkill.selfRating, skillTypeId: partySkill.skillTypeId, noOfMonths: partySkill.noOfMonths}));
         addSkills = await Promise.all(loadPromises);
 
         loadPromises = updateSkills.map(partySkill => partySkill.save())
