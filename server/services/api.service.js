@@ -4,7 +4,7 @@ const TIMEOUT = 4000;
 // Init Axios
 const axiosInstance = axios.create({
   // baseURL: "http://localhost:8080"
-  baseURL: "http://localhost:8080"
+  baseURL: "http://accessed.us-west-2.elasticbeanstalk.com"
 })
 
 const isHandlerEnabled = (config={}) => {
