@@ -35,9 +35,9 @@ class Pagination {
       return defaultPagination;
     }
 
-    let totalPages = data.length? Math.ceil(data.length / filter.size) : 0;
-
-    this.content = data;// ? normalizeJobFunction(data.docs) : [];
+    let totalPages = data.count? Math.ceil(data.count / filter.size) : 0;
+    let numberOfElements = (data && data.result.length) ? data.result.length : 0;
+    this.content = data.result;// ? normalizeJobFunction(data.docs) : [];
     this.pageable = {
       sort: {
         unsorted: false,
@@ -54,12 +54,12 @@ class Pagination {
 
     this.last  = ((totalPages-1)==filter.page)?true : false;
     this.totalPages = totalPages;
-    this.totalElements = data.length;
+    this.totalElements = data.count;
     this.first = (filter.page==0) ? true:false;
-    this.numberOfElements = data.length;
+    this.numberOfElements = numberOfElements;
     this.size = filter.size;
     this.number = filter.page;
-    this.empty = (data && data.lengh) ? false : true;
+    this.empty = numberOfElements ? false : true;
   }
 
   get() {

@@ -3,6 +3,7 @@ const CompanySalary = require('../models/companysalary.model');
 const CompanySalaryHistory = require('../models/companysalaryhistory.model');
 
 const CompanyReview = require('../models/companyreview.model');
+const CompanyReviewHistory = require('../models/companyReviewhistory.model');
 
 
 
@@ -126,20 +127,118 @@ function addCompanySalary(salary) {
   if(!salary){
     return null;
   }
-  console.log('salary', salary)
   return new CompanySalary(salary).save();
 }
 
 
 
-function findReviewsByCompanyId(filter) {
+async function findCompanyReviewHistoryByCompanyId(company) {
+  let data = null;
+
+  if(!company){
+    return [];
+  }
+
+  data = await CompanyReviewHistory.findOne({company: company});
+
+  if(data){
+
+  } else {
+    data = await CompanyReview.aggregate([
+      {$match: {company: company}},
+      {
+        $group: {
+          _id: '$company', totalReviews: {$sum: 1},
+          avgRating: {$avg: '$rating'},
+          approveCEO: {
+            $avg: {$multiply: [{$toInt: '$approveCEO'}, 100]}
+          },
+          recommendCompany: {
+            $avg: {$multiply: [{$toInt: '$recommendCompany'}, 100]}
+          },
+          noOf5Stars: {
+            $sum: {$cond: {if: {$eq: ['$rating', 5]}, then: 1, else: 0}}
+          },
+          noOf4Stars: {
+            $sum: {$cond: {if: {$eq: ['$rating', 4]}, then: 1, else: 0}}
+          },
+          noOf3Stars: {
+            $sum: {$cond: {if: {$eq: ['$rating', 3]}, then: 1, else: 0}}
+          },
+          noOf2Stars: {
+            $sum: {$cond: {if: {$eq: ['$rating', 2]}, then: 1, else: 0}}
+          },
+          noOf1Stars: {
+            $sum: {$cond: {if: {$eq: ['$rating', 1]}, then: 1, else: 0}}
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          company: '$_id', totalReviews: 1, avgRating: 1,
+          noOf5Stars: '$noOf5Stars',
+          noOf4Stars: '$noOf4Stars',
+          noOf3Stars: '$noOf3Stars',
+          noOf2Stars: '$noOf2Stars',
+          noOf1Stars: '$noOf1Stars',
+          approveCEO: {$round: ['$approveCEO', 1]},
+          recommendCompany: {$round: ['$recommendCompany', 1]}
+        }
+      }]);
+
+
+    if (data.totalReviews > 0) {
+      data = await new CompanySalaryHistory({
+        company: companyId,
+        employmentTitle: aggregate[0].employmentTitle,
+        minBaseSalary: aggregate[0].minBaseSalary,
+        maxBaseSalary: aggregate[0].maxBaseSalary,
+        avgBaseSalary: aggregate[0].avgBaseSalary,
+        minAdditionalIncome: aggregate[0].minAdditionalIncome,
+        maxAdditionalIncome: aggregate[0].maxAdditionalIncome,
+        avgAdditionalPay: aggregate[0].avgAdditionalPay,
+        minCashBonus: aggregate[0].minCashBonus,
+        maxCashBonus: aggregate[0].maxCashBonus,
+        minStockBonus: aggregate[0].minStockBonus,
+        maxStockBonus: aggregate[0].maxStockBonus,
+        minProfitSharing: aggregate[0].minProfitSharing,
+        maxProfitSharing: aggregate[0].maxProfitSharing,
+        count: aggregate[0].count
+      }).save();
+
+    }
+  }
+  return data;
+}
+
+
+function findCompanyReviewsByCompanyId(filter) {
   let data = null;
 
   if(!filter){
     return [];
   }
 
-  data = CompanyReview.find({company: filter.company});
+  let size = filter.size?parseInt(filter.size): 20;
+  let sort = {};
+
+  let match = {};
+
+  if(filter.query){
+    match.isCurrentEmployee = true;
+  }
+
+  if(filter.isCurrentEmployee){
+    match.isCurrentEmployee = true;
+  }
+
+  if(filter.employmentType){
+    match.employmentType = {$in:  filter.employmentType.split(',')};
+  }
+
+  sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
+  data = CompanyReview.find({company: filter.company}).limit(size).sort(sort);
 
   return data;
 }
@@ -159,6 +258,7 @@ module.exports = {
   findSalariesByCompanyId: findSalariesByCompanyId,
   findCompanySalaryByEmploymentTitle:findCompanySalaryByEmploymentTitle,
   addCompanySalary:addCompanySalary,
-  findReviewsByCompanyId: findReviewsByCompanyId,
+  findCompanyReviewHistoryByCompanyId:findCompanyReviewHistoryByCompanyId,
+  findCompanyReviewsByCompanyId: findCompanyReviewsByCompanyId,
   addCompanyReview:addCompanyReview
 }

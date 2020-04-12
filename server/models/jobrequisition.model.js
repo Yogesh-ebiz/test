@@ -28,6 +28,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: ""
   },
+  currency: {
+    type: String,
+    required: true
+  },
   requiredResume: {
     type: String,
     required: false,

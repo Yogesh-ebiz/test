@@ -17,6 +17,15 @@ const CompanyReviewSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  employmentType: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    required: false,
+    default: 'ACTIVE'
+  },
   rating: {
     type: Number,
     required: false

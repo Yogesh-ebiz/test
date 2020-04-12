@@ -86,7 +86,6 @@ async function getSimilarCompany(req, res) {
   let jobId = parseInt(req.params.id);
 
   let filter = req.query;
-  console.log('route getSimilarCompany');
   let data = await jobRequisitionCtl.getSimilarCompany(currentUserId, jobId, filter);
 
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));

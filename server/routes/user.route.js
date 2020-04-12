@@ -9,6 +9,7 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
+router.route('/search/all').get(asyncHandler(searchUsers));
 router.route('/:userId/detail').get(asyncHandler(getUserDetail));
 
 
@@ -67,6 +68,13 @@ router.route('/:userId/certifications').get(asyncHandler(getPartyCertifications)
 router.route('/:userId/certifications').post(asyncHandler(addPartyCertification));
 router.route('/:userId/certifications').put(asyncHandler(updatePartyCertifications));
 
+
+async function searchUsers(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let filter = req.query;
+  let data = await userCtl.searchUsers(currentUserId, filter, res.locale);
+  res.json(new Response(data, data?'users_retrieved_successful':'not_found', res));
+}
 
 async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));

@@ -242,28 +242,6 @@ async function getJobById(currentUserId, jobId, locale) {
 }
 
 
-async function addToUser(id, locale) {
-
-  try {
-    let localeStr = locale? locale : 'en';
-    job = await JobRequisition.findOne({jobId: id});
-    let skills = await Skilltype.find({skillTypeId: job.skills});
-    //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-
-    //jobFunction.name=jobFunction[name][localeStr];
-
-    job.skills = skills;
-    job.jobFunction=jobFunction;
-
-  } catch (error) {
-    console.log(error);
-
-  }
-
-  return job;
-}
-
-
 async function searchJob(currentUserId, jobId, filter, locale) {
 
   if(filter==null){

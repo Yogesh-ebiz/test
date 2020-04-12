@@ -81,7 +81,7 @@ function addCompany(userId, company) {
     yearFounded: null,
     city: '', state: '', country: ''}
 
-  return axios.post('http://localhost:8080/api/company/register', company, {headers: {"UserId":userId}});
+  return axios.post('http://accessed.us-west-2.elasticbeanstalk.com/api/company/register', company, {headers: {"UserId":userId}});
 
 }
 

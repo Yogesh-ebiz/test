@@ -139,9 +139,9 @@ async function uploadCV(currentUserId, applicationId, files) {
 }
 
 
-async function uploadOffer(currentUserId, applicationId, files) {
+async function uploadOffer(currentUserId, applicationId, file) {
 
-  if(currentUserId==null || applicationId==null || files==null){
+  if(currentUserId==null || applicationId==null || file==null){
     return null;
   }
 
@@ -156,7 +156,6 @@ async function uploadOffer(currentUserId, applicationId, files) {
     if (isPartyActive(currentParty)) {
 
       let application = await findApplicationById(applicationId);
-      console.log('application', application.partyId, currentUserId)
 
       if (application) {
 
@@ -164,9 +163,8 @@ async function uploadOffer(currentUserId, applicationId, files) {
         let job = application.job;
         let currentProgress = _.find(application.progress, {type: 'OFFER'});
 
-
+        console.log('file', file);
         if(application.partyId == currentUserId || job.partyId==currentParty.id){
-          let file = files.file;
           let fileName = file.originalFilename.split('.');
           let fileExt = fileName[fileName.length - 1];
           let timestamp = Date.now();
@@ -191,9 +189,9 @@ async function uploadOffer(currentUserId, applicationId, files) {
           }
 
           if(currentParty.id==application.partyId){
-            currentProgress.candidateAttachment = { url: name, type: type};
+            currentProgress.candidateAttachment = { url: name, type: type, createdDate: Date.now()};
           } else if(currentParty.id==job.partyId){
-            currentProgress.attachment = { url: name, type: type};
+            currentProgress.attachment = { url: name, type: type, createdDate: Date.now()};
           }
           result = await currentProgress.save();
         }
@@ -320,7 +318,6 @@ async function addProgress(currentUserId, applicationId, progress) {
     if(isPartyActive(currentParty)) {
       let application = await findApplicationById(applicationId);
 
-      console.log('application', application)
       if (application) {
         // application = await Application.populate(application, 'job');
 
@@ -332,7 +329,6 @@ async function addProgress(currentUserId, applicationId, progress) {
 
         let progresses = application.progress;
 
-        console.log('progresses')
         if(progresses) {
           let currentProgress = progresses[progresses.length - 1];
           let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];
@@ -370,6 +366,7 @@ async function addProgress(currentUserId, applicationId, progress) {
             application.progress.push(nextProgress);
             await application.save();
           } else if (nextProgress && nextProgress=='OFFER') {
+            console.log('offer', application)
             nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFERED"}).save();
             application.progress.push(nextProgress);
             await application.save();
