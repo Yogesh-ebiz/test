@@ -16,8 +16,13 @@ router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymen
 router.route('/:id/reviews').post(asyncHandler(addCompanyReview));
 router.route('/:id/reviews/stats').get(asyncHandler(getCompanyReviewStats));
 router.route('/:id/reviews').get(asyncHandler(getCompanyReviews));
-router.route('/:id/reviews/:salaryId').get(asyncHandler(getCompanyReviewById));
 router.route('/:id/reviews/:companyReviewId/report').post(asyncHandler(reportReviewById));
+
+router.route('/:id/reviews/:companyReviewId/reaction').post(asyncHandler(reactionToCompanyReviewById));
+router.route('/:id/reviews/:companyReviewId/reaction').delete(asyncHandler(removeReactionToCompanyReviewById));
+
+router.route('/:id/reviews/:companyReviewId').get(asyncHandler(getCompanyReviewById));
+
 
 
 
@@ -47,7 +52,7 @@ async function getCompanySalaryByEmploymentTitle(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let employmentTitle = req.query.employmentTitle;
-  let data = await companyCtl.getCompanySalaryByEmploymentTitle(currentUserId, company, employmentTitle, req.locale);
+  let data = await companyCtl.getCompanySalaryByEmploymentTitle(currentUserId, company, employmentTitle, country, req.locale);
   res.json(new Response(data, data?'companysalary_employmenttitle_retrieved_successful':'not_found', res));
 }
 
@@ -56,8 +61,7 @@ async function addCompanyReview(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let review = req.body;
   review.partyId = currentUserId;
-  console.log('addCompanyReview')
-  let data = await companyCtl.addNewReview(review, req.locale);
+  let data = await companyCtl.addNewReview(currentUserId, review, req.locale);
   res.json(new Response(data, data?'companyreview_added_successful':'not_found', res));
 }
 
@@ -70,9 +74,10 @@ async function getCompanyReviewStats(req, res) {
 
 async function getCompanyReviews(req, res) {
   // let company = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
   let filter = req.query;
   filter.company = req.params.id;
-  let data = await companyCtl.getCompanyReviews(filter, req.locale);
+  let data = await companyCtl.getCompanyReviews(currentUserId, filter, req.locale);
   res.json(new Response(data, data?'companyreviews_retrieved_successful':'not_found', res));
 }
 
@@ -99,4 +104,31 @@ async function reportReviewById(req, res) {
   let data = await companyCtl.reportCompanyReviewById(currentUser, companyReviewId, report);
 
   res.json(new Response(data, data?'review_reported_successful':'not_found', res));
+}
+
+
+async function reactionToCompanyReviewById(req, res) {
+
+  let currentUser = parseInt(req.header('UserId'));
+  let companyReviewId = parseInt(req.params.companyReviewId);
+  let reaction = req.body;
+  reaction.partyId = currentUser;
+  reaction.companyReviewId = companyReviewId;
+  let data = await companyCtl.reactionToCompanyReviewById(currentUser, companyReviewId, reaction);
+
+  res.json(new Response(data, data?'reaction_added_successful':'not_found', res));
+}
+
+
+async function removeReactionToCompanyReviewById(req, res) {
+
+  let currentUser = parseInt(req.header('UserId'));
+  let companyReviewId = parseInt(req.params.companyReviewId);
+  let reaction = req.body;
+
+  reaction.partyId = currentUser;
+  reaction.companyReviewId = companyReviewId;
+  let data = await companyCtl.removeReactionToCompanyReviewById(currentUser, companyReviewId, reaction);
+
+  res.json(new Response(data, data?'reaction_removed_successful':'not_found', res));
 }

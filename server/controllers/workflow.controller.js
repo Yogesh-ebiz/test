@@ -44,8 +44,7 @@ async function addWorkflow(currentUserId, workflow) {
   let result;
   try {
 
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
     // console.log('currentParty', currentParty)
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
@@ -76,8 +75,7 @@ async function removeWorkflow(currentUserId, workflowId) {
   let result;
   try {
 
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
@@ -113,11 +111,8 @@ async function getWorkflowById(currentUserId, workflowId) {
   }
   let workflow;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
-
-    console.log('currentUserId', currentParty.id)
     if(isPartyActive(currentParty)) {
       workflow = await findWorkflowById(workflowId);
 
@@ -138,8 +133,7 @@ async function getWorkflowByUserId(currentUserId) {
   }
   let workflow;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
 
     if(isPartyActive(currentParty)) {
@@ -165,16 +159,12 @@ async function getWorkflowByCompanyId(currentUserId, companyId) {
   }
   let workflows;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
-    console.log(currentParty)
 
     response = await getCompanyById(companyId);
     let company = response.data.data;
 
-
-    console.log(company)
 
     if(isPartyActive(currentParty) && isPartyActive(company)) {
       workflows = await findWorkflowByCompanyId(companyId);

@@ -29,7 +29,7 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  avgAdditionalIncome: {
+  avgTotalPay: {
     type: Number,
     required: false
   },
@@ -49,7 +49,7 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  minstockBonus: {
+  minStockBonus: {
     type: Number,
     required: false
   },
@@ -57,9 +57,17 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  profitSharing: {
+  minProfitSharing: {
     type: Number,
     required: false
+  },
+  maxProfitSharing: {
+    type: Number,
+    required: false
+  },
+  count: {
+    type: Number,
+    default: 0
   },
   city: {
     type: String,

@@ -4,5 +4,6 @@ module.exports = {
   INACTIVE: "INACTIVE",
   CANCELLED: 'CANCELLED',   //CANCELLED
   DELETED: 'DELETED',        //DELETED
-  SUSPENDED: 'SUSPENDED'     //SUSPENDED by reported User or Admin
+  SUSPENDED: 'SUSPENDED',     //SUSPENDED by reported User or Admin
+  REPORTED: 'REPORTED'
 };

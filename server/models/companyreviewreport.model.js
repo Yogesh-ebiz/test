@@ -4,11 +4,11 @@ const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 
 const CompanyReviewReportSchema = new mongoose.Schema({
-  eventReportId: {
+  companyReviewReportId: {
     type: Number,
-    required: true
+    required: false
   },
-  eventId: {
+  companyReviewId: {
     type: Number,
     required: true,
   },

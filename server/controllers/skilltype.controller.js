@@ -18,7 +18,6 @@ module.exports = {
 }
 
 async function insert(skilltype) {
-  console.log('skill', skilltype)
   return await new SkillType(skilltype).save();
 }
 

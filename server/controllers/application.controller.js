@@ -42,8 +42,7 @@ async function getApplicationById(currentUserId, applicationId) {
 
   let application;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
 
     if(isPartyActive(currentParty)) {
@@ -88,8 +87,7 @@ async function uploadCV(currentUserId, applicationId, files) {
   let result = null;
   let basePath = 'applications/';
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -149,9 +147,7 @@ async function uploadOffer(currentUserId, applicationId, file) {
   let basePath = 'applications/';
 
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
-
+    let currentParty = await getPersonById(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
@@ -218,8 +214,7 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
 
   let result;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
     if(isPartyActive(currentParty)) {
       application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
@@ -269,8 +264,7 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
 
   let result;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
     if(isPartyActive(currentParty)) {
       application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
@@ -312,8 +306,7 @@ async function addProgress(currentUserId, applicationId, progress) {
 
   let result;
   try {
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
     if(isPartyActive(currentParty)) {
       let application = await findApplicationById(applicationId);
@@ -366,7 +359,6 @@ async function addProgress(currentUserId, applicationId, progress) {
             application.progress.push(nextProgress);
             await application.save();
           } else if (nextProgress && nextProgress=='OFFER') {
-            console.log('offer', application)
             nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFERED"}).save();
             application.progress.push(nextProgress);
             await application.save();

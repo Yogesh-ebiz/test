@@ -23,7 +23,6 @@ async function sync(req, res) {
 
 
 async function getArticlesBySource(req, res) {
-  console.log('getArticlesBySource: ', req.params.source)
   let map = {data: null , "message": "Retrieved successfully", "status": 200};
   let data = await sourceCtl.getArticlesBySource(req.params.source, res.locale);
 
@@ -32,7 +31,6 @@ async function getArticlesBySource(req, res) {
 
 
 async function getArticlesBySource(req, res) {
-  console.log('getArticlesBySource: ', req.params.source)
   let map = {data: null , "message": "Retrieved successfully", "status": 200};
   let data = await sourceCtl.getTrendingBySource(req.params.source, res.locale);
 

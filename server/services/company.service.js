@@ -3,7 +3,9 @@ const CompanySalary = require('../models/companysalary.model');
 const CompanySalaryHistory = require('../models/companysalaryhistory.model');
 
 const CompanyReview = require('../models/companyreview.model');
-const CompanyReviewHistory = require('../models/companyReviewhistory.model');
+const CompanyReviewHistory = require('../models/companyreviewhistory.model');
+const CompanyReviewReport = require('../models/companyreviewreport.model');
+const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 
 
 
@@ -34,55 +36,62 @@ function findSalariesByCompanyId(filter) {
   sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
   data = CompanySalary.aggregate([
     {$match: {company: filter.company} },
-    {$group: {_id: '$employmentTitle', average: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
-    {$project: {_id: 0, employmentTitle: '$_id', count: 1, average: 1}}
+    {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, average: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', count: 1, average: 1}}
   ]).limit(filter.size).sort(sort);
 
   return data;
 }
 
-async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle) {
+async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country) {
   let data = null;
 
   if(!companyId || !employmentTitle){
     return [];
   }
 
-  let history = await CompanySalaryHistory.findOne({company: companyId, employmentTitle: employmentTitle});
+  // data = await CompanySalaryHistory.findOne({company: companyId, employmentTitle: employmentTitle, country: country});
+  //
+  // if(data){
+  //   // data.lastUpdatedDate = data.lastUpdatedDate?data.lastUpdatedDate:data.createdDate;
+  //
+  // } else {
 
-  if(history){
-    data=history;
-    data.lastUpdatedDate = data.lastUpdatedDate?data.lastUpdatedDate:data.createdDate;
+    let rates = {
+      'USD': 1,
+      'VND': 0.000001
+    }
 
-  } else {
+    let group = {
+      _id: {employmentTitle: '$employmentTitle', country: '$country'},
+      avgTotalPay: {$avg: {$sum: ['$baseSalary', '$additionalIncome', '$cashBonus', '$stockBonus', '$profitSharing', '$tip', '$commision']}},
+      minBaseSalary: {'$min': '$baseSalary'},
+      maxBaseSalary: {'$max': '$baseSalary'},
+      avgBaseSalary: {'$avg': '$baseSalary'},
+      minAdditionalIncome: {'$min': '$additionalIncome'},
+      maxAdditionalIncome: {'$max': '$additionalIncome'},
+      avgAdditionalIncome: {'$avg': '$additionalIncome'},
+      minCashBonus: {'$min': '$cashBonus'},
+      maxCashBonus: {'$max': '$cashBonus'},
+      minStockBonus: {'$min': '$stockBonus'},
+      maxStockBonus: {'$max': '$stockBonus'},
+      minProfitSharing: {'$min': '$profitSharing'},
+      maxProfitSharing: {'$max': '$profitSharing'},
+      count: {'$sum': 1}
+    };
 
-    let aggregate = await CompanySalary.aggregate([
+    data = await CompanySalary.aggregate([
       {$match: {company: companyId, employmentTitle: employmentTitle}},
       {
-        $group: {
-          _id: '$employmentTitle',
-          avgTotalPay: {$avg: {$sum: ['$basePay', '$additionalIncome', '$cashBonus', '$stockBonus', '$profitSharing', '$tip', '$commision']}},
-          minBaseSalary: {'$min': '$baseSalary'},
-          maxBaseSalary: {'$max': '$baseSalary'},
-          avgBaseSalary: {'$avg': '$baseSalary'},
-          minAdditionalIncome: {'$min': '$additionalIncome'},
-          maxAdditionalIncome: {'$max': '$additionalIncome'},
-          avgAdditionalPay: {'$avg': '$additionalIncome'},
-          minCashBonus: {'$min': '$cashBonus'},
-          maxCashBonus: {'$max': '$cashBonus'},
-          minStockBonus: {'$min': '$stockBonus'},
-          maxStockBonus: {'$max': '$stockBonus'},
-          minProfitSharing: {'$min': '$profitSharing'},
-          maxProfitSharing: {'$max': '$profitSharing'},
-          count: {'$sum': 1}
-        }
+        $group: group
       },
       {
         $project: {
           _id: 0,
-          employmentTitle: '$_id', avgTotalPay: {$floor: '$avgTotalPay'},
+          employmentTitle: '$_id.employmentTitle', country: '$_id.country', baseSalary: '$baseSalary',
+          avgTotalPay: {$floor: '$avgTotalPay'},
           minBaseSalary: 1, maxBaseSalary: 1, avgBaseSalary: {$floor: '$avgBaseSalary'},
-          minAdditionalIncome: 1, maxAdditionalIncome: 1, avgAdditionalPay: {$floor: '$avgBasePay'},
+          minAdditionalIncome: 1, maxAdditionalIncome: 1, avgAdditionalIncome: {$floor: '$avgAdditionalIncome'},
           minCashBonus: 1, maxCashBonus: 1,
           minStockBonus: 1, maxStockBonus: 1,
           minProfitSharing: 1, maxProfitSharing: 1,
@@ -91,31 +100,36 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle) {
       }
     ]);
 
-    if(aggregate[0].count>0){
-      data = await new CompanySalaryHistory({
-        company: companyId,
-        employmentTitle: aggregate[0].employmentTitle,
-        minBaseSalary: aggregate[0].minBaseSalary,
-        maxBaseSalary: aggregate[0].maxBaseSalary,
-        avgBaseSalary: aggregate[0].avgBaseSalary,
-        minAdditionalIncome: aggregate[0].minAdditionalIncome,
-        maxAdditionalIncome: aggregate[0].maxAdditionalIncome,
-        avgAdditionalPay: aggregate[0].avgAdditionalPay,
-        minCashBonus: aggregate[0].minCashBonus,
-        maxCashBonus: aggregate[0].maxCashBonus,
-        minStockBonus: aggregate[0].minStockBonus,
-        maxStockBonus: aggregate[0].maxStockBonus,
-        minProfitSharing: aggregate[0].minProfitSharing,
-        maxProfitSharing: aggregate[0].maxProfitSharing,
-        count: aggregate[0].count
-      }).save();
 
-      data.lastUpdatedDate = data.lastUpdatedDate?data.lastUpdatedDate:data.createdDate;
+    if(data.length){
+      for(item of data){
+        await CompanySalaryHistory.update({company: companyId, employmentTitle: employmentTitle, country: country},
+          {$set: {
+              company: companyId,
+              avgTotalPay: item.avgTotalPay,
+              employmentTitle: item.employmentTitle,
+              minBaseSalary: item.minBaseSalary,
+              maxBaseSalary: item.maxBaseSalary,
+              avgBaseSalary: item.avgBaseSalary,
+              minAdditionalIncome: item.minAdditionalIncome,
+              maxAdditionalIncome: item.maxAdditionalIncome,
+              avgAdditionalIncome: item.avgAdditionalIncome,
+              minCashBonus: item.minCashBonus,
+              maxCashBonus: item.maxCashBonus,
+              minStockBonus: item.minStockBonus,
+              maxStockBonus: item.maxStockBonus,
+              minProfitSharing: item.minProfitSharing,
+              maxProfitSharing: item.maxProfitSharing,
+              count: item.count,
+              lastUpdatedDate: Date.now()
+            }
+        }, {upsert:true});
+      }
 
+      data = _.find(data, {country: country});
     }
-
-
-  }
+  //
+  // }
 
 
 
@@ -187,24 +201,18 @@ async function findCompanyReviewHistoryByCompanyId(company) {
         }
       }]);
 
-
+    data = data[0]
     if (data.totalReviews > 0) {
-      data = await new CompanySalaryHistory({
-        company: companyId,
-        employmentTitle: aggregate[0].employmentTitle,
-        minBaseSalary: aggregate[0].minBaseSalary,
-        maxBaseSalary: aggregate[0].maxBaseSalary,
-        avgBaseSalary: aggregate[0].avgBaseSalary,
-        minAdditionalIncome: aggregate[0].minAdditionalIncome,
-        maxAdditionalIncome: aggregate[0].maxAdditionalIncome,
-        avgAdditionalPay: aggregate[0].avgAdditionalPay,
-        minCashBonus: aggregate[0].minCashBonus,
-        maxCashBonus: aggregate[0].maxCashBonus,
-        minStockBonus: aggregate[0].minStockBonus,
-        maxStockBonus: aggregate[0].maxStockBonus,
-        minProfitSharing: aggregate[0].minProfitSharing,
-        maxProfitSharing: aggregate[0].maxProfitSharing,
-        count: aggregate[0].count
+      data = await new CompanyReviewHistory({
+        company: data.company,
+        avgRating: data.avgRating,
+        recommendCompany: data.minBaseSalary,
+        noOf5Stars: data.maxBaseSalary,
+        noOf4Stars: data.avgBaseSalary,
+        noOf3Stars: data.minAdditionalIncome,
+        noOf2Stars: data.maxAdditionalIncome,
+        noOf1Stars: data.avgAdditionalPay,
+        totalReviews: data.totalReviews
       }).save();
 
     }
@@ -246,10 +254,19 @@ function findCompanyReviewsByCompanyId(filter) {
 
 function addCompanyReview(review) {
 
-  if(!salary){
+  if(!review){
     return null;
   }
   return new CompanyReview(review).save();
+}
+
+
+function addCompanyReviewReport(report) {
+
+  if(!report){
+    return null;
+  }
+  return new CompanyReviewReport(report).save();
 }
 
 
@@ -260,5 +277,6 @@ module.exports = {
   addCompanySalary:addCompanySalary,
   findCompanyReviewHistoryByCompanyId:findCompanyReviewHistoryByCompanyId,
   findCompanyReviewsByCompanyId: findCompanyReviewsByCompanyId,
-  addCompanyReview:addCompanyReview
+  addCompanyReview:addCompanyReview,
+  addCompanyReviewReport:addCompanyReviewReport
 }

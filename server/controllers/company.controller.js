@@ -4,20 +4,29 @@ const _ = require('lodash');
 let CustomPagination = require('../utils/custompagination');
 let Pagination = require('../utils/job.pagination');
 let SearchParam = require('../const/searchParam');
+const partyEnum = require('../const/partyEnum');
+let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 
-const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview, findCompanyReviewHistoryByCompanyId} = require('../services/company.service');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
+const {findListOfPartyEmploymentTitle} = require('../services/partyemployment.service');
+const {findCompanyReviewReactionByPartyId, addCompanyReviewReaction} = require('../services/companyreviewreaction.service');
+
+const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
+  findCompanyReviewHistoryByCompanyId, addCompanyReviewReport} = require('../services/company.service');
 
 
 const CompanyReview = require('../models/companyreview.model');
 // const CompanyReviewReport = require('../models/companyreviewreport.model');
+const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 
 
 const salarySchema = Joi.object({
   partyId: Joi.number().required(),
   company: Joi.number().required(),
   employmentTitle: Joi.string().required(),
+  currency: Joi.string().required(),
+  basePayPeriod: Joi.string().required(),
   baseSalary: Joi.number().required(),
   additionalIncome: Joi.number(),
   cashBonus: Joi.number(),
@@ -46,6 +55,20 @@ const reviewSchema = Joi.object({
   advices: Joi.array()
 })
 
+const companyReviewReportSchema = Joi.object({
+  companyReviewId: Joi.number().required(),
+  partyId: Joi.number().required(),
+  isAnonymous: Joi.boolean(),
+  reason: Joi.string().required(),
+  note: Joi.string().allow('')
+});
+
+const companyReviewReactionSchema = Joi.object({
+  companyReviewId: Joi.number().required(),
+  partyId: Joi.number().required(),
+  reactionType: Joi.string().required()
+});
+
 
 module.exports = {
   addNewSalary,
@@ -54,7 +77,9 @@ module.exports = {
   addNewReview,
   getCompanyReviewStats,
   getCompanyReviews,
-  reportCompanyReviewById
+  reportCompanyReviewById,
+  reactionToCompanyReviewById,
+  removeReactionToCompanyReviewById
 }
 
 async function addNewSalary(currentUserId, salary) {
@@ -65,7 +90,6 @@ async function addNewSalary(currentUserId, salary) {
 
   let result = null;
   try {
-    console.log('salary', salary)
     result = await addCompanySalary(salary);
   } catch(e){
     console.log('addNewSalary: Error', e);
@@ -102,24 +126,21 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 }
 
 
-async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, employmentTitle) {
+async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, employmentTitle, country) {
 
-  console.log('getCompanySalaryByEmploymentTitle', currentUserId, companyId, employmentTitle)
-  if(currentUserId==null || companyId==null || employmentTitle==null){
+  if(currentUserId==null || companyId==null || employmentTitle==null || country==null){
     return null;
   }
 
   let result = null;
   try {
 
-    console.log('get', companyId, employmentTitle)
-    result = await findCompanySalaryByEmploymentTitle(companyId, employmentTitle);
+    result = await findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country);
 
 
   } catch (e) {
     console.log('getCompanySalaryByEmploymentTitle: Error', e)
   }
-  console.log('res', result)
   return result;
 }
 
@@ -140,9 +161,8 @@ async function getCompanySalaryById(filter, locale) {
 }
 
 
-async function addNewReview(review) {
-  console.log('review', review)
-  salary = await Joi.validate(review, reviewSchema, { abortEarly: false });
+async function addNewReview(currentUserId, review) {
+  review = await Joi.validate(review, reviewSchema, { abortEarly: false });
   return await addCompanyReview(review);
 }
 
@@ -162,11 +182,17 @@ async function addNewReview(review) {
 async function getCompanyReviewStats(userId, company, locale) {
   let result = null;
 
-  return await findCompanyReviewHistoryByCompanyId(company)
+  result = await findCompanyReviewHistoryByCompanyId(company)
+  result.mostPopularReviews = [
+    {isPositive: true, comment: "I love this company"},
+    {isPositive: true, comment: "Company is Awesome"},
+    {isPositive: false, comment: "Need more space"}]
+
+  return result;
 }
 
 
-async function getCompanyReviews(filter, locale) {
+async function getCompanyReviews(currentUserId, filter, locale) {
   let result = null;
 
   let select = '-description -qualifications -responsibilities';
@@ -194,18 +220,39 @@ async function getCompanyReviews(filter, locale) {
     employmentTypes = employmentTypes.join(',');
     filter.employmentType = employmentTypes;
   }
-  console.log('filter', filter)
 
   result = await CompanyReview.paginate(new SearchParam(filter), options);
+
+  let partyIds = _.uniq(_.map(result.docs, 'partyId'));
+  let reactions = await findCompanyReviewReactionByPartyId(currentUserId);
+  result.docs = await populatePerson(result.docs);
+
+  let employments = await findListOfPartyEmploymentTitle(partyIds);
+
+  result.docs = _.reduce(result.docs, function(res, item){
+    let find = _.find(employments, {id: item.party.id});
+    let hasLiked = _.find(reactions, {partyId: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LIKE'})?true:false;
+    let hasLoved = _.find(reactions, {partyId: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LOVE'})?true:false;
+
+
+    item.party = find;
+    item.noOfLikes =  (item.likes)? item.likes.length: 0;
+    item.noOfLoves = (item.loves)? item.loves.length : 0;
+    item.hasLiked = hasLiked;
+    item.hasLoved = hasLoved;
+    item.likes = [];
+    item.loves = [];
+    res.push(item);
+    return res;
+  }, []);
 
   return new Pagination(result);
 }
 
 
-
-
 async function reportCompanyReviewById(currentUserId, companyReviewId, report) {
 
+  report = await Joi.validate(report, companyReviewReportSchema, { abortEarly: false });
 
   if(!currentUserId || !companyReviewId || !report){
     return null;
@@ -217,27 +264,131 @@ async function reportCompanyReviewById(currentUserId, companyReviewId, report) {
     let found = await CompanyReview.findOne({companyReviewId: companyReviewId});
     if(found){
 
-      let response = await getPartyById(currentUserId);
-      let currentParty = response.data.data;
+      let currentParty = await getPersonById(currentUserId);
 
-      console.log('party', currentParty)
       if(!isPartyActive(currentParty)) {
         console.debug('User Not Active: ', currentUserId);
         return null;
       }
 
-      report = await Joi.validate(report, eventReportSchema, { abortEarly: false });
-      report = await new CompanyReviewReport(report).save();
+
+      report = await addCompanyReviewReport(report);
+
 
       if(report){
 
         found.status=statusEnum.REPORTED;
-        result  = await foundEvent.save();
+        result  = await found.save();
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function reactionToCompanyReviewById(currentUserId, companyReviewId, reaction) {
+
+  reaction = await Joi.validate(reaction, companyReviewReactionSchema, { abortEarly: false });
+
+  if(!currentUserId || !companyReviewId || !reaction){
+    return null;
+  }
+
+  let result;
+  try {
+
+    let found = await CompanyReview.findOne({companyReviewId: companyReviewId});
+    if(found){
+
+      let currentParty = await getPersonById(currentUserId);
+
+      if(!isPartyActive(currentParty)) {
+        console.debug('User Not Active: ', currentUserId);
+        return null;
       }
 
 
-    }
+      reaction = await addCompanyReviewReaction(reaction);
 
+
+      if(reaction){
+        if(reaction.reactionType=='LIKE'){
+          found.likes.push(reaction)
+
+        } else if (reaction.reactionType=='LOVE') {
+          found.loves.push(reaction)
+        }
+
+        result  = await found.save();
+        result.noOfLikes = found.likes.length;
+        result.noOfLoves = found.loves.length;
+        result.loves=[];
+        result.likes=[];
+
+      }
+
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function removeReactionToCompanyReviewById(currentUserId, companyReviewId, reaction) {
+
+  reaction = await Joi.validate(reaction, companyReviewReactionSchema, { abortEarly: false });
+
+  if(!currentUserId || !companyReviewId || !reaction){
+    return null;
+  }
+
+  let result;
+  try {
+
+    let found = await CompanyReview.findOne({companyReviewId: companyReviewId});
+    if(found) {
+
+
+      let currentParty = await getPersonById(currentUserId);
+
+      if (!isPartyActive(currentParty)) {
+        console.debug('User Not Active: ', currentUserId);
+        return null;
+      }
+
+
+      reaction = await CompanyReviewReaction.findOne({
+        partyId: currentParty.id,
+        companyReviewId: companyReviewId,
+        reactionType: reaction.reactionType
+      });
+
+
+      if (reaction) {
+        let deleted = await reaction.delete();
+
+        if (deleted) {
+
+          if (reaction.reactionType == 'LIKE') {
+            let index = _.indexOf(found.likes, reaction);
+            found.likes.splice(index, 1);
+          } else {
+            let index = _.indexOf(found.loves, reaction);
+            found.loves.splice(index, 1);
+          }
+          await found.save();
+          result = {deleted: 1};
+        }
+
+      }
+    }
 
   } catch (error) {
     console.log(error);

@@ -52,10 +52,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: null
   },
-  lastCurrencyUom: {
-    type: String,
-    required: true
-  },
   noOfResources: {
     type: Number,
     required: false,

@@ -45,8 +45,7 @@ async function addPromotion(currentUserId, jobId, promotion) {
     job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
+      let currentParty = await getPersonById(currentUserId);
       // console.log('currentParty', currentParty)
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
@@ -59,7 +58,6 @@ async function addPromotion(currentUserId, jobId, promotion) {
           alert.jobId = job.jobId;
           alert.company = job.company;
 
-          console.log('alert', alert);
           result = await addAlertById(currentParty.id, alert);
         }
 
@@ -84,8 +82,7 @@ async function removePromotion(currentUserId, promotionId) {
   let result;
   try {
 
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
@@ -125,8 +122,7 @@ async function getPromotionById(currentUserId, jobId, locale) {
 
     if(job) {
 
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
+      let currentParty = await getPersonById(currentUserId);
       // console.log('currentParty', response.data)
 
       response = await getCompanyById(job.company);

@@ -48,7 +48,7 @@ const jobRequisitionSchema = Joi.object({
   durationMonths: Joi.number().optional(),
   minMonthExperience: Joi.number().optional(),
   maxMonthExperience: Joi.number().optional(),
-  lastCurrencyUom: Joi.string(),
+  currency: Joi.string(),
   noOfResources: Joi.number(),
   type: Joi.string(),
   industry: Joi.array().optional(),
@@ -110,8 +110,7 @@ async function createJob(currentUserId, job) {
 
   job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
 
-  let response = await getPersonById(currentUserId);
-  currentParty = response.data.data;
+  let currentParty = await getPersonById(currentUserId);
 
   if (isPartyActive(currentParty)) {
 
@@ -190,8 +189,7 @@ async function getJobById(currentUserId, jobId, locale) {
       let currentParty, partySkills=[];
       if(currentUserId){
 
-        let response = await getPersonById(currentUserId);
-        currentParty = response.data.data;
+        let currentParty = await getPersonById(currentUserId);
 
         if (isPartyActive(currentParty)) {
           let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
@@ -527,9 +525,7 @@ async function applyJobById(currentUserId, application ) {
     let job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-      console.debug('job', job.jobId);
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
+      let currentParty = await getPersonById(currentUserId);
       // console.log('currentParty', currentParty)
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
@@ -583,8 +579,7 @@ async function addBookmark(currentUserId, jobId) {
     job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-      let response = await getPersonById(currentUserId);
-      let currentParty = response.data.data;
+      let currentParty = await getPersonById(currentUserId);
       // console.log('currentParty', currentParty)
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
@@ -618,8 +613,7 @@ async function removeBookmark(currentUserId, jobId) {
   let result;
   try {
 
-    let response = await getPersonById(currentUserId);
-    let currentParty = response.data.data;
+    let currentParty = await getPersonById(currentUserId);
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {

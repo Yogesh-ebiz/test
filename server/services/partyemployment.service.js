@@ -16,6 +16,20 @@ function findPartyEmploymentById(userId, partyEmploymentId) {
   return PartyEmployment.findOne({partyId: userId, partyEmploymentId: partyEmploymentId});
 }
 
+function findListOfPartyEmploymentTitle(list) {
+  let data = null;
+
+  if(list==null){
+    return;
+  }
+
+  return PartyEmployment.aggregate([
+    {$match: {partyId: {$in: list}}},
+    {$group: {_id: '$partyId', lastDate: {$last: '$fromDate'}, partyTitle: {'$last': '$employmentTitle'}}},
+    {$project: {_id: 0, id: '$_id', partyTitle: '$partyTitle'}}
+    ]);
+}
+
 function findPartyEmploymentByUserId(userId) {
   let data = null;
 
@@ -59,5 +73,6 @@ module.exports = {
   findPartyEmploymentById: findPartyEmploymentById,
   findPartyEmploymentByUserId: findPartyEmploymentByUserId,
   addPartyEmploymentByUserId: addPartyEmploymentByUserId,
-  updateEmploymentByUserId: updateEmploymentByUserId
+  updateEmploymentByUserId: updateEmploymentByUserId,
+  findListOfPartyEmploymentTitle:findListOfPartyEmploymentTitle
 }

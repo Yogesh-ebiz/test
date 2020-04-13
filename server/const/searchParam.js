@@ -72,7 +72,6 @@ function SearchParam(filter) {
       result.push(value.trim());
       return result;
     }, []);
-    console.log('employment', employmentType)
     this.query.employmentType =  { $in: employmentType};
   }
 

@@ -13,65 +13,52 @@ const CompanyReviewHistorySchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  employmentTitle: {
-    type: String,
-    required: true
-  },
-  avgBaseSalary: {
+  no5Stars: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   },
-  minBaseSalary: {
+  no4Stars: {
     type: Number,
-    required: true
+    required: false,
+    default: 0
   },
-  maxBaseSalary: {
+  no3Stars: {
     type: Number,
-    required: true
+    required: false,
+    default: 0
   },
-  avgAdditionalIncome: {
+  no2Stars: {
     type: Number,
-    required: false
+    required: false,
+    default: 0
   },
-  minAdditionalIncome: {
+  no1Stars: {
     type: Number,
-    required: false
+    required: false,
+    default: 0
   },
-  maxAdditionalIncome: {
-    type: Number,
-    required: false
-  },
-  minCashBonus: {
+  recommendCompany: {
     type: Number,
     required: false
   },
-  maxCashBonus: {
+  approveCEO: {
     type: Number,
     required: false
   },
-  minstockBonus: {
+  avgRating: {
     type: Number,
     required: false
   },
-  maxStockBonus: {
+  totalReviews: {
     type: Number,
-    required: false
+    required: false,
+    default: 0
   },
-  profitSharing: {
-    type: Number,
-    required: false
-  },
-  city: {
-    type: String,
-    required: false
-  },
-  state: {
-    type: String,
-    required: false
-  },
-  country: {
-    type: String,
-    required: false
+  mostPopularReviews: {
+    type: Array,
+    required: false,
+    default: []
   },
   createdDate: {
     type: Number,

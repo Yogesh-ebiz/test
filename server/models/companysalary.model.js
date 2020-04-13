@@ -29,6 +29,14 @@ const CompanySalarySchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  currency: {
+    type: String,
+    default: ''
+  },
+  basePayPeriod: {
+    type: String,
+    default: ''
+  },
   baseSalary: {
     type: Number,
     required: true

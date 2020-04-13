@@ -1,10 +1,10 @@
 const _ = require('lodash');
 const confirmEnum = require('../const/confirmEnum');
 const statusEnum = require('../const/statusEnum');
-
 const partyTypeEnum = require('../const/partyEnum');
 const axiosInstance = require('../services/api.service');
-
+let User = require('../models/user.model');
+let Company = require('../models/company.model');
 
 const axios = require('axios');
 const instance = axios.create();
@@ -27,12 +27,18 @@ function getPartyById(partyId) {
   return axiosInstance.request('/api/party/' + partyId + "?source=job");
 }
 
-function getPersonById(partyId) {
+async function getPersonById(partyId) {
   if(partyId==null){
     return;
   }
+  let result = null;
 
-  return axiosInstance.request('/api/person/' + partyId + "?source=job");
+  result = await axiosInstance.request('/api/person/' + partyId + "?source=job");
+  if(result){
+    result = new User(result.data.data);
+  }
+
+  return result;
 }
 
 function getCompanyById(partyId) {
@@ -79,7 +85,7 @@ function addCompany(userId, company) {
     website: '',
     mission: '',
     yearFounded: null,
-    city: '', state: '', country: ''}
+    city: company.city, state: company.state, country: company.country}
 
   return axios.post('http://accessed.us-west-2.elasticbeanstalk.com/api/company/register', company, {headers: {"UserId":userId}});
 
@@ -118,13 +124,18 @@ async function populatePerson(list) {
     return;
   }
 
+  let ids = _.uniq(_.map(list, 'partyId'));
+  let result = await searchParties(ids, partyTypeEnum.PERSON, list.length, 0);
+  result = result.data.data.content;
   for (let i = 0; i < list.length; i++) {
-    let result = await getPersonById(list[i].partyId);
-    list[i].party = result.data.data;
+    let party = _.find(result, {id: list[i].partyId});
+    if(party){
+      party = new User(party);
+      delete party._id;
+    }
+    list[i].party = party;
   }
-
   return list;
-
 }
 
 async function populateCompany(list) {

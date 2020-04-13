@@ -73,7 +73,6 @@ async function getSimilarJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let filter = req.query;
-  console.log('jobId', jobId)
 
   let data = await jobRequisitionCtl.searchJob(currentUserId, jobId, filter);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));

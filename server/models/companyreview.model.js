@@ -10,8 +10,8 @@ const CompanyReviewSchema = new mongoose.Schema({
     required: true
   },
   partyId: {
-    type: Number,
-    required: false
+    type: Object,
+    required: true
   },
   company: {
     type: Object,
@@ -26,14 +26,32 @@ const CompanyReviewSchema = new mongoose.Schema({
     required: false,
     default: 'ACTIVE'
   },
+  companyReviewUrl: {
+    type: String,
+    required: false,
+    default: ''
+  },
   rating: {
     type: Number,
     required: false
   },
   hasLiked: {
     type: Boolean,
+    required: false,
     default: false
   },
+  noOfLikes: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  hasLoved: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  likes: [{ type: Schema.Types.ObjectId, ref: 'CompanyReviewReaction' }],
+  loves: [{ type: Schema.Types.ObjectId, ref: 'CompanyReviewReaction' }],
   recommendCompany: {
     type: Boolean,
     required: true,
@@ -47,6 +65,11 @@ const CompanyReviewSchema = new mongoose.Schema({
   isCurrentEmployee: {
     type: Boolean,
     required: false
+  },
+  isAnonymous: {
+    type: Boolean,
+    required: false,
+    default: true
   },
   reviewTitle: {
     type: String,

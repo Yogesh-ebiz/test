@@ -18,8 +18,6 @@ async function getAllTopics(req, res) {
 }
 
 async function getTopicById(req, res) {
-  console.log('ID: ', req.params.id)
-  console.log('locale', res.locale);
   let map = {data: null , "message": "Retrieved successfully", "status": 200};
   let data = await topicCtl.getTopicById(req.params.id, res.locale);
 
