@@ -29,7 +29,7 @@ class Pagination {
 
 
   constructor(data, filter, locale) {
-
+    // console.log(data)
 
     if(data===null || typeof data==='undefined'){
       return defaultPagination;

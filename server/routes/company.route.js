@@ -22,6 +22,8 @@ router.route('/:id/reviews').post(asyncHandler(addCompanyReview));
 router.route('/:id/reviews/stats').get(asyncHandler(getCompanyReviewStats));
 router.route('/:id/reviews').get(asyncHandler(getCompanyReviews));
 router.route('/:id/reviews/:companyReviewId/report').post(asyncHandler(reportReviewById));
+router.route('/:id/reviews/filter/locations/search').get(asyncHandler(getCompanyReviewLocations));
+
 
 router.route('/:id/reviews/:companyReviewId/reaction').post(asyncHandler(reactionToCompanyReviewById));
 router.route('/:id/reviews/:companyReviewId/reaction').delete(asyncHandler(removeReactionToCompanyReviewById));
@@ -71,7 +73,7 @@ async function getCompanySalaryLocations(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let data = await companyCtl.getCompanySalaryLocations(currentUserId, company, req.locale);
-  res.json(new Response(data, data?'companysalaries_location_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'companysalary_locations_retrieved_successful':'not_found', res));
 }
 
 
@@ -79,14 +81,14 @@ async function getCompanySalaryEmploymentTitles(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let data = await companyCtl.getCompanySalaryEmploymentTitles(currentUserId, company);
-  res.json(new Response(data, data?'companysalaries_employmentTitle_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'companysalary_employmentTitles_retrieved_successful':'not_found', res));
 }
 
 async function getCompanySalaryJobFunctions(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let data = await companyCtl.getCompanySalaryJobFunctions(currentUserId, company);
-  res.json(new Response(data, data?'companysalaries_jobFunctions_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'companysalary_jobfunctions_retrieved_successful':'not_found', res));
 }
 
 async function addCompanyReview(req, res) {
@@ -126,6 +128,14 @@ async function getCompanyReviewById(req, res) {
 }
 
 
+async function getCompanyReviewLocations(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let data = await companyCtl.getCompanyReviewLocations(currentUserId, company, req.locale);
+  res.json(new Response(data, data?'companyreview_locations_retrieved_successful':'not_found', res));
+}
+
+
 
 async function reportReviewById(req, res) {
 
@@ -144,9 +154,11 @@ async function reportReviewById(req, res) {
 async function reactionToCompanyReviewById(req, res) {
 
   let currentUser = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
   let companyReviewId = parseInt(req.params.companyReviewId);
   let reaction = req.body;
   reaction.partyId = currentUser;
+  reaction.company = company;
   reaction.companyReviewId = companyReviewId;
   let data = await companyCtl.reactionToCompanyReviewById(currentUser, companyReviewId, reaction);
 

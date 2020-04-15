@@ -14,7 +14,7 @@ const {findCompanyReviewReactionByPartyId, addCompanyReviewReaction} = require('
 const {findCurrencyRate} = require('../services/currency.service');
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
-  findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions} = require('../services/company.service');
+  findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
 
 
 const CompanyReview = require('../models/companyreview.model');
@@ -26,6 +26,8 @@ const salarySchema = Joi.object({
   partyId: Joi.number().required(),
   company: Joi.number().required(),
   employmentTitle: Joi.string().allow('').optional(),
+  jobFunction: Joi.string().required(),
+  yearExperience: Joi.number().optional(),
   currency: Joi.string().required(),
   basePayPeriod: Joi.string().required(),
   baseSalary: Joi.number().required(),
@@ -66,6 +68,7 @@ const companyReviewReportSchema = Joi.object({
 });
 
 const companyReviewReactionSchema = Joi.object({
+  company: Joi.number().required(),
   companyReviewId: Joi.number().required(),
   partyId: Joi.number().required(),
   reactionType: Joi.string().required()
@@ -82,6 +85,7 @@ module.exports = {
   addNewReview,
   getCompanyReviewStats,
   getCompanyReviews,
+  getCompanyReviewLocations,
   reportCompanyReviewById,
   reactionToCompanyReviewById,
   removeReactionToCompanyReviewById
@@ -128,7 +132,7 @@ async function getCompanySalaries(currentUserId, filter, locale) {
         return res;
       }, [])
 
-      let pagination = new CustomPagination({count: total[0].count, result: result}, filter, locale);
+      let pagination = new CustomPagination({count: total, result: result}, filter, locale);
       result = pagination;
     }
   } catch (e) {
@@ -262,10 +266,8 @@ async function getCompanyReviewStats(userId, company, locale) {
   result = await findCompanyReviewHistoryByCompanyId(company);
 
   if(result) {
-    result.mostPopularReviews = [
-      {isPositive: true, comment: "I love this company"},
-      {isPositive: true, comment: "Company is Awesome"},
-      {isPositive: false, comment: "Need more space"}]
+    let highlights = await findTop3Highlights(company);
+    result.mostPopularReviews = highlights;
   }
   return result;
 }
@@ -277,7 +279,23 @@ async function getCompanyReviews(currentUserId, filter, locale) {
   let limit = (filter.size && filter.size>0) ? filter.size:20;
   let page = (filter.page && filter.page==0) ? filter.page:1;
   let sortBy = {};
-  filter.sortBy = (filter.sortBy!=null) ? filter.sortBy : 'createdDate';
+
+  switch(filter.sortBy){
+    case('createdDate'):
+      filter.sortBy='createdDate';
+      break;
+    case('popular'):
+      filter.sortBy='popular';
+      break;
+    case('rating'):
+      filter.sortBy='rating';
+      break;
+    default:
+      filter.sortBy='createdDate';
+
+  }
+
+  // filter.sortBy = (filter.sortBy!=null) ? filter.sortBy : 'createdDate';
   filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
   sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
@@ -326,6 +344,25 @@ async function getCompanyReviews(currentUserId, filter, locale) {
   }, []);
 
   return new Pagination(result);
+}
+
+
+async function getCompanyReviewLocations(currentUserId, companyId) {
+
+  if(currentUserId==null || companyId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await findAllCompanyReviewLocations(companyId);
+
+
+  } catch (e) {
+    console.log('Error: getCompanyReviewLocations', e)
+  }
+  return result;
 }
 
 
@@ -395,6 +432,7 @@ async function reactionToCompanyReviewById(currentUserId, companyReviewId, react
 
 
       if(reaction){
+        result = reaction;
         if(reaction.reactionType=='LIKE'){
           found.likes.push(reaction)
 
@@ -402,11 +440,11 @@ async function reactionToCompanyReviewById(currentUserId, companyReviewId, react
           found.loves.push(reaction)
         }
 
-        result  = await found.save();
-        result.noOfLikes = found.likes.length;
-        result.noOfLoves = found.loves.length;
-        result.loves=[];
-        result.likes=[];
+        found  = await found.save();
+        found.noOfLikes = found.likes.length;
+        found.noOfLoves = found.loves.length;
+        found.loves=[];
+        found.likes=[];
 
       }
 

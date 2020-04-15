@@ -18,19 +18,20 @@ function addCompanySalary(salary) {
 }
 
 
-function findEmploymentTitlesCountByCompanyId(company) {
+async function findEmploymentTitlesCountByCompanyId(company) {
   let data = null;
 
   if(!company){
     return [];
   }
 
-  data = CompanySalary.aggregate([
+  let result = CompanySalary.aggregate([
     {$match: {company: company} },
     {$group: {_id: '$employmentTitle'}},
     {$count: 'count'}
   ]);
 
+  data = result.length?result[0].count:0;
   return data;
 }
 
@@ -41,13 +42,31 @@ function findSalariesByCompanyId(filter) {
     return [];
   }
 
+  let match = {};
+  let page = filter.page;
+  let size = filter.size;
+  let skip = filter.size * filter.page;
   let sort = {};
   sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
+
+  match.company = filter.company;
+
+  if(filter.country && filter.state && filter.city){
+    match.country = {$in: filter.country.trim().split(',')};
+    match.state = {$in: filter.state.trim().split(',')};
+    match.city = {$in: filter.city.trim().split(',')};
+  }
+
+  // console.log('skip', skip, page)
+
   data = CompanySalary.aggregate([
-    {$match: {company: filter.company} },
+    {$match: match},
     {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, average: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
-    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, average: 1}}
-  ]).limit(filter.size).sort(sort);
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, average: 1}},
+    {$sort: sort},
+    {$skip: skip},
+    {$limit: size}
+  ]);
 
   return data;
 }
@@ -86,6 +105,10 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
       maxStockBonus: {'$max': '$stockBonus'},
       minProfitSharing: {'$min': '$profitSharing'},
       maxProfitSharing: {'$max': '$profitSharing'},
+      minTip: {'$min': '$tip'},
+      maxTip: {'$max': '$tip'},
+      minCommision: {'$min': '$commision'},
+      maxCommision: {'$max': '$commision'},
       count: {'$sum': 1}
     };
 
@@ -104,6 +127,8 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
           minCashBonus: 1, maxCashBonus: 1,
           minStockBonus: 1, maxStockBonus: 1,
           minProfitSharing: 1, maxProfitSharing: 1,
+          minTip: 1, maxTip: 1,
+          minCommision: 1, maxCommision: 1,
           count: '$count'
         }
       }
@@ -196,6 +221,30 @@ function findAllCompanySalaryJobFunctions(company) {
 }
 
 
+
+function addCompanyReview(review) {
+
+  if(!review){
+    return null;
+  }
+  return new CompanyReview(review).save();
+}
+
+function findAllCompanyReviewLocations(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  data = CompanyReview.aggregate([
+    {$match: {company: company} },
+    {$group: {_id: {city: '$city', state: '$state', country: '$country'}}},
+    {$project: {_id: 0, city: '$_id.city', state: '$_id.state', country: '$_id.country'}}
+  ]).sort({country: 1});
+
+  return data;
+}
 
 
 async function findCompanyReviewHistoryByCompanyId(company) {
@@ -322,6 +371,32 @@ function addCompanyReview(review) {
   return new CompanyReview(review).save();
 }
 
+async function findTop3Highlights(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  let reactions = await CompanyReviewReaction.aggregate([
+    {$match: {company: company} },
+    {$group: {_id: '$companyReviewId', count: {$sum: 1}}},
+    {$project: {_id: 0, companyReviewId: '$_id', count: 1}}
+  ]).sort({count: -1}).limit(3);
+
+  if(reactions){
+    let reviews = [];
+    for(react of reactions){
+      let review = await CompanyReview.findOne({companyReviewId: react.companyReviewId}, {reviewTitle: 1, rating :1});
+      reviews.push({isPositive: review.rating>2?true:false, comment: review.reviewTitle, count: react.count})
+    }
+    data = reviews;
+  }
+
+  return data;
+}
+
+
 
 function addCompanyReviewReport(report) {
 
@@ -341,7 +416,9 @@ module.exports = {
   findAllCompanySalaryEmploymentTitles:findAllCompanySalaryEmploymentTitles,
   findAllCompanySalaryJobFunctions:findAllCompanySalaryJobFunctions,
   addCompanyReview:addCompanyReview,
+  findAllCompanyReviewLocations:findAllCompanyReviewLocations,
   findCompanyReviewHistoryByCompanyId:findCompanyReviewHistoryByCompanyId,
   findCompanyReviewsByCompanyId: findCompanyReviewsByCompanyId,
+  findTop3Highlights:findTop3Highlights,
   addCompanyReviewReport:addCompanyReviewReport
 }

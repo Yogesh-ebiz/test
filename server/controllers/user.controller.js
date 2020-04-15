@@ -96,6 +96,7 @@ const employmentSchema = Joi.object({
   partyId: Joi.number(),
   company: Joi.number().required(),
   employmentTitle: Joi.string().required(),
+  jobFunction: Joi.string().required(),
   description: Joi.string().optional(),
   startDate: Joi.number().required(),
   thruDate: Joi.number().required(),

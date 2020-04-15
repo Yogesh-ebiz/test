@@ -12,7 +12,7 @@ const CurrencySchema = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    default: Date.now()
+    default: Date.now
   },
   lastUpdatedDate: {
     type: Number

@@ -34,6 +34,10 @@ const PartyEmploymentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  jobFunction: {
+    type: String,
+    required: true
+  },
   description: {
     type: String,
     required: false,

@@ -22,6 +22,14 @@ const CompanySalarySchema = new mongoose.Schema({
     required: false,
     default: ''
   },
+  jobFunction: {
+    type: String,
+    required: true
+  },
+  yearExperience: {
+    type: Number,
+    required: true
+  },
   company: {
     type: Object,
     required: true
@@ -86,7 +94,7 @@ const CompanySalarySchema = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    default: Date.now()
+    default: Date.now
   },
   lastUpdatedDate: {
     type: Number

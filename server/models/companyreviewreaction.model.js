@@ -9,6 +9,10 @@ const CompanyReviewReaction = new mongoose.Schema({
     type: Number,
     required: false
   },
+  company: {
+    type: Number,
+    required: true
+  },
   companyReviewId: {
     type: Number,
     required: true
@@ -23,7 +27,7 @@ const CompanyReviewReaction = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    default: Date.now()
+    default: Date.now
   }
 }, {
   versionKey: false

@@ -81,5 +81,7 @@
 	"companysalaries_employmentTitle_retrieved_successful": "companysalaries_employmentTitle_retrieved_successful",
 	"companysalaries_location_retrieved_successful": "companysalaries_location_retrieved_successful",
 	"companysalaries_jobFunctions_retrieved_successful": "companysalaries_jobFunctions_retrieved_successful",
-	"jobfunctions_retrieved_successful": "jobfunctions_retrieved_successful"
+	"jobfunctions_retrieved_successful": "jobfunctions_retrieved_successful",
+	"companyreview_locations_retrieved_successful": "companyreview_locations_retrieved_successful",
+	"companysalary_employmentTitle_retrieved_successful": "companysalary_employmentTitle_retrieved_successful"
 }
