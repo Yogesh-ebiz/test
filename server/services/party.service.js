@@ -85,7 +85,8 @@ function addCompany(userId, company) {
     website: '',
     mission: '',
     yearFounded: null,
-    city: company.city, state: company.state, country: company.country}
+    postalAddress: {city: company.city, state: company.state, country: company.country}
+  }
 
   return axios.post('http://accessed.us-west-2.elasticbeanstalk.com/api/company/register', company, {headers: {"UserId":userId}});
 

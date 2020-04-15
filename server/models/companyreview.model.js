@@ -71,6 +71,11 @@ const CompanyReviewSchema = new mongoose.Schema({
     required: false,
     default: true
   },
+  employmentTitle: {
+    type: String,
+    required: false,
+    default: ''
+  },
   reviewTitle: {
     type: String,
     required: false

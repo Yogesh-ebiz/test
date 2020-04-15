@@ -98,10 +98,13 @@ app.use((err, req, res, next) => {
   if (err.isJoi) {
     err.message = err.details.map(e => e.message).join("; ");
     err.status = 400;
+
   }
 
   res.status(err.status || 500).json({
-    message: err.message
+    data: null,
+    message: err.message,
+    status: err.status
   });
   next(err);
 });

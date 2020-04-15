@@ -9,6 +9,15 @@ const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 
 
 
+function addCompanySalary(salary) {
+
+  if(!salary){
+    return null;
+  }
+  return new CompanySalary(salary).save();
+}
+
+
 function findEmploymentTitlesCountByCompanyId(company) {
   let data = null;
 
@@ -36,8 +45,8 @@ function findSalariesByCompanyId(filter) {
   sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
   data = CompanySalary.aggregate([
     {$match: {company: filter.company} },
-    {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, average: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
-    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', count: 1, average: 1}}
+    {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, average: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, average: 1}}
   ]).limit(filter.size).sort(sort);
 
   return data;
@@ -136,13 +145,56 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
   return data;
 }
 
-function addCompanySalary(salary) {
 
-  if(!salary){
-    return null;
+function findAllCompanySalaryLocations(company) {
+  let data = null;
+
+  if(!company){
+    return;
   }
-  return new CompanySalary(salary).save();
+
+  data = CompanySalary.aggregate([
+    {$match: {company: company} },
+    {$group: {_id: {city: '$city', state: '$state', country: '$country'}}},
+    {$project: {_id: 0, city: '$_id.city', state: '$_id.state', country: '$_id.country'}}
+  ]).sort({country: 1});
+
+  return data;
 }
+
+function findAllCompanySalaryEmploymentTitles(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  data = CompanySalary.aggregate([
+    {$match: {company: company} },
+    {$group: {_id: {employmentTitle: '$employmentTitle'}}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle'}}
+  ]).sort({employmentTitle: 1});
+
+  return data;
+}
+
+
+function findAllCompanySalaryJobFunctions(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  data = CompanySalary.aggregate([
+    {$match: {company: company} },
+    {$group: {_id: {jobFunction: '$jobFunction'}}},
+    {$project: {_id: 0, jobFunction: '$_id.jobFunction'}}
+  ]).sort({jobFunction: 1});
+
+  return data;
+}
+
 
 
 
@@ -153,11 +205,13 @@ async function findCompanyReviewHistoryByCompanyId(company) {
     return [];
   }
 
-  data = await CompanyReviewHistory.findOne({company: company});
+  // data = await CompanyReviewHistory.findOne({company: company});
 
-  if(data){
-
-  } else {
+  // if(data){
+  //   let today = new Date();
+  //   let lastReviewStatDate = new Date(data.createdDate);
+  //   let daysAgo = Math.floor( (Math.abs(today - lastReviewStatDate) / 1000) / 86400);
+  // } else {
     data = await CompanyReview.aggregate([
       {$match: {company: company}},
       {
@@ -201,22 +255,30 @@ async function findCompanyReviewHistoryByCompanyId(company) {
         }
       }]);
 
-    data = data[0]
-    if (data.totalReviews > 0) {
-      data = await new CompanyReviewHistory({
-        company: data.company,
-        avgRating: data.avgRating,
-        recommendCompany: data.minBaseSalary,
-        noOf5Stars: data.maxBaseSalary,
-        noOf4Stars: data.avgBaseSalary,
-        noOf3Stars: data.minAdditionalIncome,
-        noOf2Stars: data.maxAdditionalIncome,
-        noOf1Stars: data.avgAdditionalPay,
-        totalReviews: data.totalReviews
-      }).save();
+    if (data.length) {
 
+      // for(item of data) {
+      //   await CompanyReviewHistory({company: company},
+      //     {
+      //       $set: {
+      //         company: item.company,
+      //         avgRating: item.avgRating,
+      //         approveCEO: item.approveCEO,
+      //         recommendCompany: item.recommendCompany,
+      //         noOf5Stars: item.noOf5Stars,
+      //         noOf4Stars: item.noOf4Stars,
+      //         noOf3Stars: item.noOf3Stars,
+      //         noOf2Stars: item.noOf2Stars,
+      //         noOf1Stars: item.noOf1Stars,
+      //         totalReviews: item.totalReviews
+      //       }
+      //     }, {upsert: true});
+      // }
+      data = _.find(data, {company: company});
+    } else {
+      return null;
     }
-  }
+  // }
   return data;
 }
 
@@ -271,12 +333,15 @@ function addCompanyReviewReport(report) {
 
 
 module.exports = {
+  addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,
   findSalariesByCompanyId: findSalariesByCompanyId,
   findCompanySalaryByEmploymentTitle:findCompanySalaryByEmploymentTitle,
-  addCompanySalary:addCompanySalary,
+  findAllCompanySalaryLocations:findAllCompanySalaryLocations,
+  findAllCompanySalaryEmploymentTitles:findAllCompanySalaryEmploymentTitles,
+  findAllCompanySalaryJobFunctions:findAllCompanySalaryJobFunctions,
+  addCompanyReview:addCompanyReview,
   findCompanyReviewHistoryByCompanyId:findCompanyReviewHistoryByCompanyId,
   findCompanyReviewsByCompanyId: findCompanyReviewsByCompanyId,
-  addCompanyReview:addCompanyReview,
   addCompanyReviewReport:addCompanyReviewReport
 }

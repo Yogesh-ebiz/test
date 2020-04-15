@@ -19,7 +19,8 @@ const CompanySalarySchema = new mongoose.Schema({
   },
   employmentTitle: {
     type: String,
-    required: true
+    required: false,
+    default: ''
   },
   company: {
     type: Object,
@@ -31,10 +32,12 @@ const CompanySalarySchema = new mongoose.Schema({
   },
   currency: {
     type: String,
+    required: true,
     default: ''
   },
   basePayPeriod: {
     type: String,
+    required: true,
     default: ''
   },
   baseSalary: {

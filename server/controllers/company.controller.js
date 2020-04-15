@@ -11,9 +11,10 @@ let employmentTypeEnum = require('../const/employmentTypeEnum');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findListOfPartyEmploymentTitle} = require('../services/partyemployment.service');
 const {findCompanyReviewReactionByPartyId, addCompanyReviewReaction} = require('../services/companyreviewreaction.service');
+const {findCurrencyRate} = require('../services/currency.service');
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
-  findCompanyReviewHistoryByCompanyId, addCompanyReviewReport} = require('../services/company.service');
+  findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions} = require('../services/company.service');
 
 
 const CompanyReview = require('../models/companyreview.model');
@@ -24,7 +25,7 @@ const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 const salarySchema = Joi.object({
   partyId: Joi.number().required(),
   company: Joi.number().required(),
-  employmentTitle: Joi.string().required(),
+  employmentTitle: Joi.string().allow('').optional(),
   currency: Joi.string().required(),
   basePayPeriod: Joi.string().required(),
   baseSalary: Joi.number().required(),
@@ -44,6 +45,7 @@ const salarySchema = Joi.object({
 const reviewSchema = Joi.object({
   partyId: Joi.number().required(),
   company: Joi.number().required(),
+  employmentTitle: Joi.string().allow('').optional(),
   rating: Joi.number().required(),
   employmentType: Joi.string().required(),
   recommendCompany: Joi.boolean().required(),
@@ -74,6 +76,9 @@ module.exports = {
   addNewSalary,
   getCompanySalaries,
   getCompanySalaryByEmploymentTitle,
+  getCompanySalaryLocations,
+  getCompanySalaryEmploymentTitles,
+  getCompanySalaryJobFunctions,
   addNewReview,
   getCompanyReviewStats,
   getCompanyReviews,
@@ -106,18 +111,26 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 
   let result = null;
   try {
-    let total = await findEmploymentTitlesCountByCompanyId(filter.company);
-    result = await findSalariesByCompanyId(filter);
+    let currentParty = await getPersonById(currentUserId);
 
 
-    result = _.reduce(result, function(res, item){
-      item.hasLiked = false;
-      res.push(item);
-      return res;
-    }, [])
+    if (isPartyActive(currentParty)) {
+      let total = await findEmploymentTitlesCountByCompanyId(filter.company);
+      result = await findSalariesByCompanyId(filter);
+      let currencies = await findCurrencyRate(currentParty.preferredCurrency);
 
-    result = new CustomPagination({count: total[0].count, result: result}, filter, locale);
+      result = _.reduce(result, function (res, item) {
+        let currency = _.find(currencies, {currency: currentParty.preferredCurrency + item.currency});
+        item.hasLiked = false;
+        item.average = Math.floor(item.average * currency.rate, 0);
+        item.currency = currentParty.preferredCurrency;
+        res.push(item);
+        return res;
+      }, [])
 
+      let pagination = new CustomPagination({count: total[0].count, result: result}, filter, locale);
+      result = pagination;
+    }
   } catch (e) {
     console.log('getCompanySalaries: Error', e);
   }
@@ -139,7 +152,71 @@ async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, emplo
 
 
   } catch (e) {
-    console.log('getCompanySalaryByEmploymentTitle: Error', e)
+    console.log('Error: getCompanySalaryByEmploymentTitle', e)
+  }
+  return result;
+}
+
+async function getCompanySalaryLocations(currentUserId, companyId) {
+
+  if(currentUserId==null || companyId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await findAllCompanySalaryLocations(companyId);
+
+
+  } catch (e) {
+    console.log('Error: getCompanySalaryLocations', e)
+  }
+  return result;
+}
+
+async function getCompanySalaryEmploymentTitles(currentUserId, companyId) {
+
+  if(currentUserId==null || companyId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await findAllCompanySalaryEmploymentTitles(companyId);
+    result = _.reduce(result, function(res, item){
+      res.push(item.employmentTitle);
+      return res;
+    }, []);
+
+  } catch (e) {
+    console.log('Error: getCompanySalaryEmploymentTitles', e)
+  }
+  return result;
+}
+
+
+async function getCompanySalaryJobFunctions(currentUserId, companyId) {
+
+  if(currentUserId==null || companyId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await findAllCompanySalaryJobFunctions(companyId);
+    result = _.reduce(result, function(res, item){
+      if(item.jobFunction){
+        res.push(item.jobFunction);
+      }
+
+      return res;
+    }, []);
+
+  } catch (e) {
+    console.log('Error: getCompanySalaryEmploymentTitles', e)
   }
   return result;
 }
@@ -182,27 +259,29 @@ async function addNewReview(currentUserId, review) {
 async function getCompanyReviewStats(userId, company, locale) {
   let result = null;
 
-  result = await findCompanyReviewHistoryByCompanyId(company)
-  result.mostPopularReviews = [
-    {isPositive: true, comment: "I love this company"},
-    {isPositive: true, comment: "Company is Awesome"},
-    {isPositive: false, comment: "Need more space"}]
+  result = await findCompanyReviewHistoryByCompanyId(company);
 
+  if(result) {
+    result.mostPopularReviews = [
+      {isPositive: true, comment: "I love this company"},
+      {isPositive: true, comment: "Company is Awesome"},
+      {isPositive: false, comment: "Need more space"}]
+  }
   return result;
 }
 
 
 async function getCompanyReviews(currentUserId, filter, locale) {
   let result = null;
-
   let select = '-description -qualifications -responsibilities';
   let limit = (filter.size && filter.size>0) ? filter.size:20;
   let page = (filter.page && filter.page==0) ? filter.page:1;
   let sortBy = {};
-  filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+  filter.sortBy = (filter.sortBy!=null) ? filter.sortBy : 'createdDate';
   filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
   sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
+  console.log(sortBy)
   let options = {
     select:   select,
     sort:     sortBy,
@@ -225,17 +304,17 @@ async function getCompanyReviews(currentUserId, filter, locale) {
 
   let partyIds = _.uniq(_.map(result.docs, 'partyId'));
   let reactions = await findCompanyReviewReactionByPartyId(currentUserId);
-  result.docs = await populatePerson(result.docs);
+  // result.docs = await populatePerson(result.docs);
 
   let employments = await findListOfPartyEmploymentTitle(partyIds);
 
   result.docs = _.reduce(result.docs, function(res, item){
-    let find = _.find(employments, {id: item.party.id});
+    // let find = _.find(employments, {id: item.party.id});
     let hasLiked = _.find(reactions, {partyId: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LIKE'})?true:false;
     let hasLoved = _.find(reactions, {partyId: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LOVE'})?true:false;
 
 
-    item.party = find;
+    // item.party = find;
     item.noOfLikes =  (item.likes)? item.likes.length: 0;
     item.noOfLoves = (item.loves)? item.loves.length : 0;
     item.hasLiked = hasLiked;

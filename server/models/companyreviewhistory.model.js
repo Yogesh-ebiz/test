@@ -13,27 +13,27 @@ const CompanyReviewHistorySchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  no5Stars: {
+  noOf5Stars: {
     type: Number,
     required: true,
     default: 0
   },
-  no4Stars: {
+  noOf4Stars: {
     type: Number,
     required: false,
     default: 0
   },
-  no3Stars: {
+  noOf3Stars: {
     type: Number,
     required: false,
     default: 0
   },
-  no2Stars: {
+  noOf2Stars: {
     type: Number,
     required: false,
     default: 0
   },
-  no1Stars: {
+  noOf1Stars: {
     type: Number,
     required: false,
     default: 0

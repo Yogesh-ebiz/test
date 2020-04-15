@@ -76,5 +76,10 @@
 	"companyreviewstats_retrieved_successful": "companyreviewstats_retrieved_successful",
 	"review_reported_successful": "review_reported_successful",
 	"reaction_added_successful": "reaction_added_successful",
-	"reaction_removed_successful": "reaction_removed_successful"
+	"reaction_removed_successful": "reaction_removed_successful",
+	"companysalarieslocation_retrieved_successful": "companysalarieslocation_retrieved_successful",
+	"companysalaries_employmentTitle_retrieved_successful": "companysalaries_employmentTitle_retrieved_successful",
+	"companysalaries_location_retrieved_successful": "companysalaries_location_retrieved_successful",
+	"companysalaries_jobFunctions_retrieved_successful": "companysalaries_jobFunctions_retrieved_successful",
+	"jobfunctions_retrieved_successful": "jobfunctions_retrieved_successful"
 }

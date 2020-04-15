@@ -12,6 +12,11 @@ module.exports = router;
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
 router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymentTitle));
+router.route('/:id/salaries/filter/locations/search').get(asyncHandler(getCompanySalaryLocations));
+router.route('/:id/salaries/filter/employmenttitles/search').get(asyncHandler(getCompanySalaryEmploymentTitles));
+router.route('/:id/salaries/filter/jobfunctions/search').get(asyncHandler(getCompanySalaryJobFunctions));
+
+
 
 router.route('/:id/reviews').post(asyncHandler(addCompanyReview));
 router.route('/:id/reviews/stats').get(asyncHandler(getCompanyReviewStats));
@@ -29,9 +34,12 @@ router.route('/:id/reviews/:companyReviewId').get(asyncHandler(getCompanyReviewB
 
 async function addNewSalary(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
-  let body = req.body;
-  body.partyId = currentUserId;
-  let data = await companyCtl.addNewSalary(currentUserId, body);
+  let company = parseInt(req.params.id);
+  let salary = req.body;
+  salary.partyId = currentUserId;
+  salary.company = company;
+
+  let data = await companyCtl.addNewSalary(currentUserId, salary);
   res.json(new Response(data, data?'salary_added_successful':'not_found', res));
 }
 
@@ -52,15 +60,41 @@ async function getCompanySalaryByEmploymentTitle(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let employmentTitle = req.query.employmentTitle;
+  let country = req.query.country;
   let data = await companyCtl.getCompanySalaryByEmploymentTitle(currentUserId, company, employmentTitle, country, req.locale);
-  res.json(new Response(data, data?'companysalary_employmenttitle_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'companysalary_employmentTitle_retrieved_successful':'not_found', res));
 }
 
 
+
+async function getCompanySalaryLocations(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let data = await companyCtl.getCompanySalaryLocations(currentUserId, company, req.locale);
+  res.json(new Response(data, data?'companysalaries_location_retrieved_successful':'not_found', res));
+}
+
+
+async function getCompanySalaryEmploymentTitles(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let data = await companyCtl.getCompanySalaryEmploymentTitles(currentUserId, company);
+  res.json(new Response(data, data?'companysalaries_employmentTitle_retrieved_successful':'not_found', res));
+}
+
+async function getCompanySalaryJobFunctions(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let data = await companyCtl.getCompanySalaryJobFunctions(currentUserId, company);
+  res.json(new Response(data, data?'companysalaries_jobFunctions_retrieved_successful':'not_found', res));
+}
+
 async function addCompanyReview(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
   let review = req.body;
   review.partyId = currentUserId;
+  review.company = company;
   let data = await companyCtl.addNewReview(currentUserId, review, req.locale);
   res.json(new Response(data, data?'companyreview_added_successful':'not_found', res));
 }
