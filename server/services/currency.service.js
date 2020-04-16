@@ -9,18 +9,24 @@ let source = 'USD';
 let currencies = '';
 let format = 1;
 
-async function findCurrencyRate(currency) {
+async function findCurrencyRate(src, target) {
   let data = null;
 
-  if(currency==null){
+  if(src==null || target==null){
     return;
   }
 
-  let regex = '^'+currency+'*';
-  data = await Currency.find({currency: {$regex: regex}});
-  if(!data.length){
-    await updateCurrencies(currency);
-    data = await Currency.find({currency: {$regex: '/^' + currency + '/'}});
+  // let regex = '^'+currency+'*';
+  // data = await Currency.find({currency: {$regex: regex}});
+
+  let currency = src+target;
+  data = await Currency.findOne({currency: currency});
+  console.log('data', data)
+  if(!data){
+    await updateCurrencies(src);
+    // data = await Currency.find({currency: {$regex: '/^' + currency + '/'}});
+    data = await Currency.findOne({currency: currency});
+    console.log('finding', currency, data);
   }
 
   return data;

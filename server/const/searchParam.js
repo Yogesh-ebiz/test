@@ -73,6 +73,7 @@ function SearchParam(filter) {
       return result;
     }, []);
     this.query.employmentType =  { $in: employmentType};
+    console.log('employmentType', this.query.employmentType);
   }
 
   if (filter.industry && filter.industry!="") {

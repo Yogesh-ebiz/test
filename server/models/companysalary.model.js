@@ -22,6 +22,10 @@ const CompanySalarySchema = new mongoose.Schema({
     required: false,
     default: ''
   },
+  employmentType: {
+    type: String,
+    required: true
+  },
   jobFunction: {
     type: String,
     required: true

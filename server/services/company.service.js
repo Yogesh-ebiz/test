@@ -6,6 +6,7 @@ const CompanyReview = require('../models/companyreview.model');
 const CompanyReviewHistory = require('../models/companyreviewhistory.model');
 const CompanyReviewReport = require('../models/companyreviewreport.model');
 const CompanyReviewReaction = require('../models/companyreviewreaction.model');
+const JobFunction = require('../models/jobfunctions.model');
 
 
 
@@ -18,20 +19,41 @@ function addCompanySalary(salary) {
 }
 
 
-async function findEmploymentTitlesCountByCompanyId(company) {
+async function findEmploymentTitlesCountByCompanyId(filter) {
   let data = null;
 
-  if(!company){
+  if(!filter){
     return [];
   }
 
-  let result = CompanySalary.aggregate([
-    {$match: {company: company} },
-    {$group: {_id: '$employmentTitle'}},
-    {$count: 'count'}
+  let match = {};
+  let page = filter.page;
+  let size = filter.size;
+  let skip = filter.size * filter.page;
+  let sort = {};
+  sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
+
+  match.company = filter.company;
+
+  if(filter.country && filter.state && filter.city){
+    match.country = {$in: filter.country.trim().split(',')};
+    match.state = {$in: filter.state.trim().split(',')};
+    match.city = {$in: filter.city.trim().split(',')};
+  }
+  if(filter.country && filter.state && filter.city){
+    match.country = {$in: filter.country.trim().split(',')};
+    match.state = {$in: filter.state.trim().split(',')};
+    match.city = {$in: filter.city.trim().split(',')};
+  }
+
+  // console.log('skip', skip, page)
+
+  data = await CompanySalary.aggregate([
+    {$match: match},
+    {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, count: {'$sum': 1}}}
   ]);
 
-  data = result.length?result[0].count:0;
+  data = data.length;
   return data;
 }
 
@@ -61,8 +83,8 @@ function findSalariesByCompanyId(filter) {
 
   data = CompanySalary.aggregate([
     {$match: match},
-    {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, average: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
-    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, average: 1}},
+    {$group: {_id: {employmentTitle: '$employmentTitle', basePayPeriod: '$basePayPeriod', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, avgBaseSalary: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, avgBaseSalary: 1}},
     {$sort: sort},
     {$skip: skip},
     {$limit: size}
@@ -71,6 +93,8 @@ function findSalariesByCompanyId(filter) {
   return data;
 }
 
+
+//TODO: Refactor
 async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country) {
   let data = null;
 
@@ -85,11 +109,6 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
   //
   // } else {
 
-    let rates = {
-      'USD': 1,
-      'VND': 0.000001
-    }
-
     let group = {
       _id: {employmentTitle: '$employmentTitle', country: '$country'},
       avgTotalPay: {$avg: {$sum: ['$baseSalary', '$additionalIncome', '$cashBonus', '$stockBonus', '$profitSharing', '$tip', '$commision']}},
@@ -101,14 +120,19 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
       avgAdditionalIncome: {'$avg': '$additionalIncome'},
       minCashBonus: {'$min': '$cashBonus'},
       maxCashBonus: {'$max': '$cashBonus'},
+      noCashBonus: {$sum: {$cond: {if: {$gt: ['$cashBonus', 0]}, then: 1, else: 0}}},
       minStockBonus: {'$min': '$stockBonus'},
       maxStockBonus: {'$max': '$stockBonus'},
+      noStockBonus: {$sum: {$cond: {if: {$gt: ['$stockBonus', 0]}, then: 1, else: 0}}},
       minProfitSharing: {'$min': '$profitSharing'},
       maxProfitSharing: {'$max': '$profitSharing'},
+      noOfProfitSharing: {$sum: {$cond: {if: {$gt: ['$profitSharing', 0]}, then: 1, else: 0}}},
       minTip: {'$min': '$tip'},
       maxTip: {'$max': '$tip'},
+      noOfTip: {$sum: {$cond: {if: {$gt: ['$tip', 0]}, then: 1, else: 0}}},
       minCommision: {'$min': '$commision'},
       maxCommision: {'$max': '$commision'},
+      noOfCommision: {$sum: {$cond: {if: {$gt: ['$commision', 0]}, then: 1, else: 0}}},
       count: {'$sum': 1}
     };
 
@@ -124,44 +148,53 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
           avgTotalPay: {$floor: '$avgTotalPay'},
           minBaseSalary: 1, maxBaseSalary: 1, avgBaseSalary: {$floor: '$avgBaseSalary'},
           minAdditionalIncome: 1, maxAdditionalIncome: 1, avgAdditionalIncome: {$floor: '$avgAdditionalIncome'},
-          minCashBonus: 1, maxCashBonus: 1,
-          minStockBonus: 1, maxStockBonus: 1,
-          minProfitSharing: 1, maxProfitSharing: 1,
-          minTip: 1, maxTip: 1,
-          minCommision: 1, maxCommision: 1,
+          minCashBonus: 1, maxCashBonus: 1, noCashBonus: 1,
+          minStockBonus: 1, maxStockBonus: 1, noStockBonus: 1,
+          minProfitSharing: 1, maxProfitSharing: 1, noOfProfitSharing: 1,
+          minTip: 1, maxTip: 1, noOfTip: 1,
+          minCommision: 1, maxCommision: 1, noOfCommision: 1,
           count: '$count'
         }
       }
     ]);
 
-
     if(data.length){
-      for(item of data){
-        await CompanySalaryHistory.update({company: companyId, employmentTitle: employmentTitle, country: country},
-          {$set: {
-              company: companyId,
-              avgTotalPay: item.avgTotalPay,
-              employmentTitle: item.employmentTitle,
-              minBaseSalary: item.minBaseSalary,
-              maxBaseSalary: item.maxBaseSalary,
-              avgBaseSalary: item.avgBaseSalary,
-              minAdditionalIncome: item.minAdditionalIncome,
-              maxAdditionalIncome: item.maxAdditionalIncome,
-              avgAdditionalIncome: item.avgAdditionalIncome,
-              minCashBonus: item.minCashBonus,
-              maxCashBonus: item.maxCashBonus,
-              minStockBonus: item.minStockBonus,
-              maxStockBonus: item.maxStockBonus,
-              minProfitSharing: item.minProfitSharing,
-              maxProfitSharing: item.maxProfitSharing,
-              count: item.count,
-              lastUpdatedDate: Date.now()
-            }
-        }, {upsert:true});
-      }
-
-      data = _.find(data, {country: country});
+      data=data[0];
+      data.createdDate = Date.now();
+      data.lastUpdatedDate = Date.now();
+    } else {
+      data=null;
     }
+
+
+    // console.log('data', data)
+    // if(data.length){
+    //   // for(data[0] of data){
+    //     data = await CompanySalaryHistory.findOneAndUpdate({company: companyId, employmentTitle: employmentTitle, country: country},
+    //       {$set: {
+    //           company: companyId,
+    //           avgTotalPay: data[0].avgTotalPay,
+    //           employmentTitle: data[0].employmentTitle,
+    //           minBaseSalary: data[0].minBaseSalary,
+    //           maxBaseSalary: data[0].maxBaseSalary,
+    //           avgBaseSalary: data[0].avgBaseSalary,
+    //           minAdditionalIncome: data[0].minAdditionalIncome,
+    //           maxAdditionalIncome: data[0].maxAdditionalIncome,
+    //           avgAdditionalIncome: data[0].avgAdditionalIncome,
+    //           minCashBonus: data[0].minCashBonus,
+    //           maxCashBonus: data[0].maxCashBonus,
+    //           minStockBonus: data[0].minStockBonus,
+    //           maxStockBonus: data[0].maxStockBonus,
+    //           minProfitSharing: data[0].minProfitSharing,
+    //           maxProfitSharing: data[0].maxProfitSharing,
+    //           count: data[0].count,
+    //           lastUpdatedDate: Date.now()
+    //         }
+    //     }, {upsert:true, new: true});
+    //   // }
+    //
+    //   // data = _.find(data, {country: country});
+    // }
   //
   // }
 
@@ -204,18 +237,32 @@ function findAllCompanySalaryEmploymentTitles(company) {
 }
 
 
-function findAllCompanySalaryJobFunctions(company) {
+async function findAllCompanySalaryJobFunctions(company, locale) {
   let data = null;
 
   if(!company){
     return;
   }
 
-  data = CompanySalary.aggregate([
+  data = await CompanySalary.aggregate([
     {$match: {company: company} },
     {$group: {_id: {jobFunction: '$jobFunction'}}},
     {$project: {_id: 0, jobFunction: '$_id.jobFunction'}}
   ]).sort({jobFunction: 1});
+
+  data = _.reduce(data, function(res, item){
+    if(item.jobFunction) {
+      res.push(item.jobFunction);
+    }
+    return res;
+  }, []);
+
+  let localeStr = locale? locale.toLowerCase() : 'en';
+  let propLocale = '$name.'+localeStr;
+  data = JobFunction.aggregate([
+    { $match: {shortCode: {$in: data}} },
+    { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+  ]);
 
   return data;
 }

@@ -25,7 +25,8 @@ const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 const salarySchema = Joi.object({
   partyId: Joi.number().required(),
   company: Joi.number().required(),
-  employmentTitle: Joi.string().allow('').optional(),
+  employmentTitle: Joi.string().required(),
+  employmentType: Joi.string().required(),
   jobFunction: Joi.string().required(),
   yearExperience: Joi.number().optional(),
   currency: Joi.string().required(),
@@ -119,15 +120,42 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 
 
     if (isPartyActive(currentParty)) {
-      let total = await findEmploymentTitlesCountByCompanyId(filter.company);
+      let total = await findEmploymentTitlesCountByCompanyId(filter);
       result = await findSalariesByCompanyId(filter);
-      let currencies = await findCurrencyRate(currentParty.preferredCurrency);
 
+      console.log('result', result)
+
+      let listOfCurrencies = _.reduce(result, function(res, item){
+        let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
+        res.push({src: item.currency, target: preferredCurrency});
+        return res;
+      }, []);
+
+      console.log(listOfCurrencies)
+      // let currencies = await findCurrencyRate(currentParty.preferredCurrency);
+      let loadCurrencies = listOfCurrencies.map(currency => findCurrencyRate(currency.src, currency.target));
+      let currencies = await Promise.all(loadCurrencies);
+
+      console.log('currencies', currencies)
       result = _.reduce(result, function (res, item) {
-        let currency = _.find(currencies, {currency: currentParty.preferredCurrency + item.currency});
+        let currency = _.find(currencies, {currency: item.currency+currentParty.preferredCurrency});
+        let avgBaseSalary = 0;
+        switch (item.basePayPeriod){
+          case 'ANNUALLY':
+            avgBaseSalary = item.avgBaseSalary * currency.rate;
+            break;
+          case 'MONTHLY':
+            avgBaseSalary = item.avgBaseSalary * currency.rate;
+            break;
+          case 'WEEKLY':
+            avgBaseSalary = item.avgBaseSalary * currency.rate;
+            break;
+        }
+
         item.hasLiked = false;
-        item.average = Math.floor(item.average * currency.rate, 0);
-        item.currency = currentParty.preferredCurrency;
+        item.avgBaseSalary = avgBaseSalary //Math.floor(item.avgBaseSalary * currency.rate, 0);
+        item.displayCurrency = currentParty.preferredCurrency;
+
         res.push(item);
         return res;
       }, [])
@@ -153,7 +181,7 @@ async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, emplo
   try {
 
     result = await findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country);
-
+    result.shareUrl = 'http://www.accessed.com/company/' + companyId + '/salary/' + employmentTitle.replace(' ', '-');
 
   } catch (e) {
     console.log('Error: getCompanySalaryByEmploymentTitle', e)
@@ -201,7 +229,7 @@ async function getCompanySalaryEmploymentTitles(currentUserId, companyId) {
 }
 
 
-async function getCompanySalaryJobFunctions(currentUserId, companyId) {
+async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
 
   if(currentUserId==null || companyId==null){
     return null;
@@ -210,14 +238,14 @@ async function getCompanySalaryJobFunctions(currentUserId, companyId) {
   let result = null;
   try {
 
-    result = await findAllCompanySalaryJobFunctions(companyId);
-    result = _.reduce(result, function(res, item){
-      if(item.jobFunction){
-        res.push(item.jobFunction);
-      }
-
-      return res;
-    }, []);
+    result = await findAllCompanySalaryJobFunctions(companyId, locale);
+    // result = _.reduce(result, function(res, item){
+    //   if(item.jobFunction){
+    //     res.push(item.jobFunction);
+    //   }
+    //
+    //   return res;
+    // }, []);
 
   } catch (e) {
     console.log('Error: getCompanySalaryEmploymentTitles', e)
@@ -299,7 +327,6 @@ async function getCompanyReviews(currentUserId, filter, locale) {
   filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
   sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
-  console.log(sortBy)
   let options = {
     select:   select,
     sort:     sortBy,

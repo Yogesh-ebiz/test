@@ -87,7 +87,7 @@ async function getCompanySalaryEmploymentTitles(req, res) {
 async function getCompanySalaryJobFunctions(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
-  let data = await companyCtl.getCompanySalaryJobFunctions(currentUserId, company);
+  let data = await companyCtl.getCompanySalaryJobFunctions(currentUserId, company, res.locale);
   res.json(new Response(data, data?'companysalary_jobfunctions_retrieved_successful':'not_found', res));
 }
 

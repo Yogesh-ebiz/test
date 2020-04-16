@@ -2,7 +2,7 @@
   {"employmentTypeId" : 1, "name" : { "en" : "Full Time" }, "shortCode" : "FULLTIME"},
   {"employmentTypeId" : 2, "name" : { "en" : "Part Time" }, "shortCode" : "PARTTIME"},
   {"employmentTypeId" : 3, "name" : { "en" : "Freelance" }, "shortCode" : "FREELANCE"},
-  {"employmentTypeId" : 4, "name" : { "en" : "Consulting" }, "shortCode" : "CONSULT"},
+  {"employmentTypeId" : 4, "name" : { "en" : "Contract" }, "shortCode" : "CONTRACT"},
   {"employmentTypeId" : 5, "name" : { "en" : "Remote" }, "shortCode" : "REMOTE"},
   {"employmentTypeId" : 6, "name" : { "en" : "Internship" }, "shortCode" : "INTERN"}
 ]
