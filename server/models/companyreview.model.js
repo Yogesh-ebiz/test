@@ -92,6 +92,21 @@ const CompanyReviewSchema = new mongoose.Schema({
     type: Array,
     required: false
   },
+  city: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  state: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  country: {
+    type: String,
+    required: false,
+    default: ''
+  },
   createdDate: {
     type: Number,
     default: Date.now

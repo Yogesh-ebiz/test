@@ -28,7 +28,7 @@ const salarySchema = Joi.object({
   employmentTitle: Joi.string().required(),
   employmentType: Joi.string().required(),
   jobFunction: Joi.string().required(),
-  yearExperience: Joi.number().optional(),
+  yearsExperience: Joi.number().optional(),
   currency: Joi.string().required(),
   basePayPeriod: Joi.string().required(),
   baseSalary: Joi.number().required(),
@@ -57,7 +57,10 @@ const reviewSchema = Joi.object({
   reviewTitle: Joi.string(),
   pros: Joi.array(),
   cons: Joi.array(),
-  advices: Joi.array()
+  advices: Joi.array(),
+  city: Joi.string().optional(),
+  state: Joi.string().optional(),
+  country: Joi.string().optional()
 })
 
 const companyReviewReportSchema = Joi.object({
@@ -123,7 +126,6 @@ async function getCompanySalaries(currentUserId, filter, locale) {
       let total = await findEmploymentTitlesCountByCompanyId(filter);
       result = await findSalariesByCompanyId(filter);
 
-      console.log('result', result)
 
       let listOfCurrencies = _.reduce(result, function(res, item){
         let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
@@ -131,12 +133,10 @@ async function getCompanySalaries(currentUserId, filter, locale) {
         return res;
       }, []);
 
-      console.log(listOfCurrencies)
       // let currencies = await findCurrencyRate(currentParty.preferredCurrency);
       let loadCurrencies = listOfCurrencies.map(currency => findCurrencyRate(currency.src, currency.target));
       let currencies = await Promise.all(loadCurrencies);
 
-      console.log('currencies', currencies)
       result = _.reduce(result, function (res, item) {
         let currency = _.find(currencies, {currency: item.currency+currentParty.preferredCurrency});
         let avgBaseSalary = 0;

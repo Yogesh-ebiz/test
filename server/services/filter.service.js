@@ -189,10 +189,10 @@ function getAllIndustries(filter, locale) {
   let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
   let data = null;
 
-  let propLocale = '$name.'+localeStr;
+  let propLocale = '$locale.'+localeStr;
   if(keyword){
     let match = {};
-    match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
+    match['locale.'+localeStr] = { $regex: keyword, $options: 'i'};
     data = Industry.aggregate([
       { $match: match },
       { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }

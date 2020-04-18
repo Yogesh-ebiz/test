@@ -30,7 +30,7 @@ const CompanySalarySchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  yearExperience: {
+  yearsExperience: {
     type: Number,
     required: true
   },

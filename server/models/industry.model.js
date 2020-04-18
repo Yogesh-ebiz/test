@@ -8,6 +8,9 @@ const IndustrySchema = new mongoose.Schema({
     required: true
   },
   name: {
+    type: String
+  },
+  locale: {
     type: Object,
     required: true
   },
@@ -39,7 +42,7 @@ const IndustrySchema = new mongoose.Schema({
 
 
 IndustrySchema.plugin(autoIncrement, {
-  model: 'JobFunction',
+  model: 'Industries',
   field: 'id',
   startAt: 100000,
   incrementBy: 1

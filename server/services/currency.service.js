@@ -21,12 +21,10 @@ async function findCurrencyRate(src, target) {
 
   let currency = src+target;
   data = await Currency.findOne({currency: currency});
-  console.log('data', data)
   if(!data){
     await updateCurrencies(src);
     // data = await Currency.find({currency: {$regex: '/^' + currency + '/'}});
     data = await Currency.findOne({currency: currency});
-    console.log('finding', currency, data);
   }
 
   return data;

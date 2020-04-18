@@ -27,29 +27,76 @@ async function findEmploymentTitlesCountByCompanyId(filter) {
   }
 
   let match = {};
+  let and = [];
   let page = filter.page;
   let size = filter.size;
   let skip = filter.size * filter.page;
   let sort = {};
   sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
 
-  match.company = filter.company;
-
-  if(filter.country && filter.state && filter.city){
-    match.country = {$in: filter.country.trim().split(',')};
-    match.state = {$in: filter.state.trim().split(',')};
-    match.city = {$in: filter.city.trim().split(',')};
+  if(filter.company) {
+    and.push({company: filter.company});
   }
-  if(filter.country && filter.state && filter.city){
-    match.country = {$in: filter.country.trim().split(',')};
-    match.state = {$in: filter.state.trim().split(',')};
-    match.city = {$in: filter.city.trim().split(',')};
-  }
+  //
+  // if(filter.employmentTitle) {
+  //   and.push({employmentTitle: filter.employmentTitle});
+  // }
+  //
+  // if(filter.country){
+  //   let country = _.reduce(filter.country.split(','), function(res, item){
+  //     res.push(item.trim());
+  //     return res;
+  //   }, [])
+  //   and.push({country: {$in: country}});
+  // }
+  //
+  // if(filter.state){
+  //   let state = _.reduce(filter.state.split(','), function(res, item){
+  //     res.push(item.trim());
+  //     return res;
+  //   }, [])
+  //   and.push({state: {$in: state}});
+  // }
+  //
+  // if(filter.city){
+  //   let city = _.reduce(filter.city.split(','), function(res, item){
+  //     res.push(item.trim());
+  //     return res;
+  //   }, [])
+  //   and.push({city: {$in: city}});
+  // }
+  //
+  // if(filter.jobFunction){
+  //   let jobFunction = _.reduce(filter.jobFunction.split(','), function(result, value, key) {
+  //     result.push(value.trim());
+  //     return result;
+  //   }, []);
+  //
+  //   and.push({jobFunction: {$in: jobFunction}});
+  // }
+  //
+  //
+  // if(filter.yearsExperience){
+  //   let years = filter.yearsExperience.trim().split(',');
+  //
+  //   years = _.reduce(years, function(res, item){
+  //     let criteria = item.split('-')
+  //
+  //     if(criteria.length==1){
+  //       res.push({yearsExperience: parseInt(criteria[0])})
+  //     }
+  //     else if(criteria.length>1){
+  //       res.push({$and: [{yearsExperience: {$gte: parseInt(criteria[0])}}, {yearsExperience: {$lte: parseInt(criteria[1])}}]});
+  //     }
+  //
+  //     return res;
+  //   }, []);
+  //   and.push({$or: years});
+  // }
 
-  // console.log('skip', skip, page)
 
   data = await CompanySalary.aggregate([
-    {$match: match},
+    {$match: {$and: and}},
     {$group: {_id: {employmentTitle: '$employmentTitle', country: '$country'}, count: {'$sum': 1}}}
   ]);
 
@@ -65,24 +112,80 @@ function findSalariesByCompanyId(filter) {
   }
 
   let match = {};
+  let and = [];
   let page = filter.page;
   let size = filter.size;
   let skip = filter.size * filter.page;
   let sort = {};
   sort[filter.sortBy] = filter.direction=='DESC'?-1:1;
 
-  match.company = filter.company;
-
-  if(filter.country && filter.state && filter.city){
-    match.country = {$in: filter.country.trim().split(',')};
-    match.state = {$in: filter.state.trim().split(',')};
-    match.city = {$in: filter.city.trim().split(',')};
+  if(filter.company) {
+    and.push({company: filter.company});
   }
 
-  // console.log('skip', skip, page)
+  if(filter.employmentTitle) {
+    and.push({employmentTitle: filter.employmentTitle});
+  }
+
+  if(filter.country){
+    let country = _.reduce(filter.country.split(','), function(res, item){
+      res.push(item.trim());
+      return res;
+    }, [])
+    and.push({country: {$in: country}});
+  }
+
+  if(filter.state){
+    let state = _.reduce(filter.state.split(','), function(res, item){
+      res.push(item.trim());
+      return res;
+    }, [])
+    and.push({state: {$in: state}});
+  }
+
+  if(filter.city){
+    let city = _.reduce(filter.city.split(','), function(res, item){
+      res.push(item.trim());
+      return res;
+    }, [])
+    and.push({city: {$in: city}});
+  }
+
+  if(filter.jobFunction){
+    let jobFunction = _.reduce(filter.jobFunction.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+
+    and.push({jobFunction: {$in: jobFunction}});
+  }
+
+
+  if(filter.yearsExperience){
+    let years = filter.yearsExperience.trim().split(',');
+    years = _.reduce(years, function(res, item){
+      let criteria = item.split('-')
+
+      if(criteria.length==1){
+        if(criteria[0].indexOf('>')>-1){
+          res.push({yearsExperience: {$gt: parseInt(criteria[0].replace('>', ''))}});
+        }else {
+          res.push({yearsExperience: parseInt(criteria[0])})
+        }
+
+      }
+      else if(criteria.length>1){
+        res.push({$and: [{yearsExperience: {$gte: parseInt(criteria[0])}}, {yearsExperience: {$lte: parseInt(criteria[1])}}]});
+      }
+
+      return res;
+    }, []);
+    and.push({$or: years});
+  }
+
 
   data = CompanySalary.aggregate([
-    {$match: match},
+    {$match: {$and: and}},
     {$group: {_id: {employmentTitle: '$employmentTitle', basePayPeriod: '$basePayPeriod', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, avgBaseSalary: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
     {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, avgBaseSalary: 1}},
     {$sort: sort},
