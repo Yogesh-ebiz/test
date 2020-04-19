@@ -1,3 +1,6 @@
+const _ = require('lodash');
+
+
 const ExperienceLevel = require('../models/experiencelevel.model');
 const JobFunction = require('../models/jobfunctions.model');
 const EmploymentTypes = require('../models/employmenttypes.model');
@@ -190,18 +193,35 @@ function getAllIndustries(filter, locale) {
   let data = null;
 
   let propLocale = '$locale.'+localeStr;
-  if(keyword){
-    let match = {};
-    match['locale.'+localeStr] = { $regex: keyword, $options: 'i'};
-    data = Industry.aggregate([
-      { $match: match },
-      { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
-    ]);
-  }else {
-    data = Industry.aggregate([
-      { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
-    ]);
+  let match = {};
+  if(keyword) {
+    match['locale.' + localeStr] = {$regex: keyword, $options: 'i'};
   }
+
+  if(filter.shortCode){
+    let shortCode = _.reduce(filter.shortCode.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+
+    console.log(filter.shortCode, shortCode)
+    match.shortCode = {$in: shortCode};
+  }
+
+  data = Industry.aggregate([
+    { $match: match },
+    { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+  ]);
+
+  //   data = Industry.aggregate([
+  //     { $match: match },
+  //     { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+  //   ]);
+  // }else {
+  //   data = Industry.aggregate([
+  //     { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
+  //   ]);
+  // }
   return data;
 }
 
