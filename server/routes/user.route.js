@@ -45,8 +45,9 @@ router.route('/:userId/languages').get(asyncHandler(getPartyLanguages));
 router.route('/:userId/languages').post(asyncHandler(updatePartyLanguages));
 
 
-router.route('/:userId/skills/:partySkillId/endorsement').post(asyncHandler(addEndorsement));
-router.route('/:userId/skills/:partySkillId/endorsement/:endorsementId').delete(asyncHandler(removeEndorsement));
+router.route('/:userId/skills/:partySkillId/endorsements').get(asyncHandler(getEndorsementsByPartySkill));
+router.route('/:userId/skills/:partySkillId/endorsements').post(asyncHandler(addEndorsement));
+router.route('/:userId/skills/:partySkillId/endorsements/:endorsementId').delete(asyncHandler(removeEndorsement));
 
 
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
@@ -84,7 +85,7 @@ async function uploadCV(req, res) {
 
 async function getPartyExperiences(req, res) {
   let currentUserId = parseInt(req.params.userId);
-  let data = await userCtl.getPartyExperiences(currentUserId);
+  let data = await userCtl.getPartyExperiences(currentUserId, res.locale);
   res.json(new Response(data, data?'experiences_retrieved_successful':'not_found', res));
 }
 
@@ -125,8 +126,9 @@ async function updateSkillsAndAccomplishments(req, res) {
 async function getPartySkillsByUserId(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let userId = parseInt(req.params.userId);
   let filter = req.query;
-  let data = await userCtl.getPartySkillsByUserId(currentUserId, filter);
+  let data = await userCtl.getPartySkillsByUserId(currentUserId, userId, filter, res.locale);
 
   res.json(new Response(data, data?'partyskills_retrieved_successful':'not_found', res));
 }
@@ -191,12 +193,22 @@ async function updatePartyLanguages(req, res) {
 }
 
 
-async function addEndorsement(req, res) {
+async function getEndorsementsByPartySkill(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let partySkillId = parseInt(req.params.partySkillId);
+  let filter = req.query;
+  let data = await userCtl.getEndorsementsByPartySkill(currentUserId, partySkillId, filter);
+
+  res.json(new Response(data, data?'partyskill_endorsements_retrieved_successful':'not_found', res));
+}
+
+
+async function addEndorsement(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let partySkillId = parseInt(req.params.partySkillId);
   let endorsement = req.body;
-  endorsement.endorserId = currentUserId;
+  endorsement.endorser = currentUserId;
   endorsement.partySkillId = partySkillId;
   let data = await userCtl.addEndorsement(currentUserId, endorsement);
 
@@ -211,6 +223,7 @@ async function removeEndorsement(req, res) {
 
   res.json(new Response(data, data?'endorsement_remove_successful':'not_found', res));
 }
+
 
 
 async function getApplicationsByUserId(req, res) {

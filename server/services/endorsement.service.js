@@ -25,14 +25,14 @@ function findEndorseementByUserId(userId) {
   return Endorsement.find({partyId: userId}).sort({fromDate: -1});
 }
 
-function findEndorsementsByEndorseId(endorserId) {
+function findEndorsementsByEndorseId(endorser) {
   let data = null;
 
-  if(endorserId==null){
+  if(endorser==null){
     return;
   }
 
-  return Endorsement.find({endorserId: endorserId}).sort({fromDate: -1});
+  return Endorsement.find({endorser: endorser}).sort({fromDate: -1});
 }
 
 function findEndorsementsByEndorserIdAndListOfPartySkillIds(endorserId, listOfPartySKills) {
@@ -42,17 +42,17 @@ function findEndorsementsByEndorserIdAndListOfPartySkillIds(endorserId, listOfPa
     return;
   }
 
-  return Endorsement.find({endorserId: endorserId, partySkillId: {$in: listOfPartySKills}});
+  return Endorsement.find({endorser: endorserId, partySkillId: {$in: listOfPartySKills}});
 }
 
-function findEndorsementByEndorserIdAndPartySkillId(endorserId, partySkillId) {
+function findEndorsementByEndorserIdAndPartySkillId(endorser, partySkillId) {
   let data = null;
 
-  if(endorserId==null || partySkillId==null){
+  if(endorser==null || partySkillId==null){
     return;
   }
 
-  return Endorsement.findOne({endorserId: endorserId, partySkillId: partySkillId});
+  return Endorsement.findOne({endorser: endorser, partySkillId: partySkillId});
 }
 
 function addEndorsementByUserId(endorsement) {
@@ -74,7 +74,7 @@ function removeEndorsementById(endorserId, endorsementId) {
     return;
   }
 
-  return Endorsement.remove({endorseId: userId, endorsementId: endorsementId});
+  return Endorsement.remove({endorse: userId, endorsementId: endorsementId});
 }
 
 function removeEndorsementByEndorserIdAndPartySkillId(endorserId, partySkillId) {
@@ -84,7 +84,7 @@ function removeEndorsementByEndorserIdAndPartySkillId(endorserId, partySkillId) 
     return;
   }
 
-  return Endorsement.remove({endorseId: userId, partySkillId: partySkillId});
+  return Endorsement.remove({endorse: userId, partySkillId: partySkillId});
 }
 
 function getEndorsementCount(partySkillIds) {

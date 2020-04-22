@@ -537,8 +537,11 @@ async function findTop3Highlights(company) {
   if(reactions){
     let reviews = [];
     for(react of reactions){
-      let review = await CompanyReview.findOne({companyReviewId: react.companyReviewId}, {reviewTitle: 1, rating :1});
-      reviews.push({isPositive: review.rating>2?true:false, comment: review.reviewTitle, count: react.count})
+      let review = await CompanyReview.findOne({companyReviewId: react.companyReviewId}, {reviewTitle: 1, rating:1});
+      if(review){
+        reviews.push({isPositive: review.rating>2?true:false, comment: review.reviewTitle, count: react.count});
+      }
+
     }
     data = reviews;
   }

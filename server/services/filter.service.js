@@ -150,15 +150,29 @@ function getAllJobFunctions(filter, locale) {
   let data = null;
 
   let propLocale = '$name.'+localeStr;
+  let match = {};
+
   if(keyword){
-    let match = {};
     match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
+  }
+  if(filter.shortCode){
+    let listOfIds = _.reduce(filter.shortCode.split(','), function(res, item){
+      res.push(item);
+      return res;
+    }, []);
+    match.shortCode = {$in: listOfIds};
+  }
+
+
+  if(keyword){
+
     data = JobFunction.aggregate([
       { $match: match },
       { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
     ]);
   }else {
     data = JobFunction.aggregate([
+      { $match: match },
       { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale } }
     ]);
   }

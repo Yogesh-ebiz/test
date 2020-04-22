@@ -15,6 +15,30 @@ function findPartySkillById(partySkillId) {
   return PartySkill.findOne({partySkillId: partySkillId});
 }
 
+function findPartySkillWithEndorsementsById(partySkillId, filter) {
+  let data = null;
+
+  if(partySkillId==null || filter==null){
+    return;
+  }
+
+  let page = filter.page;
+  let size = filter.size;
+  let skip = filter.size * filter.page;
+
+  return PartySkill.findOne({partySkillId: partySkillId}).populate([
+    {
+      path: 'endorsements',
+      model:'Endorsement',
+      options: {
+        sort:{ },
+        skip: skip,
+        limit : size
+      }
+    }
+  ]);
+}
+
 
 function findPartySkillByUserIdAndSkillTypeId(userId, skillTypeId) {
   let data = null;
@@ -35,7 +59,7 @@ function findTop3PartySkillsByUserId(userId) {
     return;
   }
 
-  return PartySkill.find({partyId: userId});
+  return PartySkill.find({partyId: userId}).limit(3).sort({averageEndorsedRating: -1, selfRating: -1});
 }
 
 function findPartySkillsByUserId(userId) {
@@ -45,7 +69,7 @@ function findPartySkillsByUserId(userId) {
     return;
   }
 
-  return PartySkill.find({partyId: userId});
+  return PartySkill.find({partyId: userId}).sort({averageEndorsedRating: -1, selfRating: -1});
 }
 
 async function addPartySkillByUserId(userId, partySKill) {
@@ -122,8 +146,10 @@ function getEndorsersHighlySkillBySkillTypeId(skillTypeId, listOfUserId) {
 
 module.exports = {
   findPartySkillById: findPartySkillById,
+  findPartySkillWithEndorsementsById:findPartySkillWithEndorsementsById,
   findPartySkillByUserIdAndSkillTypeId: findPartySkillByUserIdAndSkillTypeId,
   findPartySkillsByUserId: findPartySkillsByUserId,
+  findTop3PartySkillsByUserId:findTop3PartySkillsByUserId,
   addPartySkillByUserId: addPartySkillByUserId,
   updatePartySkillByUserId: updatePartySkillByUserId,
   removePartySkillById: removePartySkillById,

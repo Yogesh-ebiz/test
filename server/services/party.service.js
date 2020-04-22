@@ -58,7 +58,8 @@ function searchParties(listOfParties, type, size, page) {
   page = (page)? page: 0;
 
   let listOfIds = listOfParties.toString();
-  return axiosInstance.request('/api/search/all?type=' + type + '&id=' + listOfIds + "&size=" + size + "&page=" + page + "&source=job");
+  // return axiosInstance.request('/api/search/all?type=' + type + '&id=' + listOfIds + "&size=" + size + "&page=" + page + "&source=job");
+  return axios.post('http://accessed.us-west-2.elasticbeanstalk.com/api/search/all?type='+type, {ids: listOfParties}, {});
 }
 
 
@@ -79,7 +80,7 @@ function addCompany(userId, company) {
     companyName: company.groupName,
     officeSiteName: '',
     annualRevenue: null,
-    groupSize: null,
+    size: null,
     tickerSymbol: '',
     industry: '',
     website: '',

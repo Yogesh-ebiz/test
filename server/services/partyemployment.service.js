@@ -37,7 +37,7 @@ function findPartyEmploymentByUserId(userId) {
     return;
   }
 
-  return PartyEmployment.find({partyId: userId}).sort({fromDate: -1});
+  return PartyEmployment.find({partyId: userId}).sort({fromDate: -1}).limit(5);
 }
 
 
@@ -62,7 +62,7 @@ function updateEmploymentByUserId(userId, employment) {
   }
 
   return PartyEmployment.findOneAndUpdate({partyId: userId, partyEmploymentId: employment.partyEmploymentId},
-    {$set: {partyId: employment.partyId, company: employment.company, employmentTitle: employment.employmentTitle, employmentType: employment.employmentType, description: employment.description,
+    {$set: {partyId: employment.partyId, company: employment.company, employmentTitle: employment.employmentTitle, employmentType: employment.employmentType, jobFunction: employment.jobFunction, description: employment.description,
         fromDate: employment.fromDate, thruDate: employment.thruDate, isCurrent: employment.isCurrent, terminatinReason: employment.terminationReason,
         city: employment.city, state: employment.state, country: employment.country}},
     {upsert: true, new: true});

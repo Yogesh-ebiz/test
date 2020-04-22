@@ -7,13 +7,12 @@ const timestamp = () => {
   return !_.includes(['DELETED', 'SUSPENDED', 'INACTIVE'], user.status)
 }
 
-
+const capitalizeLocale = ([ first, ...rest ], locale = navigator.language) => {
+  return [ first.toLocaleUpperCase(locale), ...rest ].join('');
+}
 
 
 
 module.exports = {
-  isUserActive,
-  orderAttendees,
-  rgbToHex,
-  hexToRgb,
-  fullColorHex, calculateForeground, validateMeetingType };
+  capitalizeLocale
+};

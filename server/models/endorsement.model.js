@@ -9,8 +9,8 @@ const EndorsementSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  endorserId: {
-    type: Number,
+  endorser: {
+    type: Object,
     required: true
   },
   partySkillId: {

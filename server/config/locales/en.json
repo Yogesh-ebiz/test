@@ -86,5 +86,6 @@
 	"companysalary_employmentTitle_retrieved_successful": "companysalary_employmentTitle_retrieved_successful",
 	"companysalary_jobfunctions_retrieved_successful": "companysalary_jobfunctions_retrieved_successful",
 	"companysalary_employmentTitles_retrieved_successful": "companysalary_employmentTitles_retrieved_successful",
-	"companysalary_locations_retrieved_successful": "companysalary_locations_retrieved_successful"
+	"companysalary_locations_retrieved_successful": "companysalary_locations_retrieved_successful",
+	"partyskill_endorsements_retrieved_successful": "partyskill_endorsements_retrieved_successful"
 }

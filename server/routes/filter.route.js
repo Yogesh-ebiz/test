@@ -13,6 +13,7 @@ const filterService = require('../services/filter.service');
 
 
 let Response = require('../const/response');
+let {capitalizeLocale} = require('../utils/helper');
 
 const router = express.Router();
 module.exports = router;
@@ -96,17 +97,21 @@ async function getLanguages(req, res) {
     data = [];
     let languages = ISO6391.getAllNativeNames();
     for (var i = 0; i < languages.length; i++) {
-      console.log(keyword.toLowerCase(), languages[i].toLowerCase(), languages[i].match(keyword));
       if (languages[i].match(keyword)) {
         data.push(languages[i]);
       }
     }
 
   } else {
-    data = ISO6391.getAllNames();
+    data = ISO6391.getAllNativeNames();
   }
 
-  res.json(new Response(data, data?'languages_retrieved_successful':'not_found', res));
+  data = _.reduce(data, function(res, item){
+    res.push(item.toLocaleUpperCase());
+    return res;
+  }, [])
+
+  res.json(new Response(data.sort(), data?'languages_retrieved_successful':'not_found', res));
 
 }
 
@@ -118,7 +123,7 @@ async function getAllJobLocations(req, res) {
       temp.count = item.count;
       res.push(temp);
       return res;
-  }, [])
+  }, []);
   res.json(new Response(data, data?'locations_retrieved_successful':'not_found', res));
 
 }
