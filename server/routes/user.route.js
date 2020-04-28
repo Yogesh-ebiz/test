@@ -27,10 +27,13 @@ router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
 router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
 router.route('/:userId/experiences').post(asyncHandler(updatePartyExperiences));
 
+
+
 router.route('/:userId/educations').get(asyncHandler(getPartyEducations));
 router.route('/:userId/educations').post(asyncHandler(updatePartyEducations));
 
 
+router.route('/:userId/accomplishments').get(asyncHandler(getPartyAccomplishments));
 router.route('/:userId/accomplishments').post(asyncHandler(updateSkillsAndAccomplishments));
 
 
@@ -112,6 +115,15 @@ async function updatePartyEducations(req, res) {
   res.json(new Response(data, data?'educations_updated_successful':'not_found', res));
 }
 
+
+async function getPartyAccomplishments(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let userId = parseInt(req.params.userId);
+  let data = await userCtl.getPartyAccomplishments(currentUserId, userId, res.locale);
+
+  res.json(new Response(data, data?'accomplishments_retrieved_successful':'not_found', res));
+}
 
 
 async function updateSkillsAndAccomplishments(req, res) {

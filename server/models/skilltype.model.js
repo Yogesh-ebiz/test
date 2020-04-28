@@ -16,7 +16,12 @@ const SkillTypeSchema = new mongoose.Schema({
     required: true
   },
   parent: {
-    type: Number,
+    type: Object,
+    required: false,
+    default: 1
+  },
+  type: {
+    type: Object,
     required: false,
     default: 1
   },

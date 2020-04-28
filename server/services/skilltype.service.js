@@ -17,7 +17,7 @@ function getListofSkillTypes(list, locale) {
   // match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
   data = Skilltype.aggregate([
     { $match: match },
-    { $project: {parent: 1, skillTypeId: 1, description: 1, icon: 1, name: propLocale } }
+    { $project: {parent: 1, skillTypeId: 1, description: 1, icon: 1, name: propLocale, type: 1 } }
   ]);
 
 
