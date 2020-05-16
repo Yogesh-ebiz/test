@@ -182,7 +182,7 @@ async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, emplo
 
     result = await findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country);
     result.shareUrl = 'http://www.accessed.com/company/' + companyId + '/salary/' + employmentTitle.replace(' ', '-');
-
+    
   } catch (e) {
     console.log('Error: getCompanySalaryByEmploymentTitle', e)
   }

@@ -33,7 +33,7 @@ async function getPersonById(partyId) {
   }
   let result = null;
 
-  result = await axiosInstance.request('/api/person/' + partyId + "?source=job");
+  result = await axiosInstance.request('/api/user/' + partyId + "?source=job");
   if(result){
     result = new User(result.data.data);
   }
