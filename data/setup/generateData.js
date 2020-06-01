@@ -29,7 +29,7 @@ function getRandomInt(max) {
 let jobs = [];
 for(var i=0; i<1000; i++) {
 
-  let company = config.company[getRandomInt(config.company.length - 1)];
+  let company = getRandomInt(54);
   let user = config.user[getRandomInt(config.user.length - 1)];
   let employmentType = config.employmentType[getRandomInt(config.employmentType.length - 1)];
   let level = config.level[getRandomInt(config.level.length - 1)];
@@ -84,7 +84,7 @@ for(var i=0; i<1000; i++) {
     promotion: promotion,
     minMonthExperience: 72,
     maxMonthExperience: 96,
-    lastCurrencyUom: "USD",
+    currency: "USD",
     workflowId: 100001,
     noOfResources: 1,
     expirationDate: 1580545602,
@@ -92,6 +92,7 @@ for(var i=0; i<1000; i++) {
     salaryRangeLow: 65000,
     salaryRangeHigh: 80000,
     salaryFixed: null,
+    partyId: 1
   }
 
   // console.log(i, job.title);
