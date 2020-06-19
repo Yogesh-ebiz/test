@@ -2,13 +2,15 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const axiosInstance = require('../services/api.service');
+const {followCompany} = require('../services/api/company.service.api');
+const {createJobFeed} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
 
-
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
+
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findApplicationByCurrentStatus, findApplicationProgresssById, addApplicationProgress} = require('../services/applicationprogress.service');
@@ -102,6 +104,12 @@ module.exports = {
 
 async function createJob(currentUserId, job) {
 
+  let sharePost = job.sharePost;
+  delete job.sharePost;
+  let shareText = job.shareText?job.shareText:job.description;
+  delete job.shareText;
+
+
   if(!job || !currentUserId){
     return null;
   }
@@ -124,6 +132,11 @@ async function createJob(currentUserId, job) {
 
     job.partyId=currentParty.id;
     result = await new JobRequisition(job).save();
+
+
+    if(result && sharePost){
+      await createJobFeed(result.jobId, result.company, shareText, currentUserId);
+    }
   }
 
   return result;
@@ -140,6 +153,7 @@ async function importJobs(type, jobs) {
 
 async function getJobById(currentUserId, jobId, locale) {
 
+  console.log('getJobById', currentUserId, jobId)
   if(!jobId || !currentUserId){
     return null;
   }
@@ -538,15 +552,16 @@ async function applyJobById(currentUserId, application ) {
           result = await applyJob(application);
 
           if(result){
-            await  addApplicationHistory({applicationId: result.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
+            await addApplicationHistory({applicationId: result.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
             let progress = await  addApplicationProgress({applicationId: result.applicationId, status: applicationEnum.APPLIED, type: 'APPLY'});
             result.progress.push(progress._id)
             await result.save();
 
             //TODO: Call Follow API
-            // if(application.follow){
-            //   await axiosInstance.post('http://localhost:90/api/party/' + job.company + '/follow' + "?source=job");
-            // }
+            if(application.follow){
+              await followCompany(job.company, currentUserId);
+            }
+
           }
 
 

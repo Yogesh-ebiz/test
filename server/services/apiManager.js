@@ -1,6 +1,6 @@
-import axios from 'axios';
-import Raven from 'raven-js';
-import store from '../store/index';
+const axios = require('axios');
+const Raven = require('raven-js');
+// const store  = require('../store/index');
 
 /**
  * Create a new Axios client instance
@@ -12,11 +12,11 @@ const getClient = (baseUrl = null) => {
     baseURL: baseUrl
   };
 
-  if (store.getters['users/isAuthenticated']) {
-    options.headers = {
-      Authorization: `Bearer ${store.getters['users/accessToken']}`,
-    };
-  }
+  // if (store.getters['users/isAuthenticated']) {
+  //   options.headers = {
+  //     Authorization: `Bearer ${store.getters['users/accessToken']}`,
+  //   };
+  // }
 
   const client = axios.create(options);
 
@@ -100,7 +100,7 @@ module.exports = ApiClient;
 /**
  * Base HTTP Client
  */
-export default {
+module.expots = {
   // Provide request methods with the default base_url
   get(url, conf = {}) {
     return getClient().get(url, conf)
@@ -142,5 +142,5 @@ export default {
     return getClient().patch(url, data, conf)
       .then(response => Promise.resolve(response))
       .catch(error => Promise.reject(error));
-  },
+  }
 };

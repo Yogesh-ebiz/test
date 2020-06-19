@@ -24,8 +24,10 @@ const alertEnum = require('../const/alertEnum');
 
 
 const {upload} = require('../services/aws.service');
+const {addCompany} = require('../services/api/party.service.api');
+const {syncExperiences} = require('../services/api/feed.service.api');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, addCompany, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
+const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes, addSkillType} = require('../services/skilltype.service');
@@ -475,8 +477,8 @@ async function updatePartyExperiences(currentUserId, data) {
               company.city = employment.city;
               company.state = employment.state;
               company.country = employment.country;
-              company = await addCompany(currentParty.id, company);
-              company=company.data.data;
+              let result = await addCompany(currentParty.id, company);
+              company=result.data.data;
             }
           } catch(e){
             console.log('Adding Company Error: ', e);
@@ -574,6 +576,8 @@ async function updatePartyExperiences(currentUserId, data) {
 
         result = _.orderBy(newEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
 
+        syncExperiences(currentParty.id, result);
+
         newSalaries = _.reduce(newSalaries, function(res, item){
           let exist = _.find(result, {fromDate: item.fromDate, thruDate: item.thruDate});
 
@@ -596,6 +600,7 @@ async function updatePartyExperiences(currentUserId, data) {
   } catch (error) {
     console.log(error);
   }
+
 
   return result;
 
