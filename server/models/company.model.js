@@ -5,7 +5,7 @@ const CompanySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  groupName: {
+  name: {
     type: String,
     required: true
   },

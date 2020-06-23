@@ -72,7 +72,7 @@ for(var i=0; i<1000; i++) {
     title: title,
     company: company,
     employmentType: employmentType,
-    experienceLevel: level,
+    level: level,
     jobFunction: jobFunction,
     skills: skill,
     responsibilities: responsibility,

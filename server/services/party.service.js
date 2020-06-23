@@ -49,6 +49,14 @@ function getCompanyById(partyId) {
   return axiosInstance.request('/api/company/' + partyId + "?source=job");
 }
 
+function getInstituteById(partyId) {
+  if(partyId==null){
+    return;
+  }
+
+  return axiosInstance.request('/api/institute/' + partyId + "?source=job");
+}
+
 function searchParties(listOfParties, type, size, page) {
   if(listOfParties==null || type==null){
     return;
@@ -107,9 +115,9 @@ async function populateParty(list) {
     if(id){
       let result = await getPartyById(id);
       if(list[i].company){
-        list[i].company = result.data;
+        list[i].company = result.data.data;
       } else if(list[i].institute){
-        list[i].institute = result.data;
+        list[i].institute = result.data.data;
       }
 
     }
@@ -165,9 +173,9 @@ async function populateInstitute(list) {
   }
 
   for (let i = 0; i < list.length; i++) {
-    let id = _.includes([27,28], list[i].institute)?list[i].institute: 27;
-    let result = await searchParties([id], partyTypeEnum.INSTITUTE, 1,0);
-    list[i].institute = result.data.data.content[0];
+    let id = list[i].institute;
+    let result = await getInstituteById(id);
+    list[i].institute = result.data.data;
   }
 
   return list;

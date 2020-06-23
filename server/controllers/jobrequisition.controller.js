@@ -2,8 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const axiosInstance = require('../services/api.service');
-const {followCompany} = require('../services/api/company.service.api');
-const {createJobFeed} = require('../services/api/feed.service.api');
+const {createJobFeed, followCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -153,7 +152,6 @@ async function importJobs(type, jobs) {
 
 async function getJobById(currentUserId, jobId, locale) {
 
-  console.log('getJobById', currentUserId, jobId)
   if(!jobId || !currentUserId){
     return null;
   }
@@ -308,7 +306,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
   let docs = [];
-
 
   let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
   let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });

@@ -269,8 +269,6 @@ async function getUserDetail(currentUserId, userId, locale) {
       result.employments = await populateCompany(employments);
 
 
-
-
       //Educations-----------------------------------------------------
       let educations = await findPartyEducationByUserId(foundUser.id);
       let fieldOfStudies = _.uniq(_.flatten(_.map(educations, 'fieldOfStudy')));
@@ -474,6 +472,7 @@ async function updatePartyExperiences(currentUserId, data) {
           let company = employment.company;
           try{
             if(company.id==null){
+              company.groupName = employment.company.
               company.city = employment.city;
               company.state = employment.state;
               company.country = employment.country;
