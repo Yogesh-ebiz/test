@@ -1,8 +1,10 @@
 const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
+const querystring = require('querystring');
 const jobRequisitionCtl = require('../controllers/jobrequisition.controller');
 let Response = require('../const/response');
+
 
 const router = express.Router();
 module.exports = router;
@@ -11,6 +13,7 @@ module.exports = router;
 
 router.route('/').post(asyncHandler(insert));
 router.route('/').post(asyncHandler(importJobs));
+router.route('/landing').get(asyncHandler(jobLanding));
 router.route('/search').get(asyncHandler(searchJob));
 router.route('/latest').get(asyncHandler(getLatestJobs));
 router.route('/:id').get(asyncHandler(getJobById));
@@ -48,6 +51,13 @@ async function getJobById(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
+
+
+async function jobLanding(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data = await jobRequisitionCtl.getJobLanding(currentUserId, res.locale);
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
+}
 
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

@@ -3,16 +3,14 @@ const statusEnum = require('../const/statusEnum');
 const JobView = require('../models/jobview.model');
 
 
-
-
-function findJobViewByUserId(userId) {
+function findJobViewByUserId(userId, size) {
   let data = null;
 
   if(userId==null){
     return;
   }
 
-  return JobView.findOne({partyId: userId});
+  return size?JobView.find({partyId: userId}).sort({createdDate: -1}).limit(size):JobView.find({partyId: userId}).sort({createdDate: -1});
 }
 
 function findJobViewByUserIdAndJobId(userId, jobId) {

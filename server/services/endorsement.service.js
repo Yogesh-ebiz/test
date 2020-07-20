@@ -45,14 +45,14 @@ function findEndorsementsByEndorserIdAndListOfPartySkillIds(endorserId, listOfPa
   return Endorsement.find({endorser: endorserId, partySkillId: {$in: listOfPartySKills}});
 }
 
-function findEndorsementByEndorserIdAndPartySkillId(endorser, partySkillId) {
+function findEndorsementByEndorserIdAndPartySkillId(endorserId, partySkillId) {
   let data = null;
 
-  if(endorser==null || partySkillId==null){
+  if(endorserId==null || partySkillId==null){
     return;
   }
 
-  return Endorsement.findOne({endorser: endorser, partySkillId: partySkillId});
+  return Endorsement.findOne({endorser: endorserId, partySkillId: partySkillId});
 }
 
 function addEndorsementByUserId(endorsement) {

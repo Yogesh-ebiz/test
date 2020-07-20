@@ -50,7 +50,9 @@ router.route('/:userId/languages').post(asyncHandler(updatePartyLanguages));
 
 router.route('/:userId/skills/:partySkillId/endorsements').get(asyncHandler(getEndorsementsByPartySkill));
 router.route('/:userId/skills/:partySkillId/endorsements').post(asyncHandler(addEndorsement));
+router.route('/:userId/skills/:partySkillId/endorsements').delete(asyncHandler(removeEndorsement));
 router.route('/:userId/skills/:partySkillId/endorsements/:endorsementId').delete(asyncHandler(removeEndorsement));
+
 
 
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
@@ -228,7 +230,7 @@ async function addEndorsement(req, res) {
 }
 
 async function removeEndorsement(req, res) {
-
+  console.log('removeEndorsement')
   let currentUserId = parseInt(req.header('UserId'));
   let partySkillId = parseInt(req.params.partySkillId);
   let data = await userCtl.removeEndorsement(currentUserId, partySkillId);

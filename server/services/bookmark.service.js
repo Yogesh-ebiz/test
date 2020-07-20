@@ -15,14 +15,14 @@ function findBookById(userId, jobId) {
   return BookMark.findOne({partyId: userId, jobId: jobId});
 }
 
-function findBookByUserId(userId) {
+function findBookByUserId(userId, size) {
   let data = null;
 
   if(userId==null){
     return;
   }
 
-  return BookMark.find({partyId: userId});
+  return size?BookMark.find({partyId: userId}).sort({createdDate: -1}).limit(size):BookMark.find({partyId: userId}).sort({createdDate: -1});
 }
 
 function addBookById(userId, jobId) {

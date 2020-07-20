@@ -68,7 +68,8 @@ const {findApplicationByUserId} = require('../services/application.service');
 const partySkillSchema = Joi.object({
   partyId: Joi.number(),
   skillTypeId: Joi.number(),
-  noOfMonths: Joi.number()
+  noOfMonths: Joi.number(),
+  selfRating: Joi.number()
 });
 
 
@@ -259,6 +260,7 @@ async function getUserDetail(currentUserId, userId, locale) {
       employments = _.reduce(employments, function(res, item){
         let found = _.find(listOfJobFunctions, {shortCode: item.jobFunction});
 
+        console.log('item', item.jobFunction, found)
         if(found){
           item.jobFunction = found;
         }
@@ -1356,6 +1358,7 @@ async function removeEndorsement(currentUserId, partySkillId) {
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkillId);
+
       if(found){
         let foundEndorsement = await findEndorsementByEndorserIdAndPartySkillId(currentParty.id, partySkillId);
         if(foundEndorsement){
@@ -1367,7 +1370,7 @@ async function removeEndorsement(currentUserId, partySkillId) {
 
             let endorsementCount = await getEndorsementCount([result.partySkillId]);
 
-            found.averageEndorsedRating = endorsementCount[0].averageEndorsedRating;
+            found.averageEndorsedRating = endorsementCount.length? endorsementCount[0].averageEndorsedRating:0;
             found.endorsements.splice(index, 1);
             await found.save();
           }
@@ -1874,8 +1877,6 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
         view.job = job;
 
-
-
       })
 
 
@@ -2210,3 +2211,6 @@ async function updatePartyCertifications(currentUserId, data) {
   return result;
 
 }
+
+
+

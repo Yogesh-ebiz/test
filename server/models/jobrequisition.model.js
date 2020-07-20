@@ -131,6 +131,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: []
   },
+  category: {
+    type: Object,
+    required: false
+  },
   promotion: {
     type: Object,
     required: false

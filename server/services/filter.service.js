@@ -12,6 +12,7 @@ const FieldStudy = require('../models/fieldstudy.model');
 const Country = require('../models/country.model');
 const State = require('../models/state.model');
 const City = require('../models/city.model');
+const Category = require('../models/category.model');
 
 
 function getAllCountries(filter, locale) {
@@ -278,6 +279,34 @@ function getAllJobLocations(filter) {
 
 
 
+function getAllCategories(filter, locale) {
+  let localeStr = locale? locale.toLowerCase() : 'en';
+  let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
+  let data = null;
+
+  let propLocale = '$locale.'+localeStr;
+  let match = {};
+  if(keyword) {
+    match['locale.' + localeStr] = {$regex: keyword, $options: 'i'};
+  }
+
+  if(filter.shortCode){
+    let shortCode = _.reduce(filter.shortCode.split(','), function(result, value, key) {
+      result.push(value.trim());
+      return result;
+    }, []);
+    match.shortCode = {$in: shortCode};
+  }
+
+  data = Category.aggregate([
+    { $match: match },
+    { $project: {parent: 1, children: 1, shortCode: 1, icon: 1, sequence: 1, name: propLocale, categoryId: 1 } }
+  ]);
+
+  return data;
+}
+
+
 
 module.exports = {
   getAllCountries:getAllCountries,
@@ -291,5 +320,6 @@ module.exports = {
   getAllSkillTypes: getAllSkillTypes,
   getAllJobLocations:getAllJobLocations,
   getAllFieldStudy:getAllFieldStudy,
+  getAllCategories:getAllCategories,
   getFieldOfStudyListByShortCode:getFieldOfStudyListByShortCode
 }

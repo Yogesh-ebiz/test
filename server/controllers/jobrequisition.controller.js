@@ -21,9 +21,9 @@ const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 
 const {findJobId, getCountsGroupByCompany} = require('../services/jobrequisition.service');
-const {addJobViewByUserId, findJobViewByUserIdAndJobId} = require('../services/jobview.service');
+const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
-
+const {getTopCategory} = require('../services/category.service');
 const filterService = require('../services/filter.service');
 
 const JobRequisition = require('../models/jobrequisition.model');
@@ -35,7 +35,8 @@ const Application = require('../models/application.model');
 const EmploymentType = require('../models/employmenttypes.model');
 const ExperienceLevel = require('../models/experiencelevel.model');
 const Industry = require('../models/industry.model');
-
+const JobView = require('../models/jobview.model');
+const Category = require('../models/category.model');
 
 
 
@@ -91,6 +92,7 @@ const applicationSchema = Joi.object({
 module.exports = {
   importJobs,
   createJob,
+  getJobLanding,
   getJobById,
   searchJob,
   getSimilarJobs,
@@ -129,6 +131,7 @@ async function createJob(currentUserId, job) {
 
     }
 
+    job.isExternal = job.externalUrl?true:false;
     job.partyId=currentParty.id;
     result = await new JobRequisition(job).save();
 
@@ -147,6 +150,78 @@ async function importJobs(type, jobs) {
   //   job.skills = await Skilltype.find({id: {$in: job.skills}});
   // }
   return await new JobRequisition(job).save();
+}
+
+
+
+async function getJobLanding(currentUserId, locale) {
+
+  let result = {categories: [], viewed: [], saved: [], popular: []};
+  try {
+    let categories = await getTopCategory(locale);
+
+    let viewed = await findJobViewByUserId(currentUserId, 3)
+    let saved = await findBookByUserId(currentUserId, 3);
+    let popular = await JobView.find({}).limit(3);
+
+    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popular, 'jobId'));
+    let jobs = await JobRequisition.find({jobId: {$in: ids}});
+    let listOfCompanyIds = _.map(jobs, 'company');
+    let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
+    let foundCompanies = res.data.data.content;
+
+    _.forEach(viewed, function(item){
+      let job = _.find(jobs, {jobId: item.jobId});
+
+      if(job) {
+        job.company = _.find(foundCompanies, {id: job.company});
+        job.description = null;
+        job.industry = [];
+        job.responsibilities = [];
+        job.qualifications = [];
+        job.skills = [];
+        result.viewed.push(job);
+
+      }
+    })
+
+    _.forEach(saved, function(item){
+      let job = _.find(jobs, {jobId: item.jobId});
+
+      if(job) {
+        job.company = _.find(foundCompanies, {id: job.company});
+        job.description = null;
+        job.industry = [];
+        job.responsibilities = [];
+        job.qualifications = [];
+        job.skills = [];
+        result.saved.push(job);
+      }
+    })
+
+    _.forEach(popular, function(item){
+      let job = _.find(jobs, {jobId: item.jobId});
+
+      if(job) {
+        job.company = _.find(foundCompanies, {id: job.company});
+        job.description = null;
+        job.industry = [];
+        job.responsibilities = [];
+        job.qualifications = [];
+        job.skills = [];
+        result.popular.push(job);
+
+      }
+    })
+
+    result.categories = categories;
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
 }
 
 
@@ -297,13 +372,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     filter.employmentType=null;
   }
 
-
-
-  // let select = 'title createdDate';
-
-  // if(filter.id && !result.content.length)
-
-
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
   let docs = [];
 
@@ -318,9 +386,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
   let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
   let foundCompanies = res.data.data.content;
-
-
-
 
   let hasSaves = [];
 
@@ -357,8 +422,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
     job.skills = skills;
   })
-
-
 
   return new Pagination(result);
 
