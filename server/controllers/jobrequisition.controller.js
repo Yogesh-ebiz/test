@@ -156,7 +156,7 @@ async function importJobs(type, jobs) {
 
 async function getJobLanding(currentUserId, locale) {
 
-  let result = {categories: [], viewed: [], saved: [], popular: []};
+  let result = {categories: [], popularJobs: [], popularCompanies: [], viewedJobs: [], savedJobs: [], newJobs: [], highlightJobs: []};
   try {
     let categories = await getTopCategory(locale);
 
@@ -167,6 +167,7 @@ async function getJobLanding(currentUserId, locale) {
     let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popular, 'jobId'));
     let jobs = await JobRequisition.find({jobId: {$in: ids}});
     let listOfCompanyIds = _.map(jobs, 'company');
+
     let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
     let foundCompanies = res.data.data.content;
 
@@ -180,7 +181,7 @@ async function getJobLanding(currentUserId, locale) {
         job.responsibilities = [];
         job.qualifications = [];
         job.skills = [];
-        result.viewed.push(job);
+        result.viewedJobs.push(job);
 
       }
     })
@@ -195,7 +196,7 @@ async function getJobLanding(currentUserId, locale) {
         job.responsibilities = [];
         job.qualifications = [];
         job.skills = [];
-        result.saved.push(job);
+        result.savedJobs.push(job);
       }
     })
 
@@ -209,12 +210,15 @@ async function getJobLanding(currentUserId, locale) {
         job.responsibilities = [];
         job.qualifications = [];
         job.skills = [];
-        result.popular.push(job);
+        result.popularJobs.push(job);
 
       }
     })
 
     result.categories = categories;
+    result.popularCompanies = foundCompanies;
+    result.newJobs = result.viewedJobs;
+    result.highlightJobs = result.popularJobs;
 
   } catch (error) {
     console.log(error);
