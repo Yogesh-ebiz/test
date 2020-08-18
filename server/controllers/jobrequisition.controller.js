@@ -163,8 +163,9 @@ async function getJobLanding(currentUserId, locale) {
     let viewed = await findJobViewByUserId(currentUserId, 3)
     let saved = await findBookByUserId(currentUserId, 3);
     let popular = await JobView.find({}).limit(3);
+    let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(6);
 
-    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popular, 'jobId'));
+    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popular, 'jobId')).concat(_.map(highlight, 'jobId'));
     let jobs = await JobRequisition.find({jobId: {$in: ids}});
     let listOfCompanyIds = _.map(jobs, 'company');
 
@@ -215,10 +216,24 @@ async function getJobLanding(currentUserId, locale) {
       }
     })
 
+    _.forEach(highlight, function(item){
+      let job = _.find(jobs, {jobId: item.jobId});
+
+      if(job) {
+        job.company = _.find(foundCompanies, {id: job.company});
+        job.description = null;
+        job.industry = [];
+        job.responsibilities = [];
+        job.qualifications = [];
+        job.skills = [];
+        result.highlightJobs.push(job);
+
+      }
+    })
+
     result.categories = categories;
     result.popularCompanies = foundCompanies;
     result.newJobs = result.viewedJobs;
-    result.highlightJobs = result.popularJobs;
 
   } catch (error) {
     console.log(error);

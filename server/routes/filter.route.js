@@ -92,24 +92,29 @@ async function getAllCities(req, res) {
 async function getLanguages(req, res) {
   let keyword = req.query.query;
   let data = null;
+
+  let allCodes = ISO6391.getAllCodes();
+  let allCodesAndLanguages = ISO6391.getLanguages(allCodes);
+
+  // console.log(allCodesAndLanguages);
   if(keyword){
 
-    data = [];
-    let languages = ISO6391.getAllNativeNames();
-    for (var i = 0; i < languages.length; i++) {
-      if (languages[i].match(keyword)) {
-        data.push(languages[i]);
-      }
-    }
+    // data = [];
+    // for (var i = 0; i < allCodesAndLanguages.length; i++) {
+    //   if (allCodesAndLanguages[i].name.match(keyword)) {
+    //     data.push(allCodesAndLanguages[i]);
+    //   }
+    // }
 
+    data = _.filter(allCodesAndLanguages, function(o) { return o.name.match(keyword); });
   } else {
-    data = ISO6391.getAllNativeNames();
+    data = allCodesAndLanguages;
   }
 
-  data = _.reduce(data, function(res, item){
-    res.push(item.toLocaleUpperCase());
-    return res;
-  }, [])
+  // data = _.reduce(data, function(res, item){
+  //   res.push(item.toLocaleUpperCase());
+  //   return res;
+  // }, [])
 
   res.json(new Response(data.sort(), data?'languages_retrieved_successful':'not_found', res));
 
