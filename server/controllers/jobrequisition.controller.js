@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const axiosInstance = require('../services/api.service');
-const {createJobFeed, followCompany} = require('../services/api/feed.service.api');
+const {createJobFeed, followCompany, findSkillsById, findIndustry, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -169,8 +169,8 @@ async function getJobLanding(currentUserId, locale) {
     let jobs = await JobRequisition.find({jobId: {$in: ids}});
     let listOfCompanyIds = _.map(jobs, 'company');
 
-    let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
-    let foundCompanies = res.data.data.content;
+    let res = await searchCompany('', listOfCompanyIds, currentUserId);
+    let foundCompanies = res.content;
 
     _.forEach(viewed, function(item){
       let job = _.find(jobs, {jobId: item.jobId});
@@ -260,10 +260,10 @@ async function getJobById(currentUserId, jobId, locale) {
     if(job) {
 
 
-      response = await getCompanyById(job.company);
-      job.company = response.data.data;
+      let company = await findCompanyById(job.company);
+      job.company = company;
 
-      let jobSkills = await getListofSkillTypes(job.skills);
+      let jobSkills = await findSkillsById(job.skills);
       // console.log('jobSkils', jobSkills)
 
 
@@ -279,7 +279,7 @@ async function getJobById(currentUserId, jobId, locale) {
       //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
       let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
 
-      let industry = await getIndustry(job.industry, locale);
+      let industry = await findIndustry('', job.industry, locale);
       job.industry = industry;
 
       // let promotion = await findPromotionByObjectId(job.promotion);
@@ -398,12 +398,12 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
-  let industries = await getIndustry(_.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
+  let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
   let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 
-  let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
+  let res = await searchCompany('', listOfCompanyIds, currentUserId);
   let foundCompanies = res.data.data.content;
 
   let hasSaves = [];

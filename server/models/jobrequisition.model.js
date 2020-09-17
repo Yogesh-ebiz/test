@@ -11,7 +11,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  partyId: {
+  createdBy: {
     type: Number,
     required: true
   },

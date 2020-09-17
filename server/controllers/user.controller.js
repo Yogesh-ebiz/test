@@ -1093,7 +1093,6 @@ async function addPartySkill(currentUserId, partySkill) {
       found = await findPartySkillByUserIdAndSkillTypeId(currentParty.id, partySkill.skillTypeId);
 
       if(!found){
-        console.log('new')
         result = await addPartySkillByUserId(currentParty.id, partySkill);
       } else {
         let lastUpdatedDate = Date.now();
