@@ -63,6 +63,13 @@ async function findIndustry(query, shortCodes, locale) {
   return response.data.data;
 };
 
+async function findJobfunction(query, shortCodes, locale) {
+  const options = {
+    'Accept-Language': locale
+  };
+  let response = await client.get(`/common/jobfunction/search?query=${query}&shortCodes=${shortCodes}`);
+  return response.data.data;
+};
 
 async function syncExperiences(id, experiences){
 
@@ -86,6 +93,7 @@ module.exports = {
 
   findSkillsById:findSkillsById,
   findIndustry:findIndustry,
+  findJobfunction:findJobfunction,
 
   syncExperiences:syncExperiences,
 

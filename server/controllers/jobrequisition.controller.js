@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const axiosInstance = require('../services/api.service');
-const {createJobFeed, followCompany, findSkillsById, findIndustry, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -277,10 +277,15 @@ async function getJobById(currentUserId, jobId, locale) {
       job.level = experienceLevel[0];
 
       //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-      let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
+      // let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
 
       let industry = await findIndustry('', job.industry, locale);
       job.industry = industry;
+
+      console.log('job', job.jobFunction)
+      let jobFunction = await findJobfunction('', job.jobFunction, locale);
+      console.log('jobfunction', jobFunction);
+      job.jobFunction = jobFunction;
 
       // let promotion = await findPromotionByObjectId(job.promotion);
       // job.promotion = promotion;
@@ -334,6 +339,7 @@ async function getJobById(currentUserId, jobId, locale) {
 
       job.skills = skills;
       job.jobFunction=jobFunction[0];
+      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
 
 
     }
@@ -404,7 +410,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 
   let res = await searchCompany('', listOfCompanyIds, currentUserId);
-  let foundCompanies = res.data.data.content;
+  let foundCompanies = res.content;
 
   let hasSaves = [];
 
@@ -419,7 +425,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
 
-
+    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
     job.promotion = _.find(promotions, {promotionId: job.promotion});
 
     let industry = _.reduce(industries, function(res, item){
@@ -505,7 +511,7 @@ async function getSimilarJobs(currentUserId, filter) {
 
 
   _.forEach(result.docs, function(job){
-
+    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
     job.company = _.find(foundCompanies, {id: job.company});
     var skills = _.reduce(job.skills, function(res, skill){

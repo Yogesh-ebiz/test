@@ -173,6 +173,11 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  shareUrl: {
+    type: String,
+    required: false,
+    default: 'http://www.anymay.com/jobs/'
+  },
   workflowId: {
     type: Number,
     required: true,
