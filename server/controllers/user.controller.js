@@ -1465,7 +1465,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
   let result = null;
   try {
 
-      let currentParty = await getPersonById(currentUserId);
+      let currentParty = await findByUserId(currentUserId);
 
       if(isPartyActive(currentParty)) {
         // console.debug('isActive', currentParty)
@@ -1498,12 +1498,12 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
         let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
 
-        let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
+        // let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
 
 
 
-        let res = await searchParties(companyIds, partyEnum.COMPANY);
-        let foundCompanies = res.data.data.content;
+        let res = await searchCompany('', companyIds, currentUserId);
+        let foundCompanies = res.content;
 
         let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
         let hasSaves = await findBookByUserId(currentParty.id);
@@ -1521,14 +1521,14 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
           job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
           job.level = _.find(experienceLevels, {shortCode: job.level});
           job.promotion = _.find(promotions, {promotionId: job.promotion});
-          let industry = _.reduce(industries, function(res, item){
-            if(_.includes(job.industry, item.shortCode)){
-              res.push(item);
-            }
-            return res;
-          }, []);
-
-          job.industry = industry;
+          // let industry = _.reduce(industries, function(res, item){
+          //   if(_.includes(job.industry, item.shortCode)){
+          //     res.push(item);
+          //   }
+          //   return res;
+          // }, []);
+          //
+          // job.industry = industry;
 
           application.job = job;
 
