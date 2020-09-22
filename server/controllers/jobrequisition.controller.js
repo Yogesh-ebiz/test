@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const axiosInstance = require('../services/api.service');
-const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -172,11 +172,12 @@ async function getJobLanding(currentUserId, locale) {
     let res = await searchCompany('', listOfCompanyIds, currentUserId);
     let foundCompanies = res.content;
 
+
     _.forEach(viewed, function(item){
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = _.find(foundCompanies, {id: job.company});
+        // job.company = _.find(foundCompanies, {id: job.company});
         job.description = null;
         job.industry = [];
         job.responsibilities = [];
@@ -186,6 +187,7 @@ async function getJobLanding(currentUserId, locale) {
 
       }
     })
+
 
     _.forEach(saved, function(item){
       let job = _.find(jobs, {jobId: item.jobId});
@@ -282,9 +284,7 @@ async function getJobById(currentUserId, jobId, locale) {
       let industry = await findIndustry('', job.industry, locale);
       job.industry = industry;
 
-      console.log('job', job.jobFunction)
       let jobFunction = await findJobfunction('', job.jobFunction, locale);
-      console.log('jobfunction', jobFunction);
       job.jobFunction = jobFunction;
 
       // let promotion = await findPromotionByObjectId(job.promotion);
@@ -300,7 +300,7 @@ async function getJobById(currentUserId, jobId, locale) {
       let currentParty, partySkills=[];
       if(currentUserId){
 
-        let currentParty = await getPersonById(currentUserId);
+        let currentParty = await findByUserId(currentUserId);
 
         if (isPartyActive(currentParty)) {
           let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
@@ -679,10 +679,8 @@ async function addBookmark(currentUserId, jobId) {
     job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-      let currentParty = await getPersonById(currentUserId);
+      let currentParty = await findByUserId(currentUserId);
       // console.log('currentParty', currentParty)
-
-      //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
 
         result = await findBookById(currentParty.id, jobId);

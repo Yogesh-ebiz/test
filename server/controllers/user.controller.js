@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const ISO6391 = require('iso-639-1');
+const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 
 const CustomPagination = require('../utils/custompagination');
 //const pagination = require('../const/pagination');
@@ -25,7 +26,8 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
-const {syncExperiences} = require('../services/api/feed.service.api');
+const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
@@ -1555,7 +1557,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
   let result = null;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
 
@@ -1583,12 +1585,12 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       let jobs = await findJobIds(jobIds);
       let companyIds = _.map(jobs, 'company');
-      let res = await searchParties(companyIds, partyEnum.COMPANY);
-      let foundCompanies = res.data.data.content;
+      let res = await searchCompany('', companyIds, currentUserId);
+      let foundCompanies = res.content;
 
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
       let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
-      let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
+      let industries = await findIndustry('', _.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
 
       let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
 
@@ -1601,7 +1603,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
         job.qualifications = [];
         job.skills = [];
         job.connection = {noConnection: 0, list: []};
-        job.company = _.find(foundCompanies, {id: job.company});
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
         job.promotion = _.find(promotions, {promotionId: job.promotion});
@@ -1820,7 +1822,7 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
   let result = null;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       // console.debug('isActive', currentParty.id)
@@ -1851,8 +1853,8 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       let jobs = await findJobIds(jobIds);
       let companyIds = _.map(jobs, 'company');
-      let res = await searchParties(companyIds, partyEnum.COMPANY);
-      let foundCompanies = res.data.data.content;
+      let res = await searchCompany('', companyIds, currentUserId);
+      let foundCompanies = res.content;
 
       let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
       let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
@@ -1869,7 +1871,7 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
         job.qualifications = [];
         job.skills = [];
         job.connection = {noConnection: 0, list: []};
-        job.company = _.find(foundCompanies, {id: job.company});
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
         job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
         job.level = _.find(experienceLevels, {shortCode: job.level});
         job.promotion = _.find(promotions, {promotionId: job.promotion});

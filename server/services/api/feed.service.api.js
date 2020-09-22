@@ -2,8 +2,8 @@ const ApiClient = require('../apiManager');
 const {findById} = require('./party.service.api');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:90/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:90/api');
 
 
 async function createJobFeed(jobId, partyId, text, userId){
@@ -22,8 +22,14 @@ async function createJobFeed(jobId, partyId, text, userId){
 };
 
 async function findUserById(id) {
-  let response = await client.get(`/user/${id}`);
-  return response.data.data;
+  let user = null;
+  try {
+    let response = await client.get(`/user/${id}`);
+    user = response.data.data;
+  } catch(error) {
+    console.log("findUserById: error", error);
+  }
+  return user;
 };
 
 async function findCompanyById(id) {
@@ -45,6 +51,7 @@ async function searchCompany(query, ids, userId){
   const options = {
     headers: {'userId': userId}
   };
+
   let res = await client.post(`/search/all?type=COMPANY&query=${query}`, {ids: ids}, options);
   return res.data.data;
 };
