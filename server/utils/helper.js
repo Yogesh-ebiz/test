@@ -35,7 +35,9 @@ const convertToCompany = (company) => {
     avatar: company.avatar,
     cover: company.cover,
     partyType: company.partyType,
-    headline: company.headline
+    headline: company.headline,
+    primaryAddress:company.primaryAddress,
+    hasFollowed:company.hasFollowed
   };
 }
 

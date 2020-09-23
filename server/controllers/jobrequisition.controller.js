@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+
+const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
 const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 
@@ -193,7 +195,7 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = _.find(foundCompanies, {id: job.company});
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
         job.description = null;
         job.industry = [];
         job.responsibilities = [];
@@ -207,7 +209,7 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = _.find(foundCompanies, {id: job.company});
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
         job.description = null;
         job.industry = [];
         job.responsibilities = [];
@@ -222,7 +224,7 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = _.find(foundCompanies, {id: job.company});
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
         job.description = null;
         job.industry = [];
         job.responsibilities = [];
@@ -711,7 +713,7 @@ async function removeBookmark(currentUserId, jobId) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
