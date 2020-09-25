@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
-const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -319,8 +319,8 @@ async function getJobById(currentUserId, jobId, locale) {
           let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
           job.hasApplied = (hasApplied)?true:false;
 
-          partySkills = await PartySkill.find({partyId: currentParty.id});
-          partySkills = _.map(partySkills, "skillTypeId");
+          partySkills = await findUserSkillsById(currentParty.id);
+          partySkills = _.map(partySkills, "id");
         }
 
 
@@ -329,7 +329,7 @@ async function getJobById(currentUserId, jobId, locale) {
       skills = _.reduce(jobSkills, function(res, skill, key){
         let temp = _.clone(skill);
 
-        if(_.includes(partySkills, skill.skillTypeId)){
+        if(_.includes(partySkills, skill.id)){
           temp.hasSkill=true;
         } else {
           temp.hasSkill=false;
@@ -715,7 +715,6 @@ async function removeBookmark(currentUserId, jobId) {
 
     let currentParty = await findByUserId(currentUserId);
 
-    //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
       result = await findBookById(currentParty.id, jobId);
 

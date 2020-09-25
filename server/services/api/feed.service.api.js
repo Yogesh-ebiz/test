@@ -24,7 +24,7 @@ async function createJobFeed(jobId, partyId, text, userId){
 async function findUserById(id) {
   let user = null;
   try {
-    let response = await client.get(`/user/${id}`);
+    let response = await client.get(`/user/${id}?isMinimal=true`);
     user = response.data.data;
   } catch(error) {
     console.log("findUserById: error", error);
@@ -56,6 +56,10 @@ async function searchCompany(query, ids, userId){
   return res.data.data;
 };
 
+async function findUserSkillsById(id) {
+  let response = await client.get(`/user/${id}/skills/all`);
+  return response.data.data;
+};
 
 async function findSkillsById(ids) {
   let response = await client.get(`/common/skills/search?query=&id=${ids}`);
@@ -99,6 +103,7 @@ module.exports = {
   createJobFeed: createJobFeed,
 
   findSkillsById:findSkillsById,
+  findUserSkillsById:findUserSkillsById,
   findIndustry:findIndustry,
   findJobfunction:findJobfunction,
 
