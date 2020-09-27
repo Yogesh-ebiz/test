@@ -262,7 +262,7 @@ async function getBookmarksByUserId(req, res) {
 
 async function getAlertsByUserId(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let filter = req.query;
   let data = await userCtl.getAlertsByUserId(currentUserId, filter);
 
@@ -271,7 +271,7 @@ async function getAlertsByUserId(req, res) {
 
 async function removePartyAlert(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let alertId = req.params.alertId;
   let data = await userCtl.removePartyAlert(currentUserId, alertId);
 
@@ -280,7 +280,7 @@ async function removePartyAlert(req, res) {
 
 async function addPartyAlert(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let alert = req.body;
   let data = await userCtl.addPartyAlert(currentUserId, alert);
 
@@ -290,7 +290,7 @@ async function addPartyAlert(req, res) {
 
 async function updatePartyAlert(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let alertId = req.params.alertId;
   let alert = req.body;
   let data = await userCtl.updatePartyAlert(currentUserId, alertId, alert);
@@ -301,7 +301,7 @@ async function updatePartyAlert(req, res) {
 
 async function getJobViewsByUserId(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let filter = req.query;
   let data = await userCtl.getJobViewsByUserId(currentUserId, filter, res.locale);
 

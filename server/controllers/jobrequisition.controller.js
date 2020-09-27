@@ -201,6 +201,7 @@ async function getJobLanding(currentUserId, locale) {
         job.responsibilities = [];
         job.qualifications = [];
         job.skills = [];
+        job.hasSaved=true;
         result.savedJobs.push(job);
       }
     })
@@ -626,8 +627,7 @@ async function applyJobById(currentUserId, application ) {
     let job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
     if(job) {
-      let currentParty = await getPersonById(currentUserId);
-      // console.log('currentParty', currentParty)
+      let currentParty = await findByUserId(currentUserId);
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {

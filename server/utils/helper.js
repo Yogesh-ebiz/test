@@ -28,6 +28,13 @@ const convertToAvatar = (user) => {
 }
 
 const convertToCompany = (company) => {
+  let primaryAddress = company.primaryAddress?{
+    name: company.primaryAddress.name,
+    address1: company.primaryAddress.address1,
+    city: company.primaryAddress.city,
+    state: company.primaryAddress.state,
+    country: company.primaryAddress.country
+  }: null;
 
   return {
     id: company.id,
@@ -36,7 +43,7 @@ const convertToCompany = (company) => {
     cover: company.cover,
     partyType: company.partyType,
     headline: company.headline,
-    primaryAddress:company.primaryAddress,
+    primaryAddress: primaryAddress,
     hasFollowed:company.hasFollowed
   };
 }

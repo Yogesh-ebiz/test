@@ -27,9 +27,7 @@ const alertEnum = require('../const/alertEnum');
 const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
 const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
-
-
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
+const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
 const {getListofSkillTypes, addSkillType} = require('../services/skilltype.service');
@@ -318,7 +316,7 @@ async function uploadCV(currentUserId, file) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -424,7 +422,7 @@ async function getPartyExperiences(currentUserId, locale) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -461,7 +459,7 @@ async function updatePartyExperiences(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -617,7 +615,7 @@ async function getPartyEducations(currentUserId) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -649,7 +647,7 @@ async function updatePartyEducations(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -759,7 +757,7 @@ async function updatePartySkills(currentUserId, data, locale) {
   locale = locale?locale: 'en';
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -864,7 +862,7 @@ async function getPartyAccomplishments(currentUserId, userId, locale) {
   let result = null;
   try {
 
-    let user = await getPersonById(userId);
+    let user = await findByUserId(userId);
 
 
     if(isPartyActive(user)) {
@@ -902,7 +900,7 @@ async function updateSkillsAndAccomplishments(currentUserId, data, locale) {
   locale = locale?locale: 'en';
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -1022,7 +1020,7 @@ async function getPartySkillsByUserId(currentUserId, userId, filter, locale) {
   let result = {topSkills: [], industrySkills: [], interpersonalSkills: [], toolAndTechnologySkills: [], otherSkills: []};
   try {
 
-    let user = await getPersonById(userId);
+    let user = await findByUserId(userId);
 
 
     if(isPartyActive(user)) {
@@ -1089,7 +1087,7 @@ async function addPartySkill(currentUserId, partySkill) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillByUserIdAndSkillTypeId(currentParty.id, partySkill.skillTypeId);
@@ -1123,7 +1121,7 @@ async function updatePartySkillById(currentUserId, partySkill) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkill.partySkillId);
@@ -1155,7 +1153,7 @@ async function removePartySkillById(currentUserId, partySkillId) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkillId);
@@ -1190,7 +1188,7 @@ async function getPartyLanguages(currentUserId, locale) {
   let result = null;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if(isPartyActive(currentParty)) {
@@ -1223,7 +1221,7 @@ async function updatePartyLanguages(currentUserId, data, locale) {
   locale = locale?locale: 'en';
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -1304,7 +1302,7 @@ async function addEndorsement(currentUserId, endorsement) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(endorsement.partySkillId);
@@ -1355,7 +1353,7 @@ async function removeEndorsement(currentUserId, partySkillId) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkillId);
@@ -1397,7 +1395,7 @@ async function getEndorsementsByPartySkill(currentUserId, partySkillId, filter, 
   let result = null;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
     if(isPartyActive(currentParty)) {
 
       let partySkill = await findPartySkillById(partySkillId, filter);
@@ -1645,7 +1643,7 @@ async function getAlertsByUserId(currentUserId, filter) {
   let result = null;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       let select = '';
@@ -1709,7 +1707,7 @@ async function addPartyAlert(currentUserId, alert) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
     // console.log('currentParty', currentParty)
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
@@ -1740,10 +1738,11 @@ async function removePartyAlert(currentUserId, alertId) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
-      found = await findJobAlertById(alertId);
+
+      let found = await findJobAlertById(alertId);
 
       if(found){
         let deleted = await removeAlertById(alertId);
@@ -1752,8 +1751,6 @@ async function removePartyAlert(currentUserId, alertId) {
           found.status = statusEnum.DELETED;
           result = found;
         }
-
-
       }
 
     }
@@ -1776,11 +1773,10 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findJobAlertById(alertId);
-
       if(found){
         found.title = alert.title?alert.title:found.title;
         found.company = alert.company?alert.company:found.company;
@@ -1903,7 +1899,7 @@ async function getPartyPublications(currentUserId) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       result = await findPartyPublicationByUserId(currentParty.id);
@@ -1928,7 +1924,7 @@ async function addPartyPublication(currentUserId, publication) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       let found;
@@ -1972,7 +1968,7 @@ async function updatePartyPublications(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
@@ -2060,7 +2056,7 @@ async function getPartyCertifications(currentUserId) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       result = await findPartyCertificationByUserId(currentParty.id);
@@ -2086,7 +2082,7 @@ async function addPartyCertification(currentUserId, certification) {
   let result;
   try {
 
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       let found;
@@ -2129,7 +2125,7 @@ async function updatePartyCertifications(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
