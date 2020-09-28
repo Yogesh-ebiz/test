@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
-const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -22,7 +22,7 @@ const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 
-const {findJobId, getCountsGroupByCompany} = require('../services/jobrequisition.service');
+const {findJobId, getCountsGroupByCompany, getNewJobs} = require('../services/jobrequisition.service');
 const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 const {getTopCategory} = require('../services/category.service');
@@ -46,6 +46,7 @@ let Pagination = require('../utils/job.pagination');
 let SearchParam = require('../const/searchParam');
 
 const jobRequisitionSchema = Joi.object({
+  createdBy: Joi.number(),
   title: Joi.string().required(),
   requiredResume: Joi.boolean().optional(),
   description: Joi.string().required(),
@@ -66,7 +67,6 @@ const jobRequisitionSchema = Joi.object({
   responsibilities: Joi.array(),
   qualifications: Joi.array(),
   skills: Joi.array(),
-  industry: Joi.array().optional(),
   employmentType: Joi.string(),
   promotion: Joi.number().optional(),
   company: Joi.number(),
@@ -112,6 +112,7 @@ async function createJob(currentUserId, job) {
   let shareText = job.shareText?job.shareText:job.description;
   delete job.shareText;
 
+  job.createdBy = currentUserId;
 
   if(!job || !currentUserId){
     return null;
@@ -121,7 +122,7 @@ async function createJob(currentUserId, job) {
 
   job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
 
-  let currentParty = await getPersonById(currentUserId);
+  let currentParty = await findByUserId(currentUserId);
 
   if (isPartyActive(currentParty)) {
 
@@ -134,7 +135,6 @@ async function createJob(currentUserId, job) {
     }
 
     job.isExternal = job.externalUrl?true:false;
-    job.partyId=currentParty.id;
     result = await new JobRequisition(job).save();
 
 
@@ -161,18 +161,23 @@ async function getJobLanding(currentUserId, locale) {
   let result = {categories: [], popularJobs: [], popularCompanies: [], viewedJobs: [], savedJobs: [], newJobs: [], highlightJobs: []};
   try {
     let categories = await getTopCategory(locale);
+    console.log('categories', categories);
 
     let viewed = await findJobViewByUserId(currentUserId, 3)
     let saved = await findBookByUserId(currentUserId, 3);
-    let popular = await JobView.find({}).limit(3);
+    let popularJobs = await JobView.find({}).limit(3);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(6);
+    let newJobs = await getNewJobs();
 
-    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popular, 'jobId')).concat(_.map(highlight, 'jobId'));
+    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, 'jobId')).concat(_.map(highlight, 'jobId')).concat(_.map(newJobs, 'jobId'));
     let jobs = await JobRequisition.find({jobId: {$in: ids}});
     let listOfCompanyIds = _.map(jobs, 'company');
 
     let res = await searchCompany('', listOfCompanyIds, currentUserId);
     let foundCompanies = res.content;
+
+    let popular = await searchCompany('', listOfCompanyIds, currentUserId);
+    let popularCompanies = res.content;
 
 
     _.forEach(viewed, function(item){
@@ -206,7 +211,7 @@ async function getJobLanding(currentUserId, locale) {
       }
     })
 
-    _.forEach(popular, function(item){
+    _.forEach(popularJobs, function(item){
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
@@ -236,9 +241,25 @@ async function getJobLanding(currentUserId, locale) {
       }
     })
 
+    _.forEach(newJobs, function(item){
+      let job = _.find(jobs, {jobId: item.jobId});
+
+      if(job) {
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
+        job.description = null;
+        job.industry = [];
+        job.responsibilities = [];
+        job.qualifications = [];
+        job.skills = [];
+        result.newJobs.push(job);
+
+      }
+    })
+
+
+
     result.categories = categories;
-    result.popularCompanies = foundCompanies;
-    result.newJobs = result.viewedJobs;
+    result.popularCompanies = popularCompanies;
 
   } catch (error) {
     console.log(error);

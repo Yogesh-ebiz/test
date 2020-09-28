@@ -95,6 +95,25 @@ function getJobCount(filter) {
 }
 
 
+function getNewJobs(filter) {
+  let data = null;
+
+  // if(filter==null){
+  //   return;
+  // }
+
+  var twoWeeksAgo = new Date(Date.now() + 12096e5);
+
+  // filter = {createdDate: {$gte: twoWeeksAgo.getTime()},level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
+  filter = {createdDate: {$gte: twoWeeksAgo.getTime()}};
+
+  let search = new SearchParam(filter);
+
+  let res = JobRequisition.find(search).count();
+  return res;
+}
+
+
 
 
 module.exports = {
@@ -103,5 +122,6 @@ module.exports = {
   findJobIds: findJobIds,
   removeByJobId: removeByJobId,
   getCountsGroupByCompany,
-  getJobCount:getJobCount
+  getJobCount:getJobCount,
+  getNewJobs:getNewJobs
 }

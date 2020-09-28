@@ -1,19 +1,17 @@
 const ApiClient = require('../apiManager');
-const {findById} = require('./party.service.api');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:90/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:90/api');
 
 
 async function createJobFeed(jobId, partyId, text, userId){
 
-  let party = await findById(partyId);
 
   let data = {};
   data.type = "JOB";
   data.text = text;
-  data.policy = {type: party.partyType, destinationId: party.id};
+  data.policy = {type: "COMPANY", destinationId: partyId};
   data.shareRefId = jobId;
   data.shareRefType = "JOB";
 
@@ -53,6 +51,12 @@ async function searchCompany(query, ids, userId){
   };
 
   let res = await client.post(`/search/all?type=COMPANY&query=${query}`, {ids: ids}, options);
+  return res.data.data;
+};
+
+async function searchPopularCompany(query){
+
+  let res = await client.get(`/company/popular?query=${query}`);
   return res.data.data;
 };
 
@@ -99,6 +103,7 @@ module.exports = {
 
   followCompany: followCompany,
   searchCompany:searchCompany,
+  searchPopularCompany:searchPopularCompany,
 
   createJobFeed: createJobFeed,
 
