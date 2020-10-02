@@ -9,7 +9,7 @@ const CompanyReviewSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  partyId: {
+  user: {
     type: Object,
     required: true
   },

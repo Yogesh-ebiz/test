@@ -47,10 +47,37 @@ function removeBookById(userId, jobId) {
   return BookMark.remove({partyId: userId, jobId: jobId});
 }
 
+async function findMostBookmarked() {
+  let data = null;
+
+  let group = {
+    _id: {jobId: '$jobId'},
+    count: {'$sum': 1}
+  };
+
+  data = await BookMark.aggregate([
+    {$match: {}},
+    {
+      $group: group
+    },
+    { $limit: 10 },
+    {
+      $project: {
+        _id: 0,
+        jobId: '$_id.jobId',
+        count: '$count'
+      }
+    }
+  ]);
+
+  return data;
+}
+
 
 module.exports = {
   findBookById: findBookById,
   findBookByUserId: findBookByUserId,
   addBookById: addBookById,
-  removeBookById: removeBookById
+  removeBookById: removeBookById,
+  findMostBookmarked:findMostBookmarked
 }

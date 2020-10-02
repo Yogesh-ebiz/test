@@ -16,14 +16,14 @@ const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findApplicationByCurrentStatus, findApplicationProgresssById, addApplicationProgress} = require('../services/applicationprogress.service');
 const {findApplicationHistoryById, addApplicationHistory} = require('../services/applicationhistory.service');
-const {findBookById, addBookById, removeBookById, findBookByUserId} = require('../services/bookmark.service');
+const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 
 const {findJobId, getCountsGroupByCompany, getNewJobs} = require('../services/jobrequisition.service');
-const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId} = require('../services/jobview.service');
+const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId, findMostViewed} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 const {getTopCategory} = require('../services/category.service');
 const filterService = require('../services/filter.service');
@@ -161,13 +161,16 @@ async function getJobLanding(currentUserId, locale) {
   let result = {categories: [], popularJobs: [], popularCompanies: [], viewedJobs: [], savedJobs: [], newJobs: [], highlightJobs: []};
   try {
     let categories = await getTopCategory(locale);
-    console.log('categories', categories);
 
     let viewed = await findJobViewByUserId(currentUserId, 3)
     let saved = await findBookByUserId(currentUserId, 3);
-    let popularJobs = await JobView.find({}).limit(3);
-    let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(6);
+    let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
     let newJobs = await getNewJobs();
+    let popularJobs = await findMostViewed();
+
+    if(!popularJobs.length){
+      popularJobs = await findMostBookmarked();
+    }
 
     let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, 'jobId')).concat(_.map(highlight, 'jobId')).concat(_.map(newJobs, 'jobId'));
     let jobs = await JobRequisition.find({jobId: {$in: ids}});

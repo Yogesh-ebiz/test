@@ -346,6 +346,7 @@ async function getCompanyReviews(currentUserId, filter, locale) {
   }
 
   result = await CompanyReview.paginate(new SearchParam(filter), options);
+  console.log(result)
 
   let partyIds = _.uniq(_.map(result.docs, 'partyId'));
   let reactions = await findCompanyReviewReactionByPartyId(currentUserId);

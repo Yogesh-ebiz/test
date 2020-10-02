@@ -38,8 +38,35 @@ function addJobViewByUserId(userId, jobId) {
 }
 
 
+async function findMostViewed() {
+  let data = null;
+
+  let group = {
+    _id: {jobId: '$jobId'},
+    count: {'$sum': 1}
+  };
+
+  data = await JobView.aggregate([
+    {$match: {}},
+    {
+      $group: group
+    },
+    { $limit: 10 },
+    {
+      $project: {
+        _id: 0,
+        jobId: '$_id.jobId',
+        count: '$count'
+      }
+    }
+  ]);
+
+  return data;
+}
+
 module.exports = {
   findJobViewByUserId: findJobViewByUserId,
   findJobViewByUserIdAndJobId:findJobViewByUserIdAndJobId,
-  addJobViewByUserId: addJobViewByUserId
+  addJobViewByUserId: addJobViewByUserId,
+  findMostViewed:findMostViewed
 }
