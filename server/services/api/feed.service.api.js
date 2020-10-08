@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:90/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:90/api');
 
 
 async function createJobFeed(jobId, partyId, text, userId){
@@ -86,6 +86,23 @@ async function findJobfunction(query, shortCodes, locale) {
   return response.data.data;
 };
 
+async function searchUsers(userId, query, ids) {
+  const requestBody = {
+    "ids": ids,
+    "city": [],
+    "state": [],
+    "country":[],
+    "rating": []
+  };
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+  let response = await client.post(`/search/users/all?query=${query}`, requestBody, options);
+  return response.data.data;
+};
+
 async function syncExperiences(id, experiences){
 
   const options = {
@@ -111,7 +128,7 @@ module.exports = {
   findUserSkillsById:findUserSkillsById,
   findIndustry:findIndustry,
   findJobfunction:findJobfunction,
-
+  searchUsers: searchUsers,
   syncExperiences:syncExperiences,
 
   update(userId, data) {

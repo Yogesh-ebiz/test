@@ -106,6 +106,7 @@ async function findEmploymentTitlesCountByCompanyId(filter) {
 
 function findSalariesByCompanyId(filter) {
   let data = null;
+  console.log('filter', filter)
 
   if(!filter){
     return [];

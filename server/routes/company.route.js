@@ -95,7 +95,7 @@ async function addCompanyReview(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let review = req.body;
-  review.partyId = currentUserId;
+  review.user = currentUserId;
   review.company = company;
   let data = await companyCtl.addNewReview(currentUserId, review, req.locale);
   res.json(new Response(data, data?'companyreview_added_successful':'not_found', res));

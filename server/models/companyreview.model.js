@@ -26,7 +26,7 @@ const CompanyReviewSchema = new mongoose.Schema({
     required: false,
     default: 'ACTIVE'
   },
-  companyReviewUrl: {
+  shareUrl: {
     type: String,
     required: false,
     default: ''

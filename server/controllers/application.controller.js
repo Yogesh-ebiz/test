@@ -12,8 +12,9 @@ const workflowEnum = require('../const/workflowEnum');
 
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
+const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {getCompanyById,  isPartyActive} = require('../services/party.service');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const {findJobId} = require('../services/jobrequisition.service');
 const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
@@ -50,7 +51,7 @@ async function getApplicationById(currentUserId, applicationId) {
       if (application && application.partyId==currentParty.id) {
         // let job = await findJobId(application.jobId);
 
-        response = await getCompanyById(application.job.company);
+        response = await findCompanyById(application.job.company);
         application.job.company = response.data.data;
         application.job.responsibilities=[];
         application.job.qualifications = [];
@@ -87,12 +88,13 @@ async function uploadCV(currentUserId, applicationId, files) {
   let result = null;
   let basePath = 'applications/';
   try {
-    let currentParty = await getPersonById(currentUserId);
-
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
       let application = await findApplicationById(applicationId);
+
+
       if (application && application.partyId == currentUserId) {
 
         let progress = application.progress[0];
@@ -105,7 +107,6 @@ async function uploadCV(currentUserId, applicationId, files) {
         let path = basePath + 'JOB_' +application.jobId + '/resumes/' + name;
 
         let response = await upload(path, file);
-        console.log('uploading')
         let type;
         switch(fileExt){
           case 'pdf':
@@ -147,7 +148,7 @@ async function uploadOffer(currentUserId, applicationId, file) {
   let basePath = 'applications/';
 
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
@@ -214,7 +215,7 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
 
   let result;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
@@ -264,7 +265,7 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
 
   let result;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
@@ -306,7 +307,7 @@ async function addProgress(currentUserId, applicationId, progress) {
 
   let result;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       let application = await findApplicationById(applicationId);

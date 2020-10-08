@@ -8,6 +8,8 @@ const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
+const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findListOfPartyEmploymentTitle} = require('../services/partyemployment.service');
 const {findCompanyReviewReactionByPartyId, addCompanyReviewReaction} = require('../services/companyreviewreaction.service');
@@ -46,7 +48,7 @@ const salarySchema = Joi.object({
 
 
 const reviewSchema = Joi.object({
-  partyId: Joi.number().required(),
+  user: Joi.number().required(),
   company: Joi.number().required(),
   employmentTitle: Joi.string().allow('').optional(),
   rating: Joi.number().required(),
@@ -102,8 +104,13 @@ async function addNewSalary(currentUserId, salary) {
   }
 
   let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
   try {
-    result = await addCompanySalary(salary);
+    if (isPartyActive(currentParty)) {
+      result = await addCompanySalary(salary);
+    }
   } catch(e){
     console.log('addNewSalary: Error', e);
   }
@@ -119,13 +126,12 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 
   let result = null;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
       let total = await findEmploymentTitlesCountByCompanyId(filter);
       result = await findSalariesByCompanyId(filter);
-
 
       let listOfCurrencies = _.reduce(result, function(res, item){
         let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
@@ -161,6 +167,7 @@ async function getCompanySalaries(currentUserId, filter, locale) {
       }, [])
 
       let pagination = new CustomPagination({count: total, result: result}, filter, locale);
+      console.log('pagination', pagination)
       result = pagination;
     }
   } catch (e) {
@@ -271,8 +278,20 @@ async function getCompanySalaryById(filter, locale) {
 
 
 async function addNewReview(currentUserId, review) {
-  review = await Joi.validate(review, reviewSchema, { abortEarly: false });
-  return await addCompanyReview(review);
+  if (currentUserId==null || review==null){
+    return null;
+  }
+  review = await Joi.validate(review, reviewSchema, {abortEarly: false});
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+  if (isPartyActive(currentParty)) {
+
+    result = await addCompanyReview(review);
+  }
+
+  return result;
 }
 
 // async function getCompanyReviews(filter, locale) {
@@ -346,21 +365,22 @@ async function getCompanyReviews(currentUserId, filter, locale) {
   }
 
   result = await CompanyReview.paginate(new SearchParam(filter), options);
-  console.log(result)
 
-  let partyIds = _.uniq(_.map(result.docs, 'partyId'));
+  let partyIds = _.uniq(_.map(result.docs, 'user'));
   let reactions = await findCompanyReviewReactionByPartyId(currentUserId);
-  // result.docs = await populatePerson(result.docs);
+
+  let results = await searchUsers(currentUserId, '', partyIds);
+  let foundUsers = results.content;
 
   let employments = await findListOfPartyEmploymentTitle(partyIds);
 
   result.docs = _.reduce(result.docs, function(res, item){
     // let find = _.find(employments, {id: item.party.id});
-    let hasLiked = _.find(reactions, {partyId: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LIKE'})?true:false;
-    let hasLoved = _.find(reactions, {partyId: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LOVE'})?true:false;
+    let hasLiked = _.find(reactions, {user: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LIKE'})?true:false;
+    let hasLoved = _.find(reactions, {user: currentUserId, companyReviewId: item.companyReviewId, reactionType: 'LOVE'})?true:false;
 
 
-    // item.party = find;
+    item.user = convertToAvatar(_.find(foundUsers, {id: item.user}));
     item.noOfLikes =  (item.likes)? item.likes.length: 0;
     item.noOfLoves = (item.loves)? item.loves.length : 0;
     item.hasLiked = hasLiked;
@@ -408,7 +428,7 @@ async function reportCompanyReviewById(currentUserId, companyReviewId, report) {
     let found = await CompanyReview.findOne({companyReviewId: companyReviewId});
     if(found){
 
-      let currentParty = await getPersonById(currentUserId);
+      let currentParty = await findByUserId(currentUserId);
 
       if(!isPartyActive(currentParty)) {
         console.debug('User Not Active: ', currentUserId);
@@ -448,7 +468,7 @@ async function reactionToCompanyReviewById(currentUserId, companyReviewId, react
     let found = await CompanyReview.findOne({companyReviewId: companyReviewId});
     if(found){
 
-      let currentParty = await getPersonById(currentUserId);
+      let currentParty = await findByUserId(currentUserId);
 
       if(!isPartyActive(currentParty)) {
         console.debug('User Not Active: ', currentUserId);
@@ -501,7 +521,7 @@ async function removeReactionToCompanyReviewById(currentUserId, companyReviewId,
     if(found) {
 
 
-      let currentParty = await getPersonById(currentUserId);
+      let currentParty = await findByUserId(currentUserId);
 
       if (!isPartyActive(currentParty)) {
         console.debug('User Not Active: ', currentUserId);
