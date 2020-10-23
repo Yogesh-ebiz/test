@@ -28,7 +28,11 @@ const convertToAvatar = (user) => {
 }
 
 const convertToCompany = (company) => {
-  let primaryAddress = company.primaryAddress?{
+  if(!company){
+    return;
+  }
+
+  let primaryAddress = (company.primaryAddress)?{
     name: company.primaryAddress.name,
     address1: company.primaryAddress.address1,
     city: company.primaryAddress.city,
@@ -49,8 +53,22 @@ const convertToCompany = (company) => {
 }
 
 
+const convertIndustry = (industry) => {
+  return {
+    id: industry.id,
+    name: industry.name,
+    shortCode: industry.shortCode,
+    icon: industry.icon,
+    image: industry.image,
+    cover: industry.cover,
+    noOfItems: industry.noOfItems
+  };
+}
+
+
 module.exports = {
   capitalizeLocale:capitalizeLocale,
   convertToAvatar:convertToAvatar,
-  convertToCompany:convertToCompany
+  convertToCompany:convertToCompany,
+  convertIndustry:convertIndustry
 };

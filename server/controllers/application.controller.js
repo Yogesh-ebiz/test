@@ -43,7 +43,7 @@ async function getApplicationById(currentUserId, applicationId) {
 
   let application;
   try {
-    let currentParty = await getPersonById(currentUserId);
+    let currentParty = await findByUserId(currentUserId);
 
 
     if(isPartyActive(currentParty)) {

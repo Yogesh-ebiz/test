@@ -9,13 +9,14 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
+router.route('/:id/jobs').get(asyncHandler(getCompanyJobs));
+
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
 router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymentTitle));
 router.route('/:id/salaries/filter/locations/search').get(asyncHandler(getCompanySalaryLocations));
 router.route('/:id/salaries/filter/employmenttitles/search').get(asyncHandler(getCompanySalaryEmploymentTitles));
 router.route('/:id/salaries/filter/jobfunctions/search').get(asyncHandler(getCompanySalaryJobFunctions));
-
 
 
 router.route('/:id/reviews').post(asyncHandler(addCompanyReview));
@@ -32,7 +33,13 @@ router.route('/:id/reviews/:companyReviewId').get(asyncHandler(getCompanyReviewB
 
 
 
-
+async function getCompanyJobs(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  console.log('id', currentUserId)
+  let data = await companyCtl.getCompanyJobs(currentUserId, company);
+  res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
+}
 
 async function addNewSalary(req, res) {
   let currentUserId = parseInt(req.header('UserId'));

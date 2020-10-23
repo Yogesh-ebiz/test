@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 
-const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {convertToAvatar, convertToCompany, convertIndustry, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
 const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
@@ -26,6 +26,8 @@ const {findJobId, getCountsGroupByCompany, getNewJobs} = require('../services/jo
 const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId, findMostViewed} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 const {getTopCategory} = require('../services/category.service');
+const {getTopIndustry} = require('../services/industry.service');
+
 const filterService = require('../services/filter.service');
 
 const JobRequisition = require('../models/jobrequisition.model');
@@ -160,7 +162,7 @@ async function getJobLanding(currentUserId, locale) {
 
   let result = {categories: [], popularJobs: [], popularCompanies: [], viewedJobs: [], savedJobs: [], newJobs: [], highlightJobs: []};
   try {
-    let categories = await getTopCategory(locale);
+    let industries = await getTopIndustry();
 
     let viewed = await findJobViewByUserId(currentUserId, 3)
     let saved = await findBookByUserId(currentUserId, 3);
@@ -179,9 +181,18 @@ async function getJobLanding(currentUserId, locale) {
     let res = await searchCompany('', listOfCompanyIds, currentUserId);
     let foundCompanies = res.content;
 
-    let popular = await searchCompany('', listOfCompanyIds, currentUserId);
-    let popularCompanies = res.content;
+    // let popular = await searchCompany('', listOfCompanyIds, currentUserId);
+    let popularCompanies = foundCompanies;
 
+
+    _.forEach(jobs, function(job){
+      job.company = _.find(foundCompanies, {id: job.company});
+      job.description = null;
+      job.industry = [];
+      job.responsibilities = [];
+      job.qualifications = [];
+      job.skills = [];
+    });
 
     _.forEach(viewed, function(item){
       let job = _.find(jobs, {jobId: item.jobId});
@@ -203,12 +214,8 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-        job.description = null;
-        job.industry = [];
-        job.responsibilities = [];
-        job.qualifications = [];
-        job.skills = [];
+        // job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
+
         job.hasSaved=true;
         result.savedJobs.push(job);
       }
@@ -218,12 +225,6 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-        job.description = null;
-        job.industry = [];
-        job.responsibilities = [];
-        job.qualifications = [];
-        job.skills = [];
         result.popularJobs.push(job);
 
       }
@@ -233,12 +234,6 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-        job.description = null;
-        job.industry = [];
-        job.responsibilities = [];
-        job.qualifications = [];
-        job.skills = [];
         result.highlightJobs.push(job);
 
       }
@@ -248,12 +243,6 @@ async function getJobLanding(currentUserId, locale) {
       let job = _.find(jobs, {jobId: item.jobId});
 
       if(job) {
-        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-        job.description = null;
-        job.industry = [];
-        job.responsibilities = [];
-        job.qualifications = [];
-        job.skills = [];
         result.newJobs.push(job);
 
       }
@@ -261,7 +250,18 @@ async function getJobLanding(currentUserId, locale) {
 
 
 
-    result.categories = categories;
+    let industryFull = await findIndustry('', _.reduceRight(industries, function(res, item){res.push(item.shortCode); return res}, []), locale);
+    industryFull = _.reduceRight(industryFull, function(res, item){
+      let found = _.find(industries, { 'shortCode': item.shortCode });
+      if(found){
+        item.noOfItems = found.count;
+        res.push(convertIndustry(item));
+      }
+
+      return res;
+    }, [])
+
+    result.categories = industryFull;
     result.popularCompanies = popularCompanies;
 
   } catch (error) {
@@ -289,7 +289,7 @@ async function getJobById(currentUserId, jobId, locale) {
     if(job) {
 
 
-      let company = await findCompanyById(job.company);
+      let company = await findCompanyById(job.company, currentUserId);
       job.company = company;
 
       let jobSkills = await findSkillsById(job.skills);

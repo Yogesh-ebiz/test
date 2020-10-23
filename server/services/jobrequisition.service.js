@@ -102,14 +102,14 @@ function getNewJobs(filter) {
   //   return;
   // }
 
-  var twoWeeksAgo = new Date(Date.now() + 12096e5);
-
+  var twoWeeksAgo = new Date(Date.now() - 12096e5);
   // filter = {createdDate: {$gte: twoWeeksAgo.getTime()},level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
   filter = {createdDate: {$gte: twoWeeksAgo.getTime()}};
 
   let search = new SearchParam(filter);
 
-  let res = JobRequisition.find(search).count();
+  let res = JobRequisition.find(search).limit(10);
+
   return res;
 }
 

@@ -29,8 +29,8 @@ function getRandomInt(max) {
 let jobs = [];
 for(var i=0; i<1000; i++) {
 
-  let company = Math.floor(Math.random() * 54) + 100;
-  let user = Math.floor(Math.random() * 40) + 0;
+  let company = config.company[getRandomInt(config.company.length - 1)];
+  let user = config.user[getRandomInt(config.user.length - 1)];
   let employmentType = config.employmentType[getRandomInt(config.employmentType.length - 1)];
   let level = config.level[getRandomInt(config.level.length - 1)];
   let jobFunction = config.jobFunction[getRandomInt(config.jobFunction.length - 1)];
@@ -92,7 +92,7 @@ for(var i=0; i<1000; i++) {
     salaryRangeLow: 65000,
     salaryRangeHigh: 80000,
     salaryFixed: null,
-    partyId: user
+    createdBy: user
   }
 
   // console.log(i, job.title);

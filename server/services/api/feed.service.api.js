@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-let client = new ApiClient('http://localhost:90/api');
+let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+// let client = new ApiClient('http://localhost:90/api');
 
 
 async function createJobFeed(jobId, partyId, text, userId){
@@ -30,8 +30,12 @@ async function findUserById(id) {
   return user;
 };
 
-async function findCompanyById(id) {
-  let response = await client.get(`/company/${id}?source=JOB`);
+async function findCompanyById(id, userId) {
+  const options = {
+    headers: {'userId': userId}
+  };
+  let response = await client.get(`/company/${id}?source=JOB`, options);
+
   return response.data.data;
 };
 
@@ -42,6 +46,15 @@ async function followCompany(id, userId){
   };
   return await client.post(`/company/${id}/follow`, {}, options);
 };
+
+async function hasFollowed(id, userId){
+
+  const options = {
+    headers: {'userId': userId}
+  };
+  return await client.get(`/company/${id}/hasfollow`, {}, options);
+};
+
 
 
 async function searchCompany(query, ids, userId){
@@ -119,6 +132,7 @@ module.exports = {
   findCompanyById: findCompanyById,
 
   followCompany: followCompany,
+  hasFollowed:hasFollowed,
   searchCompany:searchCompany,
   searchPopularCompany:searchPopularCompany,
 

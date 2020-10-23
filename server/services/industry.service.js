@@ -2,6 +2,7 @@ const _ = require('lodash');
 const confirmEnum = require('../const/confirmEnum');
 const statusEnum = require('../const/statusEnum');
 const Industry = require('../models/industry.model');
+const JobRequisition = require('../models/jobrequisition.model');
 
 
 function getIndustry(list, locale) {
@@ -24,7 +25,24 @@ function getIndustry(list, locale) {
   return data;
 }
 
+function getTopIndustry() {
+  let data = null;
+
+  data = JobRequisition.aggregate([
+    {$group: {_id: {industry: '$industry'}, count: {$sum: 1} }},
+    {$project: {_id: 0, shortCode: { $arrayElemAt: [ '$_id.industry', 0 ] }, count: 1}},
+    {$sort: {count: -1}},
+    {$limit: 4}
+  ])
+
+
+
+  return data;
+}
+
+
 
 module.exports = {
-  getIndustry: getIndustry
+  getIndustry: getIndustry,
+  getTopIndustry:getTopIndustry
 }

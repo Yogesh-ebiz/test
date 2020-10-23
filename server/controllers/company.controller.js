@@ -17,8 +17,9 @@ const {findCurrencyRate} = require('../services/currency.service');
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
+const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
 
-
+const JobRequisition = require('../models/jobrequisition.model');
 const CompanyReview = require('../models/companyreview.model');
 // const CompanyReviewReport = require('../models/companyreviewreport.model');
 const CompanyReviewReaction = require('../models/companyreviewreaction.model');
@@ -82,6 +83,7 @@ const companyReviewReactionSchema = Joi.object({
 
 
 module.exports = {
+  getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
   getCompanySalaryByEmploymentTitle,
@@ -95,6 +97,50 @@ module.exports = {
   reportCompanyReviewById,
   reactionToCompanyReviewById,
   removeReactionToCompanyReviewById
+}
+
+async function getCompanyJobs(currentUserId, companyId, locale) {
+
+  if(currentUserId==null || companyId==null){
+    return null;
+  }
+
+  let result = {recommended: [], latest: []};
+  let recommended = await JobRequisition.find({company: companyId}).limit(3);
+  let latest = await JobRequisition.find({company: companyId}).sort({createdDate: -1}).limit(3);
+
+  let company = await findCompanyById(companyId, currentUserId);
+
+
+  let hasSaves = [];
+
+  if(currentUserId){
+    hasSaves=await findBookByUserId(currentUserId);
+  }
+
+
+  _.forEach(recommended, function(job){
+    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+    job.company = company;
+    job.qualification = null
+    job.responsibilities=null;
+    job.skills=null;
+    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
+  })
+
+  _.forEach(latest, function(job){
+    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+    job.company = company;
+    job.qualification = null
+    job.responsibilities=null;
+    job.skills=null;
+    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
+  })
+
+  result.recommended = recommended;
+  result.latest = latest;
+  return result;
+
 }
 
 async function addNewSalary(currentUserId, salary) {
