@@ -164,8 +164,8 @@ async function getJobLanding(currentUserId, locale) {
   try {
     let industries = await getTopIndustry();
 
-    let viewed = await findJobViewByUserId(currentUserId, 3)
-    let saved = await findBookByUserId(currentUserId, 3);
+    let viewed = await findJobViewByUserId(currentUserId, 4)
+    let saved = await findBookByUserId(currentUserId, 4);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
     let newJobs = await getNewJobs();
     let popularJobs = await findMostViewed();
