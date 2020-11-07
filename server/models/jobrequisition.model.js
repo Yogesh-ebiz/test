@@ -6,12 +6,15 @@ const statusEnum = require('../const/statusEnum');
 
 
 const JobRequisitionSchema = new mongoose.Schema({
-
-  jobId: {
+  createdDate: {
     type: Number,
-    required: true
+    default: Date.now
   },
   createdBy: {
+    type: Object,
+    required: true
+  },
+  jobId: {
     type: Number,
     required: true
   },
@@ -118,10 +121,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Array,
     required: true
   },
-  createdDate: {
-    type: Number,
-    default: Date.now
-  },
   employmentType: {
     type: Object,
     required: true
@@ -183,6 +182,12 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
+  panelist: {
+    type: Array,
+    required: false,
+    default: []
+  },
+
   application: { type: Schema.Types.ObjectId, ref: 'Application' }
 }, {
   versionKey: false

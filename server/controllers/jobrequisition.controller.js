@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 const {convertToAvatar, convertToCompany, convertIndustry, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
-const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -322,6 +322,27 @@ async function getJobById(currentUserId, jobId, locale) {
         job.promotion = promotion[0];
       }
 
+      skills = _.reduce(jobSkills, function(res, skill, key){
+        let temp = _.clone(skill);
+
+        if(_.includes(partySkills, skill.id)){
+          temp.hasSkill=true;
+        } else {
+          temp.hasSkill=false;
+        }
+
+        res.push(temp);
+        return res;
+      }, []);
+
+      job.skills = skills;
+      job.jobFunction=jobFunction[0];
+      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
+
+      let users  = await lookupUserIds(job.panelist.concat(job.createdBy));
+      job.createdBy = _.find(users, {id: job.createdBy});
+      job.panelist = _.reject(users, {id: job.createdBy});;
+
       // let promotion = await JobRequisition.populate(job, 'promotion')
 
       let currentParty, partySkills=[];
@@ -351,22 +372,6 @@ async function getJobById(currentUserId, jobId, locale) {
 
       }
 
-      skills = _.reduce(jobSkills, function(res, skill, key){
-        let temp = _.clone(skill);
-
-        if(_.includes(partySkills, skill.id)){
-          temp.hasSkill=true;
-        } else {
-          temp.hasSkill=false;
-        }
-
-        res.push(temp);
-        return res;
-      }, []);
-
-      job.skills = skills;
-      job.jobFunction=jobFunction[0];
-      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
 
 
     }
