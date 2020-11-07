@@ -322,22 +322,7 @@ async function getJobById(currentUserId, jobId, locale) {
         job.promotion = promotion[0];
       }
 
-      skills = _.reduce(jobSkills, function(res, skill, key){
-        let temp = _.clone(skill);
 
-        if(_.includes(partySkills, skill.id)){
-          temp.hasSkill=true;
-        } else {
-          temp.hasSkill=false;
-        }
-
-        res.push(temp);
-        return res;
-      }, []);
-
-      job.skills = skills;
-      job.jobFunction=jobFunction[0];
-      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
 
       let users  = await lookupUserIds(job.panelist.concat(job.createdBy));
       job.createdBy = _.find(users, {id: job.createdBy});
@@ -371,7 +356,22 @@ async function getJobById(currentUserId, jobId, locale) {
 
 
       }
+      let skills = _.reduce(jobSkills, function(res, skill, key){
+        let temp = _.clone(skill);
 
+        if(_.includes(partySkills, skill.id)){
+          temp.hasSkill=true;
+        } else {
+          temp.hasSkill=false;
+        }
+
+        res.push(temp);
+        return res;
+      }, []);
+
+      job.skills = skills;
+      job.jobFunction=jobFunction[0];
+      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
 
 
     }
