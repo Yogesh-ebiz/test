@@ -3,6 +3,8 @@ const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
+const  ApplicationSearchParam = require('../const/applicationSearchParam');
+const Pagination = require('../utils/job.pagination');
 
 
 function findApplicationById(applicationId) {
@@ -27,6 +29,35 @@ function findApplicationById(applicationId) {
       }
     }
   ]);
+}
+
+async function findApplicationsByJobId(jobId, filter) {
+  let data = null;
+
+  if(jobId==null || !filter){
+    return;
+  }
+
+  let select = '';
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+  filter.jobId=jobId;
+
+  // let result = await Application.paginate(new ApplicationSearchParam(filter), options);
+  // return new Pagination(result);
+
+  return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('progress');
 }
 
 function findAppliedCountByJobId(jobId) {
@@ -147,5 +178,6 @@ module.exports = {
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
   findAppliedCountByJobId: findAppliedCountByJobId,
+  findApplicationsByJobId:findApplicationsByJobId,
   applyJob: applyJob
 }

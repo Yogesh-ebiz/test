@@ -2,15 +2,15 @@ const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const companyCtl = require('../controllers/company.controller');
+const adminHR = require('../controllers/adminHR.controller');
+
 let Response = require('../const/response');
 
 const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
-
 router.route('/:id/jobs').get(asyncHandler(getCompanyJobs));
-
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
 router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymentTitle));
@@ -31,12 +31,17 @@ router.route('/:id/reviews/:companyReviewId/reaction').delete(asyncHandler(remov
 
 router.route('/:id/reviews/:companyReviewId').get(asyncHandler(getCompanyReviewById));
 
-
+async function adminCompanyJobs(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  console.log('id', currentUserId)
+  let data = await adminHR.getCompanyJobs(currentUserId, company);
+  res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
+}
 
 async function getCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
-  console.log('id', currentUserId)
   let data = await companyCtl.getCompanyJobs(currentUserId, company);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }

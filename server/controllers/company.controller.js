@@ -213,7 +213,6 @@ async function getCompanySalaries(currentUserId, filter, locale) {
       }, [])
 
       let pagination = new CustomPagination({count: total, result: result}, filter, locale);
-      console.log('pagination', pagination)
       result = pagination;
     }
   } catch (e) {
@@ -222,7 +221,6 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 
   return result;
 }
-
 
 async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, employmentTitle, country) {
 
@@ -281,7 +279,6 @@ async function getCompanySalaryEmploymentTitles(currentUserId, companyId) {
   return result;
 }
 
-
 async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
 
   if(currentUserId==null || companyId==null){
@@ -306,7 +303,6 @@ async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
   return result;
 }
 
-
 async function getCompanySalaryById(filter, locale) {
   let result = null;
   let count = await findEmploymentTitlesCountByCompanyId(filter.company);
@@ -321,7 +317,6 @@ async function getCompanySalaryById(filter, locale) {
 
   return new Pagination(result, filter, locale);
 }
-
 
 async function addNewReview(currentUserId, review) {
   if (currentUserId==null || review==null){
@@ -364,7 +359,6 @@ async function getCompanyReviewStats(userId, company, locale) {
   }
   return result;
 }
-
 
 async function getCompanyReviews(currentUserId, filter, locale) {
   let result = null;
@@ -440,7 +434,6 @@ async function getCompanyReviews(currentUserId, filter, locale) {
   return new Pagination(result);
 }
 
-
 async function getCompanyReviewLocations(currentUserId, companyId) {
 
   if(currentUserId==null || companyId==null){
@@ -458,7 +451,6 @@ async function getCompanyReviewLocations(currentUserId, companyId) {
   }
   return result;
 }
-
 
 async function reportCompanyReviewById(currentUserId, companyReviewId, report) {
 
@@ -497,8 +489,6 @@ async function reportCompanyReviewById(currentUserId, companyReviewId, report) {
 
   return result;
 }
-
-
 
 async function reactionToCompanyReviewById(currentUserId, companyReviewId, reaction) {
 
@@ -549,8 +539,6 @@ async function reactionToCompanyReviewById(currentUserId, companyReviewId, react
 
   return result;
 }
-
-
 
 async function removeReactionToCompanyReviewById(currentUserId, companyReviewId, reaction) {
 
@@ -607,3 +595,6 @@ async function removeReactionToCompanyReviewById(currentUserId, companyReviewId,
 
   return result;
 }
+
+
+

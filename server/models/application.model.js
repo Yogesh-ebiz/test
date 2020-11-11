@@ -19,6 +19,10 @@ const ApplicationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  user: {
+    type: Object,
+    required: false
+  },
   status: {
     type: String,
     required: false

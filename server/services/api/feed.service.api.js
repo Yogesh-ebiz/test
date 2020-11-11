@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:90/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:90/api');
 
 
 async function createJobFeed(jobId, partyId, text, userId){
@@ -117,7 +117,7 @@ async function searchUsers(userId, query, ids) {
 };
 
 async function lookupUserIds(ids) {
-  let response = await client.get(`/search/users/id/lookup?ids=${ids}`, null, options);
+  let response = await client.get(`/search/users/lookup?ids=${ids}`, null, options);
   return response.data.data;
 };
 

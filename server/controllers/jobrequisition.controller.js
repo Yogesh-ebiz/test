@@ -104,7 +104,8 @@ module.exports = {
   getSimilarCompany,
   applyJobById,
   addBookmark,
-  removeBookmark
+  removeBookmark,
+  searchCandidates
 }
 
 async function createJob(currentUserId, job) {
@@ -324,9 +325,8 @@ async function getJobById(currentUserId, jobId, locale) {
 
 
 
-      let users  = await lookupUserIds(job.panelist.concat(job.createdBy));
+      let users  = await lookupUserIds([job.createdBy]);
       job.createdBy = _.find(users, {id: job.createdBy});
-      job.panelist = _.reject(users, {id: job.createdBy});;
 
       // let promotion = await JobRequisition.populate(job, 'promotion')
 
@@ -484,8 +484,6 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
 }
 
-
-
 async function getSimilarJobs(currentUserId, filter) {
 
   let foundJob = null;
@@ -574,8 +572,6 @@ async function getSimilarJobs(currentUserId, filter) {
 
 }
 
-
-
 async function getLatestJobs(req) {
 
   let filter = req.query
@@ -598,7 +594,6 @@ async function getLatestJobs(req) {
 
   //return await JobRequisition.find({}).select(['-description','-qualifications', '-responsibilities']);
 }
-
 
 async function getSimilarCompany(currentUserId, jobId, filter) {
 
@@ -637,9 +632,6 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
   return result;
 
 }
-
-
-
 
 async function applyJobById(currentUserId, application ) {
 
@@ -696,8 +688,6 @@ async function applyJobById(currentUserId, application ) {
   return result;
 }
 
-
-
 async function addBookmark(currentUserId, jobId) {
 
   if(currentUserId==null || jobId==null){
@@ -730,7 +720,6 @@ async function addBookmark(currentUserId, jobId) {
 
   return result;
 }
-
 
 async function removeBookmark(currentUserId, jobId) {
 
@@ -767,4 +756,91 @@ async function removeBookmark(currentUserId, jobId) {
   return result;
 }
 
+async function searchCandidates(currentUserId, jobId, filter, locale) {
 
+  if(filter==null){
+    return null;
+  }
+
+
+  let foundJob = null;
+  let select = '-description -qualifications -responsibilities';
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+  filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+  sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+  if(jobId){
+
+    filter.similarId = foundJob.jobId;
+    //filter.query = foundJob.title;
+    filter.level = foundJob.level;
+    filter.jobFunction=foundJob.jobFunction;
+    filter.employmentType=foundJob.employmentType;
+    filter.employmentType=null;
+  }
+
+  let result = await JobRequisition.paginate(new SearchParam(filter), options);
+  let docs = [];
+
+  let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+  let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+  let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
+  let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
+  let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
+  let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
+
+  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
+
+  let res = await searchCompany('', listOfCompanyIds, currentUserId);
+  let foundCompanies = res.content;
+
+  let hasSaves = [];
+
+  if(currentUserId){
+    hasSaves=await findBookByUserId(currentUserId);
+  }
+
+
+  _.forEach(result.docs, function(job){
+    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+    job.company = _.find(foundCompanies, {id: job.company});
+    job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+    job.level = _.find(experienceLevels, {shortCode: job.level});
+
+    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
+    job.promotion = _.find(promotions, {promotionId: job.promotion});
+
+    let industry = _.reduce(industries, function(res, item){
+      if(_.includes(job.industry, item.shortCode)){
+        res.push(item);
+      }
+      return res;
+    }, []);
+
+    job.industry = industry;
+
+    var skills = _.reduce(job.skills, function(res, skill){
+      let find = _.filter(listOfSkills, { 'skillTypeId': skill});
+      if(find){
+        res.push(find[0]);
+      }
+      return res;
+    }, [])
+
+    job.skills = skills;
+  })
+
+  return new Pagination(result);
+
+}

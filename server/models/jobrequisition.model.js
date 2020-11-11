@@ -60,6 +60,16 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: 1
   },
+  noOfViews: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  noOfApplied: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   type: {
     type: String,
     required: false
@@ -187,7 +197,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: []
   },
-
   application: { type: Schema.Types.ObjectId, ref: 'Application' }
 }, {
   versionKey: false

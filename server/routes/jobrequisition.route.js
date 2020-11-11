@@ -29,6 +29,8 @@ router.route('/:id/bookmark').delete(asyncHandler(removeBookmark));
 router.route('/:id/alert').post(asyncHandler(addAlert));
 router.route('/:id/alert').delete(asyncHandler(removeAlert));
 
+router.route('/:id/candidates').get(asyncHandler(searchCandidates));
+
 
 async function insert(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -165,4 +167,12 @@ async function removeAlert(req, res) {
 
 
   res.json(new Response(data, data?'alert_removed_successful':'not_found', res));
+}
+
+
+async function searchCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let filter = req.query;
+  let data = await jobRequisitionCtl.searchCandidates(currentUserId, null, filter, res.locale);
+  res.json(new Response(data, data?'job_candidates_retrieved_successful':'not_found', res));
 }
