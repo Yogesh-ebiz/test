@@ -9,6 +9,8 @@ const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
+const notificationType = require('../const/notificationType');
+
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 
@@ -156,8 +158,6 @@ async function importJobs(type, jobs) {
   // }
   return await new JobRequisition(job).save();
 }
-
-
 
 async function getJobLanding(currentUserId, locale) {
 
@@ -653,17 +653,17 @@ async function applyJobById(currentUserId, application ) {
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
 
-        result = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
-        if(!result){
+        let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
+        if(!foundApplication){
           application.job = job._id;
           // application.candidateAttachment = {type: 'PDF', url: application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf") };
-          result = await applyJob(application);
+          let savedApplication = await applyJob(application);
 
-          if(result){
-            await addApplicationHistory({applicationId: result.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
-            let progress = await  addApplicationProgress({applicationId: result.applicationId, status: applicationEnum.APPLIED, type: 'APPLY'});
-            result.progress.push(progress._id)
-            await result.save();
+          if(savedApplication){
+            await addApplicationHistory({applicationId: savedApplication.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
+            let progress = await  addApplicationProgress({applicationId: savedApplication.applicationId, status: applicationEnum.APPLIED, type: 'APPLY'});
+            savedApplication.progress.push(progress._id)
+            await savedApplication.save();
 
             //TODO: Call Follow API
             if(application.follow){
@@ -671,11 +671,8 @@ async function applyJobById(currentUserId, application ) {
             }
 
           }
-
-
-
-
-
+          let meta = {jobId: application.jobId, applicationId: savedApplication.applicationId, userId: currentUserId};
+          await feedService.createNotification(savedAppointment.customer.id, notificationType.APPLICATION, savedAppointment.status, meta);
         }
       }
     }

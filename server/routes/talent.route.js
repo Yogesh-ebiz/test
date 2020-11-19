@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const companyCtl = require('../controllers/company.controller');
-const adminHR = require('../controllers/adminHR.controller');
+const hr = require('../controllers/hr.controller');
 
 let Response = require('../const/response');
 
@@ -13,6 +13,7 @@ module.exports = router;
 router.route('/jobs').get(asyncHandler(searchJob));
 router.route('/jobs/:id').get(asyncHandler(getJobById));
 router.route('/jobs/:id/applications').get(asyncHandler(searchApplications));
+router.route('/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 
 
 async function searchJob(req, res) {
@@ -23,7 +24,7 @@ async function searchJob(req, res) {
   }
   let filter = req.query;
   let companyId = parseInt(req.query.company);
-  let data = await adminHR.searchJobs(currentUserId, companyId, filter, res.locale);
+  let data = await hr.searchJobs(currentUserId, companyId, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
@@ -31,7 +32,7 @@ async function getJobById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
-  let data = await adminHR.getJobById(currentUserId, jobId, res.locale);
+  let data = await hr.getJobById(currentUserId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
@@ -43,8 +44,17 @@ async function searchApplications(req, res) {
 
   let filter = req.query;
   let jobId = parseInt(req.params.id);
-  let data = await adminHR.searchApplications(currentUserId, jobId, filter, res.locale);
+  let data = await hr.searchApplications(currentUserId, jobId, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
 
+async function rejectApplication(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
+  let applicationId = parseInt(req.params.applicationId);
+  let data = await hr.getJobById(currentUserId, jobId, res.locale);
+
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}

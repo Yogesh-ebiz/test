@@ -13,7 +13,7 @@ const workflowRoutes = require('./workflow.route');
 const promotionRoutes = require('./promotion.route');
 const suggestionRoutes = require('./suggestion.route');
 const companyRoutes = require('./company.route');
-const hrRoutes = require('./hr.route');
+const talentRoutes = require('./talent.route');
 
 const filterRoutes = require('./filter.route');
 
@@ -43,7 +43,7 @@ router.use('/suggestions', suggestionRoutes);
 router.use('/users', userRoutes);
 router.use('/workflows', workflowRoutes);
 router.use('/company', companyRoutes);
-router.use('/talent', hrRoutes);
+router.use('/talent', talentRoutes);
 
 
 module.exports = router;

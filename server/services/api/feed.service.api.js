@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-let client = new ApiClient('http://localhost:90/api');
+let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+// let client = new ApiClient('http://localhost:90/api');
 
 
 async function createJobFeed(jobId, partyId, text, userId){

@@ -28,7 +28,8 @@ const JobRequisition = require('../models/jobrequisition.model');
 module.exports = {
   searchJobs,
   getJobById,
-  searchApplications
+  searchApplications,
+  rejectApplication
 }
 
 async function searchJobs(currentUserId, companyId, filter, locale) {
@@ -137,6 +138,33 @@ async function searchApplications(currentUserId, jobId, filter, locale) {
   return applications;
 
 
+}
+
+
+async function rejectApplication(currentUserId, jobId, applicationId, locale) {
+
+  if(!jobId || !currentUserId){
+    return null;
+  }
+
+  let job;
+  try {
+    let localeStr = locale? locale : 'en';
+    let propLocale = '$name.'+localeStr;
+    job = await findApplicationById(applicationId, locale);
+
+    if(job) {;
+
+
+
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return job;
 }
 
 

@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const companyCtl = require('../controllers/company.controller');
-const adminHR = require('../controllers/adminHR.controller');
+const hr = require('../controllers/hr.controller');
 
 let Response = require('../const/response');
 
@@ -35,7 +35,7 @@ async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   console.log('id', currentUserId)
-  let data = await adminHR.getCompanyJobs(currentUserId, company);
+  let data = await hr.getCompanyJobs(currentUserId, company);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }
 
