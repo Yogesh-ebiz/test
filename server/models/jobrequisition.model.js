@@ -94,6 +94,11 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  isNegotiable: {
+    type: String,
+    required: false,
+    default: false
+  },
   hasApplied: {
     type: Boolean,
     default: false
