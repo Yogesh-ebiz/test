@@ -166,6 +166,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  hiringManager: {
+    type: Object,
+    required: false
+  },
   city: {
     type: String,
     required: true

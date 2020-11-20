@@ -290,6 +290,10 @@ async function getJobById(currentUserId, jobId, locale) {
     if(job) {
 
 
+      let hiringManager = await findByUserId(job.createdBy, currentUserId);
+      console.log(hiringManager)
+      job.hiringManager = convertToAvatar(hiringManager);
+
       let company = await findCompanyById(job.company, currentUserId);
       job.company = company;
 
