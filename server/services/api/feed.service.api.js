@@ -130,8 +130,29 @@ async function syncExperiences(id, experiences){
 };
 
 
-module.exports = {
 
+
+async function createNotification(userId, notificationType, eventType, meta) {
+  const options = {
+    headers: {'userId': userId}
+  };
+
+  let body = {
+    userId:  userId,
+    notificationType: notificationType,
+    eventType: eventType,
+    meta: meta
+
+  };
+  console.log('createNote', body)
+  let response = await client.post(`/notifications`, body, options);
+  return response.data.data;
+};
+
+
+
+module.exports = {
+  createNotification:createNotification,
   findByUserId: findUserById,
 
   findCompanyById: findCompanyById,

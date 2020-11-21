@@ -13,6 +13,7 @@ const notificationType = require('../const/notificationType');
 
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
+const feedService = require('../services/api/feed.service.api');
 
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
@@ -291,7 +292,6 @@ async function getJobById(currentUserId, jobId, locale) {
 
 
       let hiringManager = await findByUserId(job.createdBy, currentUserId);
-      console.log(hiringManager)
       job.hiringManager = convertToAvatar(hiringManager);
 
       let company = await findCompanyById(job.company, currentUserId);
@@ -647,7 +647,7 @@ async function applyJobById(currentUserId, application ) {
     return null;
   }
 
-  let result;
+  let savedApplication;
   try {
     let job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
 
@@ -656,12 +656,11 @@ async function applyJobById(currentUserId, application ) {
 
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
-
         let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
         if(!foundApplication){
           application.job = job._id;
           // application.candidateAttachment = {type: 'PDF', url: application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf") };
-          let savedApplication = await applyJob(application);
+          savedApplication = await applyJob(application);
 
           if(savedApplication){
             await addApplicationHistory({applicationId: savedApplication.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
@@ -669,24 +668,28 @@ async function applyJobById(currentUserId, application ) {
             savedApplication.progress.push(progress._id)
             await savedApplication.save();
 
+            console.log(savedApplication)
+            let meta = {jobId: application.jobId, jobTitle: job.title, applicationId: savedApplication.applicationId, applicantId: currentUserId, createdBy: job.createdBy};
+            await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+
             //TODO: Call Follow API
             if(application.follow){
               await followCompany(job.company, currentUserId);
             }
 
           }
-          let meta = {jobId: application.jobId, applicationId: savedApplication.applicationId, userId: currentUserId};
-          await feedService.createNotification(savedAppointment.customer.id, notificationType.APPLICATION, savedAppointment.status, meta);
+
+
         }
       }
     }
 
   } catch (error) {
     console.log(error);
-    return result;
+    return savedApplication;
   }
 
-  return result;
+  return savedApplication;
 }
 
 async function addBookmark(currentUserId, jobId) {
