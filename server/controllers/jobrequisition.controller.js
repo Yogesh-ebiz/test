@@ -437,7 +437,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let docs = [];
 
   let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-  let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+  let listOfSkills = await findSkillsById(skills, locale);
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
   let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
@@ -474,7 +474,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
     job.industry = industry;
 
     var skills = _.reduce(job.skills, function(res, skill){
-      let find = _.filter(listOfSkills, { 'skillTypeId': skill});
+      let find = _.filter(listOfSkills, { 'id': skill});
       if(find){
         res.push(find[0]);
       }

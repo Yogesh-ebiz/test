@@ -11,17 +11,6 @@ module.exports = router;
 
 router.route('/search/all').get(asyncHandler(searchUsers));
 router.route('/:userId/detail').get(asyncHandler(getUserDetail));
-
-
-async function getUserDetail(req, res) {
-
-  let currentUserId = parseInt(req.header('UserId'));
-  let userId = parseInt(req.params.userId);
-  let data = await userCtl.getUserDetail(currentUserId, userId, res.locale);
-  res.json(new Response(data, data?'user_retrieved_successful':'not_found', res));
-}
-
-
 router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
 
 router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
@@ -73,6 +62,15 @@ router.route('/:userId/publications').put(asyncHandler(updatePartyPublications))
 router.route('/:userId/certifications').get(asyncHandler(getPartyCertifications));
 router.route('/:userId/certifications').post(asyncHandler(addPartyCertification));
 router.route('/:userId/certifications').put(asyncHandler(updatePartyCertifications));
+
+
+async function getUserDetail(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let userId = parseInt(req.params.userId);
+  let data = await userCtl.getUserDetail(currentUserId, userId, res.locale);
+  res.json(new Response(data, data?'user_retrieved_successful':'not_found', res));
+}
 
 
 async function searchUsers(req, res) {
