@@ -436,8 +436,8 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
   let docs = [];
 
-  let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-  let listOfSkills = await findSkillsById(skills, locale);
+  // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+  // let listOfSkills = await findSkillsById(skills, locale);
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
   let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
@@ -473,15 +473,15 @@ async function searchJob(currentUserId, jobId, filter, locale) {
 
     job.industry = industry;
 
-    var skills = _.reduce(job.skills, function(res, skill){
-      let find = _.filter(listOfSkills, { 'id': skill});
-      if(find){
-        res.push(find[0]);
-      }
-      return res;
-    }, [])
-
-    job.skills = skills;
+    // var skills = _.reduce(job.skills, function(res, skill){
+    //   let find = _.filter(listOfSkills, { 'id': skill});
+    //   if(find){
+    //     res.push(find[0]);
+    //   }
+    //   return res;
+    // }, [])
+    //
+    // job.skills = skills;
   })
 
   return new Pagination(result);
