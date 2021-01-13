@@ -52,8 +52,8 @@ async function getApplicationById(currentUserId, applicationId) {
       if (application) {
         // let job = await findJobId(application.jobId);
 
-        response = await findCompanyById(application.job.company);
-        application.job.company = response.data.data;
+        let company = await findCompanyById(application.job.company, currentUserId);
+        application.job.company = company;
         application.job.responsibilities=[];
         application.job.qualifications = [];
         application.job.skills = []
