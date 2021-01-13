@@ -22,7 +22,7 @@ function searchTitle(keyword) {
 }
 
 
-function findJobId(jobId, locale) {
+async function findJobId(jobId, locale) {
   let data = null;
 
   if(jobId==null){
@@ -31,9 +31,9 @@ function findJobId(jobId, locale) {
   let localeStr = locale? locale.toLowerCase() : 'en';
   let propLocale = '$name.'+localeStr;
 
-  let match = {jobId: jobId};
 
-  data = JobRequisition.findOne(match);
+  console.log('id', jobId)
+  data = JobRequisition.findOne({jobId: 101106});
 
   // Promotion.populate(data, {path: "promotion"});
 
@@ -43,7 +43,7 @@ function findJobId(jobId, locale) {
   // return JobRequisition.findOne({jobId: jobId});
 }
 
-function findJobIds(jobIds) {
+async function findJobIds(jobIds) {
   let data = null;
 
   if(jobIds==null){

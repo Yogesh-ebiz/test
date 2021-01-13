@@ -288,6 +288,7 @@ async function getJobById(currentUserId, jobId, locale) {
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
     job = await findJobId(jobId, locale);
 
+    console.log('job', jobId)
     if(job) {
 
 

@@ -46,9 +46,10 @@ async function getApplicationById(currentUserId, applicationId) {
     let currentParty = await findByUserId(currentUserId);
 
 
+    console.log(currentUserId, applicationId)
     if(isPartyActive(currentParty)) {
       application = await findApplicationById(applicationId);
-      if (application && application.partyId==currentParty.id) {
+      if (application) {
         // let job = await findJobId(application.jobId);
 
         response = await findCompanyById(application.job.company);
