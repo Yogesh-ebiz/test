@@ -48,7 +48,8 @@ async function getJobById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
-  let data = await jobRequisitionCtl.getJobById(currentUserId, jobId, res.locale);
+  let isMinimal = (req.query.isMinimal=='true')?true:false;
+  let data = await jobRequisitionCtl.getJobById(currentUserId, jobId, isMinimal, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }

@@ -275,7 +275,7 @@ async function getJobLanding(currentUserId, locale) {
 }
 
 
-async function getJobById(currentUserId, jobId, locale) {
+async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
   if(!jobId || !currentUserId){
     return null;
@@ -288,98 +288,96 @@ async function getJobById(currentUserId, jobId, locale) {
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
     job = await findJobId(jobId, locale);
 
-    console.log('job', jobId);
-    console.log(job)
     if(job) {
 
-
-      let hiringManager = await findByUserId(job.createdBy, currentUserId);
-      job.hiringManager = convertToAvatar(hiringManager);
-
       let company = await findCompanyById(job.company, currentUserId);
-      job.company = company;
+      job.company = convertToCompany(company);
 
-      let jobSkills = await findSkillsById(job.skills);
-      // console.log('jobSkils', jobSkills)
+      if(!isMinimal) {
 
+        let hiringManager = await findByUserId(job.createdBy, currentUserId);
+        job.hiringManager = convertToAvatar(hiringManager);
 
-      let noApplied = await findAppliedCountByJobId(job.jobId);
-      job.noApplied = noApplied;
-
-      let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
-      job.employmentType = employmentType[0];
-
-      let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
-      job.level = experienceLevel[0];
-
-      //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-      // let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
-
-      let industry = await findIndustry('', job.industry, locale);
-      job.industry = industry;
-
-      let jobFunction = await findJobfunction('', job.jobFunction, locale);
-      job.jobFunction = jobFunction;
-
-      // let promotion = await findPromotionByObjectId(job.promotion);
-      // job.promotion = promotion;
-
-      if(job.promotion){
-        let promotion = await findPromotionById(job.promotion);
-        job.promotion = promotion[0];
-      }
+        let jobSkills = await findSkillsById(job.skills);
+        // console.log('jobSkils', jobSkills)
 
 
+        let noApplied = await findAppliedCountByJobId(job.jobId);
+        job.noApplied = noApplied;
 
-      let users  = await lookupUserIds([job.createdBy]);
-      job.createdBy = _.find(users, {id: job.createdBy});
+        let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
+        job.employmentType = employmentType[0];
 
-      // let promotion = await JobRequisition.populate(job, 'promotion')
+        let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
+        job.level = experienceLevel[0];
 
-      let currentParty, partySkills=[];
-      if(currentUserId){
+        //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
+        // let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
 
-        let currentParty = await findByUserId(currentUserId);
+        let industry = await findIndustry('', job.industry, locale);
+        job.industry = industry;
 
-        if (isPartyActive(currentParty)) {
-          let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
-          if(!jobView){
-            await addJobViewByUserId(currentParty.id, jobId);
-          } else {
-            jobView.viewCount++
-            await jobView.save();
+        let jobFunction = await findJobfunction('', job.jobFunction, locale);
+        job.jobFunction = jobFunction;
+
+        // let promotion = await findPromotionByObjectId(job.promotion);
+        // job.promotion = promotion;
+
+        if (job.promotion) {
+          let promotion = await findPromotionById(job.promotion);
+          job.promotion = promotion[0];
+        }
+
+
+        let users = await lookupUserIds([job.createdBy]);
+        job.createdBy = _.find(users, {id: job.createdBy});
+
+        // let promotion = await JobRequisition.populate(job, 'promotion')
+
+        let currentParty, partySkills = [];
+        if (currentUserId) {
+
+          let currentParty = await findByUserId(currentUserId);
+
+          if (isPartyActive(currentParty)) {
+            let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
+            if (!jobView) {
+              await addJobViewByUserId(currentParty.id, jobId);
+            } else {
+              jobView.viewCount++
+              await jobView.save();
+            }
+
+            let hasSaved = await findBookById(currentParty.id, job.jobId);
+            job.hasSaved = (hasSaved) ? true : false;
+
+            let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
+            job.hasApplied = (hasApplied) ? true : false;
+
+            partySkills = await findUserSkillsById(currentParty.id);
+            partySkills = _.map(partySkills, "id");
           }
 
-          let hasSaved = await findBookById(currentParty.id, job.jobId);
-          job.hasSaved = (hasSaved)?true:false;
 
-          let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
-          job.hasApplied = (hasApplied)?true:false;
-
-          partySkills = await findUserSkillsById(currentParty.id);
-          partySkills = _.map(partySkills, "id");
         }
+        let skills = _.reduce(jobSkills, function (res, skill, key) {
+          let temp = _.clone(skill);
 
+          if (_.includes(partySkills, skill.id)) {
+            temp.hasSkill = true;
+          } else {
+            temp.hasSkill = false;
+          }
+
+          res.push(temp);
+          return res;
+        }, []);
+
+        job.skills = skills;
+        job.jobFunction = jobFunction[0];
+        job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
 
       }
-      let skills = _.reduce(jobSkills, function(res, skill, key){
-        let temp = _.clone(skill);
-
-        if(_.includes(partySkills, skill.id)){
-          temp.hasSkill=true;
-        } else {
-          temp.hasSkill=false;
-        }
-
-        res.push(temp);
-        return res;
-      }, []);
-
-      job.skills = skills;
-      job.jobFunction=jobFunction[0];
-      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
-
-
     }
 
   } catch (error) {
