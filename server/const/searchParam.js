@@ -22,6 +22,15 @@ function SearchParam(filter) {
     this.query.jobId =  { $nin: [filter.similarId] };
   }
 
+
+  if(filter.tags){
+    let tags = _.reduce(filter.tags.split(','), function(res, i){
+      res.push(i);
+      return res;
+    }, []);
+    this.query.tags =  { $in: tags };
+  }
+
   if(filter.createdDate){
     let start, end;
 
