@@ -80,7 +80,8 @@ const jobRequisitionSchema = Joi.object({
   country: Joi.string(),
   externalUrl: Joi.string(),
   hasApplied: Joi.boolean(),
-  workflowId: Joi.number().required()
+  workflowId: Joi.number().required(),
+  tags: Joi.array()
 });
 
 const applicationSchema = Joi.object({
@@ -136,7 +137,11 @@ async function createJob(currentUserId, job) {
     let promotion;
     if (job.promotion) {
       promotion = await findPromotionById(job.promotion);
-      job.promotion = (promotion) ? promotion[0].promotionId : null;
+      if(promotion!=null){
+        console.log(promotion)
+        job.promotion = (promotion) ? promotion.promotionId : null;
+      }
+
 
     }
 
@@ -288,6 +293,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
     job = await findJobId(jobId, locale);
 
+    console.log(job)
     if(job) {
 
       let company = await findCompanyById(job.company, currentUserId);
@@ -637,7 +643,7 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
 }
 
-async function applyJobById(currentUserId, application ) {
+async function applyJobById(currentUserId, jobId, application ) {
 
 
   application = await Joi.validate(application, applicationSchema, { abortEarly: false });
@@ -649,7 +655,7 @@ async function applyJobById(currentUserId, application ) {
 
   let savedApplication;
   try {
-    let job = await JobRequisition.findOne({jobId: application.jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } });
+    let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE });
 
     if(job) {
       let currentParty = await findByUserId(currentUserId);

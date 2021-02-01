@@ -32,7 +32,7 @@ async function findJobId(jobId, locale) {
   let propLocale = '$name.'+localeStr;
 
 
-  data = JobRequisition.findOne({jobId: 101106});
+  data = JobRequisition.findOne({jobId: jobId});
 
   // Promotion.populate(data, {path: "promotion"});
 

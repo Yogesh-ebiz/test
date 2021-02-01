@@ -113,7 +113,7 @@ async function applyJobById(req, res) {
   let application = req.body;
   application.jobId=jobId;
   application.partyId=currentUserId;
-  let data = await jobRequisitionCtl.applyJobById(currentUserId, application);
+  let data = await jobRequisitionCtl.applyJobById(currentUserId, jobId, application);
 
   res.json(new Response(data, data?'application_submit_successful':'not_found', res));
 }

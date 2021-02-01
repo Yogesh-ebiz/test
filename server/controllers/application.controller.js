@@ -12,7 +12,7 @@ const workflowEnum = require('../const/workflowEnum');
 
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
-const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, findEmployeeById, searchCompany} = require('../services/api/feed.service.api');
 const {getCompanyById,  isPartyActive} = require('../services/party.service');
 
 const {findJobId} = require('../services/jobrequisition.service');
@@ -30,7 +30,8 @@ module.exports = {
   uploadOffer,
   accept,
   decline,
-  addProgress
+  addProgress,
+  updateProgress
 }
 
 
@@ -77,8 +78,6 @@ async function getApplicationById(currentUserId, applicationId) {
 
   return application;
 }
-
-
 
 async function uploadCV(currentUserId, applicationId, files) {
 
@@ -137,7 +136,6 @@ async function uploadCV(currentUserId, applicationId, files) {
   return result;
 
 }
-
 
 async function uploadOffer(currentUserId, applicationId, file) {
 
@@ -206,8 +204,6 @@ async function uploadOffer(currentUserId, applicationId, file) {
 
 }
 
-
-
 async function accept(currentUserId, applicationId, applicationProgressId, action) {
 
   if(!applicationId || !applicationProgressId || !currentUserId || !action){
@@ -256,8 +252,6 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
   return result;
 }
 
-
-
 async function decline(currentUserId, applicationId, applicationProgressId, action) {
 
   if(!applicationId || !applicationProgressId || !currentUserId || !action){
@@ -297,8 +291,6 @@ async function decline(currentUserId, applicationId, applicationProgressId, acti
 
   return result;
 }
-
-
 
 async function addProgress(currentUserId, applicationId, progress) {
 
@@ -372,6 +364,82 @@ async function addProgress(currentUserId, applicationId, progress) {
 
         }
 
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function updateProgress(currentUserId, applicationId, progress) {
+
+  if(!applicationId || !currentUserId || !progress){
+    return null;
+  }
+
+  let result;
+  try {
+    let currentParty = await findEmployeeById(currentUserId);
+
+    if(isPartyActive(currentParty)) {
+      let application = await findApplicationById(applicationId);
+
+      if (application) {
+        // application = await Application.populate(application, 'job');
+        let workflow = await findWorkflowById(application.job.workflowId);
+        workflow = workflow.workflow
+
+        let organizer = application.job.partyId;
+
+        let progresses = application.progress;
+
+        if(progresses) {
+          let currentProgress = progresses[progresses.length - 1];
+          let nextProgress = workflow[_.indexOf(workflow, currentProgress.type)+1];
+
+          if(nextProgress && nextProgress!='OFFER'){
+
+            let dayAway = Math.floor(Math.random() * Math.floor(10));
+
+            let start = new Date();
+            start.setDate(start.getDate() + dayAway);
+            start.setHours(9,0,0,0);
+
+            let end = new Date();
+            end.setDate(end.getDate() + dayAway);
+            end.setHours(10,0,0.0)
+
+            let event = {
+              eventTopic: {name: "WORK", background: "#BC9EC1"},
+              summary: workflowEnum[nextProgress] + ' Scheduled',
+              description: 'Scheduled Event',
+              organizer: organizer,
+              attendees: [application.partyId],
+              start: start.toISOString(),
+              end: end.toISOString(),
+              phoneNumber: "+84 123456789",
+              meetingUrl: "http://skype.com"
+            }
+
+            let response = await createEvent(event);
+            event = response.data.data;
+
+
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "SCHEDULED", event: {eventId: event.eventId, start: event.start}}).save();
+            application.progress.push(nextProgress);
+            await application.save();
+          } else if (nextProgress && nextProgress=='OFFER') {
+            nextProgress = await new ApplicationProgress({type: nextProgress, applicationId: applicationId, requiredAction: true, status: "OFFERED"}).save();
+            application.progress.push(nextProgress);
+            await application.save();
+          }
+          result = nextProgress;
+
+        }
 
       }
     }

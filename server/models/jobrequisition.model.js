@@ -182,6 +182,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  tags: {
+    type: Array,
+    required: false
+  },
   isExternal: {
     type: Boolean,
     default: false,

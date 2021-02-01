@@ -16,10 +16,7 @@ function findPromotionById(promotionId, locale) {
 
   let match = { promotionId: promotionId };
 
-  data = Promotion.aggregate([
-    { $match: match },
-    { $project: {promotionId: 1, type: 1, name: propLocale, status: 1, hasExpired: 1, createdDate: 1, startDate: 1, endDate: 1, status: 1 } }
-  ]);
+  data = Promotion.findOne({ promotionId: promotionId });
 
   return data
 

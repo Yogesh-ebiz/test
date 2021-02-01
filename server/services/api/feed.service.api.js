@@ -41,6 +41,24 @@ async function findCompanyById(id, userId) {
   return response.data.data;
 };
 
+
+async function findEmployeeById(companyId, employeeId) {
+  let response = await client.get(`/company/${companyId}/employees/${employeeId}?source=JOB`, options);
+
+  return response.data.data;
+};
+
+
+async function getCompanyHrMember(id, userId) {
+  const options = {
+    headers: {'userId': userId}
+  };
+
+  let response = await client.get(`/company/${id}/departments/{1}?source=JOB`, options);
+
+  return response.data.data;
+};
+
 async function followCompany(id, userId){
 
   const options = {

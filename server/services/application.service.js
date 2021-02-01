@@ -14,7 +14,6 @@ function findApplicationById(applicationId) {
     return;
   }
 
-  console.log(applicationId)
   return Application.findOne({applicationId: applicationId}).populate([
     {
       path: 'job',
