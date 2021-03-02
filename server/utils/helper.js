@@ -48,7 +48,8 @@ const convertToCompany = (company) => {
     partyType: company.partyType,
     headline: company.headline,
     primaryAddress: primaryAddress,
-    hasFollowed:company.hasFollowed
+    hasFollowed:company.hasFollowed,
+    images: []
   };
 }
 

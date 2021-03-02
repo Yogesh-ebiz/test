@@ -39,10 +39,18 @@ async function adminCompanyJobs(req, res) {
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }
 
+// async function getCompanyJobs(req, res) {
+//   let currentUserId = parseInt(req.header('UserId'));
+//   let company = parseInt(req.params.id);
+//   let data = await companyCtl.getCompanyJobs(currentUserId, company, req.locale);
+//   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
+// }
+
 async function getCompanyJobs(req, res) {
-  let currentUserId = parseInt(req.header('UserId'));
-  let company = parseInt(req.params.id);
-  let data = await companyCtl.getCompanyJobs(currentUserId, company);
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let filter = req.query;
+  filter.company = req.params.id;
+  let data = await companyCtl.getCompanyJobs(currentUserId, filter, res.locale);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }
 
