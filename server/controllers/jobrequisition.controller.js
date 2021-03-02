@@ -331,7 +331,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
         if (job.promotion) {
           let promotion = await findPromotionById(job.promotion);
-          job.promotion = promotion[0];
+
+          job.promotion = promotion?promotion[0]:null;
         }
 
 
@@ -399,7 +400,7 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   if(filter==null){
     return null;
   }
-  
+
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
   let limit = (filter.size && filter.size>0) ? filter.size:20;
