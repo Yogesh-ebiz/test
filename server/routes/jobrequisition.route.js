@@ -16,6 +16,8 @@ router.route('/').post(asyncHandler(importJobs));
 router.route('/landing').get(asyncHandler(jobLanding));
 router.route('/search').get(asyncHandler(searchJob));
 router.route('/latest').get(asyncHandler(getLatestJobs));
+router.route('/company/top-five').get(asyncHandler(getTopFiveJobs));
+
 router.route('/:id').get(asyncHandler(getJobById));
 
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
@@ -59,6 +61,13 @@ async function getJobById(req, res) {
 async function jobLanding(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let data = await jobRequisitionCtl.getJobLanding(currentUserId, res.locale);
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
+}
+
+async function getTopFiveJobs(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companies = req.query.id.split(',').map(x => parseInt(x));
+  let data = await jobRequisitionCtl.getTopFiveJobs(companies, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

@@ -25,7 +25,7 @@ const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 
-const {findJobId, getCountsGroupByCompany, getNewJobs} = require('../services/jobrequisition.service');
+const {findJobId, getCountsGroupByCompany, getNewJobs, getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
 const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId, findMostViewed} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 const {getTopCategory} = require('../services/category.service');
@@ -101,6 +101,7 @@ module.exports = {
   importJobs,
   createJob,
   getJobLanding,
+  getTopFiveJobs,
   getJobById,
   searchJob,
   getSimilarJobs,
@@ -270,6 +271,20 @@ async function getJobLanding(currentUserId, locale) {
 
     result.categories = industryFull;
     result.popularCompanies = popularCompanies;
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function getTopFiveJobs(companies, locale) {
+
+  let result = [];
+  try {
+    result = await getGroupOfCompanyJobs(companies);
 
   } catch (error) {
     console.log(error);

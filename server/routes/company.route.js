@@ -31,6 +31,7 @@ router.route('/:id/reviews/:companyReviewId/reaction').delete(asyncHandler(remov
 
 router.route('/:id/reviews/:companyReviewId').get(asyncHandler(getCompanyReviewById));
 
+
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);

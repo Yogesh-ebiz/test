@@ -9,7 +9,7 @@ let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
 const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
-const {createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {getUserExperienceById, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findListOfPartyEmploymentTitle} = require('../services/partyemployment.service');
 const {findCompanyReviewReactionByPartyId, addCompanyReviewReaction} = require('../services/companyreviewreaction.service');
@@ -17,6 +17,8 @@ const {findCurrencyRate} = require('../services/currency.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
+const {getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
+
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
@@ -99,7 +101,8 @@ module.exports = {
   getCompanyReviewLocations,
   reportCompanyReviewById,
   reactionToCompanyReviewById,
-  removeReactionToCompanyReviewById
+  removeReactionToCompanyReviewById,
+  getTop5JobsPerCompanies
 }
 
 
@@ -168,7 +171,6 @@ async function getCompanyJobs(currentUserId, filter, locale) {
   return new Pagination(result);
 
 }
-
 
 async function addNewSalary(currentUserId, salary) {
   salary = await Joi.validate(salary, salarySchema, { abortEarly: false });
@@ -625,3 +627,17 @@ async function removeReactionToCompanyReviewById(currentUserId, companyReviewId,
 
 
 
+async function getTop5JobsPerCompanies(listOfCompanyIds, locale) {
+
+  if(listOfCompanyIds==null){
+    return null;
+  }
+
+
+
+
+
+  let res = await getGroupOfCompanyJobs(listOfCompanyIds);
+  return res;
+
+}

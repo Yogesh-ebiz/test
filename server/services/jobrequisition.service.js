@@ -112,6 +112,31 @@ function getNewJobs(filter) {
   return res;
 }
 
+function getGroupOfCompanyJobs(listOfCompanyIds) {
+  let data = null;
+
+  if(listOfCompanyIds==null){
+    return;
+  }
+
+
+  return JobRequisition.aggregate([
+    { $match: {company: {$in: listOfCompanyIds }} },
+    { $group: {_id:'$company'} },
+    {$lookup:{
+        from:"jobrequisitions",
+        as:"top5",
+        let:{g:"$_id"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$company","$$g"]}}},
+          {$limit:5},
+          // {$project:{_id:0, company:1, jobId:1}}
+        ]
+      }}
+  ])
+
+}
+
 
 
 
@@ -122,5 +147,6 @@ module.exports = {
   removeByJobId: removeByJobId,
   getCountsGroupByCompany,
   getJobCount:getJobCount,
-  getNewJobs:getNewJobs
+  getNewJobs:getNewJobs,
+  getGroupOfCompanyJobs
 }

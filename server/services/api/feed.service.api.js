@@ -30,6 +30,18 @@ async function findUserById(id) {
   return user;
 };
 
+async function getUserExperienceById(id) {
+  let experiences = null;
+  try {
+    let response = await client.get(`/user/${id}/experiences`);
+    experiences = response.data.data;
+  } catch(error) {
+    console.log("getUserExperienceById: error", error);
+  }
+  return experiences;
+};
+
+
 async function findCompanyById(id, userId) {
   const options = {
     headers: {'userId': userId}
