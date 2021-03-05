@@ -101,8 +101,7 @@ module.exports = {
   getCompanyReviewLocations,
   reportCompanyReviewById,
   reactionToCompanyReviewById,
-  removeReactionToCompanyReviewById,
-  getTop5JobsPerCompanies
+  removeReactionToCompanyReviewById
 }
 
 
@@ -626,18 +625,3 @@ async function removeReactionToCompanyReviewById(currentUserId, companyReviewId,
 }
 
 
-
-async function getTop5JobsPerCompanies(listOfCompanyIds, locale) {
-
-  if(listOfCompanyIds==null){
-    return null;
-  }
-
-
-
-
-
-  let res = await getGroupOfCompanyJobs(listOfCompanyIds);
-  return res;
-
-}

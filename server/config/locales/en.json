@@ -90,5 +90,6 @@
 	"partyskill_endorsements_retrieved_successful": "partyskill_endorsements_retrieved_successful",
 	"accomplishments_retrieved_successful": "accomplishments_retrieved_successful",
 	"categories_retrieved_successful": "categories_retrieved_successful",
-	"company_jobs_retrieved_successful": "company_jobs_retrieved_successful"
+	"company_jobs_retrieved_successful": "company_jobs_retrieved_successful",
+	"get_user_employers_jobs": "get_user_employers_jobs"
 }

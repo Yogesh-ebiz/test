@@ -26,7 +26,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
-const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
@@ -35,7 +35,7 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {addAlertByUserId, findJobAlertById, removeAlertById, getAlertCount} = require('../services/jobalert.service');
-const {getJobCount} = require('../services/jobrequisition.service');
+const {getJobCount, getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
 const {findListOfPartyEmploymentTitle, findPartyEmploymentByUserId, addPartyEmploymentByUserId, addEmploymentByUserId, updateEmploymentByUserId} = require('../services/partyemployment.service');
 const {findPartyEducationById, findPartyEducationByUserId, addPartyEducationsByUserId, updateEducationByUserId} = require('../services/partyeducation.service');
 const {addEndorsementByUserId, removeEndorsementById, findEndorsementByEndorserIdAndPartySkillId, findEndorsementsByEndorserIdAndListOfPartySkillIds, getEndorsementCount, getTop3SkillsEndorsement, findEndorsementsByEndorseId} = require('../services/endorsement.service');
@@ -176,7 +176,8 @@ module.exports = {
   updatePartyPublications,
   getPartyCertifications,
   addPartyCertification,
-  updatePartyCertifications
+  updatePartyCertifications,
+  getUserEmployersJobs
 }
 
 
@@ -1888,9 +1889,6 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
 }
 
-
-
-
 async function getPartyPublications(currentUserId) {
 
   if(currentUserId==null){
@@ -2046,7 +2044,6 @@ async function updatePartyPublications(currentUserId, data) {
   return result;
 
 }
-
 
 async function getPartyCertifications(currentUserId) {
 
@@ -2210,4 +2207,31 @@ async function updatePartyCertifications(currentUserId, data) {
 }
 
 
+async function getUserEmployersJobs(currenterUserid, locale) {
 
+  let res = null;
+  if(currenterUserid==null){
+    return null;
+  }
+
+  let employers = await getUserEmployers(currenterUserid, locale);
+  let employerIds = _.reduce(employers, function(a,b){
+    a.push(parseInt(b.id));
+    return a;
+  }, [])
+  console.log(employers);
+  console.log(employerIds);
+  let listOfCompanies = await getGroupOfCompanyJobs(employerIds);
+  res = _.reduce(listOfCompanies, function(a,b){
+    let found = _.find(employers, {id: b['_id']});
+
+    if(found){
+      let company = {id: found.id, name: found.name, list: b.list};
+      a.push(company);
+    }
+
+    return a;
+  }, []);
+  return res;
+
+}

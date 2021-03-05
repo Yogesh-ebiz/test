@@ -112,7 +112,7 @@ function getNewJobs(filter) {
   return res;
 }
 
-function getGroupOfCompanyJobs(listOfCompanyIds) {
+async function getGroupOfCompanyJobs(listOfCompanyIds) {
   let data = null;
 
   if(listOfCompanyIds==null){
@@ -125,7 +125,7 @@ function getGroupOfCompanyJobs(listOfCompanyIds) {
     { $group: {_id:'$company'} },
     {$lookup:{
         from:"jobrequisitions",
-        as:"top5",
+        as:"list",
         let:{g:"$_id"},
         pipeline:[
           {$match:{$expr:{$eq:["$company","$$g"]}}},
@@ -148,5 +148,5 @@ module.exports = {
   getCountsGroupByCompany,
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,
-  getGroupOfCompanyJobs
+  getGroupOfCompanyJobs:getGroupOfCompanyJobs
 }

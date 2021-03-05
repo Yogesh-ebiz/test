@@ -15,7 +15,7 @@ router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
 
 router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
 router.route('/:userId/experiences').post(asyncHandler(updatePartyExperiences));
-
+router.route('/:userId/employers/jobs').get(asyncHandler(getEmployersJobs));
 
 
 router.route('/:userId/educations').get(asyncHandler(getPartyEducations));
@@ -98,6 +98,12 @@ async function updatePartyExperiences(req, res) {
 
   let data = await userCtl.updatePartyExperiences(currentUserId, body);
   res.json(new Response(data, data?'experiences_updated_successful':'not_found', res));
+}
+
+async function getEmployersJobs(req, res) {
+  let currentUserId = parseInt(req.params.userId);
+  let data = await userCtl.getUserEmployersJobs(currentUserId, res.locale);
+  res.json(new Response(data, data?'get_user_employers_jobs':'not_found', res));
 }
 
 async function getPartyEducations(req, res) {

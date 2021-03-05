@@ -41,6 +41,17 @@ async function getUserExperienceById(id) {
   return experiences;
 };
 
+async function getUserEmployers(id) {
+  let employers = null;
+  try {
+    let response = await client.get(`/user/${id}/experiences/employers`);
+    employers = response.data.data;
+  } catch(error) {
+    console.log("getUserEmployers: error", error);
+  }
+  return employers;
+};
+
 
 async function findCompanyById(id, userId) {
   const options = {
@@ -203,7 +214,7 @@ module.exports = {
   searchUsers: searchUsers,
   lookupUserIds:lookupUserIds,
   syncExperiences:syncExperiences,
-
+  getUserEmployers:getUserEmployers,
   update(userId, data) {
     return client.put(`/user/${userId}`, data);
   }
