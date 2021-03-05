@@ -2226,6 +2226,9 @@ async function getUserEmployersJobs(currenterUserid, locale) {
     if(found){
       let list = _.reduce(b.list, function (a, b) {
         b.company=convertToCompany(found);
+        b.responsibilities=null;
+        b.qualifications=null;
+        b.skills=null;
         a.push(b);
         return a;
       }, []);
