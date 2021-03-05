@@ -2219,13 +2219,16 @@ async function getUserEmployersJobs(currenterUserid, locale) {
     a.push(parseInt(b.id));
     return a;
   }, [])
-  console.log(employers);
-  console.log(employerIds);
   let listOfCompanies = await getGroupOfCompanyJobs(employerIds);
   res = _.reduce(listOfCompanies, function(a,b){
     let found = _.find(employers, {id: b['_id']});
 
     if(found){
+      let list = _.reduce(b.list, function (a, b) {
+        b.company=convertToCompany(found);
+        a.push(b);
+        return a;
+      }, []);
       let company = {id: found.id, name: found.name, list: b.list};
       a.push(company);
     }
