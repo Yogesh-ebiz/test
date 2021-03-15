@@ -91,5 +91,9 @@
 	"accomplishments_retrieved_successful": "accomplishments_retrieved_successful",
 	"categories_retrieved_successful": "categories_retrieved_successful",
 	"company_jobs_retrieved_successful": "company_jobs_retrieved_successful",
-	"get_user_employers_jobs": "get_user_employers_jobs"
+	"get_user_employers_jobs": "get_user_employers_jobs",
+	"template_created_successful": "template_created_successful",
+	"template_retrieved_successful": "template_retrieved_successful",
+	"template_updated_successful": "template_updated_successful",
+	"template_deleted_successful": "template_deleted_successful"
 }

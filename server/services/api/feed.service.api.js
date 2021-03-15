@@ -58,7 +58,6 @@ async function findCompanyById(id, userId) {
     headers: {'userId': userId}
   };
 
-  console.log('userId', userId)
   let response = await client.get(`/company/${id}?source=JOB`, options);
 
   return response.data.data;

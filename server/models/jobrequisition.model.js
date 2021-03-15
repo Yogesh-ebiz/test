@@ -132,6 +132,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Array,
     required: false
   },
+  minimumQualifications: {
+    type: Array,
+    required: false
+  },
   skills: {
     type: Array,
     required: true
@@ -144,6 +148,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Array,
     required: false,
     default: []
+  },
+  education: {
+    type: Object,
+    required: false
   },
   category: {
     type: Object,
@@ -182,6 +190,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  postalCode: {
+    type: String,
+    required: true
+  },
   tags: {
     type: Array,
     required: false
@@ -209,6 +221,15 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Array,
     required: false,
     default: []
+  },
+  labels: {
+    type: Array,
+    required: false
+  },
+  hasQuestions: {
+    type: Boolean,
+    default: false,
+    required: false
   },
   application: { type: Schema.Types.ObjectId, ref: 'Application' }
 }, {
