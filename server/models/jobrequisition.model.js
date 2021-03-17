@@ -35,11 +35,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  requiredResume: {
-    type: String,
-    required: false,
-    default: true
-  },
   durationMonths: {
     type: Number,
     required: false,
@@ -217,6 +212,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
+  department: {
+    type: Object,
+    required: true
+  },
   panelist: {
     type: Array,
     required: false,
@@ -226,12 +225,70 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Array,
     required: false
   },
+  questions: {
+    type: Array,
+    required: false
+  },
   hasQuestions: {
     type: Boolean,
     default: false,
     required: false
   },
-  application: { type: Schema.Types.ObjectId, ref: 'Application' }
+  application: { type: Schema.Types.ObjectId, ref: 'Application' },
+  requiredResume: {
+    type: Boolean,
+    required: false,
+    default: true
+  },
+  requiredCoverLetter: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  requiredPphoto: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  requiredPhone: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  applicationPreferences: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  profileField: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  autoConfirmationEmail: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  applicationPreferences:{
+    type: Object,
+    require: false
+  },
+  profileField: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  autoConfirmationEmail: {
+    type: Boolean,
+    default: false,
+    required: false
+  },
+  pipeLine: {
+    type: Array,
+    default: false
+  }
+
 }, {
   versionKey: false
 });

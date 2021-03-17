@@ -95,5 +95,6 @@
 	"template_created_successful": "template_created_successful",
 	"template_retrieved_successful": "template_retrieved_successful",
 	"template_updated_successful": "template_updated_successful",
-	"template_deleted_successful": "template_deleted_successful"
+	"template_deleted_successful": "template_deleted_successful",
+	"job_update_successful": "job_update_successful"
 }
