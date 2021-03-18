@@ -28,9 +28,18 @@ router.route('/:id/reviews/filter/locations/search').get(asyncHandler(getCompany
 
 router.route('/:id/reviews/:companyReviewId/reaction').post(asyncHandler(reactionToCompanyReviewById));
 router.route('/:id/reviews/:companyReviewId/reaction').delete(asyncHandler(removeReactionToCompanyReviewById));
-
 router.route('/:id/reviews/:companyReviewId').get(asyncHandler(getCompanyReviewById));
 
+router.route('/:id/departments').post(asyncHandler(addCompanyDepartment));
+router.route('/:id/departments/:departmentId').put(asyncHandler(updateCompanyDepartment));
+router.route('/:id/departments/:departmentId').delete(asyncHandler(deleteCompanyDepartment));
+router.route('/:id/departments').get(asyncHandler(getCompanyDepartments));
+
+
+router.route('/:id/pipelines').post(asyncHandler(addCompanyPipeline));
+router.route('/:id/pipelines/:pipelineId').put(asyncHandler(updateCompanyPipeline));
+router.route('/:id/pipelines/:pipelineId').delete(asyncHandler(deleteCompanyPipeline));
+router.route('/:id/pipelines').get(asyncHandler(getCompanyPipelines));
 
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -88,15 +97,12 @@ async function getCompanySalaryByEmploymentTitle(req, res) {
   res.json(new Response(data, data?'companysalary_employmentTitle_retrieved_successful':'not_found', res));
 }
 
-
-
 async function getCompanySalaryLocations(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
   let data = await companyCtl.getCompanySalaryLocations(currentUserId, company, req.locale);
   res.json(new Response(data, data?'companysalary_locations_retrieved_successful':'not_found', res));
 }
-
 
 async function getCompanySalaryEmploymentTitles(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -198,4 +204,90 @@ async function removeReactionToCompanyReviewById(req, res) {
   let data = await companyCtl.removeReactionToCompanyReviewById(currentUser, companyReviewId, reaction);
 
   res.json(new Response(data, data?'reaction_removed_successful':'not_found', res));
+}
+
+
+async function addCompanyDepartment(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let department = req.body;
+  department.company = company;
+  department.createdBy = currentUserId;
+
+  let data = await companyCtl.addCompanyDepartment(company, currentUserId, department);
+  res.json(new Response(data, data?'department_added_successful':'not_found', res));
+}
+
+async function updateCompanyDepartment(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let departmentId = parseInt(req.params.departmentId);
+  let department = req.body;
+  department.company = company;
+  department.createdBy = currentUserId;
+
+  let data = await companyCtl.updateCompanyDepartment(company, departmentId, currentUserId, department);
+  res.json(new Response(data, data?'department_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyDepartment(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let departmentId = parseInt(req.params.departmentId);
+
+  let data = await companyCtl.deleteCompanyDepartment(company, departmentId, currentUserId);
+  res.json(new Response(data, data?'department_updated_successful':'not_found', res));
+}
+
+
+async function getCompanyDepartments(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await companyCtl.getCompanyDepartments(company, currentUserId, res.locale);
+  res.json(new Response(data, data?'departments_retrieved_successful':'not_found', res));
+}
+
+
+
+async function addCompanyPipeline(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let pipeline = req.body;
+  pipeline.company = company;
+  pipeline.createdBy = currentUserId;
+
+  let data = await companyCtl.addCompanyPipeline(company, currentUserId, pipeline);
+  res.json(new Response(data, data?'pipeline_added_successful':'not_found', res));
+}
+
+async function updateCompanyPipeline(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let pipelineId = parseInt(req.params.pipelineId);
+  let pipeline = req.body;
+  pipeline.company = company;
+  pipeline.createdBy = currentUserId;
+
+  let data = await companyCtl.updateCompanyPipeline(company, pipelineId, currentUserId, pipeline);
+  res.json(new Response(data, data?'pipeline_updated_successful':'not_found', res));
+}
+
+
+async function deleteCompanyPipeline(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let pipelineId = parseInt(req.params.pipelineId);
+
+  let data = await companyCtl.deleteCompanyPipeline(company, pipelineId, currentUserId);
+  res.json(new Response(data, data?'pipeline_deleted_successful':'not_found', res));
+}
+
+
+async function getCompanyPipelines(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await companyCtl.getCompanyPipelines(company, currentUserId, res.locale);
+  res.json(new Response(data, data?'pipelines_retrieved_successful':'not_found', res));
 }

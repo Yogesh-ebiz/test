@@ -96,5 +96,12 @@
 	"template_retrieved_successful": "template_retrieved_successful",
 	"template_updated_successful": "template_updated_successful",
 	"template_deleted_successful": "template_deleted_successful",
-	"job_update_successful": "job_update_successful"
+	"job_update_successful": "job_update_successful",
+	"department_added_successful": "department_added_successful",
+	"departments_retrieved_successful": "departments_retrieved_successful",
+	"department_updated_successful": "department_updated_successful",
+	"pipeline_added_successful": "pipeline_added_successful",
+	"pipeline_deleted_successful": "pipeline_deleted_successful",
+	"pipelines_retrieved_successful": "pipelines_retrieved_successful",
+	"pipeline_updated_successful": "pipeline_updated_successful"
 }

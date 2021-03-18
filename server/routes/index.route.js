@@ -17,7 +17,6 @@ const talentRoutes = require('./talent.route');
 
 const filterRoutes = require('./filter.route');
 
-const templateRoutes = require('./template.route');
 
 
 const router = express.Router(); // eslint-disable-line new-cap
@@ -46,9 +45,6 @@ router.use('/workflows', workflowRoutes);
 router.use('/company', companyRoutes);
 router.use('/talent', talentRoutes);
 
-
-
-router.use('/templates', templateRoutes);
 
 
 module.exports = router;

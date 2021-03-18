@@ -18,6 +18,8 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
+const {getDepartments, addDepartment} = require('../services/department.service');
+const {getPipelines, addPipeline} = require('../services/pipeline.service');
 
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
@@ -28,6 +30,8 @@ const JobRequisition = require('../models/jobrequisition.model');
 const CompanyReview = require('../models/companyreview.model');
 // const CompanyReviewReport = require('../models/companyreviewreport.model');
 const CompanyReviewReaction = require('../models/companyreviewreaction.model');
+const Department = require('../models/department.model');
+const Pipeline = require('../models/pipeline.model');
 
 
 const salarySchema = Joi.object({
@@ -86,6 +90,22 @@ const companyReviewReactionSchema = Joi.object({
   reactionType: Joi.string().required()
 });
 
+const departmentSchema = Joi.object({
+  name: Joi.string().required(),
+  company: Joi.number().required(),
+  createdBy: Joi.number().required()
+});
+
+const pipelineSchema = Joi.object({
+  name: Joi.string().required(),
+  department: Joi.number().required(),
+  type: Joi.string().required(),
+  category: Joi.string().required(),
+  company: Joi.number().required(),
+  stages: Joi.array().required(),
+  createdBy: Joi.number()
+});
+
 
 module.exports = {
   getCompanyJobs,
@@ -101,7 +121,15 @@ module.exports = {
   getCompanyReviewLocations,
   reportCompanyReviewById,
   reactionToCompanyReviewById,
-  removeReactionToCompanyReviewById
+  removeReactionToCompanyReviewById,
+  addCompanyDepartment,
+  updateCompanyDepartment,
+  deleteCompanyDepartment,
+  getCompanyDepartments,
+  addCompanyPipeline,
+  updateCompanyPipeline,
+  deleteCompanyPipeline,
+  getCompanyPipelines
 }
 
 
@@ -625,3 +653,192 @@ async function removeReactionToCompanyReviewById(currentUserId, companyReviewId,
 }
 
 
+
+async function addCompanyDepartment(company, currentUserId, form) {
+  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await addDepartment(form);
+    }
+  } catch(e){
+    console.log('addCompanyDepartment: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyDepartment(company, departmentId, currentUserId, form) {
+  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  if(!company || !currentUserId || !departmentId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let department = await Department.findOne({departmentId: departmentId});
+      if(department){
+        department.name = form.name;
+        department.updatedBy = currentUserId;
+        result = await department.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyDepartment: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyDepartment(company, departmentId, currentUserId) {
+  if(!company || !currentUserId || !departmentId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let department = await Department.findOne({departmentId: departmentId});
+      if(department){
+        result = await department.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyDepartment: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyDepartments(company, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await getDepartments(company);
+
+  return result;
+
+}
+
+
+
+async function addCompanyPipeline(company, currentUserId, form) {
+  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await addPipeline(form);
+    }
+  } catch(e){
+    console.log('addCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyPipeline(company, pipelineId, currentUserId, form) {
+  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  if(!company || !currentUserId || !pipelineId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let pipeline = await Pipeline.findOne({pipelineId: pipelineId});
+      if(pipeline){
+        pipeline.name = form.name;
+        pipeline.updatedBy = currentUserId;
+        pipeline.stages=form.stages;
+        pipeline.category=form.category;
+        pipeline.department=form.department;
+        pipeline.type=form.type;
+        result = await pipeline.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function deleteCompanyPipeline(company, pipelineId, currentUserId) {
+  if(!company || !currentUserId || !pipelineId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      let pipeline = await Pipeline.findOne({pipelineId: pipelineId});
+      if(pipeline){
+        result = await pipeline.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyPipelines(company, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await getPipelines(company);
+
+  return result;
+
+}
