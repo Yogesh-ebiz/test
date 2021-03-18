@@ -15,6 +15,8 @@ router.route('/').post(asyncHandler(insert));
 router.route('/').post(asyncHandler(importJobs));
 router.route('/landing').get(asyncHandler(jobLanding));
 router.route('/search').get(asyncHandler(searchJob));
+router.route('/search/suggestions').get(asyncHandler(searchSuggestions));
+
 router.route('/latest').get(asyncHandler(getLatestJobs));
 router.route('/company/top-five').get(asyncHandler(getTopFiveJobs));
 
@@ -32,7 +34,6 @@ router.route('/:id/bookmark').delete(asyncHandler(removeBookmark));
 
 router.route('/:id/alert').post(asyncHandler(addAlert));
 router.route('/:id/alert').delete(asyncHandler(removeAlert));
-
 router.route('/:id/candidates').get(asyncHandler(searchCandidates));
 
 
@@ -85,6 +86,12 @@ async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.query;
   let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, res.locale);
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
+}
+
+
+async function searchSuggestions(req, res) {
+  let data = await jobRequisitionCtl.searchSuggestions(req.query.query, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

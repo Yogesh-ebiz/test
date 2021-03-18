@@ -122,6 +122,7 @@ module.exports = {
   getJobLanding,
   getTopFiveJobs,
   searchJob,
+  searchSuggestions,
   getSimilarJobs,
   getLatestJobs,
   getSimilarCompany,
@@ -607,6 +608,31 @@ async function searchJob(currentUserId, jobId, filter, locale) {
   return new Pagination(result);
 
 }
+
+
+
+async function searchSuggestions(keyword, locale) {
+
+  if(keyword==null){
+    return null;
+  }
+
+
+  let results = await JobRequisition.aggregate([
+      {$match: {title: { $regex: keyword, $options: 'i'} } },
+      { $project: {_id: 0, title: 1} }
+      ]).limit(10).sort({title: 1});
+
+  results = _.reduce(results, function(a, b){
+      a.push(b.title);
+      return a;
+      }, []);
+
+  return results;
+
+}
+
+
 
 async function getSimilarJobs(currentUserId, filter) {
 

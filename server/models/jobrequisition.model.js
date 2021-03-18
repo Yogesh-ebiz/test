@@ -187,7 +187,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   postalCode: {
     type: String,
-    required: true
+    required: false
   },
   tags: {
     type: Array,
@@ -214,7 +214,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   department: {
     type: Object,
-    required: true
+    required: false
   },
   panelist: {
     type: Array,
@@ -260,11 +260,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: false,
     required: false
   },
-  profileField: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
   autoConfirmationEmail: {
     type: Boolean,
     default: false,
@@ -275,17 +270,16 @@ const JobRequisitionSchema = new mongoose.Schema({
     require: false
   },
   profileField: {
-    type: Boolean,
-    default: false,
+    type: Object,
     required: false
   },
   autoConfirmationEmail: {
-    type: Boolean,
+    type: Object,
     default: false,
     required: false
   },
   pipeLine: {
-    type: Array,
+    type: Object,
     default: false
   }
 
