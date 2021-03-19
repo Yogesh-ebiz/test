@@ -103,5 +103,9 @@
 	"pipeline_added_successful": "pipeline_added_successful",
 	"pipeline_deleted_successful": "pipeline_deleted_successful",
 	"pipelines_retrieved_successful": "pipelines_retrieved_successful",
-	"pipeline_updated_successful": "pipeline_updated_successful"
+	"pipeline_updated_successful": "pipeline_updated_successful",
+	"policy_added_successful": "policy_added_successful",
+	"policy_updated_successful": "policy_updated_successful",
+	"policy_deleted_successful": "policy_deleted_successful",
+	"policies_retrieved_successful": "policies_retrieved_successful"
 }

@@ -16,6 +16,7 @@ const companyRoutes = require('./company.route');
 const talentRoutes = require('./talent.route');
 
 const filterRoutes = require('./filter.route');
+const policyRoutes = require('./policy.route');
 
 
 
@@ -44,7 +45,7 @@ router.use('/users', userRoutes);
 router.use('/workflows', workflowRoutes);
 router.use('/company', companyRoutes);
 router.use('/talent', talentRoutes);
-
+router.use('/policies', policyRoutes);
 
 
 module.exports = router;

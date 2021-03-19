@@ -688,7 +688,7 @@ async function updateCompanyDepartment(company, departmentId, currentUserId, for
 
   try {
     if (isPartyActive(currentParty)) {
-      let department = await Department.findOne({departmentId: departmentId});
+      let department = await Department.findById(departmentId);
       if(department){
         department.name = form.name;
         department.updatedBy = currentUserId;
@@ -715,7 +715,7 @@ async function deleteCompanyDepartment(company, departmentId, currentUserId) {
 
   try {
     if (isPartyActive(currentParty)) {
-      let department = await Department.findOne({departmentId: departmentId});
+      let department = await Department.findById(departmentId);
       if(department){
         result = await department.delete();
         if(result){
@@ -842,3 +842,5 @@ async function getCompanyPipelines(company, currentUserId, locale) {
   return result;
 
 }
+
+

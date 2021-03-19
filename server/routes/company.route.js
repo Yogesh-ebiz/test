@@ -221,7 +221,7 @@ async function addCompanyDepartment(req, res) {
 async function updateCompanyDepartment(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let departmentId = parseInt(req.params.departmentId);
+  let departmentId = req.params.departmentId;
   let department = req.body;
   department.company = company;
   department.createdBy = currentUserId;
@@ -233,7 +233,7 @@ async function updateCompanyDepartment(req, res) {
 async function deleteCompanyDepartment(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let departmentId = parseInt(req.params.departmentId);
+  let departmentId = req.params.departmentId;
 
   let data = await companyCtl.deleteCompanyDepartment(company, departmentId, currentUserId);
   res.json(new Response(data, data?'department_updated_successful':'not_found', res));
