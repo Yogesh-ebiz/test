@@ -1,0 +1,50 @@
+{
+	"title":"Default",
+	"category":null,
+	"custom":false,
+	"default":true,
+	"stages":[
+		{
+			"actions":[],
+			"type":"SOURCED",
+			"name":"Sourced",
+			"timeLimit":null
+		},
+		{
+			"actions":[],
+			"type":"APPLIED",
+			"name":"Applied",
+			"timeLimit":null
+		},
+		{
+			"actions":[],
+			"type":"PHONE_INTERVIEW",
+			"name":"Phone Interview",
+			"timeLimit":null
+		},
+		{
+			"actions":[],
+			"type":"ONSITE_INTERVIEW",
+			"name":"On-Site Interview",
+			"timeLimit":null
+		},
+		{
+			"actions":[],
+			"type":"EVALUATION",
+			"name":"Evaluation",
+			"timeLimit":null
+		},
+		{
+			"actions":[],
+			"type":"OFFER",
+			"name":"Offer",
+			"timeLimit":null
+		},
+		{
+			"actions":[],
+			"type":"HIRED",
+			"name":"Hired",
+			"timeLimit":null
+		}
+	]
+}

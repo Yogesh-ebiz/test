@@ -10,7 +10,7 @@ function getPipelines(company) {
     return;
   }
 
-  return Pipeline.find({company: company});
+  return Pipeline.find({$or: [{company: company}, {default: true}]}).sort({default: -1});
 }
 
 

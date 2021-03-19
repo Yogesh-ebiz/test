@@ -28,10 +28,6 @@ const PipelineSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  type: {
-    type: String,
-    required: true
-  },
   category: {
     type: String
   },
