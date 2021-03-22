@@ -510,27 +510,27 @@ async function getTopFiveJobs(companies, locale) {
 
 
 
-async function searchJob(currentUserId, jobId, filter, locale) {
+async function searchJob(currentUserId, jobId, filter, pagination, locale) {
 
-  if(filter==null){
+  if(!filter || !pagination){
     return null;
   }
 
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
-  let limit = (filter.size && filter.size>0) ? filter.size:20;
-  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let limit = (pagination.size && pagination.size>0) ? pagination.size:20;
+  let page = (pagination.page && pagination.page==0) ? pagination.page:1;
   let sortBy = {};
-  filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
-  filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
-  sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
+  pagination.sortBy = (pagination.sortyBy) ? pagination.sortyBy : 'createdDate';
+  pagination.direction = (pagination.direction && pagination.direction=="ASC") ? "ASC" : 'DESC';
+  sortBy[pagination.sortBy] = (pagination.direction == "DESC") ? -1 : 1;
 
   let options = {
     select:   select,
     sort:     sortBy,
     lean:     true,
     limit:    limit,
-    page: parseInt(filter.page)+1
+    page: parseInt(pagination.page)+1
   };
 
 

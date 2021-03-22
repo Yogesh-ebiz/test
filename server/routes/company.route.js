@@ -41,6 +41,11 @@ router.route('/:id/pipelines/:pipelineId').put(asyncHandler(updateCompanyPipelin
 router.route('/:id/pipelines/:pipelineId').delete(asyncHandler(deleteCompanyPipeline));
 router.route('/:id/pipelines').get(asyncHandler(getCompanyPipelines));
 
+router.route('/:id/roles').post(asyncHandler(addCompanyRole));
+router.route('/:id/roles/:roleId').put(asyncHandler(updateCompanyRole));
+router.route('/:id/roles/:roleId').delete(asyncHandler(deleteCompanyRole));
+router.route('/:id/roles').get(asyncHandler(getCompanyRoles));
+
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
@@ -290,4 +295,46 @@ async function getCompanyPipelines(req, res) {
 
   let data = await companyCtl.getCompanyPipelines(company, currentUserId, res.locale);
   res.json(new Response(data, data?'pipelines_retrieved_successful':'not_found', res));
+}
+
+
+async function addCompanyRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let role = req.body;
+  role.company = company;
+  role.createdBy = currentUserId;
+
+  let data = await companyCtl.addCompanyRole(company, currentUserId, role);
+  res.json(new Response(data, data?'role_added_successful':'not_found', res));
+}
+
+async function updateCompanyRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let roleId = req.params.roleId;
+  let role = req.body;
+  role.company = company;
+  role.createdBy = currentUserId;
+
+  let data = await companyCtl.updateCompanyRole(company, roleId, currentUserId, role);
+  res.json(new Response(data, data?'role_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let roleId = req.params.roleId;
+
+  let data = await companyCtl.deleteCompanyDepartment(company, roleId, currentUserId);
+  res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
+}
+
+
+async function getCompanyRoles(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await companyCtl.getCompanyRoles(company, currentUserId, res.locale);
+  res.json(new Response(data, data?'roles_retrieved_successful':'not_found', res));
 }

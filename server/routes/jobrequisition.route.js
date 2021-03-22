@@ -14,7 +14,7 @@ module.exports = router;
 router.route('/').post(asyncHandler(insert));
 router.route('/').post(asyncHandler(importJobs));
 router.route('/landing').get(asyncHandler(jobLanding));
-router.route('/search').get(asyncHandler(searchJob));
+router.route('/search').post(asyncHandler(searchJob));
 router.route('/search/suggestions').get(asyncHandler(searchSuggestions));
 
 router.route('/latest').get(asyncHandler(getLatestJobs));
@@ -84,8 +84,9 @@ async function getTopFiveJobs(req, res) {
 
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let filter = req.query;
-  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, res.locale);
+  let filter = req.body;
+  let pagination = req.query;
+  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, pagination, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
