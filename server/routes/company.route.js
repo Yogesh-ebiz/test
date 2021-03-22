@@ -326,7 +326,50 @@ async function deleteCompanyRole(req, res) {
   let company = parseInt(req.params.id);
   let roleId = req.params.roleId;
 
-  let data = await companyCtl.deleteCompanyDepartment(company, roleId, currentUserId);
+  let data = await companyCtl.deleteCompanyRole(company, roleId, currentUserId);
+  res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
+}
+
+
+async function getCompanyRoles(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await companyCtl.getCompanyRoles(company, currentUserId, res.locale);
+  res.json(new Response(data, data?'roles_retrieved_successful':'not_found', res));
+}
+
+
+
+async function addCompanyMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let role = req.body;
+  role.company = company;
+  role.createdBy = currentUserId;
+
+  let data = await companyCtl.addCompanyRole(company, currentUserId, role);
+  res.json(new Response(data, data?'role_added_successful':'not_found', res));
+}
+
+async function updateCompanyMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let roleId = req.params.roleId;
+  let role = req.body;
+  role.company = company;
+  role.createdBy = currentUserId;
+
+  let data = await companyCtl.updateCompanyRole(company, roleId, currentUserId, role);
+  res.json(new Response(data, data?'role_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let roleId = req.params.roleId;
+
+  let data = await companyCtl.deleteCompanyRole(company, roleId, currentUserId);
   res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
 }
 

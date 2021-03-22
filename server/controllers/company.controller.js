@@ -107,6 +107,16 @@ const pipelineSchema = Joi.object({
   createdBy: Joi.number()
 });
 
+const roleSchema = Joi.object({
+  name: Joi.string().required(),
+  createdBy: Joi.number().required(),
+  company: Joi.number().required(),
+  description: Joi.object().required(),
+  privileges: Joi.array().required(),
+  default: Joi.boolean()
+});
+
+
 
 module.exports = {
   getCompanyJobs,
@@ -853,7 +863,8 @@ async function getCompanyPipelines(company, currentUserId, locale) {
 
 
 async function addCompanyRole(company, currentUserId, form) {
-  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  console.log('addCompanyRole', form)
+  form = await Joi.validate(form, roleSchema, { abortEarly: false });
   if(!company || !currentUserId || !form){
     return null;
   }
@@ -875,7 +886,7 @@ async function addCompanyRole(company, currentUserId, form) {
 }
 
 async function updateCompanyRole(company, roleId, currentUserId, form) {
-  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  form = await Joi.validate(form, roleSchema, { abortEarly: false });
   if(!company || !currentUserId || !roleId || !form){
     return null;
   }
@@ -886,7 +897,7 @@ async function updateCompanyRole(company, roleId, currentUserId, form) {
 
   try {
     if (isPartyActive(currentParty)) {
-      let role = await Role.findbyId(roleId);
+      let role = await Role.findById(roleId);
       if(role){
         role.name = form.name;
         role.updatedBy = currentUserId;

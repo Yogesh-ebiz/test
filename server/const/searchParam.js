@@ -23,12 +23,9 @@ function SearchParam(filter) {
   }
 
 
-  if(filter.tags){
-    let tags = _.reduce(filter.tags.split(','), function(res, i){
-      res.push(i);
-      return res;
-    }, []);
-    this.query.tags =  { $in: tags };
+  if(filter.tags && filter.tags.length>0){
+
+    this.query.tags =  { $in: filter.tags };
   }
 
   if(filter.createdDate){
@@ -65,7 +62,8 @@ function SearchParam(filter) {
   }
 
   if (filter.level && filter.level!="") {
-    this.query.level =  { $in: filter.level.split(',') };
+    // this.query.level =  { $in: filter.level.split(',') };
+    this.query.level = { $in: filter.level };
   }
 
   if (filter.jobFunction && filter.jobFunction!="") {
@@ -73,7 +71,8 @@ function SearchParam(filter) {
       result.push(value.trim());
       return result;
     }, []);
-    this.query.jobFunction =  { $in: jobFunctions };
+    // this.query.jobFunction =  { $in: jobFunctions };
+    this.query.jobFunction =  { $in: filter.jobFunction };
   }
 
   if (filter.employmentType && filter.employmentType!="") {
@@ -81,7 +80,8 @@ function SearchParam(filter) {
       result.push(value.trim());
       return result;
     }, []);
-    this.query.employmentType =  { $in: employmentType};
+    // this.query.employmentType =  { $in: employmentType};
+    this.query.employmentType =  { $in: filter.employmentType};
   }
 
   if (filter.industry && filter.industry!="") {
@@ -89,7 +89,8 @@ function SearchParam(filter) {
       result.push(value.trim());
       return result;
     }, []);
-    this.query.industry =  { $in: industry };
+    // this.query.industry =  { $in: industry };
+    this.query.industry =  { $in: filter.industry };
   }
 
   if (filter.company && filter.company!="") {
@@ -99,7 +100,8 @@ function SearchParam(filter) {
       return result;
     }, []);
 
-    this.query.company = { $in: company };
+    // this.query.company = { $in: company };
+    this.query.company = { $in: filter.company };
   }
 
   if (filter.city && filter.city!="") {
@@ -108,7 +110,8 @@ function SearchParam(filter) {
       return result;
     }, []);
 
-    this.query.city =  { $in: city};
+    // this.query.city =  { $in: city};
+    this.query.city =  { $in: filter.city};
   }
 
   if (filter.state && filter.state!="") {
@@ -116,7 +119,8 @@ function SearchParam(filter) {
       result.push(value.trim());
       return result;
     }, []);
-    this.query.state =  { $in: state};
+    // this.query.state =  { $in: state};
+    this.query.state =  { $in: filter.state};
   }
 
   if (filter.country && filter.country!="") {
@@ -125,7 +129,8 @@ function SearchParam(filter) {
       return result;
     }, []);
 
-    this.query.country =  { $in: country};
+    // this.query.country =  { $in: country};
+    this.query.country =  { $in: filter.country};
   }
 
   if (filter.distance && filter.distance!="") {
@@ -134,7 +139,8 @@ function SearchParam(filter) {
       return result;
     }, []);
 
-    this.query.distance =  { $in: distance};
+    // this.query.distance =  { $in: distance};
+    this.query.distance =  { $in: filter.distance};
   }
 
   return this.query;

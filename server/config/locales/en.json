@@ -107,5 +107,9 @@
 	"policy_added_successful": "policy_added_successful",
 	"policy_updated_successful": "policy_updated_successful",
 	"policy_deleted_successful": "policy_deleted_successful",
-	"policies_retrieved_successful": "policies_retrieved_successful"
+	"policies_retrieved_successful": "policies_retrieved_successful",
+	"role_added_successful": "role_added_successful",
+	"roles_retrieved_successful": "roles_retrieved_successful",
+	"role_updated_successful": "role_updated_successful",
+	"role_deleted_successful": "role_deleted_successful"
 }
