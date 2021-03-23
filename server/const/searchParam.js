@@ -67,82 +67,83 @@ function SearchParam(filter) {
   }
 
   if (filter.jobFunction && filter.jobFunction!="") {
-    let jobFunctions = _.reduce(filter.jobFunction.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let jobFunctions = _.reduce(filter.jobFunction.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
     // this.query.jobFunction =  { $in: jobFunctions };
     this.query.jobFunction =  { $in: filter.jobFunction };
   }
 
   if (filter.employmentType && filter.employmentType!="") {
-    let employmentType = _.reduce(filter.employmentType.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let employmentType = _.reduce(filter.employmentType.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
     // this.query.employmentType =  { $in: employmentType};
     this.query.employmentType =  { $in: filter.employmentType};
   }
 
   if (filter.industry && filter.industry!="") {
-    let industry = _.reduce(filter.industry.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let industry = _.reduce(filter.industry.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
     // this.query.industry =  { $in: industry };
     this.query.industry =  { $in: filter.industry };
   }
 
   if (filter.company && filter.company!="") {
 
-    let company = _.reduce(filter.company.split(','), function(result, value, key) {
-      result.push(parseInt(value));
-      return result;
-    }, []);
+    // let company = _.reduce(filter.company.split(','), function(result, value, key) {
+    //   result.push(parseInt(value));
+    //   return result;
+    // }, []);
 
     // this.query.company = { $in: company };
     this.query.company = { $in: filter.company };
   }
 
   if (filter.city && filter.city!="") {
-    let city = _.reduce(filter.city.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let city = _.reduce(filter.city.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
 
     // this.query.city =  { $in: city};
     this.query.city =  { $in: filter.city};
   }
 
   if (filter.state && filter.state!="") {
-    let state = _.reduce(filter.state.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let state = _.reduce(filter.state.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
     // this.query.state =  { $in: state};
     this.query.state =  { $in: filter.state};
   }
 
   if (filter.country && filter.country!="") {
-    let country = _.reduce(filter.country.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let country = _.reduce(filter.country.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
 
     // this.query.country =  { $in: country};
     this.query.country =  { $in: filter.country};
   }
 
   if (filter.distance && filter.distance!="") {
-    let distance = _.reduce(filter.distance.split(','), function(result, value, key) {
-      result.push(value.trim());
-      return result;
-    }, []);
+    // let distance = _.reduce(filter.distance.split(','), function(result, value, key) {
+    //   result.push(value.trim());
+    //   return result;
+    // }, []);
 
     // this.query.distance =  { $in: distance};
     this.query.distance =  { $in: filter.distance};
   }
 
+  console.log(this.query)
   return this.query;
 }
 

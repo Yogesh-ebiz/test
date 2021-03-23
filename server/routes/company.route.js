@@ -10,7 +10,7 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
-router.route('/:id/jobs').get(asyncHandler(getCompanyJobs));
+router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
 router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymentTitle));
@@ -63,9 +63,10 @@ async function adminCompanyJobs(req, res) {
 
 async function getCompanyJobs(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let filter = req.query;
-  filter.company = req.params.id;
-  let data = await companyCtl.getCompanyJobs(currentUserId, filter, res.locale);
+  let filter = req.body;
+  let pagination = req.query;
+  filter.company = [parseInt(req.params.id)];
+  let data = await companyCtl.getCompanyJobs(currentUserId, filter, pagination, res.locale);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }
 
@@ -364,7 +365,7 @@ async function updateCompanyMember(req, res) {
   res.json(new Response(data, data?'role_updated_successful':'not_found', res));
 }
 
-async function deleteCompanyRole(req, res) {
+async function deleteCompanyMember(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let roleId = req.params.roleId;
@@ -374,7 +375,7 @@ async function deleteCompanyRole(req, res) {
 }
 
 
-async function getCompanyRoles(req, res) {
+async function getCompanyMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
 

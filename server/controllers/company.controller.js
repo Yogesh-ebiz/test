@@ -148,37 +148,41 @@ module.exports = {
 
 }
 
+async function getCompanyJobs(currentUserId, filter, pagination, locale) {
 
-async function getCompanyJobs(currentUserId, filter, locale) {
-
-  if(filter==null){
+  console.log(filter, pagination)
+  if(!filter || !pagination){
     return null;
   }
 
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
-  let limit = (filter.size && filter.size>0) ? filter.size:20;
-  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let limit = (pagination.size && pagination.size>0) ? pagination.size:20;
+  let page = (pagination.page && pagination.page==0) ? pagination.page:1;
   let sortBy = {};
-  filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
-  filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
-  sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
+  pagination.sortBy = (pagination.sortyBy) ? pagination.sortyBy : 'createdDate';
+  pagination.direction = (pagination.direction && pagination.direction=="ASC") ? "ASC" : 'DESC';
+  sortBy[pagination.sortBy] = (pagination.direction == "DESC") ? -1 : 1;
 
   let options = {
     select:   select,
     sort:     sortBy,
     lean:     true,
     limit:    limit,
-    page: parseInt(filter.page)+1
+    page: parseInt(pagination.page)+1
   };
+
 
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
   let docs = [];
 
+  // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+  // let listOfSkills = await findSkillsById(skills, locale);
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
-  // let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
-  // let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
+  let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
+  let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
   let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
+
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
 
   let res = await searchCompany('', listOfCompanyIds, currentUserId);
@@ -193,12 +197,21 @@ async function getCompanyJobs(currentUserId, filter, locale) {
 
   _.forEach(result.docs, function(job){
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-    job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
+    job.company = _.find(foundCompanies, {id: job.company});
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+    job.level = _.find(experienceLevels, {shortCode: job.level});
 
+    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
     job.promotion = _.find(promotions, {promotionId: job.promotion});
 
+    let industry = _.reduce(industries, function(res, item){
+      if(_.includes(job.industry, item.shortCode)){
+        res.push(item);
+      }
+      return res;
+    }, []);
 
+    job.industry = industry;
 
     // var skills = _.reduce(job.skills, function(res, skill){
     //   let find = _.filter(listOfSkills, { 'id': skill});
@@ -264,6 +277,8 @@ async function getCompanySalaries(currentUserId, filter, locale) {
       result = _.reduce(result, function (res, item) {
         let currency = _.find(currencies, {currency: item.currency+currentParty.preferredCurrency});
         let avgBaseSalary = 0;
+
+        /* temporary commenting out
         switch (item.basePayPeriod){
           case 'ANNUALLY':
             avgBaseSalary = item.avgBaseSalary * currency.rate;
@@ -275,6 +290,7 @@ async function getCompanySalaries(currentUserId, filter, locale) {
             avgBaseSalary = item.avgBaseSalary * currency.rate;
             break;
         }
+        */
 
         item.hasLiked = false;
         item.avgBaseSalary = avgBaseSalary //Math.floor(item.avgBaseSalary * currency.rate, 0);

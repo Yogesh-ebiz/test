@@ -545,13 +545,18 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
     // }
 
 
+    if(foundJob) {
+      filter.similarId = jobId;
+      //filter.query = foundJob.title;
+      filter.level = [foundJob.level];
+      filter.jobFunction = foundJob.jobFunction;
+      filter.industry = [foundJob.industry];
+      filter.employmentType = [foundJob.employmentType];
+      filter.city = [foundJob.city];
+      filter.state = [foundJob.state];
+      filter.country = [foundJob.country];
 
-    filter.similarId = foundJob.jobId;
-    //filter.query = foundJob.title;
-    filter.level = foundJob.level;
-    filter.jobFunction=foundJob.jobFunction;
-    filter.employmentType=foundJob.employmentType;
-    filter.employmentType=null;
+    }
   }
 
   let result = await JobRequisition.paginate(new SearchParam(filter), options);
