@@ -143,7 +143,6 @@ function SearchParam(filter) {
     this.query.distance =  { $in: filter.distance};
   }
 
-  console.log(this.query)
   return this.query;
 }
 

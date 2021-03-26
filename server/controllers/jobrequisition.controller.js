@@ -198,7 +198,6 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
     job = await findJobId(jobId, locale);
 
-    console.log(job)
     if(job) {
 
       let company = await findCompanyById(job.company, currentUserId);
@@ -548,13 +547,13 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
     if(foundJob) {
       filter.similarId = jobId;
       //filter.query = foundJob.title;
-      filter.level = [foundJob.level];
-      filter.jobFunction = foundJob.jobFunction;
+      // filter.level = [foundJob.level];
+      filter.jobFunction = [foundJob.jobFunction];
       filter.industry = [foundJob.industry];
-      filter.employmentType = [foundJob.employmentType];
-      filter.city = [foundJob.city];
-      filter.state = [foundJob.state];
-      filter.country = [foundJob.country];
+      filter.employmentType = [];
+      // filter.city = [foundJob.city];
+      // filter.state = [foundJob.state];
+      // filter.country = [foundJob.country];
 
     }
   }
@@ -772,12 +771,17 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
         return res;
       }, []);
 
-      let companies = await searchParties(group, partyEnum.COMPANY, 20, filter.page);
-      result = (companies.data)? companies.data.data : null;
+      let companies = await feedService.searchCompany(null, group, currentUserId);
+      result = companies;
 
-      _.forEach(result.content, function(res){
-        res.hasFollowed = false;
-      })
+      result.content = _.reduce(result.content, function(res, item){
+        item = convertToCompany(item);
+        item.hasFollowed = false;
+        res.push(item);
+        return res;
+
+      }, [])
+
 
     }
   } catch (error) {

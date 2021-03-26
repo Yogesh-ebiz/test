@@ -37,7 +37,8 @@ const convertToCompany = (company) => {
     address1: company.primaryAddress.address1,
     city: company.primaryAddress.city,
     state: company.primaryAddress.state,
-    country: company.primaryAddress.country
+    country: company.primaryAddress.country,
+    images: company.images
   }: null;
 
   return {
@@ -49,7 +50,7 @@ const convertToCompany = (company) => {
     headline: company.headline,
     primaryAddress: primaryAddress,
     hasFollowed:company.hasFollowed,
-    images: []
+    images: company.images
   };
 }
 

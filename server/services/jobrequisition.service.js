@@ -120,7 +120,7 @@ async function getGroupOfCompanyJobs(listOfCompanyIds) {
   }
 
 
-  return JobRequisition.aggregate([
+  return await JobRequisition.aggregate([
     { $match: {company: {$in: listOfCompanyIds }} },
     { $group: {_id:'$company'} },
     {$lookup:{
