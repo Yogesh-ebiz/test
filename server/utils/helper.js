@@ -67,10 +67,26 @@ const convertIndustry = (industry) => {
   };
 }
 
+const categoryMinimal = (category) => {
+  if(!category){
+    return null;
+  }
+  return {
+    id: category.id,
+    name: category.name,
+    image: category.image,
+    icon: category.icon,
+    cover: category.cover,
+    fontColor: category.fontColor,
+    backgroundColor: category.backgroundColor,
+    shortCode: category.shortCode
+  };
+}
 
 module.exports = {
   capitalizeLocale:capitalizeLocale,
   convertToAvatar:convertToAvatar,
   convertToCompany:convertToCompany,
-  convertIndustry:convertIndustry
+  convertIndustry:convertIndustry,
+  categoryMinimal:categoryMinimal
 };

@@ -125,6 +125,18 @@ async function findSkillsById(ids) {
   return response.data.data;
 };
 
+async function findCategoryById(id, isMinimal) {
+  let response = await client.get(`/categories/${id}?isMinimal=${isMinimal}`);
+  return response.data.data;
+};
+
+
+async function findCategoryByShortCode(shortCode) {
+  let response = await client.get(`/categories/shortcode/${shortCode}?isMinimal=true`);
+  return response.data.data;
+};
+
+
 async function findIndustry(query, shortCodes, locale) {
   const options = {
     'Accept-Language': locale
@@ -214,6 +226,8 @@ module.exports = {
   lookupUserIds:lookupUserIds,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,
+  findCategoryById:findCategoryById,
+  findCategoryByShortCode:findCategoryByShortCode,
   update(userId, data) {
     return client.put(`/user/${userId}`, data);
   }

@@ -21,6 +21,8 @@ const {getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
 const {getPipelines, addPipeline} = require('../services/pipeline.service');
 const roleService = require('../services/role.service');
+const labelService = require('../services/label.service');
+
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
@@ -33,6 +35,7 @@ const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 const Department = require('../models/department.model');
 const Pipeline = require('../models/pipeline.model');
 const Role = require('../models/role.model');
+const Label = require('../models/label.model');
 
 
 const salarySchema = Joi.object({
@@ -116,6 +119,12 @@ const roleSchema = Joi.object({
   default: Joi.boolean()
 });
 
+const labelSchema = Joi.object({
+  name: Joi.string().required(),
+  type: Joi.string().required(),
+  company: Joi.number().required()
+});
+
 
 
 module.exports = {
@@ -144,7 +153,12 @@ module.exports = {
   addCompanyRole,
   getCompanyRoles,
   updateCompanyRole,
-  deleteCompanyRole
+  deleteCompanyRole,
+  addCompanyLabel,
+  getCompanyLabels,
+  updateCompanyLabel,
+  deleteCompanyLabel,
+
 
 }
 
@@ -969,6 +983,103 @@ async function getCompanyRoles(company, currentUserId, locale) {
   }
 
   let result = await roleService.getRoles(company);
+
+  return result;
+
+}
+
+
+
+
+async function addCompanyLabel(company, currentUserId, form) {
+  console.log('addCompanyRole', form)
+  form = await Joi.validate(form, labelSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await labelService.addLabel(form);
+    }
+  } catch(e){
+    console.log('addCompanyLabel: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyLabel(company, labelId, currentUserId, form) {
+  form = await Joi.validate(form, labelSchema, { abortEarly: false });
+  if(!company || !currentUserId || !labelId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let label = await Label.findById(labelId);
+      if(label){
+        label.name = form.name;
+        label.updatedBy = currentUserId;
+        label.type=form.type;
+        result = await label.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyLabel: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function deleteCompanyLabel(company, labelId, currentUserId) {
+  if(!company || !currentUserId || !labelId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      let label = await Label.findById(labelId);
+      if(label){
+        result = await label.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyLabel: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyLabels(company, type, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await labelService.getLabels(company, type);
 
   return result;
 

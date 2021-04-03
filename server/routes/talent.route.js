@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const companyCtl = require('../controllers/company.controller');
-const hr = require('../controllers/hr.controller');
+const talentCtrl = require('../controllers/talent.controller');
 
 let Response = require('../const/response');
 
@@ -24,7 +24,7 @@ async function searchJob(req, res) {
   }
   let filter = req.query;
   let companyId = parseInt(req.query.company);
-  let data = await hr.searchJobs(currentUserId, companyId, filter, res.locale);
+  let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
@@ -32,7 +32,7 @@ async function getJobById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
-  let data = await hr.getJobById(currentUserId, jobId, res.locale);
+  let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
@@ -44,7 +44,7 @@ async function searchApplications(req, res) {
 
   let filter = req.query;
   let jobId = parseInt(req.params.id);
-  let data = await hr.searchApplications(currentUserId, jobId, filter, res.locale);
+  let data = await talentCtrl.searchApplications(currentUserId, jobId, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
@@ -54,7 +54,7 @@ async function rejectApplication(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let applicationId = parseInt(req.params.applicationId);
-  let data = await hr.getJobById(currentUserId, jobId, res.locale);
+  let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }

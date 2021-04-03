@@ -46,6 +46,11 @@ router.route('/:id/roles/:roleId').put(asyncHandler(updateCompanyRole));
 router.route('/:id/roles/:roleId').delete(asyncHandler(deleteCompanyRole));
 router.route('/:id/roles').get(asyncHandler(getCompanyRoles));
 
+router.route('/:id/labels').post(asyncHandler(addCompanyLabel));
+router.route('/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
+router.route('/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
+router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
+
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
@@ -381,4 +386,48 @@ async function getCompanyMembers(req, res) {
 
   let data = await companyCtl.getCompanyRoles(company, currentUserId, res.locale);
   res.json(new Response(data, data?'roles_retrieved_successful':'not_found', res));
+}
+
+
+
+async function addCompanyLabel(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let label = req.body;
+  label.company = company;
+  label.createdBy = currentUserId;
+
+  let data = await companyCtl.addCompanyLabel(company, currentUserId, label);
+  res.json(new Response(data, data?'label_added_successful':'not_found', res));
+}
+
+async function updateCompanyLabel(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let labelId = req.params.labelId;
+  let label = req.body;
+  label.company = company;
+  label.createdBy = currentUserId;
+
+  let data = await companyCtl.updateCompanyLabel(company, labelId, currentUserId, label);
+  res.json(new Response(data, data?'label_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyLabel(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let labelId = req.params.labelId;
+
+  let data = await companyCtl.deleteCompanyLabel(company, labelId, currentUserId);
+  res.json(new Response(data, data?'label_deleted_successful':'not_found', res));
+}
+
+
+async function getCompanyLabels(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let type = req.query.type
+
+  let data = await companyCtl.getCompanyLabels(company, type, currentUserId, res.locale);
+  res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
 }

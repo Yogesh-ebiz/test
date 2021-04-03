@@ -1,8 +1,7 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
-
-const {convertToAvatar, convertToCompany, convertIndustry, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
@@ -47,7 +46,7 @@ const Category = require('../models/category.model');
 
 
 
-let Pagination = require('../utils/job.pagination');
+let Pagination = require('../utils/pagination');
 let SearchParam = require('../const/searchParam');
 
 const jobRequisitionSchema = Joi.object({
@@ -206,7 +205,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
       if(!isMinimal) {
 
         let hiringManager = await findByUserId(job.createdBy, currentUserId);
-        job.hiringManager = convertToAvatar(hiringManager);
+        job.createdBy = convertToAvatar(hiringManager);
 
         let jobSkills = await findSkillsById(job.skills);
         // console.log('jobSkils', jobSkills)
@@ -239,6 +238,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
           job.promotion = promotion?promotion[0]:null;
         }
 
+        job.category = await feedService.findCategoryByShortCode(job.category, locale, true);
+        job.category = categoryMinimal(job.category);
 
         let users = await lookupUserIds([job.createdBy]);
         job.createdBy = _.find(users, {id: job.createdBy});
@@ -638,7 +639,7 @@ async function searchSuggestions(keyword, locale) {
 
 
 
-async function getSimilarJobs(currentUserId, filter) {
+async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) {
 
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
@@ -655,74 +656,54 @@ async function getSimilarJobs(currentUserId, filter) {
     page: parseInt(filter.page)+1
   };
 
-
-  if(filter.id){
-    foundJob = await JobRequisition.findOne({jobId: filter.id});
-    //
-    // if(!foundJob){
-    //   return new Pagination(null);
-    // }
-
-
+  let result = null;
+  if(jobId){
+    foundJob = await JobRequisition.findOne({jobId: jobId});
 
     //filter.query = foundJob.title;
     filter.level = foundJob.level;
     filter.jobFunction=foundJob.jobFunction;
     filter.employmentType=foundJob.employmentType;
     filter.employmentType=null;
+
+
+    console.log(foundJob.title)
+    result = await JobRequisition.paginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
+    let docs = [];
+
+    let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+    let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+
+    let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
+
+    let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
+    let foundCompanies = res.data.data.content;
+
+
+    let hasSaves = await findBookByUserId(currentUserId);
+
+
+    _.forEach(result.docs, function(job){
+      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
+      job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+      job.company = _.find(foundCompanies, {id: job.company});
+      var skills = _.reduce(job.skills, function(res, skill){
+        let find = _.filter(listOfSkills, { 'skillTypeId': skill});
+        if(find){
+          res.push(find[0]);
+        }
+
+        return res;
+      }, [])
+
+      job.skills = skills;
+    })
+
+
+
+
   }
-
-
-
-  // let select = 'title createdDate';
-
-  // if(filter.id && !result.content.length)
-
-
-  let result = await JobRequisition.paginate(new SearchParam(filter), options);
-  let docs = [];
-
-  let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-  let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
-
-  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-
-  let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
-  let foundCompanies = res.data.data.content;
-
-
-  let hasSaves = await findBookByUserId(currentUserId);
-
-
-  _.forEach(result.docs, function(job){
-    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
-    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-    job.company = _.find(foundCompanies, {id: job.company});
-    var skills = _.reduce(job.skills, function(res, skill){
-      let find = _.filter(listOfSkills, { 'skillTypeId': skill});
-      if(find){
-        res.push(find[0]);
-      }
-      return res;
-    }, [])
-
-    job.skills = skills;
-  })
-
-
-  // if(filter.id && !result.content.length){
-  //   filter.employmentType=null;
-  //
-  //
-  //   //Assuring similar Job always have data
-  //   result = await JobRequisition.paginate(new SearchParam(filter), options, function(err, result) {
-  //     console.log('result', result)
-  //     return new PaginationModel(result);
-  //   });
-  // }
-
-
-  return new Pagination(result);
+  return new Pagination(result, locale);
 
 }
 
