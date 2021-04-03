@@ -650,7 +650,8 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
 
   let options = {
     select:   select,
-    sort:     sortBy,
+    projection: {score: { $meta: "textScore" }},
+    sort:     {score:{$meta:"textScore"}},
     lean:     true,
     limit:    limit,
     page: parseInt(filter.page)+1
@@ -667,7 +668,6 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
     filter.employmentType=null;
 
 
-    console.log(foundJob.title)
     result = await JobRequisition.paginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
     let docs = [];
 
