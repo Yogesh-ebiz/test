@@ -52,12 +52,12 @@ async function getUserEmployers(id) {
 };
 
 
-async function findCompanyById(id, userId) {
+async function findCompanyById(companyId, userId) {
   const options = {
     headers: {'userId': userId}
   };
 
-  let response = await client.get(`/company/${id}?source=JOB`, options);
+  let response = await client.get(`/company/${companyId}`, options);
 
   return response.data.data;
 };

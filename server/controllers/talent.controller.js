@@ -2,7 +2,8 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 let CustomPagination = require('../utils/custompagination');
-let Pagination = require('../utils/job.pagination');
+let Pagination = require('../utils/pagination');
+
 let JobSearchParam = require('../const/jobSearchParam');
 const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
@@ -53,17 +54,16 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   };
 
   filter.company = companyId;
-  let company = null; //await findCompanyById(companyId);
+  let company = await findCompanyById(companyId, currentUserId);
 
   let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
 
-  console.log('result', result)
   const loadPromises = result.docs.map(job => {
 
-    // job.company = company;
+    job.company = convertToCompany(company);
     return job;
   });
-  result = await Promise.all(loadPromises);
+  // result = await Promise.all(loadPromises);
 
   return new Pagination(result);
 

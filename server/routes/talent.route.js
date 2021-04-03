@@ -22,8 +22,13 @@ async function searchJob(req, res) {
   if(req.query.company==null){
     res.json(new Response(data, 'not_found', res));
   }
-  let filter = req.query;
   let companyId = parseInt(req.query.company);
+
+  let filter = req.body;
+  let pagination = req.query;
+  filter.query = req.query.query;
+  filter.company = [companyId];
+
   let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
