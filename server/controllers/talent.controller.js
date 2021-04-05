@@ -201,21 +201,39 @@ async function searchCandidates(currentUserId, filter, locale) {
   // let company = await findCompanyById(companyId, currentUserId);
 
 
-  console.log(filter)
   let jobs = await JobRequisition.find(new JobSearchParam(filter));
   let jobIds = _.map(jobs, 'jobId');
 
-  console.log(jobIds)
 
   // result = await Application.paginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
 
-  var myAggregate = Application.aggregate([ {$group:{_id:{partyId:'$partyId'}, numOfApplications:{$sum:1}}}, {$project: {_id: 0, userId: '$_id.partyId', numOfApplications: 1}}  ]);
+  var myAggregate = Application.aggregate([ {$group:{_id:{partyId:'$partyId'}, applications: {$push: '$$ROOT'}}}, {$project: {_id: 0, userId: '$_id.partyId', applications: '$applications'}} ]);
 
   result = await Application.aggregatePaginate(myAggregate , options);
   let userIds = _.map(result.docs, 'userId');
   let users = await lookupUserIds(userIds)
-  result.docs = users;
 
-  return result;
+  console.log(result.docs);
+  console.log(users);
+  let loadPromises = result.docs.map(function(user){
+      let foundUser = _.find(users, {id: user.userId})
+      if(foundUser){
+        foundUser.noOfMonthExperiences = 68;
+        foundUser.level = 'SENIOR'
+        foundUser.applications = user.applications.map(function(app){
+          // let job = await JobRequisition.findOne({jobId: app.jobId});
+          app.jobTitle = "Senior iOS Developer";
+          app.progress = {
+            title: 'INTERVIEWED',
+            status: 'FAILED'
+          }
+          return app;
+        });
+        return foundUser;
+      }
+  });
+  result.docs = await Promise.all(loadPromises);
+
+  return new Pagination(result);
 
 }
