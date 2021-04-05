@@ -22,15 +22,15 @@ const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../
 const {findCurrencyRate} = require('../services/currency.service');
 
 const {} = require('../services/company.service');
-
 const JobRequisition = require('../models/jobrequisition.model');
-
+const Application = require('../models/application.model');
 
 module.exports = {
   searchJobs,
   getJobById,
   searchApplications,
-  rejectApplication
+  rejectApplication,
+  searchCandidates
 }
 
 async function searchJobs(currentUserId, companyId, filter, locale) {
@@ -178,3 +178,44 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
 }
 
 
+
+
+async function searchCandidates(currentUserId, filter, locale) {
+
+  if(!currentUserId || !filter){
+    return null;
+  }
+
+  let result;
+  let select = '';
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+  let options = {
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+  // let company = await findCompanyById(companyId, currentUserId);
+
+
+  console.log(filter)
+  let jobs = await JobRequisition.find(new JobSearchParam(filter));
+  let jobIds = _.map(jobs, 'jobId');
+
+  console.log(jobIds)
+
+  // result = await Application.paginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
+
+  var myAggregate = Application.aggregate([ {$group:{_id:{partyId:'$partyId'}, numOfApplications:{$sum:1}}}, {$project: {_id: 0, userId: '$_id.partyId', numOfApplications: 1}}  ]);
+
+  result = await Application.aggregatePaginate(myAggregate , options);
+  let userIds = _.map(result.docs, 'userId');
+  let users = await lookupUserIds(userIds)
+  result.docs = users;
+
+  return result;
+
+}

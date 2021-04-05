@@ -111,5 +111,6 @@
 	"role_added_successful": "role_added_successful",
 	"roles_retrieved_successful": "roles_retrieved_successful",
 	"role_updated_successful": "role_updated_successful",
-	"role_deleted_successful": "role_deleted_successful"
+	"role_deleted_successful": "role_deleted_successful",
+	"candidates_retrieved_successful": "candidates_retrieved_successful"
 }

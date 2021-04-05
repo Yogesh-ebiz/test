@@ -15,6 +15,7 @@ router.route('/jobs/:id').get(asyncHandler(getJobById));
 router.route('/jobs/:id/applications').get(asyncHandler(searchApplications));
 router.route('/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 
+router.route('/candidates').post(asyncHandler(searchCandidates));
 
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -62,4 +63,17 @@ async function rejectApplication(req, res) {
   let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+async function searchCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+
+  let filter = req.body;
+  let pagination = req.query;
+  filter.query = req.query.query;
+  filter.company = [802]
+  data = await talentCtrl.searchCandidates(currentUserId, filter, res.locale);
+  res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
