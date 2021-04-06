@@ -9,7 +9,7 @@ const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
-const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findJobId} = require('../services/jobrequisition.service');
@@ -24,13 +24,91 @@ const {findCurrencyRate} = require('../services/currency.service');
 const {} = require('../services/company.service');
 const JobRequisition = require('../models/jobrequisition.model');
 const Application = require('../models/application.model');
+const Role = require('../models/role.model');
+
+
+const invitationSchema = Joi.object({
+  createdBy: Joi.number().required(),
+  userId: Joi.number().required(),
+  email: Joi.string().required(),
+  role: Joi.string().required()
+});
 
 module.exports = {
+  inviteMember,
+  getUserProfile,
   searchJobs,
   getJobById,
   searchApplications,
   rejectApplication,
   searchCandidates
+}
+
+
+async function inviteMember(currentUserId, invitation) {
+
+  if(!currentUserId || !invitation){
+    return null;
+  }
+
+  let result;
+  job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
+
+
+  return result;
+
+}
+
+
+async function getUserProfile(currentUserId) {
+
+  if(!currentUserId){
+    return null;
+  }
+
+  let result;
+  let user = await findByUserId(currentUserId);
+  let companies = await searchCompany('', [25, 100, 101, 102], currentUserId);
+  let role = await Role.findOne({name: 'Administrator'});
+  delete role.description;
+  delete role.company;
+
+  companies = _.reduce(companies.content, function(res, item){
+    item = convertToCompany(item);
+    item.role = role;
+    res.push(item)
+
+    return res;
+  }, [])
+  user = convertToTalentUser(user);
+  user.company = companies;
+
+
+
+  return user;
+
+
+}
+
+
+async function getCompanies(currentUserId) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let company = await findCompanyById(companyId, currentUserId);
+
+
+  const loadPromises = result.docs.map(job => {
+
+    job.company = convertToCompany(company);
+    return job;
+  });
+  // result = await Promise.all(loadPromises);
+
+  return new Pagination(result);
+
 }
 
 async function searchJobs(currentUserId, companyId, filter, locale) {
@@ -220,6 +298,7 @@ async function searchCandidates(currentUserId, filter, locale) {
       if(foundUser){
         foundUser.noOfMonthExperiences = 68;
         foundUser.level = 'SENIOR'
+        foundUser.match = 87;
         foundUser.applications = user.applications.map(function(app){
           // let job = await JobRequisition.findOne({jobId: app.jobId});
           app.jobTitle = "Senior iOS Developer";

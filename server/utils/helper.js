@@ -13,6 +13,19 @@ const capitalizeLocale = ([ first, ...rest ], locale = navigator.language) => {
 
 
 
+const convertToTalentUser = (user) => {
+  return {
+    id: user.id,
+    name: user.name,
+    firstName: user.firstName,
+    middleName: user.middleName,
+    lastName: user.lastName,
+    avatar: user.avatar,
+    isOnline: user.isOnline
+  };
+}
+
+
 const convertToAvatar = (user) => {
   return {
     id: user.id,
@@ -88,5 +101,6 @@ module.exports = {
   convertToAvatar:convertToAvatar,
   convertToCompany:convertToCompany,
   convertIndustry:convertIndustry,
-  categoryMinimal:categoryMinimal
+  categoryMinimal:categoryMinimal,
+  convertToTalentUser:convertToTalentUser
 };

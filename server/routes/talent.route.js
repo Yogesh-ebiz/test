@@ -10,12 +10,46 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
+router.route('/profile').get(asyncHandler(getUserProfile));
+router.route('/company').get(asyncHandler(getCompanies));
+router.route('/company/:id/invite').get(asyncHandler(inviteMember));
+
 router.route('/jobs').get(asyncHandler(searchJob));
 router.route('/jobs/:id').get(asyncHandler(getJobById));
 router.route('/jobs/:id/applications').get(asyncHandler(searchApplications));
 router.route('/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 
 router.route('/candidates').post(asyncHandler(searchCandidates));
+
+
+
+async function inviteMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let invitation = req.body;
+  invitation.createdBy = currentUserId;
+
+  let data = await talentCtl.inviteMember(currentUserId, invitation);
+  res.json(new Response(data, data?'member_invited_successful':'not_found', res));
+}
+
+
+async function getUserProfile(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+
+  let data = await talentCtrl.getUserProfile(currentUserId);
+  res.json(new Response(data, data?'get_profile_successful':'not_found', res));
+}
+
+
+
+async function getCompanies(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+
+  let data = await talentCtrl.getCompanies(currentUserId);
+  res.json(new Response(data, data?'companies_retrieved_successful':'not_found', res));
+}
+
+
 
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
