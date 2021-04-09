@@ -10,7 +10,7 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
-router.route('/profile').get(asyncHandler(getUserProfile));
+router.route('/session').get(asyncHandler(getUserSession));
 router.route('/company').get(asyncHandler(getCompanies));
 router.route('/company/:id/invite').get(asyncHandler(inviteMember));
 
@@ -33,11 +33,12 @@ async function inviteMember(req, res) {
 }
 
 
-async function getUserProfile(req, res) {
+async function getUserSession(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let preferredCompany = req.query.company?req.query.company:null;
 
-  let data = await talentCtrl.getUserProfile(currentUserId);
-  res.json(new Response(data, data?'get_profile_successful':'not_found', res));
+  let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
+  res.json(new Response(data, data?'get_session_successful':'not_found', res));
 }
 
 

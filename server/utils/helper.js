@@ -14,6 +14,22 @@ const capitalizeLocale = ([ first, ...rest ], locale = navigator.language) => {
 
 
 const convertToTalentUser = (user) => {
+
+  if(!user){
+    return;
+  }
+
+  console.log(user)
+  let primaryEmail = (user.primaryEmail)?{
+    type: user.primaryEmail.name,
+    value: user.primaryEmail.value
+  }: null;
+
+  let primaryPhone = (user.primaryPhone)?{
+    type: user.primaryPhone.name,
+    value: user.primaryPhone.value
+  }: null;
+
   return {
     id: user.id,
     name: user.name,
@@ -21,7 +37,9 @@ const convertToTalentUser = (user) => {
     middleName: user.middleName,
     lastName: user.lastName,
     avatar: user.avatar,
-    isOnline: user.isOnline
+    isOnline: user.isOnline,
+    primaryEmail: primaryEmail,
+    primaryPhone: primaryPhone
   };
 }
 

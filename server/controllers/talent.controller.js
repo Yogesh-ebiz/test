@@ -36,7 +36,7 @@ const invitationSchema = Joi.object({
 
 module.exports = {
   inviteMember,
-  getUserProfile,
+  getUserSession,
   searchJobs,
   getJobById,
   searchApplications,
@@ -60,11 +60,12 @@ async function inviteMember(currentUserId, invitation) {
 }
 
 
-async function getUserProfile(currentUserId) {
+async function getUserSession(currentUserId, preferredCompany) {
 
   if(!currentUserId){
     return null;
   }
+
 
   let result;
   let user = await findByUserId(currentUserId);
@@ -82,11 +83,12 @@ async function getUserProfile(currentUserId) {
   }, [])
   user = convertToTalentUser(user);
   user.company = companies;
-
+  user.currentCompanyId = preferredCompany? _.some(companies, {id: preferredCompany})?preferredCompany:companies.length?companies[0].id:null:companies.length?companies[0].id:null;
+  user.timezone = "Asia/Ho_Chi_Minh";
+  user.timeFormat = 24;
 
 
   return user;
-
 
 }
 
@@ -123,6 +125,7 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   let sortBy = {};
   sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
 
+
   let options = {
     select:   select,
     sort:     sortBy,
@@ -133,6 +136,8 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
 
   filter.company = companyId;
   let company = await findCompanyById(companyId, currentUserId);
+
+  console.log(company)
 
   let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
 
@@ -291,14 +296,23 @@ async function searchCandidates(currentUserId, filter, locale) {
   let userIds = _.map(result.docs, 'userId');
   let users = await lookupUserIds(userIds)
 
-  console.log(result.docs);
-  console.log(users);
   let loadPromises = result.docs.map(function(user){
       let foundUser = _.find(users, {id: user.userId})
       if(foundUser){
         foundUser.noOfMonthExperiences = 68;
         foundUser.level = 'SENIOR'
         foundUser.match = 87;
+
+        let isNew = _.some(user.applications, function(application){
+          let appliedDate = new Date(application.createdDate);
+          var timeStamp = Math.round(new Date().getTime() / 1000);
+          var timeStampYesterday = timeStamp - (24 * 3600);
+          var is24 = appliedDate >= new Date(timeStampYesterday*1000).getTime();
+          return is24;
+        });
+
+        foundUser.isNew = isNew;
+
         foundUser.applications = user.applications.map(function(app){
           // let job = await JobRequisition.findOne({jobId: app.jobId});
           app.jobTitle = "Senior iOS Developer";

@@ -113,5 +113,6 @@
 	"role_updated_successful": "role_updated_successful",
 	"role_deleted_successful": "role_deleted_successful",
 	"candidates_retrieved_successful": "candidates_retrieved_successful",
-	"get_profile_successful": "get_profile_successful"
+	"get_profile_successful": "get_profile_successful",
+	"get_session_successful": "get_session_successful"
 }
