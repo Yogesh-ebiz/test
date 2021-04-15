@@ -64,6 +64,7 @@ const jobRequisitionSchema = Joi.object({
   labels: Joi.array().optional(),
   industry: Joi.array().optional(),
   category: Joi.string(),
+  internalCode: Joi.string(),
   jobFunction: Joi.string(),
   expirationDate: Joi.number(),
   requiredOnDate: Joi.number(),

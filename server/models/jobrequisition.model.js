@@ -189,6 +189,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  internalCode: {
+    type: String,
+    required: false
+  },
   tags: {
     type: Array,
     required: false

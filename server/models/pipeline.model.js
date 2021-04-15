@@ -13,8 +13,14 @@ const PipelineSchema = new mongoose.Schema({
   },
   createdBy: {
     type: Number,
-    default: Date.now,
     required: true
+  },
+  updatedAt: {
+    type: Number,
+    default: Date.now
+  },
+  updatedBy: {
+    type: Number
   },
   custom: {
     type: Boolean,

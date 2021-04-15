@@ -17,6 +17,10 @@ const {findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplication
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
+const {getDepartments, addDepartment} = require('../services/department.service');
+const {getPipelines, addPipeline} = require('../services/pipeline.service');
+const roleService = require('../services/role.service');
+const labelService = require('../services/label.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -34,6 +38,38 @@ const invitationSchema = Joi.object({
   role: Joi.string().required()
 });
 
+
+const departmentSchema = Joi.object({
+  name: Joi.string().required(),
+  company: Joi.number().required(),
+  createdBy: Joi.number().required()
+});
+
+const pipelineSchema = Joi.object({
+  name: Joi.string().required(),
+  department: Joi.number().required(),
+  category: Joi.string().required(),
+  company: Joi.number().required(),
+  stages: Joi.array().required(),
+  createdBy: Joi.number()
+});
+
+const roleSchema = Joi.object({
+  name: Joi.string().required(),
+  createdBy: Joi.number().required(),
+  company: Joi.number().required(),
+  description: Joi.object().required(),
+  privileges: Joi.array().required(),
+  default: Joi.boolean()
+});
+
+const labelSchema = Joi.object({
+  name: Joi.string().required(),
+  type: Joi.string().required(),
+  company: Joi.number().required()
+});
+
+
 module.exports = {
   inviteMember,
   getUserSession,
@@ -41,7 +77,23 @@ module.exports = {
   getJobById,
   searchApplications,
   rejectApplication,
-  searchCandidates
+  searchCandidates,
+  addCompanyDepartment,
+  updateCompanyDepartment,
+  deleteCompanyDepartment,
+  getCompanyDepartments,
+  addCompanyPipeline,
+  updateCompanyPipeline,
+  deleteCompanyPipeline,
+  getCompanyPipelines,
+  addCompanyRole,
+  getCompanyRoles,
+  updateCompanyRole,
+  deleteCompanyRole,
+  addCompanyLabel,
+  getCompanyLabels,
+  updateCompanyLabel,
+  deleteCompanyLabel
 }
 
 
@@ -137,7 +189,6 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   filter.company = companyId;
   let company = await findCompanyById(companyId, currentUserId);
 
-  console.log(company)
 
   let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
 
@@ -231,6 +282,33 @@ async function searchApplications(currentUserId, jobId, filter, locale) {
   return applications;
 
 
+}
+
+
+async function updateApplication(currentUserId, jobId, applicationId, newStatus) {
+
+  if(!jobId || !applicaitonId || !currentUserId || !newStatus){
+    return null;
+  }
+
+  let application;
+  try {
+    let localeStr = locale? locale : 'en';
+    let propLocale = '$name.'+localeStr;
+    application = await findApplicationById(applicationId, locale);
+
+    if(application) {
+
+
+
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
 }
 
 
@@ -330,3 +408,390 @@ async function searchCandidates(currentUserId, filter, locale) {
   return new Pagination(result);
 
 }
+
+
+/************************** DEPARTMENTS *****************************/
+async function addCompanyDepartment(company, currentUserId, form) {
+  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await addDepartment(form);
+    }
+  } catch(e){
+    console.log('addCompanyDepartment: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyDepartment(company, departmentId, currentUserId, form) {
+  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  if(!company || !currentUserId || !departmentId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      let department = await Department.findById(departmentId);
+      if(department){
+        department.name = form.name;
+        department.updatedBy = currentUserId;
+        result = await department.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyDepartment: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyDepartment(company, departmentId, currentUserId) {
+  if(!company || !currentUserId || !departmentId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let department = await Department.findById(departmentId);
+      if(department){
+        result = await department.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyDepartment: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyDepartments(company, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await getDepartments(company);
+
+  return result;
+
+}
+
+
+/************************** PIPELINES *****************************/
+async function addCompanyPipeline(company, currentUserId, form) {
+  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await addPipeline(form);
+    }
+  } catch(e){
+    console.log('addCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyPipeline(company, pipelineId, currentUserId, form) {
+  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  if(!company || !currentUserId || !pipelineId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let pipeline = await Pipeline.findOne({pipelineId: pipelineId});
+      if(pipeline){
+        pipeline.name = form.name;
+        pipeline.updatedBy = currentUserId;
+        pipeline.stages=form.stages;
+        pipeline.category=form.category;
+        pipeline.department=form.department;
+        pipeline.type=form.type;
+        result = await pipeline.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyPipeline(company, pipelineId, currentUserId) {
+  if(!company || !currentUserId || !pipelineId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      let pipeline = await Pipeline.findOne({pipelineId: pipelineId});
+      if(pipeline){
+        result = await pipeline.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyPipelines(company, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await getPipelines(company);
+
+  return result;
+
+}
+
+
+
+/************************** ROLES *****************************/
+async function addCompanyRole(company, currentUserId, form) {
+  console.log('addCompanyRole', form)
+  form = await Joi.validate(form, roleSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await roleService.addRole(form);
+    }
+  } catch(e){
+    console.log('addCompanyRole: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyRole(company, roleId, currentUserId, form) {
+  form = await Joi.validate(form, roleSchema, { abortEarly: false });
+  if(!company || !currentUserId || !roleId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let role = await Role.findById(roleId);
+      if(role){
+        role.name = form.name;
+        role.updatedBy = currentUserId;
+        role.privileges=form.privileges;
+        role.description=form.description;
+        result = await role.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyRole: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyRole(company, roleId, currentUserId) {
+  if(!company || !currentUserId || !roleId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      let role = await Role.findById(roleId);
+      if(role){
+        result = await role.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyRole: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyRoles(company, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await roleService.getRoles(company);
+
+  return result;
+
+}
+
+
+
+/************************** LABELS *****************************/
+async function addCompanyLabel(company, currentUserId, form) {
+  console.log('addCompanyRole', form)
+  form = await Joi.validate(form, labelSchema, { abortEarly: false });
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await labelService.addLabel(form);
+    }
+  } catch(e){
+    console.log('addCompanyLabel: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyLabel(company, labelId, currentUserId, form) {
+  form = await Joi.validate(form, labelSchema, { abortEarly: false });
+  if(!company || !currentUserId || !labelId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let label = await Label.findById(labelId);
+      if(label){
+        label.name = form.name;
+        label.updatedBy = currentUserId;
+        label.type=form.type;
+        result = await label.save();
+      }
+
+    }
+  } catch(e){
+    console.log('updateCompanyLabel: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function deleteCompanyLabel(company, labelId, currentUserId) {
+  if(!company || !currentUserId || !labelId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      let label = await Label.findById(labelId);
+      if(label){
+        result = await label.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyLabel: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyLabels(company, type, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await labelService.getLabels(company, type);
+
+  return result;
+
+}
+
+

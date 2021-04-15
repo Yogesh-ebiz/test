@@ -103,7 +103,6 @@ const departmentSchema = Joi.object({
 const pipelineSchema = Joi.object({
   name: Joi.string().required(),
   department: Joi.number().required(),
-  type: Joi.string().required(),
   category: Joi.string().required(),
   company: Joi.number().required(),
   stages: Joi.array().required(),
@@ -848,7 +847,6 @@ async function updateCompanyPipeline(company, pipelineId, currentUserId, form) {
   return result
 }
 
-
 async function deleteCompanyPipeline(company, pipelineId, currentUserId) {
   if(!company || !currentUserId || !pipelineId){
     return null;
@@ -945,7 +943,6 @@ async function updateCompanyRole(company, roleId, currentUserId, form) {
 
   return result
 }
-
 
 async function deleteCompanyRole(company, roleId, currentUserId) {
   if(!company || !currentUserId || !roleId){

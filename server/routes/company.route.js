@@ -250,7 +250,6 @@ async function deleteCompanyDepartment(req, res) {
   res.json(new Response(data, data?'department_updated_successful':'not_found', res));
 }
 
-
 async function getCompanyDepartments(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -284,7 +283,6 @@ async function updateCompanyPipeline(req, res) {
   res.json(new Response(data, data?'pipeline_updated_successful':'not_found', res));
 }
 
-
 async function deleteCompanyPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -293,7 +291,6 @@ async function deleteCompanyPipeline(req, res) {
   let data = await companyCtl.deleteCompanyPipeline(company, pipelineId, currentUserId);
   res.json(new Response(data, data?'pipeline_deleted_successful':'not_found', res));
 }
-
 
 async function getCompanyPipelines(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -335,7 +332,6 @@ async function deleteCompanyRole(req, res) {
   let data = await companyCtl.deleteCompanyRole(company, roleId, currentUserId);
   res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
 }
-
 
 async function getCompanyRoles(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -379,7 +375,6 @@ async function deleteCompanyMember(req, res) {
   res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
 }
 
-
 async function getCompanyMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -421,7 +416,6 @@ async function deleteCompanyLabel(req, res) {
   let data = await companyCtl.deleteCompanyLabel(company, labelId, currentUserId);
   res.json(new Response(data, data?'label_deleted_successful':'not_found', res));
 }
-
 
 async function getCompanyLabels(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
