@@ -71,6 +71,7 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
+  getInsights,
   inviteMember,
   getUserSession,
   searchJobs,
@@ -96,6 +97,12 @@ module.exports = {
   deleteCompanyLabel
 }
 
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 async function inviteMember(currentUserId, invitation) {
 
@@ -162,6 +169,337 @@ async function getCompanies(currentUserId) {
   // result = await Promise.all(loadPromises);
 
   return new Pagination(result);
+
+}
+
+
+async function getInsights(currentUserId, companyId, timeframe) {
+
+
+  console.log(currentUserId, companyId)
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+
+  let data = [];
+  let min = 10, max = 100;
+  let numOfItems = timeframe=='3M'?12:timeframe=='6M'?24:timeframe=='1Y'?52:30;
+
+    for(var i=0; i<4; i++){
+      let sample = [];
+      for(var j=0; j<numOfItems; j++){
+        let random = getRandomInt(min, max);
+        min = random - 10;
+        max = random + 10;
+        sample.push(random);
+      }
+      data.push(sample);
+    }
+
+  let result = {
+    impressions: [
+      {
+        type: 'VIEWED',
+        data: data[0],
+        total: getRandomInt(1, 2000),
+        changes: getRandomInt(1,100)
+      },
+      {
+        type: 'APPLIED',
+        data: data[1],
+        total: getRandomInt(1, 2000),
+        changes: getRandomInt(1,100)
+      },
+      {
+        type: 'LIKED',
+        data: data[2],
+        total: getRandomInt(1, 2000),
+        changes: getRandomInt(1,100)
+      },
+      {
+        type: 'SHARED',
+        data: data[3],
+        total: getRandomInt(1, 2000),
+        changes: getRandomInt(1,100)
+      }
+    ],
+    impressionByRoles: [
+      {
+        name: 'Senior',
+        value: 85.7
+      },
+      {
+        name: 'Entry',
+        value: 14.9
+      },
+      {
+        name: 'Director',
+        value: 12.3
+      },{
+        name: 'Owner',
+        value: 11.9
+      },
+      {
+        name: 'Other',
+        value: 11.9
+      },
+      {
+        name: 'Manager',
+        value: 9
+      },
+      {
+        name: 'VP',
+        value: 7.9
+      },
+      {
+        name: 'CXO',
+        value: 5.6
+      }
+    ],
+    newCandidates: [
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Chan",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_5_1603790757692.jpg",
+        "id": 5,
+        "headline": "I am Chan Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Chan",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_5_1603790757692.jpg",
+        "id": 5,
+        "headline": "I am Chan Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Chan",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_5_1603790757692.jpg",
+        "id": 5,
+        "headline": "I am Chan Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Chan",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_5_1603790757692.jpg",
+        "id": 5,
+        "headline": "I am Chan Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Chan",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_5_1603790757692.jpg",
+        "id": 5,
+        "headline": "I am Chan Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Winnie",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_7_1603790822635.jpg",
+        "id": 7,
+        "headline": "I am Winnie Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Pete",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_12_1603912315336.jpg",
+        "id": 12,
+        "headline": "I am Pete nhe ban",
+        "matches": 50
+      }
+    ]
+  }
+
+
+
+
+
+  return result;
 
 }
 

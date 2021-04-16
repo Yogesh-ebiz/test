@@ -12,6 +12,7 @@ module.exports = router;
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('/session').get(asyncHandler(getUserSession));
 router.route('/company').get(asyncHandler(getCompanies));
+router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/invite').get(asyncHandler(inviteMember));
 
 router.route('/jobs').get(asyncHandler(searchJob));
@@ -45,12 +46,24 @@ router.route('/company/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel
 router.route('/company/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/company/:id/labels').get(asyncHandler(getCompanyLabels));
 
+
+async function getInsights(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+  let timeframe = req.query.timeframe
+
+  let data = await talentCtrl.getInsights(currentUserId, companyId, timeframe);
+  res.json(new Response(data, data?'get_insights_successful':'not_found', res));
+}
+
+
+
 async function inviteMember(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let invitation = req.body;
   invitation.createdBy = currentUserId;
 
-  let data = await talentCtl.inviteMember(currentUserId, invitation);
+  let data = await talentCtrl.inviteMember(currentUserId, invitation);
   res.json(new Response(data, data?'member_invited_successful':'not_found', res));
 }
 
