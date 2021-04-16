@@ -182,8 +182,9 @@ async function deleteCompanyDepartment(req, res) {
 async function getCompanyDepartments(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
+  let query = req.query.query?req.query.query:'';
 
-  let data = await talentCtrl.getCompanyDepartments(company, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyDepartments(company, query, currentUserId, res.locale);
   res.json(new Response(data, data?'departments_retrieved_successful':'not_found', res));
 }
 

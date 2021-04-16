@@ -491,13 +491,13 @@ async function deleteCompanyDepartment(company, departmentId, currentUserId) {
   return result
 }
 
-async function getCompanyDepartments(company, currentUserId, locale) {
+async function getCompanyDepartments(company, query, currentUserId, locale) {
 
   if(!company || !currentUserId){
     return null;
   }
 
-  let result = await getDepartments(company);
+  let result = await getDepartments(company, query);
 
   return result;
 

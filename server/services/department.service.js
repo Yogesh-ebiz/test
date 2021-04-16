@@ -3,14 +3,15 @@ const statusEnum = require('../const/statusEnum');
 const Department = require('../models/department.model');
 
 
-function getDepartments(company) {
+function getDepartments(company, query) {
   let data = null;
 
   if(company==null){
     return;
   }
 
-  return Department.find({company: company});
+  console.log(company, query)
+  return Department.find({company: company, name: { $regex: query, $options: "si" }});
 }
 
 
