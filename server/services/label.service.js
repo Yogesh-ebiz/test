@@ -3,14 +3,15 @@ const statusEnum = require('../const/statusEnum');
 const Label = require('../models/label.model');
 
 
-function getLabels(company, type) {
+async function getLabels(company, query, type) {
   let data = null;
 
   if(company==null){
     return;
   }
 
-  return Label.find({company: company, type: type});
+  console.log(company, query, type)
+  return Label.find({company: company, name: { $regex: query, $options: "si" },type: type});
 }
 
 

@@ -701,7 +701,6 @@ async function getCompanyRoles(company, currentUserId, locale) {
 
 /************************** LABELS *****************************/
 async function addCompanyLabel(company, currentUserId, form) {
-  console.log('addCompanyRole', form)
   form = await Joi.validate(form, labelSchema, { abortEarly: false });
   if(!company || !currentUserId || !form){
     return null;
@@ -713,6 +712,7 @@ async function addCompanyLabel(company, currentUserId, form) {
 
   try {
     if (isPartyActive(currentParty)) {
+      form.createdBy = currentUserId;
       result = await labelService.addLabel(form);
     }
   } catch(e){
@@ -782,13 +782,13 @@ async function deleteCompanyLabel(company, labelId, currentUserId) {
   return result
 }
 
-async function getCompanyLabels(company, type, currentUserId, locale) {
+async function getCompanyLabels(company, query, type, currentUserId, locale) {
 
   if(!company || !currentUserId){
     return null;
   }
 
-  let result = await labelService.getLabels(company, type);
+  let result = await labelService.getLabels(company, query, type);
 
   return result;
 

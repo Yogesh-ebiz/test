@@ -319,7 +319,7 @@ async function addCompanyLabel(req, res) {
   let company = parseInt(req.params.id);
   let label = req.body;
   label.company = company;
-  label.createdBy = currentUserId;
+  // label.createdBy = currentUserId;
 
   let data = await talentCtrl.addCompanyLabel(company, currentUserId, label);
   res.json(new Response(data, data?'label_added_successful':'not_found', res));
@@ -349,8 +349,9 @@ async function deleteCompanyLabel(req, res) {
 async function getCompanyLabels(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let type = req.query.type
+  let query = req.query.query;
+  let type = req.query.type;
 
-  let data = await talentCtrl.getCompanyLabels(company, type, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyLabels(company, query, type, currentUserId, res.locale);
   res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
 }
