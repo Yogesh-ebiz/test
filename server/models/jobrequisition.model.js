@@ -14,6 +14,14 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  updatedDate: {
+    type: Number,
+    default: Date.now
+  },
+  updatedBy: {
+    type: Object,
+    required: false
+  },
   jobId: {
     type: Number,
     required: true
@@ -231,34 +239,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: false,
     required: false
   },
-  requiredResume: {
-    type: Boolean,
-    required: false,
-    default: true
-  },
-  requiredCoverLetter: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
-  requiredPphoto: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
-  requiredPhone: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
   applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
-  applicationPreferences:{
+  applicationForm:{
     type: Object,
     require: false
-  },
-  profileField: {
-    type: Object,
-    required: false
   },
   autoConfirmationEmail: {
     type: Boolean,

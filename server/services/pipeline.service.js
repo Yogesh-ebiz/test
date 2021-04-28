@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const JobRequisition = require('../models/jobrequisition.model');
 const Pipeline = require('../models/pipeline.model');
 const PipelineTemplate = require('../models/pipelineTemplate.model');
 const Stage = require('../models/stage.model');
@@ -44,16 +45,22 @@ async function addPipeline(jobId, newPipeline) {
     return;
   }
 
-  newPipeline = await Joi.validate(newPipeline, pipelineSchema, { abortEarly: false });
+  let job = await JobRequisition.findById(jobId);
 
-  let pipeline = null;
+  if(job) {
+    newPipeline = await Joi.validate(newPipeline, pipelineSchema, {abortEarly: false});
 
-  for (let stage of newPipeline.stages) {
-    stage._id = new ObjectID();
-    stage = await addStage(stage)
+    let pipeline = null;
+
+    for (let stage of newPipeline.stages) {
+      stage._id = new ObjectID();
+      stage = await addStage(stage)
+    }
+
+    newPipeline = new Pipeline(newPipeline).save();
+    job.pipeLine = newPipeline._id;
+    job = await job.save();
   }
-
-  newPipeline = new Pipeline(newPipeline).save();
 
   return newPipeline;
 

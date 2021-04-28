@@ -2,6 +2,8 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
+const QuestionTemplate = require('../models/questiontemplate.model');
+
 const Promotion = require('../models/promotion.model');
 const Pipeline = require('../models/pipeline.model');
 const PipelineTemplate = require('../models/pipelineTemplate.model');
@@ -71,6 +73,55 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
 
   return pipeline;
+}
+
+async function getJobPipeline(jobId) {
+  let data = null;
+
+  if(!jobId){
+    return;
+  }
+
+
+  let job = await JobRequisition.findById(jobId);
+  console.log(job)
+  if(job){
+    data = await Pipeline.findById(job.pipeLine);
+
+  }
+
+
+  return data;
+}
+
+async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
+  let data = null;
+
+  if(!jobId || !form || !currentUserId){
+    return;
+  }
+
+
+  let job = await JobRequisition.findById(jobId);
+  if(job){
+    let questionTemplate = await QuestionTemplate.findById(form.questionTemplateId);
+    if(questionTemplate){
+      job.questionTemplate = questionTemplate._id;
+      job.applicationForm = form.applicationForm;
+      job.updatedBy = currentUserId;
+
+      if(!job.pipeLine){
+        console.log(job.pipeLine)
+        job.pipeLine = null;
+      }
+
+
+      data = await job.save();
+    }
+  }
+
+
+  return data;
 }
 
 
@@ -228,6 +279,8 @@ module.exports = {
   findJobIds: findJobIds,
   removeByJobId: removeByJobId,
   updateJobPipeline:updateJobPipeline,
+  getJobPipeline:getJobPipeline,
+  updateJobApplicationForm:updateJobApplicationForm,
   getCountsGroupByCompany,
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,

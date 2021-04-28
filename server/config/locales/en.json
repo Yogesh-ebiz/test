@@ -122,5 +122,10 @@
 	"board_retrieved_successful": "board_retrieved_successful",
 	"pipeline_retrieved_successful": "pipeline_retrieved_successful",
 	"job_pipeline_updated_successful": "job_pipeline_updated_successful",
-	"event_reported_successful": "event_reported_successful"
+	"event_reported_successful": "event_reported_successful",
+	"question_added_successful": "question_added_successful",
+	"question_updated_successful": "question_updated_successful",
+	"question_deleted_successful": "question_deleted_successful",
+	"questions_retrieved_successful": "questions_retrieved_successful",
+	"job_applicationform_updated_successful": "job_applicationform_updated_successful"
 }

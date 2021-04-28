@@ -18,6 +18,7 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
+const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
 const {getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
 const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
 
@@ -76,6 +77,8 @@ module.exports = {
   searchJobs,
   getJobById,
   updateJobPipeline,
+  getJobPipeline,
+  updateJobApplicationForm,
   searchApplications,
   rejectApplication,
   getBoard,
@@ -84,6 +87,10 @@ module.exports = {
   updateCompanyDepartment,
   deleteCompanyDepartment,
   getCompanyDepartments,
+  addCompanyQuestionTemplate,
+  updateCompanyQuestionTemplate,
+  deleteCompanyQuestionTemplate,
+  getCompanyQuestionTemplates,
   addCompanyPipelineTemplate,
   updateCompanyPipelineTemplate,
   deleteCompanyPipelineTemplate,
@@ -613,6 +620,48 @@ async function updateJobPipeline(jobId, currentUserId, form) {
   return result
 }
 
+
+async function getJobPipeline(jobId, currentUserId) {
+  if(!jobId || !currentUserId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await jobService.getJobPipeline(jobId);
+    }
+  } catch(e){
+    console.log('getJobPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function updateJobApplicationForm(jobId, currentUserId, form) {
+  if(!jobId || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await jobService.updateJobApplicationForm(jobId, form, currentUserId);
+    }
+  } catch(e){
+    console.log('updateJobApplicationForm: Error', e);
+  }
+
+
+  return result
+}
+
 async function searchApplications(currentUserId, jobId, filter, locale) {
 
   if(currentUserId==null || jobId==null){
@@ -884,6 +933,86 @@ async function getCompanyDepartments(company, query, currentUserId, locale) {
   }
 
   let result = await getDepartments(company, query);
+
+  return result;
+
+}
+
+
+/************************** QUESTIONTEMPLATES *****************************/
+async function addCompanyQuestionTemplate(company, currentUserId, form) {
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      form.createdBy = currentUserId;
+      form.company = company;
+      result = await addQuestionTemplate(form);
+    }
+  } catch(e){
+    console.log('addCompanyQuestionTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyQuestionTemplate(company, questionId, currentUserId, form) {
+  if(!company || !currentUserId || !questionId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await updateQuestionTemplate(questionId, form);
+    }
+  } catch(e){
+    console.log('updateCompanyQuestionTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyQuestionTemplate(company, questionId, currentUserId) {
+  if(!company || !currentUserId || !questionId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await deleteQuestionTemplate(questionId);
+
+    }
+  } catch(e){
+    console.log('deleteCompanyQuestionTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyQuestionTemplates(company, query, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await getQuestionTemplates(company, query);
 
   return result;
 

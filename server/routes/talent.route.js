@@ -16,18 +16,22 @@ router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/stats').get(asyncHandler(getStats));
 router.route('/company/:id/invite').get(asyncHandler(inviteMember));
 
-router.route('/jobs').get(asyncHandler(searchJob));
-router.route('/jobs/:id').get(asyncHandler(getJobById));
-router.route('/jobs/:id/applications').get(asyncHandler(searchApplications));
-router.route('/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
-router.route('/jobs/:id/applications/:applicationId').post(asyncHandler(updateApplication));
+router.route('/company/:id/jobs').get(asyncHandler(searchJob));
+router.route('/company/:id/jobs/:id').get(asyncHandler(getJobById));
+router.route('/company/:id/jobs/:id/applications').get(asyncHandler(searchApplications));
+router.route('/company/:id/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
+router.route('/company/:id/jobs/:id/applications/:applicationId').post(asyncHandler(updateApplication));
 
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
-router.route('/jobs/:id/board').get(asyncHandler(getBoard));
+router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
+
+router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updateJobApplicationForm));
+
+router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 
 
-router.route('/candidates').post(asyncHandler(searchCandidates));
+router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));
@@ -35,6 +39,11 @@ router.route('/company/:id/departments/:departmentId').put(asyncHandler(updateCo
 router.route('/company/:id/departments/:departmentId').delete(asyncHandler(deleteCompanyDepartment));
 router.route('/company/:id/departments').get(asyncHandler(getCompanyDepartments));
 
+
+router.route('/company/:id/questions/templates').post(asyncHandler(addCompanyQuestionTemplate));
+router.route('/company/:id/questions/templates/:questionTemplateId').put(asyncHandler(updateCompanyQuestionTemplate));
+router.route('/company/:id/questions/templates/:questionTemplateId').delete(asyncHandler(deleteCompanyQuestionTemplate));
+router.route('/company/:id/questions/templates').get(asyncHandler(getCompanyQuestionTemplates));
 
 router.route('/company/:id/pipelines').post(asyncHandler(addCompanyPipelineTemplate));
 router.route('/company/:id/pipelines/:pipelineId').put(asyncHandler(updateCompanyPipelineTemplate));
@@ -155,8 +164,6 @@ async function rejectApplication(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
-
-
 async function updateJobPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let jobId = req.params.jobId;
@@ -165,6 +172,25 @@ async function updateJobPipeline(req, res) {
   let data = await talentCtrl.updateJobPipeline(jobId, currentUserId, pipeline);
   res.json(new Response(data, data?'job_pipeline_updated_successful':'not_found', res));
 }
+
+
+async function getJobPipeline(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.getJobPipeline(jobId, currentUserId);
+  res.json(new Response(data, data?'job_pipeline_retreived_successful':'not_found', res));
+}
+
+async function updateJobApplicationForm(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobId = req.params.jobId;
+  let form = req.body;
+
+  let data = await talentCtrl.updateJobApplicationForm(jobId, currentUserId, form);
+  res.json(new Response(data, data?'job_applicationform_updated_successful':'not_found', res));
+}
+
 
 async function getBoard(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -229,6 +255,49 @@ async function getCompanyDepartments(req, res) {
 
   let data = await talentCtrl.getCompanyDepartments(company, query, currentUserId, res.locale);
   res.json(new Response(data, data?'departments_retrieved_successful':'not_found', res));
+}
+
+
+async function addCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let question = req.body;
+  question.company = company;
+  question.createdBy = currentUserId;
+
+  let data = await talentCtrl.addCompanyQuestionTemplate(company, currentUserId, question);
+  res.json(new Response(data, data?'question_added_successful':'not_found', res));
+}
+
+async function updateCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionTemplateId = req.params.questionTemplateId;
+  let question = req.body;
+  question.company = company;
+  question.updatedBy = currentUserId;
+
+  console.log(company, questionTemplateId, currentUserId, question)
+  let data = await talentCtrl.updateCompanyQuestionTemplate(company, questionTemplateId, currentUserId, question);
+  res.json(new Response(data, data?'question_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionTemplateId = req.params.questionTemplateId;
+
+  let data = await talentCtrl.deleteCompanyQuestionTemplate(company, questionTemplateId, currentUserId);
+  res.json(new Response(data, data?'question_deleted_successful':'not_found', res));
+}
+
+async function getCompanyQuestionTemplates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query?req.query.query:'';
+
+  let data = await talentCtrl.getCompanyQuestionTemplates(company, query, currentUserId, res.locale);
+  res.json(new Response(data, data?'questions_retrieved_successful':'not_found', res));
 }
 
 

@@ -51,6 +51,12 @@ const StageSchema = new mongoose.Schema({
   versionKey: false
 });
 
+StageSchema.plugin(autoIncrement, {
+  model: 'Stage',
+  field: 'stageId',
+  startAt: 100000,
+  incrementBy: 1
+});
 StageSchema.plugin(mongoosePaginate);
 
 
