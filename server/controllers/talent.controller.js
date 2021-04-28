@@ -12,13 +12,15 @@ let employmentTypeEnum = require('../const/employmentTypeEnum');
 const {convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
-const {findJobId} = require('../services/jobrequisition.service');
+const jobService = require('../services/jobrequisition.service');
 const {findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
-const {getPipelines, addPipeline} = require('../services/pipeline.service');
+const {getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
+const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
+
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 
@@ -46,12 +48,8 @@ const departmentSchema = Joi.object({
 });
 
 const pipelineSchema = Joi.object({
-  name: Joi.string().required(),
-  department: Joi.number().required(),
-  category: Joi.string().required(),
-  company: Joi.number().required(),
-  stages: Joi.array().required(),
-  createdBy: Joi.number()
+  pipelineTemplateId: Joi.string().required(),
+  stages: Joi.array().required()
 });
 
 const roleSchema = Joi.object({
@@ -72,21 +70,25 @@ const labelSchema = Joi.object({
 
 module.exports = {
   getInsights,
+  getStats,
   inviteMember,
   getUserSession,
   searchJobs,
   getJobById,
+  updateJobPipeline,
   searchApplications,
   rejectApplication,
+  getBoard,
   searchCandidates,
   addCompanyDepartment,
   updateCompanyDepartment,
   deleteCompanyDepartment,
   getCompanyDepartments,
-  addCompanyPipeline,
-  updateCompanyPipeline,
-  deleteCompanyPipeline,
-  getCompanyPipelines,
+  addCompanyPipelineTemplate,
+  updateCompanyPipelineTemplate,
+  deleteCompanyPipelineTemplate,
+  getCompanyPipelineTemplate,
+  getCompanyPipelineTemplates,
   addCompanyRole,
   getCompanyRoles,
   updateCompanyRole,
@@ -256,12 +258,41 @@ async function getInsights(currentUserId, companyId, timeframe) {
         name: 'CXO',
         value: 5.6
       }
-    ],
+    ]
+  }
+
+
+
+  return result;
+
+}
+
+async function getStats(currentUserId, companyId) {
+
+
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+
+  let data = [];
+
+  let jobs = await JobRequisition.find({company: companyId}).limit(10);
+
+  jobs = _.reduce(jobs, function(res, job){
+    job.responsibilities=null;
+    job.qualifications=null;
+    job.skills = null;
+    res.push(job);
+    return res;
+  }, []);
+
+  let result = {
     newCandidates: [
       {
         "cover": "cover.png",
         "lastName": "Nguyen",
-        "firstName": "Chan",
+        "firstName": "Yu",
         "currentPosition": {
           "employmentTitle": "Android",
           "company": {
@@ -271,9 +302,9 @@ async function getInsights(currentUserId, companyId, timeframe) {
         },
         "rating": 0,
         "middleName": "",
-        "avatar": "person_5_1603790757692.jpg",
-        "id": 5,
-        "headline": "I am Chan Nguyen",
+        "avatar": "person_0_1609948186560.jpg",
+        "id": 0,
+        "headline": "I am Yu Nguyen",
         "matches": 50
       },
       {
@@ -292,168 +323,6 @@ async function getInsights(currentUserId, companyId, timeframe) {
         "avatar": "person_5_1603790757692.jpg",
         "id": 5,
         "headline": "I am Chan Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Chan",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_5_1603790757692.jpg",
-        "id": 5,
-        "headline": "I am Chan Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Chan",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_5_1603790757692.jpg",
-        "id": 5,
-        "headline": "I am Chan Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Chan",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_5_1603790757692.jpg",
-        "id": 5,
-        "headline": "I am Chan Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
         "matches": 50
       },
       {
@@ -491,11 +360,136 @@ async function getInsights(currentUserId, companyId, timeframe) {
         "id": 12,
         "headline": "I am Pete nhe ban",
         "matches": 50
+      },
+      {
+        "cover": "person_63_1613525639.jpg",
+        "lastName": "Doe",
+        "firstName": "Austin",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_63_1613525674523.jpg",
+        "id": 63,
+        "headline": "I am Austin Doe",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Doe",
+        "firstName": "Brooklyn",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_75_1603789930127.png",
+        "id": 75,
+        "headline": "I am Brooklyn",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Doe",
+        "firstName": "Cade",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_80_1603790011021.jpg",
+        "id": 80,
+        "headline": "I am Cade Doe",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Trang",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_85_1617007079881.jpg",
+        "id": 85,
+        "headline": "I am Trang Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover.png",
+        "lastName": "Nguyen",
+        "firstName": "Minh",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_89_1603790258619.jpg",
+        "id": 89,
+        "headline": "I am Minh Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "cover4.png",
+        "lastName": "Nguyen",
+        "firstName": "Tuan",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "A",
+        "avatar": "person_91_1612156489438.jpg",
+        "id": 91,
+        "headline": "I am Tuan Nguyen",
+        "matches": 50
+      },
+      {
+        "cover": "person_187_1614103679.jpg",
+        "lastName": "Doe",
+        "firstName": "Casey",
+        "currentPosition": {
+          "employmentTitle": "Android",
+          "company": {
+            "name": "name",
+            "id": 1
+          }
+        },
+        "rating": 0,
+        "middleName": "",
+        "avatar": "person_187_1614103672779.jpg",
+        "id": 187,
+        "headline": "I am Casey Doe",
+        "matches": 50
       }
-    ]
+    ],
+    mostActiveJobs: jobs
   }
-
-
 
 
 
@@ -552,7 +546,7 @@ async function getJobById(currentUserId, jobId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    job = await findJobId(jobId, locale);
+    job = await jobService.findJobId(jobId, locale);
 
     if(job) {;
 
@@ -598,6 +592,26 @@ async function getJobById(currentUserId, jobId, locale) {
   return job;
 }
 
+async function updateJobPipeline(jobId, currentUserId, form) {
+  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+  if(!jobId || !currentUserId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await jobService.updateJobPipeline(jobId, form, currentUserId);
+    }
+  } catch(e){
+    console.log('updateJobPipeline: Error', e);
+  }
+
+
+  return result
+}
 
 async function searchApplications(currentUserId, jobId, filter, locale) {
 
@@ -677,6 +691,40 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
 }
 
 
+
+async function getBoard(currentUserId, jobId, locale) {
+
+  if(currentUserId==null || jobId==null){
+    return null;
+  }
+
+  let job = await jobService.findJobId(jobId, locale);
+
+  let userIds = [5, 7, 12, 63, 75, 80, 85, 89, 91, 187, 188, 197, 198, 276, 277, 279, 286, 288, 289, 290, 4075]
+  let users = await lookupUserIds(userIds);
+
+  // applications.forEach(function(app){
+  //   let user = _.find(users, {id: app.partyId});
+  //   if(user){
+  //     app.user = user;
+  //   }
+  // })
+
+  let columns = ['APPLIED', 'PHONE_SCREEN', 'TEST', 'INTERVIEW', 'OFFER'];
+  let board = [];
+  for(var i=0; i<5; i++){
+    let column = {type: columns[i], candidates: []};
+    var items = getRandomInt(1, 5);
+    for(var j=0; j<items; j++){
+      let removed = _.pullAt(users, 0);
+      column.candidates.push(removed[0]);
+    }
+    board.push(column);
+  }
+  return board;
+
+
+}
 
 
 async function searchCandidates(currentUserId, filter, locale) {
@@ -843,8 +891,8 @@ async function getCompanyDepartments(company, query, currentUserId, locale) {
 
 
 /************************** PIPELINES *****************************/
-async function addCompanyPipeline(company, currentUserId, form) {
-  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
+async function addCompanyPipelineTemplate(company, currentUserId, form) {
+
   if(!company || !currentUserId || !form){
     return null;
   }
@@ -852,10 +900,9 @@ async function addCompanyPipeline(company, currentUserId, form) {
   let result = null;
   let currentParty = await findByUserId(currentUserId);
 
-
   try {
     if (isPartyActive(currentParty)) {
-      result = await addPipeline(form);
+      result = await addPipelineTemplate(form);
     }
   } catch(e){
     console.log('addCompanyPipeline: Error', e);
@@ -865,7 +912,7 @@ async function addCompanyPipeline(company, currentUserId, form) {
   return result
 }
 
-async function updateCompanyPipeline(company, pipelineId, currentUserId, form) {
+async function updateCompanyPipelineTemplate(company, pipelineId, currentUserId, form) {
   form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
   if(!company || !currentUserId || !pipelineId || !form){
     return null;
@@ -877,7 +924,7 @@ async function updateCompanyPipeline(company, pipelineId, currentUserId, form) {
 
   try {
     if (isPartyActive(currentParty)) {
-      let pipeline = await Pipeline.findOne({pipelineId: pipelineId});
+      let pipeline = await getPipelineTemplateById(pipelineId);
       if(pipeline){
         pipeline.name = form.name;
         pipeline.updatedBy = currentUserId;
@@ -897,7 +944,7 @@ async function updateCompanyPipeline(company, pipelineId, currentUserId, form) {
   return result
 }
 
-async function deleteCompanyPipeline(company, pipelineId, currentUserId) {
+async function deleteCompanyPipelineTemplate(company, pipelineId, currentUserId) {
   if(!company || !currentUserId || !pipelineId){
     return null;
   }
@@ -909,7 +956,7 @@ async function deleteCompanyPipeline(company, pipelineId, currentUserId) {
   try {
     if (isPartyActive(currentParty)) {
 
-      let pipeline = await Pipeline.findOne({pipelineId: pipelineId});
+      let pipeline = await getPipelineTemplateById(pipelineId);
       if(pipeline){
         result = await pipeline.delete();
         if(result){
@@ -926,13 +973,25 @@ async function deleteCompanyPipeline(company, pipelineId, currentUserId) {
   return result
 }
 
-async function getCompanyPipelines(company, currentUserId, locale) {
+async function getCompanyPipelineTemplate(company, pipelineId, currentUserId, locale) {
+
+  if(!company || !pipelineId || !currentUserId){
+    return null;
+  }
+
+  let result = await getPipelineById(pipelineId);
+
+  return result;
+
+}
+
+async function getCompanyPipelineTemplates(company, currentUserId, locale) {
 
   if(!company || !currentUserId){
     return null;
   }
 
-  let result = await getPipelines(company);
+  let result = await getPipelineTemplates(company);
 
   return result;
 

@@ -3,6 +3,10 @@ const statusEnum = require('../const/statusEnum');
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
 const Promotion = require('../models/promotion.model');
+const Pipeline = require('../models/pipeline.model');
+const PipelineTemplate = require('../models/pipelineTemplate.model');
+const PipelineService = require('../services/pipeline.service');
+
 let SearchParam = require('../const/searchParam');
 
 
@@ -28,8 +32,8 @@ async function findJobId(jobId, locale) {
   if(jobId==null){
     return;
   }
-  let localeStr = locale? locale.toLowerCase() : 'en';
-  let propLocale = '$name.'+localeStr;
+  // let localeStr = locale? locale.toLowerCase() : 'en';
+  // let propLocale = '$name.'+localeStr;
 
 
   data = JobRequisition.findOne({jobId: jobId});
@@ -51,6 +55,22 @@ async function findJobIds(jobIds) {
 
 
   return JobRequisition.find({jobId: {$in: jobIds }});
+}
+
+
+async function updateJobPipeline(jobId, form, currentUserId, locale) {
+  let data = null;
+
+  if(!jobId || !form || !currentUserId){
+    return;
+  }
+
+  form.createdBy =currentUserId
+  form.jobId = jobId;
+  let pipeline = await PipelineService.addPipeline(jobId, form);
+
+
+  return pipeline;
 }
 
 
@@ -207,6 +227,7 @@ module.exports = {
   findJobId: findJobId,
   findJobIds: findJobIds,
   removeByJobId: removeByJobId,
+  updateJobPipeline:updateJobPipeline,
   getCountsGroupByCompany,
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,

@@ -117,5 +117,10 @@
 	"get_session_successful": "get_session_successful",
 	"label_added_successful": "label_added_successful",
 	"labels_retrieved_successful": "labels_retrieved_successful",
-	"get_insights_successful": "get_insights_successful"
+	"get_insights_successful": "get_insights_successful",
+	"get_stats_successful": "get_stats_successful",
+	"board_retrieved_successful": "board_retrieved_successful",
+	"pipeline_retrieved_successful": "pipeline_retrieved_successful",
+	"job_pipeline_updated_successful": "job_pipeline_updated_successful",
+	"event_reported_successful": "event_reported_successful"
 }

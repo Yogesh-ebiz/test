@@ -13,6 +13,7 @@ module.exports = router;
 router.route('/session').get(asyncHandler(getUserSession));
 router.route('/company').get(asyncHandler(getCompanies));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
+router.route('/company/:id/stats').get(asyncHandler(getStats));
 router.route('/company/:id/invite').get(asyncHandler(inviteMember));
 
 router.route('/jobs').get(asyncHandler(searchJob));
@@ -20,6 +21,10 @@ router.route('/jobs/:id').get(asyncHandler(getJobById));
 router.route('/jobs/:id/applications').get(asyncHandler(searchApplications));
 router.route('/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/jobs/:id/applications/:applicationId').post(asyncHandler(updateApplication));
+
+
+router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
+router.route('/jobs/:id/board').get(asyncHandler(getBoard));
 
 
 router.route('/candidates').post(asyncHandler(searchCandidates));
@@ -31,10 +36,11 @@ router.route('/company/:id/departments/:departmentId').delete(asyncHandler(delet
 router.route('/company/:id/departments').get(asyncHandler(getCompanyDepartments));
 
 
-router.route('/company/:id/pipelines').post(asyncHandler(addCompanyPipeline));
-router.route('/company/:id/pipelines/:pipelineId').put(asyncHandler(updateCompanyPipeline));
-router.route('/company/:id/pipelines/:pipelineId').delete(asyncHandler(deleteCompanyPipeline));
-router.route('/company/:id/pipelines').get(asyncHandler(getCompanyPipelines));
+router.route('/company/:id/pipelines').post(asyncHandler(addCompanyPipelineTemplate));
+router.route('/company/:id/pipelines/:pipelineId').put(asyncHandler(updateCompanyPipelineTemplate));
+router.route('/company/:id/pipelines/:pipelineId').delete(asyncHandler(deleteCompanyPipelineTemplate));
+router.route('/company/:id/pipelines/:pipelineId').get(asyncHandler(getCompanyPipelineTemplate));
+router.route('/company/:id/pipelines').get(asyncHandler(getCompanyPipelineTemplates));
 
 router.route('/company/:id/roles').post(asyncHandler(addCompanyRole));
 router.route('/company/:id/roles/:roleId').put(asyncHandler(updateCompanyRole));
@@ -56,7 +62,13 @@ async function getInsights(req, res) {
   res.json(new Response(data, data?'get_insights_successful':'not_found', res));
 }
 
+async function getStats(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
 
+  let data = await talentCtrl.getStats(currentUserId, companyId);
+  res.json(new Response(data, data?'get_stats_successful':'not_found', res));
+}
 
 async function inviteMember(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -113,8 +125,6 @@ async function getJobById(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
-
-
 async function searchApplications(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
 
@@ -143,6 +153,26 @@ async function rejectApplication(req, res) {
   let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+
+async function updateJobPipeline(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobId = req.params.jobId;
+  let pipeline = req.body;
+
+  let data = await talentCtrl.updateJobPipeline(jobId, currentUserId, pipeline);
+  res.json(new Response(data, data?'job_pipeline_updated_successful':'not_found', res));
+}
+
+async function getBoard(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+
+  let filter = req.query;
+  let jobId = parseInt(req.params.id);
+  let data = await talentCtrl.getBoard(currentUserId, jobId, filter, res.locale);
+  res.json(new Response(data, data?'board_retrieved_successful':'not_found', res));
 }
 
 
@@ -203,18 +233,18 @@ async function getCompanyDepartments(req, res) {
 
 
 
-async function addCompanyPipeline(req, res) {
+async function addCompanyPipelineTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let pipeline = req.body;
   pipeline.company = company;
   pipeline.createdBy = currentUserId;
 
-  let data = await talentCtrl.addCompanyPipeline(company, currentUserId, pipeline);
+  let data = await talentCtrl.addCompanyPipelineTemplate(company, currentUserId, pipeline);
   res.json(new Response(data, data?'pipeline_added_successful':'not_found', res));
 }
 
-async function updateCompanyPipeline(req, res) {
+async function updateCompanyPipelineTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let pipelineId = parseInt(req.params.pipelineId);
@@ -222,24 +252,35 @@ async function updateCompanyPipeline(req, res) {
   pipeline.company = company;
   pipeline.createdBy = currentUserId;
 
-  let data = await talentCtrl.updateCompanyPipeline(company, pipelineId, currentUserId, pipeline);
+  let data = await talentCtrl.updateCompanyPipelineTemplate(company, pipelineId, currentUserId, pipeline);
   res.json(new Response(data, data?'pipeline_updated_successful':'not_found', res));
 }
 
-async function deleteCompanyPipeline(req, res) {
+async function deleteCompanyPipelineTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let pipelineId = parseInt(req.params.pipelineId);
 
-  let data = await talentCtrl.deleteCompanyPipeline(company, pipelineId, currentUserId);
+  let data = await talentCtrl.deleteCompanyPipelineTemplate(company, pipelineId, currentUserId);
   res.json(new Response(data, data?'pipeline_deleted_successful':'not_found', res));
 }
 
-async function getCompanyPipelines(req, res) {
+
+async function getCompanyPipelineTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let pipelineId = req.params.pipelineId;
+
+  let data = await talentCtrl.getCompanyPipelineTemplate(company, pipelineId, currentUserId, res.locale);
+  res.json(new Response(data, data?'pipeline_retrieved_successful':'not_found', res));
+}
+
+
+async function getCompanyPipelineTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
 
-  let data = await talentCtrl.getCompanyPipelines(company, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyPipelineTemplates(company, currentUserId, res.locale);
   res.json(new Response(data, data?'pipelines_retrieved_successful':'not_found', res));
 }
 

@@ -43,6 +43,7 @@ const ExperienceLevel = require('../models/experiencelevel.model');
 const Industry = require('../models/industry.model');
 const JobView = require('../models/jobview.model');
 const Category = require('../models/category.model');
+const ReportedJob = require('../models/reportedjob.model');
 
 
 
@@ -113,12 +114,23 @@ const applicationSchema = Joi.object({
 
 
 
+const ReportedJobSchema = Joi.object({
+  _id: Joi.string(),
+  jobId: Joi.number().required(),
+  user: Joi.number().required(),
+  isAnonymous: Joi.boolean(),
+  createdDate: Joi.date(),
+  lastUpdatedDate: Joi.date(),
+  reason: Joi.string().required(),
+  note: Joi.string().allow('')
+});
 
 module.exports = {
   importJobs,
   createJob,
   getJobById,
   updateJobById,
+  reportJobById,
   getJobLanding,
   getTopFiveJobs,
   searchJob,
@@ -380,6 +392,68 @@ async function updateJobById(jobId, currentUserId, jobForm, locale) {
 
   return job;
 }
+
+
+async function reportJobById(currentUserId, jobId, report) {
+
+
+  if(!currentUserId || !jobId || !report){
+    return null;
+  }
+
+  let result;
+  let newReport;
+  try {
+
+    let foundJob = await JobRequisition.findOne({jobId: jobId});
+    if(foundJob){
+      let currentParty = await feedService.findByUserId(currentUserId);
+
+      if(!isPartyActive(currentParty, currentUserId)) {
+        console.debug('User Not Active: ', currentUserId);
+        return null;
+      }
+
+      newReport = await ReportedJob.findOne({jobId:jobId, user: currentUserId});
+      if(newReport!=null){
+        return newReport;
+      }
+
+      report = await Joi.validate(report, ReportedJobSchema, { abortEarly: false });
+      newReport = await new ReportedJob(report).save();
+
+      if(newReport){
+        // let attendees = await getAllAttendees(foundEvent.eventId);
+        // let currentAttendee = _.find(attendees, {partyId: currentParty.id});
+        //
+        // let finalAttendeees = _.reduce(attendees, function(res, attendee){
+        //   if(attendee.partyId!=currentParty.id){
+        //     res.push(attendee.partyId);
+        //   }
+        //   return res;
+        // }, []);
+        //
+        // if(currentAttendee){
+        //   await currentAttendee.remove();
+        // }
+
+        // foundEvent.attendees = finalAttendeees;
+        // foundEvent.eventStatus=statusEnum.REPORTED;
+        // result  = await foundEvent.save();
+      }
+
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return newReport;
+}
+
+
 
 async function getJobLanding(currentUserId, locale) {
 

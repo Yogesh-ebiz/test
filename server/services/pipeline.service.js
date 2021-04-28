@@ -1,12 +1,35 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const Pipeline = require('../models/pipeline.model');
+const PipelineTemplate = require('../models/pipelineTemplate.model');
+const Stage = require('../models/stage.model');
+const {addStage} = require('../services/stage.service');
+const ObjectID = require('mongodb').ObjectID;
+const Joi = require('joi');
+
+
+const pipelineSchema = Joi.object({
+  createdBy: Joi.number().required(),
+  jobId: Joi.string().required(),
+  pipelineTemplateId: Joi.string().required(),
+  stages: Joi.array().required()
+});
+
+function getPipelineById(pipeLineId) {
+  let data = null;
+
+  if(!pipeLineId){
+    return;
+  }
+
+  return Pipeline.findById(pipeLineId).populate('stages');
+}
 
 
 function getPipelines(company) {
   let data = null;
 
-  if(company==null){
+  if(!company){
     return;
   }
 
@@ -14,21 +37,32 @@ function getPipelines(company) {
 }
 
 
-function addPipeline(pipeline) {
+async function addPipeline(jobId, newPipeline) {
   let data = null;
 
-  if(pipeline==null){
+  if(!newPipeline){
     return;
   }
 
-  pipeline = new Pipeline(pipeline).save();
-  return pipeline;
+  newPipeline = await Joi.validate(newPipeline, pipelineSchema, { abortEarly: false });
+
+  let pipeline = null;
+
+  for (let stage of newPipeline.stages) {
+    stage._id = new ObjectID();
+    stage = await addStage(stage)
+  }
+
+  newPipeline = new Pipeline(newPipeline).save();
+
+  return newPipeline;
 
 }
 
 
 
 module.exports = {
+  getPipelineById:getPipelineById,
   getPipelines:getPipelines,
   addPipeline:addPipeline
 }

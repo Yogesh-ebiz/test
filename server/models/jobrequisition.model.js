@@ -107,10 +107,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  applicationId: {
-    type: Number,
-    required: false
-  },
   level: {
     type: Object,
     required: false
@@ -229,16 +225,12 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Array,
     required: false
   },
-  questions: {
-    type: Array,
-    required: false
-  },
+  questionTemplate: { type: Schema.Types.ObjectId, ref: 'QuestionTemplate'},
   hasQuestions: {
     type: Boolean,
     default: false,
     required: false
   },
-  application: { type: Schema.Types.ObjectId, ref: 'Application' },
   requiredResume: {
     type: Boolean,
     required: false,
@@ -259,16 +251,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: false,
     required: false
   },
-  applicationPreferences: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
-  autoConfirmationEmail: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
+  applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
   applicationPreferences:{
     type: Object,
     require: false
@@ -278,14 +261,11 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false
   },
   autoConfirmationEmail: {
-    type: Object,
+    type: Boolean,
     default: false,
     required: false
   },
-  pipeLine: {
-    type: Object,
-    default: false
-  }
+  pipeLine: { type: Schema.Types.ObjectId, ref: 'Pipeline' }
 
 }, {
   versionKey: false

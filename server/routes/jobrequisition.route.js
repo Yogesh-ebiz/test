@@ -22,6 +22,7 @@ router.route('/company/top-five').get(asyncHandler(getTopFiveJobs));
 
 router.route('/:id').get(asyncHandler(getJobById));
 router.route('/:id').put(asyncHandler(updateJobById));
+router.route('/:id/report').post(asyncHandler(reportJobById));
 
 
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
@@ -59,6 +60,7 @@ async function getJobById(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
+
 async function updateJobById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
@@ -67,6 +69,21 @@ async function updateJobById(req, res) {
 
   res.json(new Response(data, data?'job_update_successful':'not_found', res));
 }
+
+
+async function reportJobById(req, res) {
+
+  let currentUser = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
+  let report = req.body;
+
+  report.user = currentUser;
+  report.jobId = jobId;
+  let data = await jobRequisitionCtl.reportJobById(currentUser, jobId, report);
+
+  res.json(new Response(data, data?'job_reported_successful':'not_found', res));
+}
+
 
 
 async function jobLanding(req, res) {

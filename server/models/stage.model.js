@@ -3,25 +3,15 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const Schema = mongoose.Schema;
 
-const PipelineSchema = new mongoose.Schema({
-  pipelineId: {
-    type: Number
-  },
-  pipelineTemplateId: {
-    type: String,
-    required: true
-  },
-  jobId: {
-    type: String,
-    required: true
-  },
+
+const StageSchema = new mongoose.Schema({
   createdAt: {
     type: Number,
     default: Date.now
   },
   createdBy: {
     type: Number,
-    required: true
+    required: false
   },
   updatedAt: {
     type: Number,
@@ -38,21 +28,32 @@ const PipelineSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  stages: [{ type: Schema.Types.ObjectId, ref: 'Stage' }],
+  name: {
+    type: String,
+    required: false
+  },
+  type: {
+    type: String,
+    required: true
+  },
+  timeLimit: {
+    type: String,
+    required: false
+  },
+  mandatory: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
+  evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],
 }, {
   versionKey: false
 });
 
-
-PipelineSchema.plugin(autoIncrement, {
-  model: 'Pipeline',
-  field: 'pipelineId',
-  startAt: 100000,
-  incrementBy: 1
-});
-PipelineSchema.plugin(mongoosePaginate);
+StageSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('Pipeline', PipelineSchema);
+module.exports = mongoose.model('Stage', StageSchema);
 
 
