@@ -43,7 +43,7 @@ router.route('/:userId/skills/:partySkillId/endorsements').delete(asyncHandler(r
 router.route('/:userId/skills/:partySkillId/endorsements/:endorsementId').delete(asyncHandler(removeEndorsement));
 
 
-
+router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
 router.route('/:userId/bookmarks').get(asyncHandler(getBookmarksByUserId));
 
@@ -243,6 +243,15 @@ async function removeEndorsement(req, res) {
 }
 
 
+
+async function getUserResumes(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  console.log(currentUserId)
+  let data = await userCtl.getUserResumes(currentUserId);
+
+  res.json(new Response(data, data?'user_resumes_retrieved_successful':'not_found', res));
+}
 
 async function getApplicationsByUserId(req, res) {
 

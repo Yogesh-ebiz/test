@@ -525,7 +525,6 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
-  filter.company = companyId;
   let company = await findCompanyById(companyId, currentUserId);
 
 
@@ -555,6 +554,7 @@ async function getJobById(currentUserId, jobId, locale) {
     let propLocale = '$name.'+localeStr;
     job = await jobService.findJobId(jobId, locale);
 
+    console.log(job);
     if(job) {;
 
       let jobSkills = await findSkillsById(job.skills);

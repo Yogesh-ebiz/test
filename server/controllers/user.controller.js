@@ -26,7 +26,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
-const {syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
@@ -164,6 +164,7 @@ module.exports = {
   getEndorsementsByPartySkill,
   addEndorsement,
   removeEndorsement,
+  getUserResumes,
   getApplicationsByUserId,
   getBookmarksByUserId,
   getAlertsByUserId,
@@ -1446,6 +1447,26 @@ async function getEndorsementsByPartySkill(currentUserId, partySkillId, filter, 
 
       result = new CustomPagination({count: count, result: endorsements}, filter, locale);
     }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
+
+async function getUserResumes(currentUserId) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    result = await getUserLast5Resumes(currentUserId);
 
   } catch (error) {
     console.log(error);

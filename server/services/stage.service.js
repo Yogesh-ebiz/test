@@ -37,8 +37,6 @@ async function addStage(stage) {
 
   stage = await Joi.validate(stage, stageSchema, { abortEarly: false });
 
-
-  console.log(stage);
   for (let task of stage.tasks) {
     task._id = new ObjectID();
     task = await addTask(task)

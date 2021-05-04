@@ -45,22 +45,17 @@ async function addPipeline(jobId, newPipeline) {
     return;
   }
 
-  let job = await JobRequisition.findById(jobId);
+  newPipeline = await Joi.validate(newPipeline, pipelineSchema, {abortEarly: false});
 
-  if(job) {
-    newPipeline = await Joi.validate(newPipeline, pipelineSchema, {abortEarly: false});
+  let pipeline = null;
 
-    let pipeline = null;
-
-    for (let stage of newPipeline.stages) {
-      stage._id = new ObjectID();
-      stage = await addStage(stage)
-    }
-
-    newPipeline = new Pipeline(newPipeline).save();
-    job.pipeLine = newPipeline._id;
-    job = await job.save();
+  for (let stage of newPipeline.stages) {
+    stage._id = new ObjectID();
+    stage = await addStage(stage)
   }
+
+  newPipeline = new Pipeline(newPipeline).save();
+
 
   return newPipeline;
 

@@ -127,5 +127,7 @@
 	"question_updated_successful": "question_updated_successful",
 	"question_deleted_successful": "question_deleted_successful",
 	"questions_retrieved_successful": "questions_retrieved_successful",
-	"job_applicationform_updated_successful": "job_applicationform_updated_successful"
+	"job_applicationform_updated_successful": "job_applicationform_updated_successful",
+	"job_pipeline_retreived_successful": "job_pipeline_retreived_successful",
+	"user_resumes_retrieved_successful": "user_resumes_retrieved_successful"
 }

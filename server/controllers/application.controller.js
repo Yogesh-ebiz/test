@@ -12,7 +12,7 @@ const workflowEnum = require('../const/workflowEnum');
 
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
-const {syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, findEmployeeById, searchCompany} = require('../services/api/feed.service.api');
+const {addUserResume, syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, findEmployeeById, searchCompany} = require('../services/api/feed.service.api');
 const {getCompanyById,  isPartyActive} = require('../services/party.service');
 
 const {findJobId} = require('../services/jobrequisition.service');
@@ -79,32 +79,32 @@ async function getApplicationById(currentUserId, applicationId) {
   return application;
 }
 
-async function uploadCV(currentUserId, applicationId, files) {
+async function uploadCV(currentUserId, applicationId, files, name) {
 
   if(currentUserId==null || applicationId==null || files==null){
     return null;
   }
 
   let result = null;
-  let basePath = 'applications/';
+  let basePath = 'user/';
   try {
     let currentParty = await findByUserId(currentUserId);
-
     if (isPartyActive(currentParty)) {
 
       let application = await findApplicationById(applicationId);
+
 
 
       if (application && application.partyId == currentUserId) {
 
         let progress = application.progress[0];
         let file = files.file;
-        let fileName = file.originalFilename.split('.');
+        let fileName = name?name.split('.'):file.originalFilename.split('.');
         let fileExt = fileName[fileName.length - 1];
+        // let date = new Date();
         let timestamp = Date.now();
-        let name = 'Resume_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
-
-        let path = basePath + 'JOB_' +application.jobId + '/resumes/' + name;
+        name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
+        let path = basePath + application.partyId + '/resumes/' + name;
 
         let response = await upload(path, file);
         let type;
@@ -123,7 +123,7 @@ async function uploadCV(currentUserId, applicationId, files) {
 
         progress.candidateAttachment = { url: name, type: type};
         result = await progress.save();
-
+        await addUserResume(currentUserId, name, type);
 
       }
 

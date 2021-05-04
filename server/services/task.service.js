@@ -35,7 +35,6 @@ async function addTask(task) {
 
   task = await Joi.validate(task, taskSchema, { abortEarly: false });
 
-  console.log('task', task)
   task = await new Task(task).save();
   return task;
 

@@ -858,16 +858,19 @@ async function applyJobById(currentUserId, jobId, application ) {
     return null;
   }
 
+
   let savedApplication;
   try {
     let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE });
 
     if(job) {
       let currentParty = await findByUserId(currentUserId);
-
+      console.log(currentParty)
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
+
         let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
+        console.log(foundApplication)
         if(!foundApplication){
           application.job = job._id;
           // application.candidateAttachment = {type: 'PDF', url: application.jobId.toString().concat("_").concat(application.partyId).concat(".pdf") };

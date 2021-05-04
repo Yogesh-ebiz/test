@@ -204,6 +204,27 @@ async function createNotification(userId, notificationType, eventType, meta) {
 };
 
 
+async function getUserLast5Resumes(id) {
+  let files = null;
+  try {
+    let response = await client.get(`/user/${id}/resumes`);
+    files = response.data.data;
+  } catch(error) {
+    console.log("getUserResumes: error", error);
+  }
+  return files;
+};
+
+async function addUserResume(id, name, fileType) {
+  let user = null;
+  try {
+    let response = await client.post(`/user/${id}/folders/_resumes/add?name=${name}&fileType=${fileType}`);
+    file = response.data.data;
+  } catch(error) {
+    console.log("addUserResume: error", error);
+  }
+  return user;
+};
 
 module.exports = {
   createNotification:createNotification,
@@ -228,6 +249,8 @@ module.exports = {
   getUserEmployers:getUserEmployers,
   findCategoryById:findCategoryById,
   findCategoryByShortCode:findCategoryByShortCode,
+  getUserLast5Resumes:getUserLast5Resumes,
+  addUserResume:addUserResume,
   update(userId, data) {
     return client.put(`/user/${userId}`, data);
   }

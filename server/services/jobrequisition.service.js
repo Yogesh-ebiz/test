@@ -67,10 +67,20 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
     return;
   }
 
-  form.createdBy =currentUserId
-  form.jobId = jobId;
-  let pipeline = await PipelineService.addPipeline(jobId, form);
+  let pipeline=null;
 
+  let job = await JobRequisition.findById(jobId);
+  if(job) {
+    form.createdBy = currentUserId
+    form.jobId = jobId;
+    pipeline = await PipelineService.addPipeline(jobId, form);
+
+    if(pipeline){
+      console.log(job);
+      job.pipeLine=pipeline._id;
+      await job.save();
+    }
+  }
 
   return pipeline;
 }
@@ -84,9 +94,8 @@ async function getJobPipeline(jobId) {
 
 
   let job = await JobRequisition.findById(jobId);
-  console.log(job)
   if(job){
-    data = await Pipeline.findById(job.pipeLine);
+    data = await Pipeline.findById(job.pipeLine).populate('stages').populate('tasks');
 
   }
 
@@ -111,7 +120,6 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
       job.updatedBy = currentUserId;
 
       if(!job.pipeLine){
-        console.log(job.pipeLine)
         job.pipeLine = null;
       }
 

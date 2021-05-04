@@ -110,12 +110,7 @@ async function getCompanies(req, res) {
 
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-
-  if(req.query.company==null){
-    res.json(new Response(data, 'not_found', res));
-  }
-  let companyId = parseInt(req.query.company);
-
+  let companyId = parseInt(req.params.id);
   let filter = req.body;
   let pagination = req.query;
   filter.query = req.query.query;
