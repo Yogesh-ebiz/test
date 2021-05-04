@@ -76,7 +76,6 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
     pipeline = await PipelineService.addPipeline(jobId, form);
 
     if(pipeline){
-      console.log(job);
       job.pipeLine=pipeline._id;
       await job.save();
     }

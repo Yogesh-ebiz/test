@@ -26,7 +26,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
-const {getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {addUserResume, getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
@@ -147,7 +147,7 @@ const partyCertificationSchema = Joi.object({
 
 module.exports = {
   getUserDetail,
-  uploadCV,
+  uploadResume,
   getPartyExperiences,
   updatePartyExperiences,
   getPartyEducations,
@@ -311,7 +311,7 @@ async function getUserDetail(currentUserId, userId, locale) {
  * @param {HTTP} currentUserId
  * @param {HTTP} files
  */
-async function uploadCV(currentUserId, file) {
+async function uploadResume(currentUserId, file) {
   if(currentUserId==null || file==null){
     return null;
   }
@@ -407,6 +407,123 @@ async function uploadCV(currentUserId, file) {
 
 
     }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+async function uploadResume(currentUserId, files, name) {
+
+  if(!currentUserId || !files){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'user/';
+  try {
+    let currentParty = await findByUserId(currentUserId);
+    if (isPartyActive(currentParty)) {
+
+      let file = files.file;
+      let fileName = name?name.split('.'):file.originalFilename.split('.');
+      let fileExt = fileName[fileName.length - 1];
+      // let date = new Date();
+      let timestamp = Date.now();
+      name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
+      let path = basePath + currentUserId + '/_resumes/' + name;
+
+      let response = await upload(path, file);
+      let type;
+      switch(fileExt){
+        case 'pdf':
+          type='PDF';
+          break;
+        case 'doc':
+          type='WORD';
+          break;
+        case 'docx':
+          type='WORD';
+          break;
+
+      }
+
+      await addUserResume(currentUserId, name, type);
+
+      result = {
+        employments: [
+          {
+            "employmentTitle": "Sr. Android Developer",
+            "fromDate": 1554080400000,
+            "description": "Lead a team of 5 mobile developers",
+            "isCurrent": false,
+            "terminationReason": '',
+            "terminationType": '',
+            "company": {
+              "id": 15,
+              "partyType": "ORGANIZATION",
+              "groupName": "eBay"
+            },
+            "city": "San Jose",
+            "state": "California",
+            "country": "US"
+          },
+          {
+            "employmentTitle": "Android Developer",
+            "fromDate": 1483232400000,
+            "thruDate": 1554080400000,
+            "description": "Developed first app",
+            "isCurrent": false,
+            "terminationReason": '',
+            "terminationType": '',
+            "company": {
+              "partyType": "ORGANIZATION",
+              "groupName": "FPT"
+            },
+            "city": "Seattle",
+            "state": "Washington",
+            "country": "US"
+          }
+
+        ],
+        educations: [
+          {
+            "typeOfDegree": "Bachelor of Science",
+            "major": "CIS",
+            "fromDate": 1320123740000,
+            "thruDate": 1398920540000,
+            "hasGraduated": true,
+            "isCurrent": false,
+            "school": {
+              "id": 27,
+              "partyType": "INSTITUTE",
+              "groupName": "Temple University"
+            },
+          },
+          {
+            "typeOfDegree": "Bachelor of Science",
+            "major": "MIS",
+            "fromDate": 1320123740000,
+            "thruDate": 1398920540000,
+            "hasGraduated": true,
+            "isCurrent": false,
+            "school": {
+              "partyType": "INSTITUTE",
+              "groupName": "Ohio University"
+            },
+
+          },
+        ]
+
+      }
+
+
+    }
+
+
 
   } catch (error) {
     console.log(error);

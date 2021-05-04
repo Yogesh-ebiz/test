@@ -11,7 +11,8 @@ module.exports = router;
 
 router.route('/search/all').get(asyncHandler(searchUsers));
 router.route('/:userId/detail').get(asyncHandler(getUserDetail));
-router.route('/:userId/cv/upload').post(asyncHandler(uploadCV));
+router.route('/:userId/resumes/upload').post(asyncHandler(uploadResume));
+router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
 
 router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
 router.route('/:userId/experiences').post(asyncHandler(updatePartyExperiences));
@@ -43,7 +44,7 @@ router.route('/:userId/skills/:partySkillId/endorsements').delete(asyncHandler(r
 router.route('/:userId/skills/:partySkillId/endorsements/:endorsementId').delete(asyncHandler(removeEndorsement));
 
 
-router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
+
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
 router.route('/:userId/bookmarks').get(asyncHandler(getBookmarksByUserId));
 
@@ -80,9 +81,9 @@ async function searchUsers(req, res) {
   res.json(new Response(data, data?'users_retrieved_successful':'not_found', res));
 }
 
-async function uploadCV(req, res) {
+async function uploadResume(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
-  let data = await userCtl.uploadCV(currentUserId, req.files.file);
+  let data = await userCtl.uploadResume(currentUserId, req.files, req.body.name);
   res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
 }
 

@@ -11,10 +11,11 @@ const stageSchema = Joi.object({
   _id: Joi.object().required(),
   custom: Joi.boolean().required(),
   default: Joi.boolean().required(),
-  // name: Joi.string().required(),
+  name: Joi.string().required(),
   type: Joi.string().required(),
   timeLimit: Joi.string().required(),
-  tasks: Joi.array().optional()
+  tasks: Joi.array().optional(),
+  members: Joi.array().optional()
 });
 
 function getStage(id) {

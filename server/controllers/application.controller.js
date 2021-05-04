@@ -104,7 +104,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
         // let date = new Date();
         let timestamp = Date.now();
         name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
-        let path = basePath + application.partyId + '/resumes/' + name;
+        let path = basePath + currentUserId + '/_resumes/' + name;
 
         let response = await upload(path, file);
         let type;

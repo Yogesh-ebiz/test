@@ -554,7 +554,6 @@ async function getJobById(currentUserId, jobId, locale) {
     let propLocale = '$name.'+localeStr;
     job = await jobService.findJobId(jobId, locale);
 
-    console.log(job);
     if(job) {;
 
       let jobSkills = await findSkillsById(job.skills);
@@ -577,7 +576,10 @@ async function getJobById(currentUserId, jobId, locale) {
 
       if(job.promotion){
         let promotion = await findPromotionById(job.promotion);
-        job.promotion = promotion[0];
+        if(promotion){
+          job.promotion = promotion[0];
+        }
+
       }
 
       let users  = await lookupUserIds(job.panelist.concat(job.createdBy));
