@@ -10,7 +10,7 @@ module.exports = router;
 //router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/:id').get(asyncHandler(getApplicationById));
-router.route('/:id/cv/upload').post(asyncHandler(uploadCV));
+router.route('/:id/upload').post(asyncHandler(uploadCV));
 router.route('/:id/offer/upload').post(asyncHandler(uploadOffer));
 router.route('/:id/progresses/:applicationProgressId/accept').post(asyncHandler(accept));
 router.route('/:id/progresses/:applicationProgressId/decline').post(asyncHandler(decline));
@@ -26,8 +26,6 @@ async function getApplicationById(req, res) {
 
   res.json(new Response(data, data?'application_retrieved_successful':'not_found', res));
 }
-
-
 
 async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));

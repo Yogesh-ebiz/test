@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const UserSchema = new mongoose.Schema({
+const MemberSchema = new mongoose.Schema({
   id: {
     type: Number,
     required: true
@@ -10,44 +10,58 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     required:false
   },
+  createdDate: {
+    type: Number,
+    default: Date.now
+  },
+  company: {
+    type: Number,
+    required:true
+  },
   status: {
     type: String,
     required: true
   },
   firstName: {
     type: String,
-    required:false
+    required:true
   },
   lastName: {
     type: String,
-    required:false
+    required:true
   },
   middleName: {
     type: String,
-      required:false
-  },
-  createdDate: {
-    type: Number,
       required:false
   },
   imageUrl: {
     type: String,
     required:false
   },
-  preferredCurrency: {
+  phone: {
     type: String,
     required:false
   },
-  createdDate: {
-    type: Number,
-    default: Date.now
-  },
-  roles: [{
+  email: {
     type: String,
-  }]
+    required:true
+  },
+  language: {
+    type: String,
+    required:false
+  },
+  timezone: {
+    type: String,
+    required:false
+  },
+  preferTimeFormat: {
+    type: String,
+    required:false
+  },
+  role: { type: Schema.Types.ObjectId, ref: 'Role' }
 }, {
   versionKey: false
 });
 
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Member', MemberSchema);

@@ -32,7 +32,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: statusEnum.ACTIVE
+    default: statusEnum.DRAFT
   },
   description: {
     type: String,
@@ -177,9 +177,13 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  district: {
+    type: String,
+    required: false
+  },
   city: {
     type: String,
-    required: true
+    required: false
   },
   state: {
     type: String,
@@ -249,7 +253,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: false,
     required: false
   },
-  pipeLine: { type: Schema.Types.ObjectId, ref: 'Pipeline' }
+  pipeline: { type: Schema.Types.ObjectId, ref: 'Pipeline' }
 
 }, {
   versionKey: false

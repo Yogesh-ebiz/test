@@ -129,5 +129,11 @@
 	"questions_retrieved_successful": "questions_retrieved_successful",
 	"job_applicationform_updated_successful": "job_applicationform_updated_successful",
 	"job_pipeline_retreived_successful": "job_pipeline_retreived_successful",
-	"user_resumes_retrieved_successful": "user_resumes_retrieved_successful"
+	"user_resumes_retrieved_successful": "user_resumes_retrieved_successful",
+	"job_questions_retrieved_successful": "job_questions_retrieved_successful",
+	"members_retrieved_successful": "members_retrieved_successful",
+	"comment_added_successful": "comment_added_successful",
+	"comment_updated_successful": "comment_updated_successful",
+	"comment_retrieved_successful": "comment_retrieved_successful",
+	"job_paid_successful": "job_paid_successful"
 }

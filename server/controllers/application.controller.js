@@ -47,17 +47,16 @@ async function getApplicationById(currentUserId, applicationId) {
     let currentParty = await findByUserId(currentUserId);
 
 
-    console.log(currentUserId, applicationId)
     if(isPartyActive(currentParty)) {
       application = await findApplicationById(applicationId);
       if (application) {
         // let job = await findJobId(application.jobId);
 
-        let company = await findCompanyById(application.job.company, currentUserId);
-        application.job.company = company;
-        application.job.responsibilities=[];
-        application.job.qualifications = [];
-        application.job.skills = []
+        // let company = await findCompanyById(application.job.company, currentUserId);
+        // application.job.company = company;
+        // application.job.responsibilities=[];
+        // application.job.qualifications = [];
+        // application.job.skills = []
 
         application.progress = _.reduce(application.progress, function(res, item){
           item.label = workflowEnum[item.type]['en'];
@@ -80,7 +79,6 @@ async function getApplicationById(currentUserId, applicationId) {
 }
 
 async function uploadCV(currentUserId, applicationId, files, name) {
-
   if(currentUserId==null || applicationId==null || files==null){
     return null;
   }
@@ -93,36 +91,63 @@ async function uploadCV(currentUserId, applicationId, files, name) {
 
       let application = await findApplicationById(applicationId);
 
-
-
-      if (application && application.partyId == currentUserId) {
+      if (application && application.user == currentUserId) {
 
         let progress = application.progress[0];
-        let file = files.file;
-        let fileName = name?name.split('.'):file.originalFilename.split('.');
-        let fileExt = fileName[fileName.length - 1];
-        // let date = new Date();
-        let timestamp = Date.now();
-        name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
-        let path = basePath + currentUserId + '/_resumes/' + name;
 
-        let response = await upload(path, file);
-        let type;
-        switch(fileExt){
-          case 'pdf':
-            type='PDF';
-            break;
-          case 'doc':
-            type='WORD';
-            break;
-          case 'docx':
-            type='WORD';
-            break;
+        //------------Upload CV----------------
+        if(files.file) {
+          let cv = files.file;
+          let fileName = name ? name.split('.') : cv.originalFilename.split('.');
+          let fileExt = fileName[fileName.length - 1];
+          // let date = new Date();
+          let timestamp = Date.now();
+          name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
+          let path = basePath + currentUserId + '/_resumes/' + name;
+          let response = await upload(path, cv);
+          let type;
+          switch (fileExt) {
+            case 'pdf':
+              type = 'PDF';
+              break;
+            case 'doc':
+              type = 'WORD';
+              break;
+            case 'docx':
+              type = 'WORD';
+              break;
 
+          }
+          application.resume = {filename: name, type: type};
         }
 
-        progress.candidateAttachment = { url: name, type: type};
-        result = await progress.save();
+        //------------Upload Photo----------------
+        applicationBasePath = 'applications/';
+
+        if(files.photo) {
+          let photo = files.photo;
+          fileName = photo.originalFilename.split('.');
+          fileExt = fileName[fileName.length - 1];
+          timestamp = Date.now();
+          name = currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '_' + applicationId + '-' + timestamp + '.' + fileExt;
+          path = applicationBasePath + applicationId + '/photos/' + name;
+          response = await upload(path, photo);
+          switch (fileExt) {
+            case 'png':
+              type = 'PNG';
+              break;
+            case 'jpeg':
+              type = 'JPG';
+              break;
+            case 'jpg':
+              type = 'JPG';
+              break;
+
+          }
+          application.photo = {filename: path, type: type};
+        }
+
+        result = await application.save();
         await addUserResume(currentUserId, name, type);
 
       }

@@ -27,7 +27,7 @@ function findApplicationByCurrentStatus(applicationId) {
 
 function addApplicationProgress(applicationProgress) {
 
-  if(applicationProgress==null){
+  if(!applicationProgress){
     return;
   }
 

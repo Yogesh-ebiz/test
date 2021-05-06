@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
+const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
 let CustomPagination = require('../utils/custompagination');
 let Pagination = require('../utils/pagination');
@@ -13,17 +14,20 @@ const {convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, val
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
-const {findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
+const {findApplicationBy_Id, findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
 const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
-const {getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
+const {getPipelineByJobId, getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
 const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
+const {addApplicationProgress} = require('../services/applicationprogress.service');
+const commentService = require('../services/comment.service');
 
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
+const memberService = require('../services/member.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -79,9 +83,15 @@ module.exports = {
   updateJobPipeline,
   getJobPipeline,
   updateJobApplicationForm,
+  getBoard,
+  payJob,
   searchApplications,
   rejectApplication,
-  getBoard,
+  updateApplicationProgress,
+  getApplicationComments,
+  addApplicationComment,
+  deleteApplicationComment,
+  updateApplicationComment,
   searchCandidates,
   addCompanyDepartment,
   updateCompanyDepartment,
@@ -103,7 +113,8 @@ module.exports = {
   addCompanyLabel,
   getCompanyLabels,
   updateCompanyLabel,
-  deleteCompanyLabel
+  deleteCompanyLabel,
+  getCompanyMembers
 }
 
 
@@ -634,6 +645,7 @@ async function getJobPipeline(jobId, currentUserId) {
   try {
     if (isPartyActive(currentParty)) {
       result = await jobService.getJobPipeline(jobId);
+
     }
   } catch(e){
     console.log('getJobPipeline: Error', e);
@@ -664,54 +676,47 @@ async function updateJobApplicationForm(jobId, currentUserId, form) {
   return result
 }
 
+
+
+async function payJob(currentUserId, jobId, payment) {
+
+  if(!currentUserId || !jobId || !payment){
+    return null;
+  }
+
+  let job = await jobService.findJob_Id(jobId);
+
+  if(job){
+    job.status = statusEnum.ACTIVE;
+    await job.save();
+  }
+
+  return job;
+
+
+}
+
 async function searchApplications(currentUserId, jobId, filter, locale) {
 
   if(currentUserId==null || jobId==null){
     return null;
   }
 
-  let applications = await findApplicationsByJobId(jobId, filter);
+  let results = await findApplicationsByJobId(jobId, filter);
 
-  let userIds = _.map(applications, 'partyId');
+  let userIds = _.map(results.content, 'user');
   let users = await lookupUserIds(userIds);
 
-  applications.forEach(function(app){
-    let user = _.find(users, {id: app.partyId});
+  results.content.forEach(function(app){
+    let user = _.find(users, {id: app.user});
     if(user){
       app.user = user;
     }
   })
 
-  return applications;
+  return results;
 
 
-}
-
-
-async function updateApplication(currentUserId, jobId, applicationId, newStatus) {
-
-  if(!jobId || !applicaitonId || !currentUserId || !newStatus){
-    return null;
-  }
-
-  let application;
-  try {
-    let localeStr = locale? locale : 'en';
-    let propLocale = '$name.'+localeStr;
-    application = await findApplicationById(applicationId, locale);
-
-    if(application) {
-
-
-
-
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  return application;
 }
 
 
@@ -742,6 +747,200 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
 }
 
 
+async function updateApplication(currentUserId, jobId, applicationId, newStatus) {
+
+  if(!jobId || !applicationId || !currentUserId || !newStatus){
+    return null;
+  }
+
+  let application;
+  try {
+    let localeStr = locale? locale : 'en';
+    let propLocale = '$name.'+localeStr;
+    application = await findApplicationById(applicationId, locale);
+
+    if(application) {
+
+
+
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
+}
+
+async function updateApplicationProgress(currentUserId, applicationId, newStage) {
+
+  if(!currentUserId || !applicationId || !newStage){
+    return null;
+  }
+
+
+  let progress;
+  try {
+
+    let application = await findApplicationBy_Id(applicationId);
+
+
+    if(application) {
+      progress = _.find(application.progress, {stageId: ObjectID(newStage)})
+
+      if(progress){
+        application.currentProgress = progress;
+        await application.save();
+      } else {
+        let pipeline = await getPipelineByJobId(application.jobId);
+        if(pipeline) {
+          foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
+          if(foundStage) {
+            progress = await  addApplicationProgress({
+              applicationId: application.applicationId,
+              stageId: foundStage._id
+            });
+
+            application.currentProgress = progress;
+            application.progress.push(progress);
+            application.progress = _.orderBy(application.progress, ['stageId'], []);
+            await application.save();
+
+          }
+        }
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return progress;
+}
+
+
+
+async function getJobApplications(currentUserId, jobId) {
+
+  if(!currentUserId || !jobId){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    result = await app.getComments(jobId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function getApplicationComments(currentUserId, applicationId) {
+
+  if(!currentUserId || !applicationId){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    result = await commentService.getComments(applicationId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function addApplicationComment(currentUserId, applicationId, comment) {
+
+  if(!currentUserId || !applicationId || !comment){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let application = await findApplicationBy_Id(applicationId);
+
+
+    if(application) {
+      comment.applicationId = application._id;
+      comment.candidate = application.user;
+      comment.createdBy = currentUserId;
+      result = await commentService.addComment(comment);
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function deleteApplicationComment(currentUserId, applicationId, commentId) {
+
+  if(!currentUserId || !applicationId || !commentId){
+    return null;
+  }
+
+  let result;
+  try {
+    let comment = await commentService.findBy_Id(commentId);
+
+    if(comment) {
+      result = await comment.delete();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function updateApplicationComment(currentUserId, applicationId, commentId, comment) {
+
+  console.log(commentId, comment)
+  if(!currentUserId || !applicationId || !commentId || !comment){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let found = await commentService.findBy_Id(commentId);
+
+
+    if(found) {
+      found.message = comment.message;
+      found.lastUpdatedDate = Date.now();
+      result = await found.save()
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 
 async function getBoard(currentUserId, jobId, locale) {
 
@@ -749,30 +948,64 @@ async function getBoard(currentUserId, jobId, locale) {
     return null;
   }
 
+  let boardStages = [];
+  let pipelineStages;
   let job = await jobService.findJobId(jobId, locale);
+  let pipeline = await getPipelineByJobId(job.jobId);
+  if(pipeline.stages) {
 
-  let userIds = [5, 7, 12, 63, 75, 80, 85, 89, 91, 187, 188, 197, 198, 276, 277, 279, 286, 288, 289, 290, 4075]
-  let users = await lookupUserIds(userIds);
 
-  // applications.forEach(function(app){
-  //   let user = _.find(users, {id: app.partyId});
-  //   if(user){
-  //     app.user = user;
-  //   }
-  // })
+    let pipelineStages = pipeline.stages;
 
-  let columns = ['APPLIED', 'PHONE_SCREEN', 'TEST', 'INTERVIEW', 'OFFER'];
-  let board = [];
-  for(var i=0; i<5; i++){
-    let column = {type: columns[i], candidates: []};
-    var items = getRandomInt(1, 5);
-    for(var j=0; j<items; j++){
-      let removed = _.pullAt(users, 0);
-      column.candidates.push(removed[0]);
-    }
-    board.push(column);
+
+    // let userIds = [5, 7, 12, 63, 75, 80, 85, 89, 91, 187, 188, 197, 198, 276, 277, 279, 286, 288, 289, 290, 4075]
+    // let users = await lookupUserIds(userIds);
+    //
+    //
+    // let columns = ['APPLIED', 'PHONE_SCREEN', 'TEST', 'INTERVIEW', 'OFFER'];
+    //
+    // for(var i=0; i<5; i++){
+    //   let column = {type: columns[i], candidates: []};
+    //   var items = getRandomInt(1, 5);
+    //   for(var j=0; j<items; j++){
+    //     let removed = _.pullAt(users, 0);
+    //     column.candidates.push(removed[0]);
+    //   }
+    //   boardStages.push(column);
+    // }
+
+    let applicationsGroupByStage = await Application.aggregate([
+      {$match: {jobId: job.jobId}},
+      {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
+      {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }}, {$group: {_id: '$currentProgress.stageId', applications: {$push: "$$ROOT"}}}
+    ]);
+
+
+    let userIds = _.reduce(applicationsGroupByStage, function(res, item){ res.push(_.map(item.applications, 'user')); return res; }, []);
+
+    let users = await lookupUserIds(_.flatten(userIds));
+
+    pipelineStages.forEach(function(item){
+      let found = _.find(applicationsGroupByStage, {'_id': item._id});
+      if(found){
+        found.applications.forEach(function(application){
+          let user = _.find(users, {id: application.user});
+          if(user){
+            application.user = convertToAvatar(user);
+          }
+
+        });
+
+        item.applications = found.applications;
+      }
+
+      let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, applications: item.applications}
+      boardStages.push(stage);
+
+
+    });
   }
-  return board;
+  return boardStages;
 
 
 }
@@ -1110,7 +1343,7 @@ async function getCompanyPipelineTemplate(company, pipelineId, currentUserId, lo
     return null;
   }
 
-  let result = await getPipelineById(pipelineId);
+  let result = await getPipelineTemplateById(pipelineId);
 
   return result;
 
@@ -1323,3 +1556,14 @@ async function getCompanyLabels(company, query, type, currentUserId, locale) {
 }
 
 
+async function getCompanyMembers(company, query, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await memberService.getMembers(company, query);
+
+  return result;
+
+}

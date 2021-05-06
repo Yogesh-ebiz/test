@@ -22,7 +22,7 @@ function getPipelineTemplateById(pipeLineId) {
     return;
   }
 
-  return PipelineTemplate.findById(pipeLineId).populate('stages');
+  return PipelineTemplate.findById(pipeLineId);
 }
 
 

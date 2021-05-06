@@ -12,7 +12,8 @@ const questionSchema = Joi.object({
   question: Joi.string().required(),
   hint: Joi.any().optional(),
   options: Joi.array().optional(),
-  attachment: Joi.any().optional()
+  attachment: Joi.any().optional(),
+  isRequired: Joi.boolean()
 });
 
 const questionTemplateSchema = Joi.object({

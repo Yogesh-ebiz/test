@@ -5,9 +5,9 @@ function ApplicationSearchParam(filter) {
   this.query = {};
 
 
-  if(filter.partyId){
+  if(filter.user){
 
-    this.query.partyId =  { $eq: filter.partyId };
+    this.query.user =  { $eq: filter.user };
   }
 
   if(filter.id){

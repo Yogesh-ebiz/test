@@ -11,7 +11,7 @@ const Joi = require('joi');
 
 const pipelineSchema = Joi.object({
   createdBy: Joi.number().required(),
-  jobId: Joi.string().required(),
+  jobId: Joi.number().required(),
   pipelineTemplateId: Joi.string().required(),
   stages: Joi.array().required()
 });
@@ -24,6 +24,17 @@ function getPipelineById(pipeLineId) {
   }
 
   return Pipeline.findById(pipeLineId).populate('stages');
+}
+
+
+function getPipelineByJobId(jobId) {
+  let data = null;
+
+  if(!jobId){
+    return;
+  }
+
+  return Pipeline.findOne({jobId: jobId}).populate('stages');
 }
 
 
@@ -66,5 +77,6 @@ async function addPipeline(jobId, newPipeline) {
 module.exports = {
   getPipelineById:getPipelineById,
   getPipelines:getPipelines,
+  getPipelineByJobId:getPipelineByJobId,
   addPipeline:addPipeline
 }

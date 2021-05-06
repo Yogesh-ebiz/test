@@ -48,6 +48,19 @@ async function findJobId(jobId, locale) {
   // return JobRequisition.findOne({jobId: jobId});
 }
 
+
+async function findJob_Id(jobId, locale) {
+  let data = null;
+
+  if(jobId==null){
+    return;
+  }
+  data = JobRequisition.findById(jobId);
+  return data;
+
+  // return JobRequisition.findOne({jobId: jobId});
+}
+
 async function findJobIds(jobIds) {
   let data = null;
 
@@ -72,7 +85,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
   let job = await JobRequisition.findById(jobId);
   if(job) {
     form.createdBy = currentUserId
-    form.jobId = jobId;
+    form.jobId = job.jobId;
     pipeline = await PipelineService.addPipeline(jobId, form);
 
     if(pipeline){
@@ -94,7 +107,16 @@ async function getJobPipeline(jobId) {
 
   let job = await JobRequisition.findById(jobId);
   if(job){
-    data = await Pipeline.findById(job.pipeLine).populate('stages').populate('tasks');
+    data = await Pipeline.findById(job.pipeLine).populate({
+      path: 'stages',
+      populate:[{
+        path: 'members',
+        model: 'Member'
+      }, {
+        path: 'tasks',
+        model: 'Task'
+      }]
+    });
 
   }
 
@@ -112,19 +134,25 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
 
   let job = await JobRequisition.findById(jobId);
   if(job){
-    let questionTemplate = await QuestionTemplate.findById(form.questionTemplateId);
-    if(questionTemplate){
-      job.questionTemplate = questionTemplate._id;
-      job.applicationForm = form.applicationForm;
-      job.updatedBy = currentUserId;
+    if(form.questionTemplateId) {
+      let questionTemplate = await QuestionTemplate.findById(form.questionTemplateId);
 
-      if(!job.pipeLine){
-        job.pipeLine = null;
+      if (questionTemplate) {
+        job.questionTemplate = questionTemplate._id;
+        job.hasQuestions = true;
       }
-
-
-      data = await job.save();
     }
+
+    if (form.applicationForm) {
+      job.applicationForm = form.applicationForm;
+    }
+
+    if (!job.pipeLine) {
+      job.pipeLine = null;
+    }
+
+    job.updatedBy = currentUserId;
+    data = await job.save();
   }
 
 
@@ -283,6 +311,7 @@ async function getGroupOfCompanyJobs(listOfCompanyIds) {
 module.exports = {
   searchTitle: searchTitle,
   findJobId: findJobId,
+  findJob_Id:findJob_Id,
   findJobIds: findJobIds,
   removeByJobId: removeByJobId,
   updateJobPipeline:updateJobPipeline,

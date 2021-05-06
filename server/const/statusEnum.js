@@ -5,5 +5,6 @@ module.exports = {
   CANCELLED: 'CANCELLED',   //CANCELLED
   DELETED: 'DELETED',        //DELETED
   SUSPENDED: 'SUSPENDED',     //SUSPENDED by reported User or Admin
-  REPORTED: 'REPORTED'
+  REPORTED: 'REPORTED',
+  DRAFT: 'DRAFT'
 };

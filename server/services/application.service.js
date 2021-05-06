@@ -16,8 +16,8 @@ function findApplicationById(applicationId) {
 
   return Application.findOne({applicationId: applicationId}).populate([
     {
-      path: 'job',
-      model: 'JobRequisition'
+      path: 'currentProgress',
+      model: 'ApplicationProgress'
     },
     {
       path: 'progress',
@@ -27,6 +27,25 @@ function findApplicationById(applicationId) {
         path: 'schedule',
         model: 'Event'
       }
+    }
+  ]);
+}
+
+function findApplicationBy_Id(applicationId) {
+  let data = null;
+
+  if(applicationId==null){
+    return;
+  }
+
+  return Application.findById(applicationId).populate([
+    {
+      path: 'currentProgress',
+      model: 'ApplicationProgress'
+    },
+    {
+      path: 'progress',
+      model: 'ApplicationProgress'
     }
   ]);
 }
@@ -54,10 +73,42 @@ async function findApplicationsByJobId(jobId, filter) {
 
   filter.jobId=jobId;
 
-  // let result = await Application.paginate(new ApplicationSearchParam(filter), options);
-  // return new Pagination(result);
 
-  return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('progress');
+  const aggregate = Application.aggregate([{
+    $match: {
+      jobId: jobId
+    }
+  },
+    {
+      $lookup: {
+        from: 'applicationprogresses',
+        localField: 'currentProgress',
+        foreignField: '_id',
+        as: 'currentProgress',
+      },
+    },
+
+  ]);
+
+  //   (filter = {}, skip = 0, limit = 10, sort = {}) => [{
+  //   $match: {
+  //     jobId: 1
+  //   }
+  // },
+  //   {
+  //     $lookup: {
+  //       from: 'applicationprogresses',
+  //       localField: 'currentProgress',
+  //       foreignField: '_id',
+  //       as: 'currentProgress',
+  //     },
+  //   },
+  //
+  // ];
+  let result = await Application.aggregatePaginate(aggregate, options);
+  return new Pagination(result);
+
+  // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
 }
 
 function findAppliedCountByJobId(jobId) {
@@ -174,6 +225,7 @@ function applyJob(application) {
 
 module.exports = {
   findApplicationById: findApplicationById,
+  findApplicationBy_Id:findApplicationBy_Id,
   findApplicationByUserId: findApplicationByUserId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,

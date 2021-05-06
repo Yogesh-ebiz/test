@@ -18,9 +18,20 @@ router.route('/company/:id/invite').get(asyncHandler(inviteMember));
 
 router.route('/company/:id/jobs').get(asyncHandler(searchJob));
 router.route('/company/:id/jobs/:id').get(asyncHandler(getJobById));
+
+router.route('/company/:id/jobs/:id/pay').post(asyncHandler(payJob));
+
 router.route('/company/:id/jobs/:id/applications').get(asyncHandler(searchApplications));
 router.route('/company/:id/jobs/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:id/applications/:applicationId').post(asyncHandler(updateApplication));
+
+router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
+
+
+router.route('/company/:id/applications/:applicationId/comments').get(asyncHandler(getApplicationComments));
+router.route('/company/:id/applications/:applicationId/comments').post(asyncHandler(addApplicationComment));
+router.route('/company/:id/applications/:applicationId/comments/:commentId').delete(asyncHandler(deleteApplicationComment));
+router.route('/company/:id/applications/:applicationId/comments/:commentId').put(asyncHandler(updateApplicationComment));
 
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
@@ -60,6 +71,9 @@ router.route('/company/:id/labels').post(asyncHandler(addCompanyLabel));
 router.route('/company/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
 router.route('/company/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/company/:id/labels').get(asyncHandler(getCompanyLabels));
+
+
+router.route('/company/:id/members').get(asyncHandler(getCompanyMembers));
 
 
 async function getInsights(req, res) {
@@ -129,14 +143,40 @@ async function getJobById(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
+
+async function payJob(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+
+  let jobId = req.params.id;
+  let payment = req.body;
+
+  let data = await talentCtrl.payJob(currentUserId, jobId, payment);
+  res.json(new Response(data, data?'job_paid_successful':'not_found', res));
+}
+
+
+
 async function searchApplications(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
 
   let filter = req.query;
   let jobId = parseInt(req.params.id);
   let data = await talentCtrl.searchApplications(currentUserId, jobId, filter, res.locale);
-  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
+
+
+async function rejectApplication(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
+  let applicationId = parseInt(req.params.applicationId);
+  let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
+
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
 
 async function updateApplication(req, res) {
 
@@ -149,15 +189,67 @@ async function updateApplication(req, res) {
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
-async function rejectApplication(req, res) {
+async function updateApplicationProgress(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
-  let jobId = parseInt(req.params.id);
-  let applicationId = parseInt(req.params.applicationId);
-  let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
+  let applicationId = req.params.applicationId;
+  let newStage = req.body.newStage;
+
+  let data = await talentCtrl.updateApplicationProgress(currentUserId, applicationId, newStage);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
+
+
+
+async function getApplicationComments(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.getApplicationComments(currentUserId, applicationId);
+
+  res.json(new Response(data, data?'comment_retrieved_successful':'not_found', res));
+}
+
+
+async function addApplicationComment(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let comment = req.body;
+
+  let data = await talentCtrl.addApplicationComment(currentUserId, applicationId, comment);
+
+  res.json(new Response(data, data?'comment_added_successful':'not_found', res));
+}
+
+
+
+async function deleteApplicationComment(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let commentId = req.params.commentId;
+
+  let data = await talentCtrl.deleteApplicationComment(currentUserId, applicationId, commentId);
+
+  res.json(new Response(data, data?'comment_deleted_successful':'not_found', res));
+}
+
+
+async function updateApplicationComment(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let commentId = req.params.commentId;
+  let comment = req.body;
+
+  let data = await talentCtrl.updateApplicationComment(currentUserId, applicationId, commentId, comment);
+
+  res.json(new Response(data, data?'comment_updated_successful':'not_found', res));
+}
+
 
 async function updateJobPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -473,4 +565,15 @@ async function getCompanyLabels(req, res) {
 
   let data = await talentCtrl.getCompanyLabels(company, query, type, currentUserId, res.locale);
   res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getCompanyMembers(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query;
+
+  let data = await talentCtrl.getCompanyMembers(company, query, currentUserId, res.locale);
+  res.json(new Response(data, data?'members_retrieved_successful':'not_found', res));
 }

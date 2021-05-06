@@ -13,6 +13,8 @@ router.route('/search/all').get(asyncHandler(searchUsers));
 router.route('/:userId/detail').get(asyncHandler(getUserDetail));
 router.route('/:userId/resumes/upload').post(asyncHandler(uploadResume));
 router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
+router.route('/:userId/resumes/:resumeId/default').post(asyncHandler(setResumeDefault));
+
 
 router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
 router.route('/:userId/experiences').post(asyncHandler(updatePartyExperiences));
@@ -235,7 +237,6 @@ async function addEndorsement(req, res) {
 }
 
 async function removeEndorsement(req, res) {
-  console.log('removeEndorsement')
   let currentUserId = parseInt(req.header('UserId'));
   let partySkillId = parseInt(req.params.partySkillId);
   let data = await userCtl.removeEndorsement(currentUserId, partySkillId);
@@ -248,11 +249,22 @@ async function removeEndorsement(req, res) {
 async function getUserResumes(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
-  console.log(currentUserId)
   let data = await userCtl.getUserResumes(currentUserId);
 
   res.json(new Response(data, data?'user_resumes_retrieved_successful':'not_found', res));
 }
+
+
+
+async function setResumeDefault(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let resumeId = parseInt(req.params.resumeId);
+  let data = await userCtl.setResumeDefault(currentUserId, resumeId);
+
+  res.json(new Response(data, data?'user_resumes_retrieved_successful':'not_found', res));
+}
+
 
 async function getApplicationsByUserId(req, res) {
 

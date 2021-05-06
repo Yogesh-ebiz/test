@@ -10,6 +10,10 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  stageId: {
+    type: Number,
+    required: true
+  },
   label: {
     type: String,
     required: false,
@@ -21,26 +25,18 @@ const ApplicationProgressSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: false
+    required: true,
+    default: statusEnum.ACTIVE
   },
   candidateComment: {
     type: String,
     required: false,
     default: ''
   },
-  note: {
-    type: String,
-    required: false,
-    default: '',
-  },
   requiredAction: {
     type: Boolean,
     required: false,
     default: false
-  },
-  type: {
-    type: String,
-    required: true
   },
   event: {
     type: Object,
@@ -59,15 +55,24 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  stageId: {
+    type: Object,
+    required: true
+  },
+  noOfComments: {
+    type: Number,
+    required: false
+  },
+  noOfEvaluations: {
+    type: Object,
+    required: false
+  },
   candidateAttachment: {
     type: Object,
     required: false
   },
-  comments: {
-    type: Array,
-    required: false,
-    default: []
-  }
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+  evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],
 
 }, {
   versionKey: false

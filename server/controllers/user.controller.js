@@ -26,7 +26,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 const {addCompany} = require('../services/api/party.service.api');
-const {addUserResume, getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
+const {updateResumeDefault, addUserResume, getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
@@ -165,6 +165,7 @@ module.exports = {
   addEndorsement,
   removeEndorsement,
   getUserResumes,
+  setResumeDefault,
   getApplicationsByUserId,
   getBookmarksByUserId,
   getAlertsByUserId,
@@ -429,11 +430,11 @@ async function uploadResume(currentUserId, files, name) {
     if (isPartyActive(currentParty)) {
 
       let file = files.file;
-      let fileName = name?name.split('.'):file.originalFilename.split('.');
+      let fileName = file.originalFilename.split('.');
       let fileExt = fileName[fileName.length - 1];
       // let date = new Date();
       let timestamp = Date.now();
-      name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
+      name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : name + '-' + timestamp + '.' + fileExt;
       let path = basePath + currentUserId + '/_resumes/' + name;
 
       let response = await upload(path, file);
@@ -450,6 +451,7 @@ async function uploadResume(currentUserId, files, name) {
           break;
 
       }
+      console.log('fileExt', fileExt, type)
 
       await addUserResume(currentUserId, name, type);
 
@@ -1593,6 +1595,27 @@ async function getUserResumes(currentUserId) {
 
 }
 
+
+
+async function setResumeDefault(currentUserId, resumeId) {
+  console.log(currentUserId, resumeId)
+  if(!currentUserId || !resumeId){
+    return null;
+  }
+
+
+  let result = null;
+  try {
+    result = await updateResumeDefault(currentUserId, resumeId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
 async function getApplicationsByUserId(currentUserId, filter, locale) {
 
   if(currentUserId==null || filter==null){
@@ -1624,7 +1647,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
         filter.partyId=currentParty.id;
 
-        result = await Application.paginate(new ApplicationSearchParam(filter), options);
+        result = await Application.aggregatePaginate(new ApplicationSearchParam(filter), options);
         let jobIds = _.map(result.docs, 'jobId');
 
 
@@ -1654,7 +1677,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
           job.qualifications = [];
           job.skills = [];
           job.connection = {noConnection: 0, list: []};
-          job.company = _.find(foundCompanies, {id: job.company});
+          job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
           job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
           job.level = _.find(experienceLevels, {shortCode: job.level});
           job.promotion = _.find(promotions, {promotionId: job.promotion});

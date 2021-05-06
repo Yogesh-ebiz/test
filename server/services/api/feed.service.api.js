@@ -226,6 +226,28 @@ async function addUserResume(id, name, fileType) {
   return user;
 };
 
+async function getResumeById(userId, id) {
+  let file = null;
+  try {
+    let response = await client.get(`/user/${userId}/resumes/${id}`);
+    file = response.data.data;
+  } catch(error) {
+    console.log("getResumeById: error", error);
+  }
+  return file;
+};
+
+async function updateResumeDefault(userId, id) {
+  let file = null;
+  try {
+    let response = await client.post(`/user/${userId}/resumes/${id}/default`);
+    file = response.data.data;
+  } catch(error) {
+    console.log("getResumeById: error", error);
+  }
+  return file;
+};
+
 module.exports = {
   createNotification:createNotification,
   findByUserId: findUserById,
@@ -251,6 +273,8 @@ module.exports = {
   findCategoryByShortCode:findCategoryByShortCode,
   getUserLast5Resumes:getUserLast5Resumes,
   addUserResume:addUserResume,
+  getResumeById:getResumeById,
+  updateResumeDefault:updateResumeDefault,
   update(userId, data) {
     return client.put(`/user/${userId}`, data);
   }

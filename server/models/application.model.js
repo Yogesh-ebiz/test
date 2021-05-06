@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 // const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
-let mongooseAggregatePaginate = require('mongoose-aggregate-paginate-v2');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 
 const statusEnum = require('../const/statusEnum');
 
@@ -17,10 +17,6 @@ const ApplicationSchema = new mongoose.Schema({
     required: true
   },
   // job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
-  partyId: {
-    type: Number,
-    required: true
-  },
   user: {
     type: Object,
     required: false
@@ -53,11 +49,25 @@ const ApplicationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  attachment: {
-    type: String,
-    required: false
+  coverLetter: {
+    type: String
   },
-  progress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }]
+  photo: {
+    type: Object
+  },
+  resume: {
+    type: Object
+  },
+  questionAnswers: {
+    type: Array
+  },
+  sources: {
+    type: Array
+  },
+  note: [{ type: Schema.Types.ObjectId, ref: 'Note' }],
+  labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
+  progress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
+  currentProgress: { type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }
 
 }, {
   versionKey: false
@@ -69,7 +79,7 @@ ApplicationSchema.plugin(autoIncrement, {
   startAt: 100000,
   incrementBy: 1
 });
-ApplicationSchema.plugin(mongooseAggregatePaginate);
+ApplicationSchema.plugin(mongoosePaginate);
 
 
 module.exports = mongoose.model('Application', ApplicationSchema);
