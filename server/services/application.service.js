@@ -5,6 +5,7 @@ const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
 const  ApplicationSearchParam = require('../const/applicationSearchParam');
 const Pagination = require('../utils/job.pagination');
+const JobService = require('../services/jobrequisition.service');
 
 
 function findApplicationById(applicationId) {
@@ -110,6 +111,56 @@ async function findApplicationsByJobId(jobId, filter) {
 
   // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
 }
+
+
+async function findCandidatesByCompanyId(company, filter) {
+  let data = null;
+
+  if(company==null || !filter){
+    return;
+  }
+
+  let select = '';
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+
+
+  let jobs = await JobService.findJobsByCompanyId(company);
+
+  const aggregate = Application.aggregate([{
+    $match: {
+      jobId: {$in: _.map(jobs, 'jobId')}
+    }
+  },
+  {
+    $lookup: {
+      from: 'applicationprogresses',
+      localField: 'currentProgress',
+      foreignField: '_id',
+      as: 'currentProgress',
+    },
+  },
+  {$group: {_id: '$user', applications: {$push: "$$ROOT"}}},
+  {$project: {_id: 0, id: '$_id', applications: '$applications' }}
+  ]);
+
+  let result = await Application.aggregatePaginate(aggregate, options);
+
+  return result;
+
+}
+
 
 function findAppliedCountByJobId(jobId) {
   let data = null;
@@ -231,5 +282,6 @@ module.exports = {
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
   findAppliedCountByJobId: findAppliedCountByJobId,
   findApplicationsByJobId:findApplicationsByJobId,
+  findCandidatesByCompanyId:findCandidatesByCompanyId,
   applyJob: applyJob
 }

@@ -89,7 +89,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
     pipeline = await PipelineService.addPipeline(jobId, form);
 
     if(pipeline){
-      job.pipeLine=pipeline._id;
+      job.pipeline=pipeline._id;
       await job.save();
     }
   }
@@ -104,10 +104,9 @@ async function getJobPipeline(jobId) {
     return;
   }
 
-
   let job = await JobRequisition.findById(jobId);
   if(job){
-    data = await Pipeline.findById(job.pipeLine).populate({
+    data = await Pipeline.findById(job.pipeline).populate({
       path: 'stages',
       populate:[{
         path: 'members',
@@ -280,6 +279,21 @@ async function getRelatedJobs(job) {
   return res;
 }
 
+
+
+async function findJobsByCompanyId(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  console.log(company)
+  return await JobRequisition.find({company:company})
+
+}
+
+
 async function getGroupOfCompanyJobs(listOfCompanyIds) {
   let data = null;
 
@@ -320,5 +334,6 @@ module.exports = {
   getCountsGroupByCompany,
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,
+  findJobsByCompanyId:findJobsByCompanyId,
   getGroupOfCompanyJobs:getGroupOfCompanyJobs
 }

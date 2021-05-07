@@ -70,7 +70,6 @@ class Pagination {
 
   constructor(data, locale) {
 
-
     if(data===null || typeof data==='undefined'){
       return defaultPagination;
     }

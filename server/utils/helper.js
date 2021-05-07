@@ -19,7 +19,6 @@ const convertToTalentUser = (user) => {
     return;
   }
 
-  console.log(user)
   let primaryEmail = (user.primaryEmail)?{
     type: user.primaryEmail.name,
     value: user.primaryEmail.value
@@ -55,6 +54,25 @@ const convertToAvatar = (user) => {
     isOnline: user.isOnline,
     partyType: user.partyType,
     headline: user.headline
+  };
+}
+
+const convertToCandidate = (user) => {
+  return {
+    id: user.id,
+    name: user.name,
+    firstName: user.firstName,
+    middleName: user.middleName,
+    lastName: user.lastName,
+    avatar: user.avatar,
+    isOnline: user.isOnline,
+    partyType: user.partyType,
+    jobTitle: user.jobTitle?user.jobTitle:'',
+    headline: user.headline,
+    noOfMonthExperiences: user.noOfMonthExperiences,
+    level:user.level,
+    match:user.match,
+    applications: user.applications?user.applications:[]
   };
 }
 
@@ -120,5 +138,6 @@ module.exports = {
   convertToCompany:convertToCompany,
   convertIndustry:convertIndustry,
   categoryMinimal:categoryMinimal,
-  convertToTalentUser:convertToTalentUser
+  convertToTalentUser:convertToTalentUser,
+  convertToCandidate:convertToCandidate
 };

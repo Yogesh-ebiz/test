@@ -10,11 +10,11 @@ const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
-const {convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
-const {findApplicationBy_Id, findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
+const {findCandidatesByCompanyId, findApplicationBy_Id, findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
@@ -977,7 +977,8 @@ async function getBoard(currentUserId, jobId, locale) {
     let applicationsGroupByStage = await Application.aggregate([
       {$match: {jobId: job.jobId}},
       {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
-      {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }}, {$group: {_id: '$currentProgress.stageId', applications: {$push: "$$ROOT"}}}
+      {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }},
+      {$group: {_id: '$currentProgress.stageId', applications: {$push: "$$ROOT"}}}
     ]);
 
 
@@ -1011,9 +1012,9 @@ async function getBoard(currentUserId, jobId, locale) {
 }
 
 
-async function searchCandidates(currentUserId, filter, locale) {
+async function searchCandidates(currentUserId, company, filter, locale) {
 
-  if(!currentUserId || !filter){
+  if(!currentUserId || !company || !filter){
     return null;
   }
 
@@ -1029,51 +1030,25 @@ async function searchCandidates(currentUserId, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
-  // let company = await findCompanyById(companyId, currentUserId);
-
-
-  let jobs = await JobRequisition.find(new JobSearchParam(filter));
-  let jobIds = _.map(jobs, 'jobId');
-
-
-  // result = await Application.paginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
-
-  var myAggregate = Application.aggregate([ {$group:{_id:{partyId:'$partyId'}, applications: {$push: '$$ROOT'}}}, {$project: {_id: 0, userId: '$_id.partyId', applications: '$applications'}} ]);
-
-  result = await Application.aggregatePaginate(myAggregate , options);
-  let userIds = _.map(result.docs, 'userId');
+  result = await findCandidatesByCompanyId(company, filter);
+  let userIds = _.map(result.docs, 'id');
   let users = await lookupUserIds(userIds)
 
-  let loadPromises = result.docs.map(function(user){
-      let foundUser = _.find(users, {id: user.userId})
-      if(foundUser){
-        foundUser.noOfMonthExperiences = 68;
-        foundUser.level = 'SENIOR'
-        foundUser.match = 87;
+  for(var i=0; i<result.docs.length; i++){
+    let foundUser = _.find(users, {id: result.docs[i].id});
+    if(foundUser) {
+      foundUser.noOfMonthExperiences = 68;
+      foundUser.level = 'SENIOR'
+      foundUser.match = 87;
 
-        let isNew = _.some(user.applications, function(application){
-          let appliedDate = new Date(application.createdDate);
-          var timeStamp = Math.round(new Date().getTime() / 1000);
-          var timeStampYesterday = timeStamp - (24 * 3600);
-          var is24 = appliedDate >= new Date(timeStampYesterday*1000).getTime();
-          return is24;
-        });
+      foundUser = convertToCandidate(foundUser);
+      foundUser.applications = result.docs[i].applications;
+      result.docs[i] = foundUser
 
-        foundUser.isNew = isNew;
+    }
 
-        foundUser.applications = user.applications.map(function(app){
-          // let job = await JobRequisition.findOne({jobId: app.jobId});
-          app.jobTitle = "Senior iOS Developer";
-          app.progress = {
-            title: 'INTERVIEWED',
-            status: 'FAILED'
-          }
-          return app;
-        });
-        return foundUser;
-      }
-  });
-  result.docs = await Promise.all(loadPromises);
+  };
+
 
   return new Pagination(result);
 

@@ -292,12 +292,13 @@ async function getBoard(req, res) {
 async function searchCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let data;
-
+  let company = parseInt(req.params.id);
   let filter = req.body;
   let pagination = req.query;
   filter.query = req.query.query;
-  filter.company = [802]
-  data = await talentCtrl.searchCandidates(currentUserId, filter, res.locale);
+
+
+  data = await talentCtrl.searchCandidates(currentUserId, company, filter, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 
