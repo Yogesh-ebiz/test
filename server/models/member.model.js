@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const statusEnum = require('../const/statusEnum');
+
 
 const MemberSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true
-  },
   createdBy: {
     type: Number,
     required:false
@@ -20,7 +18,7 @@ const MemberSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: true
+    default: statusEnum.ACTIVE
   },
   firstName: {
     type: String,
@@ -32,7 +30,7 @@ const MemberSchema = new mongoose.Schema({
   },
   middleName: {
     type: String,
-      required:false
+    required:false
   },
   imageUrl: {
     type: String,

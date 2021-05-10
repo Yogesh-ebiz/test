@@ -132,6 +132,19 @@ const categoryMinimal = (category) => {
   };
 }
 
+const roleMinimal = (role) => {
+  if(!role){
+    return null;
+  }
+  return {
+    _id: role._id,
+    name: role.name,
+    privileges: role.privileges,
+    name: role.name,
+    company: role.company
+  };
+}
+
 module.exports = {
   capitalizeLocale:capitalizeLocale,
   convertToAvatar:convertToAvatar,
@@ -139,5 +152,6 @@ module.exports = {
   convertIndustry:convertIndustry,
   categoryMinimal:categoryMinimal,
   convertToTalentUser:convertToTalentUser,
-  convertToCandidate:convertToCandidate
+  convertToCandidate:convertToCandidate,
+  roleMinimal:roleMinimal
 };

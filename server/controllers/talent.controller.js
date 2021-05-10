@@ -10,11 +10,11 @@ const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
-const {convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
-const {findCandidatesByCompanyId, findApplicationBy_Id, findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
+const applicationService = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
@@ -23,8 +23,6 @@ const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, delete
 const {getPipelineByJobId, getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
 const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
 const {addApplicationProgress} = require('../services/applicationprogress.service');
-const commentService = require('../services/comment.service');
-
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const memberService = require('../services/member.service');
@@ -36,6 +34,7 @@ const {} = require('../services/company.service');
 const JobRequisition = require('../models/jobrequisition.model');
 const Application = require('../models/application.model');
 const Role = require('../models/role.model');
+const Department = require('../models/department.model');
 
 
 const invitationSchema = Joi.object({
@@ -76,7 +75,6 @@ const labelSchema = Joi.object({
 module.exports = {
   getInsights,
   getStats,
-  inviteMember,
   getUserSession,
   searchJobs,
   getJobById,
@@ -88,6 +86,9 @@ module.exports = {
   searchApplications,
   rejectApplication,
   updateApplicationProgress,
+  getApplicationLabels,
+  addApplicationLabel,
+  deleteApplicationLabel,
   getApplicationComments,
   addApplicationComment,
   deleteApplicationComment,
@@ -114,7 +115,13 @@ module.exports = {
   getCompanyLabels,
   updateCompanyLabel,
   deleteCompanyLabel,
-  getCompanyMembers
+  inviteMembers,
+  getCompanyMemberInvitations,
+  getCompanyMembers,
+  addCompanyMember,
+  updateCompanyMember,
+  updateCompanyMemberRole,
+  deleteCompanyMember,
 }
 
 
@@ -122,20 +129,6 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-async function inviteMember(currentUserId, invitation) {
-
-  if(!currentUserId || !invitation){
-    return null;
-  }
-
-  let result;
-  job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
-
-
-  return result;
-
 }
 
 
@@ -570,7 +563,7 @@ async function getJobById(currentUserId, jobId, locale) {
       let jobSkills = await findSkillsById(job.skills);
       // console.log('jobSkils', jobSkills)
 
-      let noApplied = await findAppliedCountByJobId(job.jobId);
+      let noApplied = await applicationService.findAppliedCountByJobId(job.jobId);
       job.noApplied = noApplied;
 
       let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
@@ -702,7 +695,7 @@ async function searchApplications(currentUserId, jobId, filter, locale) {
     return null;
   }
 
-  let results = await findApplicationsByJobId(jobId, filter);
+  let results = await applicationService.findApplicationsByJobId(jobId, filter);
 
   let userIds = _.map(results.content, 'user');
   let users = await lookupUserIds(userIds);
@@ -730,7 +723,7 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    job = await findApplicationById(applicationId, locale);
+    job = await applicationService.findApplicationById(applicationId, locale);
 
     if(job) {;
 
@@ -757,7 +750,7 @@ async function updateApplication(currentUserId, jobId, applicationId, newStatus)
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    application = await findApplicationById(applicationId, locale);
+    application = await applicationService.findApplicationById(applicationId, locale);
 
     if(application) {
 
@@ -783,7 +776,16 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
   let progress;
   try {
 
-    let application = await findApplicationBy_Id(applicationId);
+    let application = await findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'currentProgress',
+        model: 'ApplicationProgress'
+      },
+      {
+        path: 'progress',
+        model: 'ApplicationProgress'
+      }
+    ]);
 
 
     if(application) {
@@ -841,6 +843,100 @@ async function getJobApplications(currentUserId, jobId) {
   return result;
 }
 
+
+
+async function getApplicationLabels(currentUserId, applicationId) {
+
+  if(!currentUserId || !applicationId){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'labels',
+        model: 'Label'
+      }]);
+
+    if(application){
+      retsult = application.labels;
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function addApplicationLabel(currentUserId, applicationId, label) {
+
+  if(!currentUserId || !applicationId || !label){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'labels',
+        model: 'Label'
+      }]);
+
+
+    if(application) {
+      console.log(application)
+      console.log(label);
+      application.labels.push(label);
+
+      // comment.applicationId = application._id;
+      // comment.candidate = application.user;
+      // comment.createdBy = currentUserId;
+      result = await application.save();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function deleteApplicationLabel(currentUserId, applicationId, labelId) {
+
+  if(!currentUserId || !applicationId || !labelId){
+    return null;
+  }
+
+  let result;
+  try {
+
+    let application = await applicationService.findApplicationBy_Id(applicationId);
+
+
+    if(application) {
+      application = await application.update(
+        { $pull: { labels: labelId } }
+      );
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application.labels;
+}
+
+
+
 async function getApplicationComments(currentUserId, applicationId) {
 
   if(!currentUserId || !applicationId){
@@ -870,7 +966,7 @@ async function addApplicationComment(currentUserId, applicationId, comment) {
   try {
 
 
-    let application = await findApplicationBy_Id(applicationId);
+    let application = await applicationService.findApplicationBy_Id(applicationId);
 
 
     if(application) {
@@ -939,7 +1035,6 @@ async function updateApplicationComment(currentUserId, applicationId, commentId,
 
   return result;
 }
-
 
 
 async function getBoard(currentUserId, jobId, locale) {
@@ -1030,7 +1125,7 @@ async function searchCandidates(currentUserId, company, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
-  result = await findCandidatesByCompanyId(company, filter);
+  result = await applicationService.findCandidatesByCompanyId(company, filter);
   let userIds = _.map(result.docs, 'id');
   let users = await lookupUserIds(userIds)
 
@@ -1531,6 +1626,36 @@ async function getCompanyLabels(company, query, type, currentUserId, locale) {
 }
 
 
+
+async function inviteMembers(company, currentUserId, form) {
+
+  if(!company || !currentUserId || !form){
+    return null;
+  }
+
+  let result = await memberService.inviteMembers(company, currentUserId, form.emails, form.role);
+
+
+  return result;
+
+}
+
+
+async function getCompanyMemberInvitations(company) {
+
+  if(!company){
+    return null;
+  }
+
+  let result = await memberService.getMemberInvitations(company);
+  result.forEach(function(member){
+    member.role = roleMinimal(member.role);
+  });
+  return result;
+
+}
+
+
 async function getCompanyMembers(company, query, currentUserId, locale) {
 
   if(!company || !currentUserId){
@@ -1538,7 +1663,113 @@ async function getCompanyMembers(company, query, currentUserId, locale) {
   }
 
   let result = await memberService.getMembers(company, query);
+  result.forEach(function(member){
+    member.role = roleMinimal(member.role);
+  });
 
   return result;
 
+}
+
+
+async function addCompanyMember(company, currentUserId, form, invitationId) {
+  if(!company || !currentUserId || !form || !invitationId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let role = form.role;
+      delete form.role
+
+      result = await memberService.addMember(form, role, invitationId);
+    }
+  } catch(e){
+    console.log('addCompanyMember: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyMember(company, memberId, currentUserId, form) {
+  if(!company || !currentUserId || !memberId || !form){
+    return null;
+  }
+
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      result = await memberService.updateMember(memberId, form);
+
+
+    }
+  } catch(e){
+    console.log('updateCompanyMember: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyMemberRole(company, memberId, currentUserId, role) {
+  if(!company || !currentUserId || !memberId || !role){
+    return null;
+  }
+
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+
+      result = await memberService.updateMemberRole(memberId, role);
+
+
+    }
+  } catch(e){
+    console.log('updateCompanyMember: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyMember(company, memberId, currentUserId) {
+  if(!company || !currentUserId || !memberId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let member = await memberService.findMemberBy_Id(memberId);
+      if(member){
+        result = await member.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyMember: Error', e);
+  }
+
+
+  return result
 }

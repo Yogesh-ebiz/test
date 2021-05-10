@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const Application = require('../models/application.model');
@@ -39,16 +40,7 @@ function findApplicationBy_Id(applicationId) {
     return;
   }
 
-  return Application.findById(applicationId).populate([
-    {
-      path: 'currentProgress',
-      model: 'ApplicationProgress'
-    },
-    {
-      path: 'progress',
-      model: 'ApplicationProgress'
-    }
-  ]);
+  return Application.findById(applicationId);
 }
 
 async function findApplicationsByJobId(jobId, filter) {

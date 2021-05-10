@@ -10,8 +10,7 @@ function getDepartments(company, query) {
     return;
   }
 
-  console.log(company, query)
-  return Department.find({company: company, name: { $regex: query, $options: "si" }});
+  return Department.aggregate([ {$match: {company: company}}, {$lookup: {from: "jobrequisitions", localField: "_id", foreignField: "department", as: "jobs"}}, {$project: {_id: 1, company: 1, name: 1, background: 1, noOfJobs: {$size: "$jobs"}}} ]);
 }
 
 
@@ -22,6 +21,8 @@ function addDepartment(department) {
     return;
   }
 
+  const randomColor = Math.floor(Math.random()*16777215).toString(16);
+  department.background = "#" + randomColor;
   department = new Department(department).save();
   return department;
 

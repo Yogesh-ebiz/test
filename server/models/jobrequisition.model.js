@@ -224,10 +224,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
-  department: {
-    type: Object,
-    required: false
-  },
+  department: { type: Schema.Types.ObjectId, ref: 'Department'},
   panelist: {
     type: Array,
     required: false,

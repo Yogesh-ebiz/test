@@ -6,6 +6,13 @@ const DepartmentSchema = new mongoose.Schema({
   name: {
     type: String
   },
+  background: {
+    type: String
+  },
+  noOfJobs: {
+    type: Number,
+    required: false
+  },
   company: {
     type: Object,
     required: true

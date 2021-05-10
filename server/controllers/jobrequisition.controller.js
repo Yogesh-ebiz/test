@@ -63,7 +63,7 @@ const jobRequisitionSchema = Joi.object({
   currency: Joi.string(),
   noOfResources: Joi.number(),
   type: Joi.string(),
-  department: Joi.number(),
+  department: Joi.object().optional(),
   labels: Joi.array().optional(),
   industry: Joi.array().optional(),
   category: Joi.string(),
@@ -874,6 +874,9 @@ async function applyJobById(currentUserId, jobId, application ) {
       let currentParty = await findByUserId(currentUserId);
       //Security Check if user is part of meeting attendees that is ACTIVE.
       if (isPartyActive(currentParty)) {
+
+        let candidate = null;
+
 
         let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
         if(!foundApplication){

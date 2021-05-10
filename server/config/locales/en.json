@@ -135,5 +135,9 @@
 	"comment_added_successful": "comment_added_successful",
 	"comment_updated_successful": "comment_updated_successful",
 	"comment_retrieved_successful": "comment_retrieved_successful",
-	"job_paid_successful": "job_paid_successful"
+	"job_paid_successful": "job_paid_successful",
+	"member_added_successful": "member_added_successful",
+	"member_updated_successful": "member_updated_successful",
+	"member_deleted_successful": "member_deleted_successful",
+	"members_invited_successful": "members_invited_successful"
 }

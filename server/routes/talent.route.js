@@ -14,7 +14,6 @@ router.route('/session').get(asyncHandler(getUserSession));
 router.route('/company').get(asyncHandler(getCompanies));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/stats').get(asyncHandler(getStats));
-router.route('/company/:id/invite').get(asyncHandler(inviteMember));
 
 router.route('/company/:id/jobs').get(asyncHandler(searchJob));
 router.route('/company/:id/jobs/:id').get(asyncHandler(getJobById));
@@ -27,6 +26,9 @@ router.route('/company/:id/jobs/:id/applications/:applicationId').post(asyncHand
 
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
 
+router.route('/company/:id/applications/:applicationId/labels').get(asyncHandler(getApplicationLabels));
+router.route('/company/:id/applications/:applicationId/labels').post(asyncHandler(addApplicationLabel));
+router.route('/company/:id/applications/:applicationId/labels/:labelId').delete(asyncHandler(deleteApplicationLabel));
 
 router.route('/company/:id/applications/:applicationId/comments').get(asyncHandler(getApplicationComments));
 router.route('/company/:id/applications/:applicationId/comments').post(asyncHandler(addApplicationComment));
@@ -72,9 +74,14 @@ router.route('/company/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel
 router.route('/company/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/company/:id/labels').get(asyncHandler(getCompanyLabels));
 
+router.route('/company/:id/members/invites').post(asyncHandler(inviteMembers));
+router.route('/company/:id/members/invites').get(asyncHandler(getCompanyMemberInvitations));
 
 router.route('/company/:id/members').get(asyncHandler(getCompanyMembers));
-
+router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
+router.route('/company/:id/members/:memberId').put(asyncHandler(updateCompanyMember));
+router.route('/company/:id/members/:memberId/role').put(asyncHandler(updateCompanyMemberRole));
+router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompanyMember));
 
 async function getInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -93,14 +100,6 @@ async function getStats(req, res) {
   res.json(new Response(data, data?'get_stats_successful':'not_found', res));
 }
 
-async function inviteMember(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let invitation = req.body;
-  invitation.createdBy = currentUserId;
-
-  let data = await talentCtrl.inviteMember(currentUserId, invitation);
-  res.json(new Response(data, data?'member_invited_successful':'not_found', res));
-}
 
 
 async function getUserSession(req, res) {
@@ -198,6 +197,43 @@ async function updateApplicationProgress(req, res) {
   let data = await talentCtrl.updateApplicationProgress(currentUserId, applicationId, newStage);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getApplicationLabels(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.getApplicationLabels(currentUserId, applicationId);
+
+  res.json(new Response(data, data?'label_retrieved_successful':'not_found', res));
+}
+
+
+async function addApplicationLabel(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let label = req.body;
+
+  let data = await talentCtrl.addApplicationLabel(currentUserId, applicationId, label);
+
+  res.json(new Response(data, data?'label_added_successful':'not_found', res));
+}
+
+
+
+async function deleteApplicationLabel(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let labelId = req.params.labelId;
+
+  let data = await talentCtrl.deleteApplicationLabel(currentUserId, applicationId, labelId);
+
+  res.json(new Response(data, data?'label_deleted_successful':'not_found', res));
 }
 
 
@@ -365,7 +401,6 @@ async function updateCompanyQuestionTemplate(req, res) {
   question.company = company;
   question.updatedBy = currentUserId;
 
-  console.log(company, questionTemplateId, currentUserId, question)
   let data = await talentCtrl.updateCompanyQuestionTemplate(company, questionTemplateId, currentUserId, question);
   res.json(new Response(data, data?'question_updated_successful':'not_found', res));
 }
@@ -570,6 +605,26 @@ async function getCompanyLabels(req, res) {
 
 
 
+async function inviteMembers(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let form = req.body;
+
+  let data = await talentCtrl.inviteMembers(company, currentUserId, form);
+  res.json(new Response(data, data?'members_invited_successful':'not_found', res));
+}
+
+
+async function getCompanyMemberInvitations(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query;
+
+  let data = await talentCtrl.getCompanyMemberInvitations(company, query, currentUserId, res.locale);
+  res.json(new Response(data, data?'members_retrieved_successful':'not_found', res));
+}
+
+
 async function getCompanyMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -577,4 +632,49 @@ async function getCompanyMembers(req, res) {
 
   let data = await talentCtrl.getCompanyMembers(company, query, currentUserId, res.locale);
   res.json(new Response(data, data?'members_retrieved_successful':'not_found', res));
+}
+
+
+async function addCompanyMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let member = req.body;
+  let invitationId = req.query.invitationId;
+  member.company = company;
+  member.createdBy = currentUserId;
+
+
+  let data = await talentCtrl.addCompanyMember(company, currentUserId, member, invitationId);
+  res.json(new Response(data, data?'member_added_successful':'not_found', res));
+}
+
+async function updateCompanyMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let memberId = req.params.memberId;
+  let member = req.body;
+  member.company = company;
+  member.createdBy = currentUserId;
+
+  let data = await talentCtrl.updateCompanyMember(company, memberId, currentUserId, member);
+  res.json(new Response(data, data?'member_updated_successful':'not_found', res));
+}
+
+async function updateCompanyMemberRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let memberId = req.params.memberId;
+  let role = req.body.role;
+
+  let data = await talentCtrl.updateCompanyMemberRole(company, memberId, currentUserId, role);
+  res.json(new Response(data, data?'member_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let memberId = req.params.memberId;
+
+  let data = await talentCtrl.deleteCompanyMember(company, memberId, currentUserId);
+  res.json(new Response(data, data?'member_deleted_successful':'not_found', res));
 }
