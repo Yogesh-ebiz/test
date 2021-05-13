@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const dateEnum = require('../const/dateEnum')
+const ObjectID = require('mongodb').ObjectID;
 
 
 function jobSearchParam(filter) {
@@ -101,6 +102,11 @@ function jobSearchParam(filter) {
 
     // this.query.distance =  { $in: distance};
   }
+
+  if (filter.department) {
+    this.query.department =  ObjectID(filter.department);
+  }
+
 
   return this.query;
 }

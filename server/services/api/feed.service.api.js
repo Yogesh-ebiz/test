@@ -18,6 +18,18 @@ async function createJobFeed(jobId, partyId, text, userId){
   return client.post(`/feeds`, data, options);
 };
 
+async function register(user){
+  console.log('register', user)
+  if(!user){
+    return null;
+  }
+
+  user.type = "EMAIL";
+  let response = await client.post(`/user/register`, user, null);
+  console.log(response);
+  return response.data
+};
+
 async function findUserById(id) {
   let user = null;
   try {
@@ -131,8 +143,11 @@ async function findCategoryById(id, isMinimal) {
 };
 
 
-async function findCategoryByShortCode(shortCode) {
-  let response = await client.get(`/categories/shortcode/${shortCode}?isMinimal=true`);
+async function findCategoryByShortCode(shortCode, locale) {
+  const options = {
+    'Accept-Language': locale
+  };
+  let response = await client.get(`/categories/shortcode/${shortCode}?isMinimal=true`, options);
   return response.data.data;
 };
 
@@ -249,6 +264,7 @@ async function updateResumeDefault(userId, id) {
 };
 
 module.exports = {
+  register:register,
   createNotification:createNotification,
   findByUserId: findUserById,
 

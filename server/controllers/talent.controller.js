@@ -10,8 +10,8 @@ const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
-const {roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
-const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
 const applicationService = require('../services/application.service');
@@ -26,6 +26,7 @@ const {addApplicationProgress} = require('../services/applicationprogress.servic
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const memberService = require('../services/member.service');
+const poolService = require('../services/pool.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -76,6 +77,8 @@ module.exports = {
   getInsights,
   getStats,
   getUserSession,
+  createJob,
+  updateJob,
   searchJobs,
   getJobById,
   updateJobPipeline,
@@ -122,6 +125,10 @@ module.exports = {
   updateCompanyMember,
   updateCompanyMemberRole,
   deleteCompanyMember,
+  getCompanyPools,
+  addCompanyPool,
+  updateCompanyPool,
+  deleteCompanyPool
 }
 
 
@@ -141,14 +148,15 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   let result;
   let user = await findByUserId(currentUserId);
-  let companies = await searchCompany('', [25, 100, 101, 102], currentUserId);
-  let role = await Role.findOne({name: 'Administrator'});
-  delete role.description;
-  delete role.company;
+  let allAccounts = await memberService.findMemberByUserId(currentUserId);
+
+  let companies = await searchCompany('', _.map(allAccounts, 'company'), currentUserId);
+
 
   companies = _.reduce(companies.content, function(res, item){
+    let found = _.find(allAccounts, {company: item.id});
     item = convertToCompany(item);
-    item.role = role;
+    item.role = roleMinimal(found.role);
     res.push(item)
 
     return res;
@@ -156,8 +164,7 @@ async function getUserSession(currentUserId, preferredCompany) {
   user = convertToTalentUser(user);
   user.company = companies;
   user.currentCompanyId = preferredCompany? _.some(companies, {id: preferredCompany})?preferredCompany:companies.length?companies[0].id:null:companies.length?companies[0].id:null;
-  user.timezone = "Asia/Ho_Chi_Minh";
-  user.timeFormat = 24;
+
 
 
   return user;
@@ -531,11 +538,11 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
 
   let company = await findCompanyById(companyId, currentUserId);
 
-
   let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
 
   const loadPromises = result.docs.map(job => {
-
+    job.isHot = false;
+    job.isNew = false;
     job.company = convertToCompany(company);
     return job;
   });
@@ -545,6 +552,40 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
 
 }
 
+async function createJob(currentUserId, job) {
+
+  if(!job || !currentUserId){
+    return null;
+  }
+
+
+  let result;
+  let currentParty = await findByUserId(currentUserId);
+
+  if (isPartyActive(currentParty)) {
+    result = await jobService.addJob(job, currentUserId);
+
+  }
+
+  return result;
+}
+
+async function updateJob(jobId, currentUserId, form) {
+
+  if(!jobId || !form || !currentUserId){
+    return null;
+  }
+
+
+  let result;
+  let currentParty = await findByUserId(currentUserId);
+
+  if (isPartyActive(currentParty)) {
+    result = await jobService.updateJob(jobId, currentUserId, form);
+  }
+
+  return result;
+}
 
 async function getJobById(currentUserId, jobId, locale) {
 
@@ -556,9 +597,9 @@ async function getJobById(currentUserId, jobId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    job = await jobService.findJobId(jobId, locale);
+    job = await jobService.findJob_Id(jobId, locale);
 
-    if(job) {;
+    if(job) {
 
       let jobSkills = await findSkillsById(job.skills);
       // console.log('jobSkils', jobSkills)
@@ -566,8 +607,6 @@ async function getJobById(currentUserId, jobId, locale) {
       let noApplied = await applicationService.findAppliedCountByJobId(job.jobId);
       job.noApplied = noApplied;
 
-      let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
-      job.employmentType = employmentType[0];
 
       let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
       job.level = experienceLevel[0];
@@ -576,25 +615,22 @@ async function getJobById(currentUserId, jobId, locale) {
       job.industry = industry;
 
       let jobFunction = await findJobfunction('', job.jobFunction, locale);
-      job.jobFunction = jobFunction;
-
-      if(job.promotion){
-        let promotion = await findPromotionById(job.promotion);
-        if(promotion){
-          job.promotion = promotion[0];
-        }
-
+      if(jobFunction.length){
+        job.jobFunction = jobFunction[0];
       }
 
-      let users  = await lookupUserIds(job.panelist.concat(job.createdBy));
+      if(job.category){
+        let cateogry = await findCategoryByShortCode(job.category, locale);
+        job.category = categoryMinimal(cateogry);
+      }
+
+
+      let users  = await lookupUserIds(job.createdBy);
       job.createdBy = _.find(users, {id: job.createdBy});
-      job.panelist = _.reject(users, {id: job.createdBy});;
 
       let currentParty, partySkills=[];
 
       job.skills = jobSkills;
-      job.jobFunction=jobFunction[0];
-
 
     }
 
@@ -1672,21 +1708,18 @@ async function getCompanyMembers(company, query, currentUserId, locale) {
 }
 
 
-async function addCompanyMember(company, currentUserId, form, invitationId) {
-  if(!company || !currentUserId || !form || !invitationId){
+async function addCompanyMember(company, form, invitationId) {
+  if(!company || !form || !invitationId){
     return null;
   }
 
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
-
   try {
-    if (isPartyActive(currentParty)) {
       let role = form.role;
       delete form.role
 
       result = await memberService.addMember(form, role, invitationId);
-    }
+
   } catch(e){
     console.log('addCompanyMember: Error', e);
   }
@@ -1768,6 +1801,97 @@ async function deleteCompanyMember(company, memberId, currentUserId) {
     }
   } catch(e){
     console.log('deleteCompanyMember: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+
+async function getCompanyPools(company, query, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await poolService.getPools(company);
+  // result.forEach(function(member){
+  //   member.role = roleMinimal(member.role);
+  // });
+
+  return result;
+
+}
+
+async function addCompanyPool(company, form, currentUserId) {
+  if(!company || !form){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await poolService.addPool(currentUserId, form);
+
+  } catch(e){
+    console.log('addCompanyPool: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyPool(company, poolId, currentUserId, form) {
+  console.log(company, poolId, currentUserId, form)
+  if(!company || !currentUserId || !poolId || !form){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      form.department = ObjectID(form.department);
+
+      result = await poolService.updatePool(poolId, form);
+
+
+    }
+  } catch(e){
+    console.log('updateCompanyPool: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyPool(company, poolId, currentUserId) {
+  if(!company || !currentUserId || !poolId){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+
+  try {
+    if (isPartyActive(currentParty)) {
+      let pool = await poolService.findPoolBy_Id(poolId);
+      if(pool){
+        result = await pool.delete();
+        if(result){
+          result = {deleted: 1};
+        }
+
+      }
+
+    }
+  } catch(e){
+    console.log('deleteCompanyPool: Error', e);
   }
 
 

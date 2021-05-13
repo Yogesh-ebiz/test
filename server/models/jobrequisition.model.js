@@ -137,7 +137,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   skills: {
     type: Array,
-    required: true
+    required: false
   },
   employmentType: {
     type: Object,
@@ -164,6 +164,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
     required: false
+  },
+  allowRemote: {
+    type: Boolean,
+    default: false
   },
   company: {
     type: Object,
@@ -201,10 +205,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  tags: {
-    type: Array,
-    required: false
-  },
   isExternal: {
     type: Boolean,
     default: false,
@@ -219,21 +219,8 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: 'http://www.anymay.com/jobs/'
   },
-  workflowId: {
-    type: Number,
-    required: true,
-    default: 0
-  },
   department: { type: Schema.Types.ObjectId, ref: 'Department'},
-  panelist: {
-    type: Array,
-    required: false,
-    default: []
-  },
-  labels: {
-    type: Array,
-    required: false
-  },
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   questionTemplate: { type: Schema.Types.ObjectId, ref: 'QuestionTemplate'},
   hasQuestions: {
     type: Boolean,

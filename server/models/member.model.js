@@ -56,6 +56,10 @@ const MemberSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  userId: {
+    type: Number,
+    required:true
+  },
   role: { type: Schema.Types.ObjectId, ref: 'Role' }
 }, {
   versionKey: false

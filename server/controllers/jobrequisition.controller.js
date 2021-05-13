@@ -52,60 +52,6 @@ const ReportedJob = require('../models/reportedjob.model');
 let Pagination = require('../utils/pagination');
 let SearchParam = require('../const/searchParam');
 
-const jobRequisitionSchema = Joi.object({
-  jobId: Joi.number().optional(),
-  createdBy: Joi.number(),
-  title: Joi.string().required(),
-  description: Joi.string().required(),
-  durationMonths: Joi.number().optional(),
-  minMonthExperience: Joi.number().optional(),
-  maxMonthExperience: Joi.number().optional(),
-  currency: Joi.string(),
-  noOfResources: Joi.number(),
-  type: Joi.string(),
-  department: Joi.object().optional(),
-  labels: Joi.array().optional(),
-  industry: Joi.array().optional(),
-  category: Joi.string(),
-  internalCode: Joi.string().optional(),
-  jobFunction: Joi.string(),
-  expirationDate: Joi.number(),
-  requiredOnDate: Joi.number(),
-  salaryRangeLow: Joi.number().optional(),
-  salaryRangeHigh: Joi.number().optional(),
-  salaryFixed: Joi.any(),
-  level: Joi.string(),
-  responsibilities: Joi.array(),
-  qualifications: Joi.array(),
-  minimumQualifications: Joi.array(),
-  skills: Joi.array(),
-  employmentType: Joi.string(),
-  education: Joi.string(),
-  promotion: Joi.number().optional(),
-  company: Joi.number(),
-  district: Joi.any().optional(),
-  city: Joi.any().optional(),
-  state: Joi.string(),
-  country: Joi.string(),
-  postalCode: Joi.string(),
-  externalUrl: Joi.string(),
-  hasApplied: Joi.boolean(),
-  workflowId: Joi.number().required(),
-  questions: Joi.array(),
-  tags: Joi.array(),
-  requiredResume: Joi.boolean(),
-  requiredCoverLetter: Joi.boolean(),
-  requiredPhoto: Joi.boolean(),
-  requiredPhone: Joi.boolean(),
-  applicationPreferences: Joi.object(),
-  profileField: Joi.object(),
-  autoConfirmationEmail: Joi.object(),
-  pipeLine: Joi.object(),
-  sharePost: Joi.boolean(),
-  shareText: Joi.string(),
-  source: Joi.string()
-});
-
 const applicationSchema = Joi.object({
   jobId: Joi.number().required(),
   user: Joi.number().required(),
@@ -133,7 +79,6 @@ const ReportedJobSchema = Joi.object({
 
 module.exports = {
   importJobs,
-  createJob,
   getJobById,
   updateJobById,
   reportJobById,
@@ -151,49 +96,6 @@ module.exports = {
   getJobQuestionaires
 }
 
-async function createJob(currentUserId, job) {
-
-  let sharePost = job.sharePost;
-  delete job.sharePost;
-  let shareText = job.shareText?job.shareText:job.description;
-  delete job.shareText;
-
-  job.createdBy = currentUserId;
-
-  if(!job || !currentUserId){
-    return null;
-  }
-
-  let result;
-
-  job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
-
-  let currentParty = await findByUserId(currentUserId);
-
-  if (isPartyActive(currentParty)) {
-
-    //job.skills = await Skilltype.find({id: {$in: job.skills}});
-    let promotion;
-    if (job.promotion) {
-      promotion = await findPromotionById(job.promotion);
-      if(promotion!=null){
-        job.promotion = (promotion) ? promotion.promotionId : null;
-      }
-
-
-    }
-
-    job.isExternal = job.externalUrl?true:false;
-    result = await new JobRequisition(job).save();
-
-
-    if(result && sharePost){
-      await createJobFeed(result.jobId, result.company, shareText, currentUserId);
-    }
-  }
-
-  return result;
-}
 
 async function importJobs(type, jobs) {
   job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
@@ -908,6 +810,8 @@ async function applyJobById(currentUserId, jobId, application ) {
             savedApplication.progress.push(progress._id)
             savedApplication.currentProgress = progress._id;
             await savedApplication.save();
+
+            //Create Notification
             let meta = {companyId: job.company, jobId: application.jobId, jobTitle: job.title, applicationId: savedApplication.applicationId, applicantId: currentUserId, createdBy: job.createdBy};
             await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 

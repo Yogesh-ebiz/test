@@ -24,7 +24,7 @@ const locale = require("locale")
   , defaultLocale = "en";
 
 const app = express();
-
+// app.set('case sensitive routing', true);
 
 app.use(locale(supported, defaultLocale));
 
@@ -73,10 +73,11 @@ app.use(passport.initialize());
 app.use(i18n);
 
 
+
 var options = {
   explorer: true
 };
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
+app.use('/docApi', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 
 // API router

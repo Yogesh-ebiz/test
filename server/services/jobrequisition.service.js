@@ -1,3 +1,6 @@
+const Joi = require('joi');
+const ObjectID = require('mongodb').ObjectID;
+
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const JobAlert = require('../models/job_alert.model');
@@ -13,6 +16,130 @@ let SearchParam = require('../const/searchParam');
 
 
 
+const jobSchema = Joi.object({
+  jobId: Joi.number().optional(),
+  createdBy: Joi.number(),
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  durationMonths: Joi.number().optional(),
+  minMonthExperience: Joi.number().optional(),
+  maxMonthExperience: Joi.number().optional(),
+  currency: Joi.string(),
+  noOfResources: Joi.number(),
+  type: Joi.string(),
+  department: Joi.object().optional(),
+  industry: Joi.array().optional(),
+  category: Joi.string(),
+  internalCode: Joi.string().optional(),
+  jobFunction: Joi.string(),
+  expirationDate: Joi.number(),
+  requiredOnDate: Joi.number(),
+  salaryRangeLow: Joi.number().optional(),
+  salaryRangeHigh: Joi.number().optional(),
+  salaryFixed: Joi.any(),
+  level: Joi.string(),
+  responsibilities: Joi.array(),
+  qualifications: Joi.array(),
+  minimumQualifications: Joi.array(),
+  skills: Joi.array().optional(),
+  employmentType: Joi.string(),
+  allowRemote: Joi.boolean(),
+  education: Joi.string().allow(''),
+  company: Joi.number(),
+  district: Joi.any().optional(),
+  city: Joi.any().optional(),
+  state: Joi.string(),
+  country: Joi.string(),
+  postalCode: Joi.string(),
+  externalUrl: Joi.string(),
+  hasApplied: Joi.boolean(),
+  questions: Joi.array(),
+  tags: Joi.array(),
+  applicationPreferences: Joi.object(),
+  profileField: Joi.object(),
+  autoConfirmationEmail: Joi.object(),
+  pipeLine: Joi.object()
+});
+
+
+
+async function addJob(form, currentUserId) {
+  if(!form || !currentUserId){
+    return;
+  }
+
+
+  let result;
+  form.createdBy = currentUserId;
+
+  if(form.department) {
+    form.department = ObjectID(form.department);
+  }
+
+  form = await Joi.validate(form, jobSchema, {abortEarly: false});
+
+
+
+  result = new JobRequisition(form).save();
+
+  return result;
+
+}
+
+
+async function updateJob(jobId, currentUserId, form) {
+  if(!jobId || !currentUserId || !form){
+    return;
+  }
+
+
+  let result;
+
+  if(form.department) {
+    form.department = ObjectID(form.department);
+  }
+
+  form = await Joi.validate(form, jobSchema, {abortEarly: false});
+
+  let job = await findJob_Id(jobId);
+
+  if(job){
+    job.title =  form.title,
+    job.description =  form.description,
+    job.internalCode =  form.internalCode,
+    job.salaryRangeLow =  form.salaryRangeLow,
+    job.salaryRangeHigh =  form.salaryRangeHigh,
+    job.salaryFixed =  form.salaryFixed,
+    job.jobFunction =  form.jobFunction,
+    job.level =  form.level,
+    job.category = form.category,
+    job.district = form.district
+    job.city =  form.city;
+    job.state =  form.state;
+    job.country =  form.country;
+    job.responsibilities=  form.responsibilities;
+    job.qualifications = form.qualifications;
+    job.minimumQualifications = form.minimumQualifications;
+    job.skills = form.skills;
+    job.employmentType = form.employmentType;
+    job.education = form.education;
+    job.industry = form.industry;
+    job.tags = form.tags;
+    job.allowRemote=form.allowRemote;
+
+    if(form.department){
+      job.department =  ObjectID(form.department);
+    }
+
+    job.updatedBy = currentUserId;
+    job.updatedDate = Date.now();
+    result = new JobRequisition(job).save();
+  }
+
+  return result;
+
+}
+
 function searchTitle(keyword) {
   let data = null;
 
@@ -26,7 +153,6 @@ function searchTitle(keyword) {
     { $project: {_id: 0, keyword: '$_id.title'}}
   ])
 }
-
 
 async function findJobId(jobId, locale) {
   let data = null;
@@ -55,7 +181,7 @@ async function findJob_Id(jobId, locale) {
   if(jobId==null){
     return;
   }
-  data = JobRequisition.findById(jobId);
+  data = JobRequisition.findById(jobId).populate('department').populate('tags');
   return data;
 
   // return JobRequisition.findOne({jobId: jobId});
@@ -323,6 +449,8 @@ async function getGroupOfCompanyJobs(listOfCompanyIds) {
 
 
 module.exports = {
+  addJob:addJob,
+  updateJob:updateJob,
   searchTitle: searchTitle,
   findJobId: findJobId,
   findJob_Id:findJob_Id,

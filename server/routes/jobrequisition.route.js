@@ -11,7 +11,7 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
-router.route('/').post(asyncHandler(insert));
+// router.route('/').post(asyncHandler(insert));
 router.route('/').post(asyncHandler(importJobs));
 router.route('/landing').get(asyncHandler(jobLanding));
 router.route('/search').post(asyncHandler(searchJob));
@@ -39,13 +39,13 @@ router.route('/:id/candidates').get(asyncHandler(searchCandidates));
 
 router.route('/:id/questionaires').get(asyncHandler(getJobQuestionaires));
 
-
-async function insert(req, res) {
-  let currentUserId = parseInt(req.header('UserId'));
-  let map = {"message": "Created successfully", "status": 200, data: null };
-  let data = await jobRequisitionCtl.createJob(currentUserId, req.body);
-  res.json(new Response(data, data?'job_created_successful':'not_found', res));
-}
+//
+// async function insert(req, res) {
+//   let currentUserId = parseInt(req.header('UserId'));
+//   let map = {"message": "Created successfully", "status": 200, data: null };
+//   let data = await jobRequisitionCtl.createJob(currentUserId, req.body);
+//   res.json(new Response(data, data?'job_created_successful':'not_found', res));
+// }
 
 async function importJobs(req, res) {
   let data = await jobRequisitionCtl.importJobs(req.query.type, req.body);

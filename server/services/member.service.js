@@ -2,9 +2,10 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const Member = require('../models/member.model');
 const MemberInvitation = require('../models/memberInvitation.model');
-
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
+const feedService = require('../services/api/feed.service.api');
+
 
 const memberSchema = Joi.object({
   createdBy: Joi.number().required(),
@@ -17,8 +18,8 @@ const memberSchema = Joi.object({
   status: Joi.string().optional(),
   language: Joi.string().allow('').optional(),
   timezone: Joi.string().allow('').optional(),
-  preferTimeFormat: Joi.string().allow('').optional()
-
+  preferTimeFormat: Joi.string().allow('').optional(),
+  userId: Joi.number()
 });
 
 
@@ -42,7 +43,6 @@ async function inviteMembers(company, currentUserId, emails, role) {
   let invitations = await MemberInvitation.insertMany(newMembers);
   return invitations;
 }
-
 
 async function getMemberInvitations(company) {
   let data = null;
@@ -78,22 +78,39 @@ async function findMemberBy_Id(memberId) {
   return member
 }
 
+async function findMemberByUserId(userId) {
+  let data = null;
+
+  if(userId==null){
+    return;
+  }
+
+  let allAccounts = Member.find({userId: userId}).populate('role')
+  return allAccounts
+}
+
 
 async function addMember(member, role, invitationId) {
-
   if(!member || !role || !invitationId){
     return;
   }
+
 
   let result;
   let invitation = await MemberInvitation.findById(invitationId);
   if(invitation) {
     member = await Joi.validate(member, memberSchema, {abortEarly: false});
-    member.role = role;
 
-    result = new Member(member).save();
-    if(result){
-      await invitation.delete();
+    let user = await feedService.register(member);
+
+    if(user) {
+      member.userId = user.id;
+      member.role = role;
+
+      result = new Member(member).save();
+      if (result) {
+        await invitation.delete();
+      }
     }
   }
   return result;
@@ -148,6 +165,7 @@ module.exports = {
   getMemberInvitations:getMemberInvitations,
   getMembers:getMembers,
   findMemberBy_Id:findMemberBy_Id,
+  findMemberByUserId:findMemberByUserId,
   addMember:addMember,
   updateMember:updateMember,
   updateMemberRole:updateMemberRole

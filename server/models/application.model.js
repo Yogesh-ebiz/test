@@ -16,7 +16,7 @@ const ApplicationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  // job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
+  //user = partyId
   user: {
     type: Object,
     required: false
