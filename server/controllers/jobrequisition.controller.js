@@ -142,8 +142,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
         job.level = experienceLevel[0];
 
-        //let jobFunction = await JobFunction.findOne({shortCode: job.jobFunction});
-        // let jobFunction = await JobFunction.aggregate([{$match: {shortCode: job.jobFunction} }, {$project: {name: '$name.'+localeStr, shortCode:1}}]);
+
 
         if(job.industry) {
           let industry = await findIndustry('', job.industry, locale);

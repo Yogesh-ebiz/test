@@ -41,6 +41,12 @@ router.route('/company/:id/applications/:applicationId/comments/:commentId').put
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
 router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
 
+router.route('/company/:id/jobs/:jobId/members').post(asyncHandler(updateJobMembers));
+
+router.route('/company/:id/jobs/:jobId/follow').post(asyncHandler(followJob));
+router.route('/company/:id/jobs/:jobId/follow').delete(asyncHandler(unfollowJob));
+
+
 router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updateJobApplicationForm));
 
 router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
@@ -162,8 +168,9 @@ async function searchJob(req, res) {
 async function getJobById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let jobId = req.params.jobId;
-  let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
+  let data = await talentCtrl.getJobById(currentUserId, companyId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
@@ -331,6 +338,20 @@ async function getJobPipeline(req, res) {
   res.json(new Response(data, data?'job_pipeline_retreived_successful':'not_found', res));
 }
 
+
+
+async function updateJobMembers(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobId = req.params.jobId;
+  let members = req.body.members;
+  console.log(members)
+
+  let data = await talentCtrl.updateJobMembers(jobId, currentUserId, members);
+  res.json(new Response(data, data?'job_member_updated_successful':'not_found', res));
+}
+
+
+
 async function updateJobApplicationForm(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let jobId = req.params.jobId;
@@ -338,6 +359,31 @@ async function updateJobApplicationForm(req, res) {
 
   let data = await talentCtrl.updateJobApplicationForm(jobId, currentUserId, form);
   res.json(new Response(data, data?'job_applicationform_updated_successful':'not_found', res));
+}
+
+
+
+async function followJob(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let memberId = req.header('memberId');
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.followJob(memberId, jobId);
+
+  res.json(new Response(data, data?'job_followed_successful':'not_found', res));
+}
+
+
+async function unfollowJob(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let memberId = req.header('memberId');
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.unfollowJob(memberId, jobId);
+
+  res.json(new Response(data, data?'job_unfollowed_successful':'not_found', res));
 }
 
 

@@ -219,6 +219,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: 'http://www.anymay.com/jobs/'
   },
+  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
   department: { type: Schema.Types.ObjectId, ref: 'Department'},
   tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   questionTemplate: { type: Schema.Types.ObjectId, ref: 'QuestionTemplate'},

@@ -44,6 +44,10 @@ const MemberSchema = new mongoose.Schema({
     type: String,
     required:true
   },
+  avatar: {
+    type: String,
+    required:false
+  },
   language: {
     type: String,
     required:false
@@ -60,7 +64,9 @@ const MemberSchema = new mongoose.Schema({
     type: Number,
     required:true
   },
-  role: { type: Schema.Types.ObjectId, ref: 'Role' }
+  role: { type: Schema.Types.ObjectId, ref: 'Role' },
+  followedJobs: [{ type: Schema.Types.ObjectId, ref: 'JobRequisition' }],
+  followedCandidates: [{ type: Schema.Types.ObjectId, ref: 'Candidate' }]
 }, {
   versionKey: false
 });

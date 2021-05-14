@@ -90,6 +90,19 @@ async function findMemberByUserId(userId) {
 }
 
 
+async function findMemberByUserIdAndCompany(userId, company) {
+  let data = null;
+
+  if(!userId || !company){
+    return;
+  }
+  console.log()
+
+  let member = Member.findOne({userId: userId, company: company}).populate('role')
+  return member
+}
+
+
 async function addMember(member, role, invitationId) {
   if(!member || !role || !invitationId){
     return;
@@ -160,13 +173,57 @@ async function updateMemberRole(memberId, role) {
 
 
 
+
+async function followJob(memberId, jobId) {
+  if(!memberId || !jobId){
+    return;
+  }
+
+  console.log(memberId, jobId)
+  let member = await findMemberBy_Id(memberId);
+
+  if(member){
+    member.followedJobs.push(jobId);
+    member = await member.save();
+  }
+  return member.followedJobs;
+
+}
+
+
+
+async function unfollowJob(memberId, jobId) {
+  if(!memberId || !jobId){
+    return;
+  }
+
+
+  let member = await findMemberBy_Id(memberId);
+
+  if(member){
+    member.followedJobs.forEach(function(item, index, object){
+      if(item==jobId){
+        object.splice(index, 1);
+      }
+    });
+    member = await member.save();
+  }
+  return member;
+
+}
+
+
+
 module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   getMembers:getMembers,
   findMemberBy_Id:findMemberBy_Id,
   findMemberByUserId:findMemberByUserId,
+  findMemberByUserIdAndCompany:findMemberByUserIdAndCompany,
   addMember:addMember,
   updateMember:updateMember,
-  updateMemberRole:updateMemberRole
+  updateMemberRole:updateMemberRole,
+  followJob: followJob,
+  unfollowJob: unfollowJob
 }

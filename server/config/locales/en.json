@@ -143,5 +143,8 @@
 	"pools_retrieved_successful": "pools_retrieved_successful",
 	"pool_added_successful": "pool_added_successful",
 	"pool_deleted_successful": "pool_deleted_successful",
-	"pool_updated_successful": "pool_updated_successful"
+	"pool_updated_successful": "pool_updated_successful",
+	"job_member_updated_successful": "job_member_updated_successful",
+	"job_followed_successful": "job_followed_successful",
+	"job_unfollowed_successful": "job_unfollowed_successful"
 }

@@ -73,7 +73,6 @@ function jobSearchParam(filter) {
   }
 
   if (filter.company && filter.company.length) {
-    console.log(filter.company)
     this.query.company = {$in: filter.company };
   }
 
@@ -107,7 +106,12 @@ function jobSearchParam(filter) {
     this.query.department =  ObjectID(filter.department);
   }
 
+  if (filter.member) {
 
+    this.query.members = {$in: filter.member };
+  }
+
+  console.log(this.query)
   return this.query;
 }
 

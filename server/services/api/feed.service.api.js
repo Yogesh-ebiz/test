@@ -19,7 +19,7 @@ async function createJobFeed(jobId, partyId, text, userId){
 };
 
 async function register(user){
-  if(!user){
+    if(!user){
     return null;
   }
 

@@ -83,6 +83,7 @@ module.exports = {
   getJobById,
   updateJobPipeline,
   getJobPipeline,
+  updateJobMembers,
   updateJobApplicationForm,
   getBoard,
   payJob,
@@ -128,7 +129,9 @@ module.exports = {
   getCompanyPools,
   addCompanyPool,
   updateCompanyPool,
-  deleteCompanyPool
+  deleteCompanyPool,
+  followJob,
+  unfollowJob
 }
 
 
@@ -518,7 +521,13 @@ async function getStats(currentUserId, companyId) {
 
 async function searchJobs(currentUserId, companyId, filter, locale) {
 
-  if(currentUserId==null || companyId==null){
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -537,14 +546,18 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
-  let company = await findCompanyById(companyId, currentUserId);
 
+  filter.member = member._id;
+
+  let company = await findCompanyById(companyId, currentUserId);
   let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
 
   const loadPromises = result.docs.map(job => {
     job.isHot = false;
     job.isNew = false;
     job.company = convertToCompany(company);
+    job.hasSaved = _.some(member.followedJobs, job._id);
+
     return job;
   });
   // result = await Promise.all(loadPromises);
@@ -588,22 +601,27 @@ async function updateJob(jobId, currentUserId, form) {
   return result;
 }
 
-async function getJobById(currentUserId, jobId, locale) {
+async function getJobById(currentUserId, companyId, jobId, locale) {
 
   if(!jobId || !currentUserId){
     return null;
   }
 
-  let job;
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result, job;
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     job = await jobService.findJob_Id(jobId, locale);
 
-    if(job) {
 
+    if(job && _.find(job.members, {_id: ObjectID(member._id)})) {
 
-      // console.log('jobSkils', jobSkills)
 
       let noApplied = await applicationService.findAppliedCountByJobId(job.jobId);
       job.noApplied = noApplied;
@@ -630,12 +648,25 @@ async function getJobById(currentUserId, jobId, locale) {
         job.skills = jobSkills;
       }
 
-      let users  = await lookupUserIds(job.createdBy);
+
+      let userIds = _.map(job.members, 'userId');
+      userIds.push(job.createdBy)
+      let users  = await lookupUserIds(userIds);
+
+
       job.createdBy = _.find(users, {id: job.createdBy});
+      job.members.forEach(function(member){
+        let found = _.find(users, {id: member.userId});
 
-      let currentParty, partySkills=[];
+        if(found){
+          member.avatar = found.avatar?found.avatar:'';
+        }
+      });
+
+      job.hasSaved = _.some(member.followedJobs, job._id);
 
 
+      result = job;
 
     }
 
@@ -643,7 +674,7 @@ async function getJobById(currentUserId, jobId, locale) {
     console.log(error);
   }
 
-  return job;
+  return result;
 }
 
 async function updateJobPipeline(jobId, currentUserId, form) {
@@ -683,6 +714,27 @@ async function getJobPipeline(jobId, currentUserId) {
     }
   } catch(e){
     console.log('getJobPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function updateJobMembers(jobId, currentUserId, members) {
+  if(!jobId || !currentUserId || !members){
+    return null;
+  }
+
+  let result = null;
+  let currentParty = await findByUserId(currentUserId);
+
+  try {
+    if (isPartyActive(currentParty)) {
+      result = await jobService.updateJobMembers(jobId, members, currentUserId);
+    }
+  } catch(e){
+    console.log('updateJobMember: Error', e);
   }
 
 
@@ -1901,4 +1953,37 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
 
 
   return result
+}
+
+
+async function followJob(memberId, jobId) {
+  if(!memberId || !jobId){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await memberService.followJob(memberId, jobId);
+  } catch(e){
+    console.log('followJob: Error', e);
+  }
+
+  return result;
+}
+
+
+
+async function unfollowJob(memberId, jobId) {
+  if(!memberId || !jobId){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await memberService.unfollowJob(memberId, jobId);
+  } catch(e){
+    console.log('followJob: Error', e);
+  }
+
+  return result;
 }

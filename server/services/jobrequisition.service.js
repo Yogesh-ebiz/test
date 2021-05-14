@@ -164,7 +164,7 @@ async function findJobId(jobId, locale) {
   // let propLocale = '$name.'+localeStr;
 
 
-  data = JobRequisition.findOne({jobId: jobId});
+  data = JobRequisition.findOne({jobId: jobId}).populate('tags');
 
   // Promotion.populate(data, {path: "promotion"});
 
@@ -181,7 +181,7 @@ async function findJob_Id(jobId, locale) {
   if(jobId==null){
     return;
   }
-  data = JobRequisition.findById(jobId).populate('department').populate('tags');
+  data = JobRequisition.findById(jobId).populate('department').populate('tags').populate('members');
   return data;
 
   // return JobRequisition.findOne({jobId: jobId});
@@ -224,6 +224,56 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 }
 
 async function getJobPipeline(jobId) {
+  let data = null;
+
+  if(!jobId){
+    return;
+  }
+
+  let job = await JobRequisition.findById(jobId);
+  if(job){
+    data = await Pipeline.findById(job.pipeline).populate({
+      path: 'stages',
+      populate:[{
+        path: 'members',
+        model: 'Member'
+      }, {
+        path: 'tasks',
+        model: 'Task'
+      }]
+    });
+
+  }
+
+
+  return data;
+}
+
+
+async function updateJobMembers(jobId, members, currentUserId, locale) {
+  let data = null;
+
+  if(!jobId || !members || !currentUserId){
+    return;
+  }
+
+  let pipeline=null;
+
+  let job = await JobRequisition.findById(jobId);
+  if(job) {
+    job.members = members
+    job.updatedBy = currentUserId;
+    data = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {members: members, updatedBy: currentUserId}});
+    console.log(data, jobId)
+  }
+
+
+  return data;
+}
+
+
+
+async function getJobMembers(jobId) {
   let data = null;
 
   if(!jobId){
@@ -458,6 +508,8 @@ module.exports = {
   removeByJobId: removeByJobId,
   updateJobPipeline:updateJobPipeline,
   getJobPipeline:getJobPipeline,
+  updateJobMembers:updateJobMembers,
+  getJobMembers:getJobMembers,
   updateJobApplicationForm:updateJobApplicationForm,
   getCountsGroupByCompany,
   getJobCount:getJobCount,
