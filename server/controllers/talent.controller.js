@@ -79,6 +79,9 @@ module.exports = {
   getUserSession,
   createJob,
   updateJob,
+  closeJob,
+  archiveJob,
+  deleteJob,
   searchJobs,
   getJobById,
   updateJobPipeline,
@@ -566,30 +569,34 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
 
 }
 
-async function createJob(currentUserId, job) {
+async function createJob(companyId, currentUserId, job) {
 
-  if(!job || !currentUserId){
+  if(!companyId || !currentUserId || !job){
     return null;
   }
 
 
   let result;
-  let currentParty = await findByUserId(currentUserId);
+  // let currentParty = await findByUserId(currentUserId);
 
-  if (isPartyActive(currentParty)) {
-    result = await jobService.addJob(job, currentUserId);
+  // if (isPartyActive(currentParty)) {
+  result = await jobService.addJob(companyId, currentUserId, job);
 
-  }
+  // }
 
   return result;
 }
 
-async function updateJob(jobId, currentUserId, form) {
+async function updateJob(companyId, currentUserId, jobId, form) {
 
-  if(!jobId || !form || !currentUserId){
+  if(!companyId || !currentUserId || !jobId || !form){
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
 
   let result;
   let currentParty = await findByUserId(currentUserId);
@@ -601,6 +608,64 @@ async function updateJob(jobId, currentUserId, form) {
   return result;
 }
 
+
+async function closeJob(companyId, currentUserId, jobId) {
+
+  if(!companyId || !currentUserId || !jobId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await jobService.closeJob(jobId, currentUserId);
+
+  return result;
+}
+
+
+
+async function archiveJob(companyId, currentUserId, jobId) {
+
+  if(!companyId || !currentUserId || !jobId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await jobService.archiveJob(jobId, currentUserId);
+
+  return result;
+}
+
+
+
+async function deleteJob(companyId, currentUserId, jobId) {
+
+  if(!companyId || !currentUserId || !jobId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let job = await jobService.findJob_Id(jobId);
+  if(job){
+    result = await job.delete();
+  }
+
+
+  return result;
+}
+
+
 async function getJobById(currentUserId, companyId, jobId, locale) {
 
   if(!jobId || !currentUserId){
@@ -608,7 +673,6 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
   }
 
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-
   if(!member){
     return null;
   }

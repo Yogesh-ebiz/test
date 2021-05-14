@@ -93,6 +93,7 @@ module.exports = {
   addBookmark,
   removeBookmark,
   searchCandidates,
+  submitJobQuestionaires,
   getJobQuestionaires
 }
 
@@ -993,6 +994,28 @@ async function searchCandidates(currentUserId, jobId, filter, locale) {
 
 
 
+
+async function submitJobQuestionaires(currentUserId, jobId, form) {
+
+  if(!currentUserId || !jobId || !form){
+    return null;
+  }
+
+
+  let result;
+  try {
+
+    let job = await JobRequisition.findOne({jobId: jobId}).populate('questionTemplate');
+
+    result = job.questionTemplate;
+
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
 
 async function getJobQuestionaires(jobId) {
 

@@ -37,6 +37,7 @@ router.route('/:id/alert').post(asyncHandler(addAlert));
 router.route('/:id/alert').delete(asyncHandler(removeAlert));
 router.route('/:id/candidates').get(asyncHandler(searchCandidates));
 
+router.route('/:id/questionaires').post(asyncHandler(submitJobQuestionaires));
 router.route('/:id/questionaires').get(asyncHandler(getJobQuestionaires));
 
 //
@@ -226,6 +227,16 @@ async function searchCandidates(req, res) {
   let data = await jobRequisitionCtl.searchCandidates(currentUserId, null, filter, res.locale);
   res.json(new Response(data, data?'job_candidates_retrieved_successful':'not_found', res));
 }
+
+
+async function submitJobQuestionaires(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobId = parseInt(req.params.id);
+  let answers = req.query;
+  let data = await jobRequisitionCtl.submitJobQuestionaires(currrentUserId, jobId, answers);
+  res.json(new Response(data, data?'job_questions_submitted_successful':'not_found', res));
+}
+
 
 async function getJobQuestionaires(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

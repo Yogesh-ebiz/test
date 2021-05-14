@@ -111,7 +111,6 @@ function jobSearchParam(filter) {
     this.query.members = {$in: filter.member };
   }
 
-  console.log(this.query)
   return this.query;
 }
 

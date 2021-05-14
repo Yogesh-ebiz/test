@@ -19,6 +19,10 @@ router.route('/company/:id/jobs').post(asyncHandler(createJob));
 router.route('/company/:id/jobs').get(asyncHandler(searchJob));
 router.route('/company/:id/jobs/:jobId').get(asyncHandler(getJobById));
 router.route('/company/:id/jobs/:jobId').put(asyncHandler(updateJob));
+router.route('/company/:id/jobs/:jobId/close').post(asyncHandler(closeJob));
+router.route('/company/:id/jobs/:jobId/archive').post(asyncHandler(archiveJob));
+router.route('/company/:id/jobs/:jobId').delete(asyncHandler(deleteJob));
+
 
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
@@ -138,7 +142,7 @@ async function createJob(req, res) {
   let companyId = parseInt(req.params.id);
   let job = req.body;
   job.company = companyId;
-  let data = await talentCtrl.createJob(currentUserId, job);
+  let data = await talentCtrl.createJob(companyId, currentUserId, job);
   res.json(new Response(data, data?'job_created_successful':'not_found', res));
 }
 
@@ -147,8 +151,40 @@ async function updateJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = req.params.jobId;
 
-  let data = await talentCtrl.updateJob(jobId, currentUserId, req.body);
-  res.json(new Response(data, data?'job_created_successful':'not_found', res));
+  let data = await talentCtrl.updateJob(companyId, currentUserId, jobId, req.body);
+  res.json(new Response(data, data?'job_updated_successful':'not_found', res));
+}
+
+
+
+async function closeJob(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.closeJob(companyId, currentUserId, jobId);
+  res.json(new Response(data, data?'job_closed_successful':'not_found', res));
+}
+
+
+
+async function archiveJob(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.archiveJob(companyId, currentUserId, jobId);
+  res.json(new Response(data, data?'job_archived_successful':'not_found', res));
+}
+
+
+async function deleteJob(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.deleteJob(companyId, currentUserId, jobId);
+  res.json(new Response(data, data?'job_deleted_successful':'not_found', res));
 }
 
 

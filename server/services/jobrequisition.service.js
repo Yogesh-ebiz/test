@@ -11,6 +11,7 @@ const Promotion = require('../models/promotion.model');
 const Pipeline = require('../models/pipeline.model');
 const PipelineTemplate = require('../models/pipelineTemplate.model');
 const PipelineService = require('../services/pipeline.service');
+const memberService = require('../services/member.service');
 
 let SearchParam = require('../const/searchParam');
 
@@ -63,8 +64,13 @@ const jobSchema = Joi.object({
 
 
 
-async function addJob(form, currentUserId) {
-  if(!form || !currentUserId){
+async function addJob(companyId, currentUserId, form) {
+  if(!companyId || !currentUserId || !form){
+    return;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return;
   }
 
@@ -79,7 +85,7 @@ async function addJob(form, currentUserId) {
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
 
 
-
+  form.members = [member._id];
   result = new JobRequisition(form).save();
 
   return result;
@@ -271,8 +277,6 @@ async function updateJobMembers(jobId, members, currentUserId, locale) {
   return data;
 }
 
-
-
 async function getJobMembers(jobId) {
   let data = null;
 
@@ -332,6 +336,28 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
 
 
   return data;
+}
+
+
+async function closeJob(jobId, currentUserId) {
+  if(!jobId || !currentUserId){
+    return;
+  }
+
+  let result = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  return result;
+
+}
+
+
+async function archiveJob(jobId, currentUserId) {
+  if(!jobId || !currentUserId){
+    return;
+  }
+
+  let result = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  return result;
+
 }
 
 
@@ -498,6 +524,8 @@ async function getGroupOfCompanyJobs(listOfCompanyIds) {
 
 
 
+
+
 module.exports = {
   addJob:addJob,
   updateJob:updateJob,
@@ -511,6 +539,8 @@ module.exports = {
   updateJobMembers:updateJobMembers,
   getJobMembers:getJobMembers,
   updateJobApplicationForm:updateJobApplicationForm,
+  closeJob:closeJob,
+  archiveJob:archiveJob,
   getCountsGroupByCompany,
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,

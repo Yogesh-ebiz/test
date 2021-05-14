@@ -96,9 +96,8 @@ async function findMemberByUserIdAndCompany(userId, company) {
   if(!userId || !company){
     return;
   }
-  console.log()
 
-  let member = Member.findOne({userId: userId, company: company}).populate('role')
+  let member = Member.findOne({userId: userId, company: company}).populate('role');
   return member
 }
 
