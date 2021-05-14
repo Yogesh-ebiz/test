@@ -157,6 +157,7 @@ async function getUserSession(currentUserId, preferredCompany) {
     let found = _.find(allAccounts, {company: item.id});
     item = convertToCompany(item);
     item.role = roleMinimal(found.role);
+    item.memberId = found._id
     res.push(item)
 
     return res;
@@ -601,7 +602,7 @@ async function getJobById(currentUserId, jobId, locale) {
 
     if(job) {
 
-      let jobSkills = await findSkillsById(job.skills);
+
       // console.log('jobSkils', jobSkills)
 
       let noApplied = await applicationService.findAppliedCountByJobId(job.jobId);
@@ -624,13 +625,17 @@ async function getJobById(currentUserId, jobId, locale) {
         job.category = categoryMinimal(cateogry);
       }
 
+      if(job.skills.length) {
+        let jobSkills = await findSkillsById(job.skills);
+        job.skills = jobSkills;
+      }
 
       let users  = await lookupUserIds(job.createdBy);
       job.createdBy = _.find(users, {id: job.createdBy});
 
       let currentParty, partySkills=[];
 
-      job.skills = jobSkills;
+
 
     }
 

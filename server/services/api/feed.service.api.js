@@ -19,14 +19,12 @@ async function createJobFeed(jobId, partyId, text, userId){
 };
 
 async function register(user){
-  console.log('register', user)
   if(!user){
     return null;
   }
 
   user.type = "EMAIL";
   let response = await client.post(`/user/register`, user, null);
-  console.log(response);
   return response.data
 };
 
@@ -133,6 +131,10 @@ async function findUserSkillsById(id) {
 };
 
 async function findSkillsById(ids) {
+  if(!ids){
+    return;
+  }
+
   let response = await client.get(`/common/skills/search?query=&id=${ids}`);
   return response.data.data;
 };
