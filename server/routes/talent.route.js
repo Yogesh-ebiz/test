@@ -358,19 +358,21 @@ async function updateApplicationComment(req, res) {
 
 async function updateJobPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
   let jobId = req.params.jobId;
   let pipeline = req.body;
 
-  let data = await talentCtrl.updateJobPipeline(jobId, currentUserId, pipeline);
+  let data = await talentCtrl.updateJobPipeline(companyId, jobId, currentUserId, pipeline);
   res.json(new Response(data, data?'job_pipeline_updated_successful':'not_found', res));
 }
 
 
 async function getJobPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
   let jobId = req.params.jobId;
 
-  let data = await talentCtrl.getJobPipeline(jobId, currentUserId);
+  let data = await talentCtrl.getJobPipeline(companyId, jobId, currentUserId);
   res.json(new Response(data, data?'job_pipeline_retreived_successful':'not_found', res));
 }
 
@@ -489,6 +491,17 @@ async function getCompanyDepartments(req, res) {
   res.json(new Response(data, data?'departments_retrieved_successful':'not_found', res));
 }
 
+
+async function addCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let question = req.body;
+  question.company = company;
+  question.createdBy = currentUserId;
+
+  let data = await talentCtrl.addCompanyQuestionTemplate(company, currentUserId, question);
+  res.json(new Response(data, data?'question_added_successful':'not_found', res));
+}
 
 async function addCompanyQuestionTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

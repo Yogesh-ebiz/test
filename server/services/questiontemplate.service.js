@@ -4,6 +4,7 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 let SearchParam = require('../const/searchParam');
 const QuestionTemplate = require('../models/questiontemplate.model');
+const questionService = require('../services/question.service');
 
 
 
@@ -31,9 +32,28 @@ function getQuestionTemplates(company, query) {
     return;
   }
 
-  return QuestionTemplate.find({company: company});
+  return QuestionTemplate.find({company: company}).populate('questions');
 }
 
+
+// async function addQuestionTemplate(form) {
+//   let data = null;
+//
+//   if(form==null){
+//     return;
+//   }
+//
+//   form = await Joi.validate(form, questionTemplateSchema, { abortEarly: false });
+//
+//   for (let question of form.questions) {
+//     await Joi.validate(question, questionSchema, { abortEarly: false });
+//   }
+//
+//
+//   let template = new QuestionTemplate(form).save();
+//   return template;
+//
+// }
 
 async function addQuestionTemplate(form) {
   let data = null;
@@ -44,12 +64,19 @@ async function addQuestionTemplate(form) {
 
   form = await Joi.validate(form, questionTemplateSchema, { abortEarly: false });
 
-  for (let question of form.questions) {
-    await Joi.validate(question, questionSchema, { abortEarly: false });
+  let questions = form.questions;
+  delete form.questions;
+  let template = await new QuestionTemplate(form).save();
+
+
+  for (let question of questions) {
+    question._id = new ObjectID();
+    question = await questionService.addQuestion(question)
   }
 
+  template.questions = questions;
+  template = await template.save();
 
-  let template = new QuestionTemplate(form).save();
   return template;
 
 }

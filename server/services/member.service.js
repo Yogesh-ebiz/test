@@ -111,6 +111,7 @@ async function addMember(member, role, invitationId) {
   let result;
   let invitation = await MemberInvitation.findById(invitationId);
   if(invitation) {
+    member.createdBy = invitation.createdBy;
     member = await Joi.validate(member, memberSchema, {abortEarly: false});
 
     let user = await feedService.register(member);

@@ -46,7 +46,6 @@ async function addPipelineTemplate(newPipeline) {
     return;
   }
 
-  console.log(newPipeline)
   let pipeline = null;
   // for (let stage of newPipeline.stages) {
   //   stage._id = new ObjectID();

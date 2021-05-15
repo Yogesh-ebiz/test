@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
@@ -15,10 +16,7 @@ const QuestionTemplateSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  questions: {
-    type: Array,
-    required: true
-  },
+  questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
   company: {
     type: Number,
     required: true

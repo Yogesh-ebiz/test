@@ -741,19 +741,25 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
   return result;
 }
 
-async function updateJobPipeline(jobId, currentUserId, form) {
+async function updateJobPipeline(companyId, jobId, currentUserId, form) {
+
+  if(!companyId || !jobId || !currentUserId || !form){
+    return null;
+  }
+
   form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
-  if(!jobId || !currentUserId || !form){
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
 
   try {
-    if (isPartyActive(currentParty)) {
       result = await jobService.updateJobPipeline(jobId, form, currentUserId);
-    }
+
   } catch(e){
     console.log('updateJobPipeline: Error', e);
   }
@@ -763,19 +769,22 @@ async function updateJobPipeline(jobId, currentUserId, form) {
 }
 
 
-async function getJobPipeline(jobId, currentUserId) {
-  if(!jobId || !currentUserId){
+async function getJobPipeline(companyId, jobId, currentUserId) {
+  if(!companyId || !jobId || !currentUserId){
     return null;
   }
 
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
 
   try {
-    if (isPartyActive(currentParty)) {
-      result = await jobService.getJobPipeline(jobId);
+    result = await jobService.getJobPipeline(jobId);
 
-    }
   } catch(e){
     console.log('getJobPipeline: Error', e);
   }
@@ -783,7 +792,6 @@ async function getJobPipeline(jobId, currentUserId) {
 
   return result
 }
-
 
 async function updateJobMembers(jobId, currentUserId, members) {
   if(!jobId || !currentUserId || !members){

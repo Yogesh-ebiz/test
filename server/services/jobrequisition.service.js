@@ -84,7 +84,7 @@ async function addJob(companyId, currentUserId, form) {
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
 
-
+  form.companyId = companyId
   form.members = [member._id];
   result = new JobRequisition(form).save();
 
@@ -230,15 +230,15 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 }
 
 async function getJobPipeline(jobId) {
-  let data = null;
+  let data;
 
   if(!jobId){
     return;
   }
 
-  let job = await JobRequisition.findById(jobId);
-  if(job){
-    data = await Pipeline.findById(job.pipeline).populate({
+  let job = await JobRequisition.findById(jobId).populate({
+    path: 'pipeline',
+    populate:[{
       path: 'stages',
       populate:[{
         path: 'members',
@@ -247,7 +247,11 @@ async function getJobPipeline(jobId) {
         path: 'tasks',
         model: 'Task'
       }]
-    });
+    }]
+  });
+
+  if(job){
+    data = job.pipeline;
 
   }
 

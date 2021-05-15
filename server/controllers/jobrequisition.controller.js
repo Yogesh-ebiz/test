@@ -1024,13 +1024,22 @@ async function getJobQuestionaires(jobId) {
   }
 
 
-  let result;
+  let result = [];
   try {
 
-    let job = await JobRequisition.findOne({jobId: jobId}).populate('questionTemplate');
+    let job = await JobRequisition.findOne({jobId: jobId}).populate({
+      path: 'questionTemplate',
+      model: 'QuestionTemplate',
+      populate: {
+        path: 'questions',
+        model: 'Question'
+      }
+    });
 
-    result = job.questionTemplate;
-
+    if(job.questionTemplate && job.questionTemplate.questions) {
+      // delete job.questionTemplate.questions.answers;
+      result = job.questionTemplate.questions;
+    }
   } catch (error) {
     console.log(error);
     return result;
