@@ -93,6 +93,7 @@ module.exports = {
   searchApplications,
   rejectApplication,
   updateApplicationProgress,
+  getApplicationQuestions,
   getApplicationLabels,
   addApplicationLabel,
   deleteApplicationLabel,
@@ -941,7 +942,7 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
   let progress;
   try {
 
-    let application = await findApplicationBy_Id(applicationId).populate([
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
       {
         path: 'currentProgress',
         model: 'ApplicationProgress'
@@ -986,6 +987,52 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
 
   return progress;
 }
+
+
+async function getApplicationQuestions(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+  
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'questionSubmission',
+        model: 'QuestionSubmission',
+        populate: {
+          path: 'answers',
+          model: 'Answer',
+          populate: {
+            path: 'question',
+            model: 'Question',
+
+          }
+        }
+      }
+    ]);
+
+
+    if(application) {
+      result = application.questionSubmission;
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 
 
 

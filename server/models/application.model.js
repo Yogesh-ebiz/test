@@ -58,12 +58,16 @@ const ApplicationSchema = new mongoose.Schema({
   resume: {
     type: Object
   },
-  questionAnswers: {
-    type: Array
+  hasSubmittedQuestion: {
+    type: Boolean,
+    default: false,
+    required: false
   },
+  progress: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
   sources: {
     type: Array
   },
+  questionSubmission: { type: Schema.Types.ObjectId, ref: 'QuestionSubmission' },
   note: [{ type: Schema.Types.ObjectId, ref: 'Note' }],
   labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   progress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],

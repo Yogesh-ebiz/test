@@ -21,8 +21,7 @@ const QuestionSchema = new mongoose.Schema({
   },
   hint: {
     type: String
-  },
-  answers: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
+  }
 }, {
   versionKey: false
 });

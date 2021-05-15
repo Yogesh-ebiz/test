@@ -31,6 +31,7 @@ router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
 
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
+router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
 
 router.route('/company/:id/applications/:applicationId/labels').get(asyncHandler(getApplicationLabels));
 router.route('/company/:id/applications/:applicationId/labels').post(asyncHandler(addApplicationLabel));
@@ -266,6 +267,19 @@ async function updateApplicationProgress(req, res) {
   let data = await talentCtrl.updateApplicationProgress(currentUserId, applicationId, newStage);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getApplicationQuestions(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.getApplicationQuestions(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'questions_retrieved_successful':'not_found', res));
 }
 
 

@@ -19,16 +19,19 @@ function findApplicationById(applicationId) {
   return Application.findOne({applicationId: applicationId}).populate([
     {
       path: 'currentProgress',
-      model: 'ApplicationProgress'
+      model: 'ApplicationProgress',
+      populate: {
+        path: 'stage',
+        model: 'Stage'
+      }
     },
     {
       path: 'progress',
       model: 'ApplicationProgress',
-      //select: 'id applicationId status',  //return all fields
-      populate: {
-        path: 'schedule',
-        model: 'Event'
-      }
+      // populate: {
+      //   path: 'schedule',
+      //   model: 'Event'
+      // }
     }
   ]);
 }

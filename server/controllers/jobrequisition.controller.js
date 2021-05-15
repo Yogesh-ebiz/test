@@ -760,13 +760,14 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
 async function applyJobById(currentUserId, jobId, application ) {
 
+  if(currentUserId==null || !jobId || application==null){
+    return null;
+  }
 
   application = await Joi.validate(application, applicationSchema, { abortEarly: false });
 
 
-  if(currentUserId==null || application==null){
-    return null;
-  }
+
 
   let savedApplication;
   try {
@@ -805,8 +806,8 @@ async function applyJobById(currentUserId, jobId, application ) {
             await addApplicationHistory({applicationId: savedApplication.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
 
 
-            let progress = await  addApplicationProgress({applicationId: savedApplication.applicationId, stageId: applyStage._id});
-            progress.stageId = applyStage._id;
+            let progress = await  addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
+            // progress.stage = applyStage._id;
             savedApplication.progress.push(progress._id)
             savedApplication.currentProgress = progress._id;
             await savedApplication.save();

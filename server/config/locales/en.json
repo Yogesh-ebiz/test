@@ -149,5 +149,6 @@
 	"job_unfollowed_successful": "job_unfollowed_successful",
 	"job_closed_successful": "job_closed_successful",
 	"job_archived_successful": "job_archived_successful",
-	"job_deleted_successful": "job_deleted_successful"
+	"job_deleted_successful": "job_deleted_successful",
+	"answers_submitted_successful": "answers_submitted_successful"
 }

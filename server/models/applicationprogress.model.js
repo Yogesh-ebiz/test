@@ -10,10 +10,6 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  stageId: {
-    type: Number,
-    required: true
-  },
   label: {
     type: String,
     required: false,
@@ -55,10 +51,6 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  stageId: {
-    type: Object,
-    required: true
-  },
   noOfComments: {
     type: Number,
     required: false
@@ -71,6 +63,7 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  stage: { type: Schema.Types.ObjectId, ref: 'Stage' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],
 

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
 
 const fs = require('fs');
 const AWS = require('aws-sdk');
@@ -21,6 +22,7 @@ const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationByI
 const {findWorkflowById} = require('../services/workflow.service');
 
 const {createEvent, acceptEvent, declineEvent} = require('../services/calendar.service');
+const questionSubmissionService = require('../services/questionsubmission.service');
 
 
 
@@ -31,7 +33,8 @@ module.exports = {
   accept,
   decline,
   addProgress,
-  updateProgress
+  updateProgress,
+  submitApplicationQuestions
 }
 
 
@@ -59,7 +62,7 @@ async function getApplicationById(currentUserId, applicationId) {
         // application.job.skills = []
 
         application.progress = _.reduce(application.progress, function(res, item){
-          item.label = workflowEnum[item.type]['en'];
+          // item.label = workflowEnum[item.type]['en'];
           res.push(item);
           return res;
         }, [])
@@ -474,4 +477,45 @@ async function updateProgress(currentUserId, applicationId, progress) {
   }
 
   return result;
+}
+
+
+
+
+async function submitApplicationQuestions(currentUserId, applicationId, form) {
+
+  if(!currentUserId || !applicationId || !form){
+    return null;
+  }
+
+  let result = false;
+  try {
+    let currentParty = await findByUserId(currentUserId);
+    let application;
+
+    if(isPartyActive(currentParty)) {
+      application = await findApplicationById(applicationId);
+
+      if (application && !application.hasSubmittedQuestion && application.user==currentUserId) {
+        form.createdBy = currentUserId;
+        let questionSubmission = await questionSubmissionService.addSubmission(form);
+
+        if(questionSubmission){
+          application.questionSubmission=questionSubmission._id;
+          application.hasSubmittedQuestion = true;
+          application = await application.save();
+          result = application.hasSubmittedQuestion;
+        }
+
+
+
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {hasSubmittedQuestion: result};
 }

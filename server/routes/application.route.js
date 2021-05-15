@@ -16,6 +16,7 @@ router.route('/:id/progresses/:applicationProgressId/accept').post(asyncHandler(
 router.route('/:id/progresses/:applicationProgressId/decline').post(asyncHandler(decline));
 router.route('/:id/progresses').post(asyncHandler(addProgress));
 router.route('/:id/progress').put(asyncHandler(updateProgress));
+router.route('/:id/questions').post(asyncHandler(submitApplicationQuestions));
 
 
 async function getApplicationById(req, res) {
@@ -86,4 +87,16 @@ async function updateProgress(req, res) {
   let data = await applicationCtl.updateProgress(currentUserId, applicationId, progess);
 
   res.json(new Response(data, data?'progress_updated_successful':'not_found', res));
+}
+
+
+
+async function submitApplicationQuestions(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = parseInt(req.params.id);
+  let answers = req.body;
+  let data = await applicationCtl.submitApplicationQuestions(currentUserId, applicationId, answers);
+
+  res.json(new Response(data, data?'answers_submitted_successful':'not_found', res));
 }
