@@ -81,6 +81,7 @@ module.exports = {
   updateJob,
   closeJob,
   archiveJob,
+  unarchiveJob,
   deleteJob,
   searchJobs,
   getJobById,
@@ -101,6 +102,8 @@ module.exports = {
   addApplicationComment,
   deleteApplicationComment,
   updateApplicationComment,
+  disqualifyApplication,
+  revertApplication,
   searchCandidates,
   addCompanyDepartment,
   updateCompanyDepartment,
@@ -646,6 +649,24 @@ async function archiveJob(companyId, currentUserId, jobId) {
 
 
 
+async function unarchiveJob(companyId, currentUserId, jobId) {
+
+  if(!companyId || !currentUserId || !jobId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await jobService.unarchiveJob(jobId, currentUserId);
+
+  return result;
+}
+
+
+
 async function deleteJob(companyId, currentUserId, jobId) {
 
   if(!companyId || !currentUserId || !jobId){
@@ -994,7 +1015,7 @@ async function getApplicationQuestions(companyId, currentUserId, applicationId) 
   if(!companyId || !currentUserId || !applicationId){
     return null;
   }
-  
+
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
@@ -1222,7 +1243,6 @@ async function deleteApplicationComment(currentUserId, applicationId, commentId)
 
 async function updateApplicationComment(currentUserId, applicationId, commentId, comment) {
 
-  console.log(commentId, comment)
   if(!currentUserId || !applicationId || !commentId || !comment){
     return null;
   }
@@ -1240,6 +1260,54 @@ async function updateApplicationComment(currentUserId, applicationId, commentId,
       result = await found.save()
 
     }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function disqualifyApplication(companyId, currentUserId, applicationId, disqualification) {
+
+  if(!companyId || !currentUserId || !applicationId || !disqualification){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await applicationService.disqualifyApplication(applicationId, disqualification.reason, currentUserId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function revertApplication(companyId, currentUserId, applicationId, disqualification) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await applicationService.revertApplication(applicationId, currentUserId);
 
   } catch (error) {
     console.log(error);

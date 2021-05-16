@@ -365,6 +365,18 @@ async function archiveJob(jobId, currentUserId) {
 }
 
 
+
+async function unarchiveJob(jobId, currentUserId) {
+  if(!jobId || !currentUserId){
+    return;
+  }
+
+  let result = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: currentUserId, updatedDate: Date.now()}});
+  return result;
+
+}
+
+
 function removeByJobId(userId, jobId) {
   let data = null;
 
@@ -545,6 +557,7 @@ module.exports = {
   updateJobApplicationForm:updateJobApplicationForm,
   closeJob:closeJob,
   archiveJob:archiveJob,
+  unarchiveJob:unarchiveJob,
   getCountsGroupByCompany,
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,

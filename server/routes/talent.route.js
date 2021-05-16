@@ -21,6 +21,7 @@ router.route('/company/:id/jobs/:jobId').get(asyncHandler(getJobById));
 router.route('/company/:id/jobs/:jobId').put(asyncHandler(updateJob));
 router.route('/company/:id/jobs/:jobId/close').post(asyncHandler(closeJob));
 router.route('/company/:id/jobs/:jobId/archive').post(asyncHandler(archiveJob));
+router.route('/company/:id/jobs/:jobId/unarchive').post(asyncHandler(unarchiveJob));
 router.route('/company/:id/jobs/:jobId').delete(asyncHandler(deleteJob));
 
 
@@ -41,6 +42,9 @@ router.route('/company/:id/applications/:applicationId/comments').get(asyncHandl
 router.route('/company/:id/applications/:applicationId/comments').post(asyncHandler(addApplicationComment));
 router.route('/company/:id/applications/:applicationId/comments/:commentId').delete(asyncHandler(deleteApplicationComment));
 router.route('/company/:id/applications/:applicationId/comments/:commentId').put(asyncHandler(updateApplicationComment));
+
+router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHandler(disqualifyApplication));
+router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
 
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
@@ -179,6 +183,17 @@ async function archiveJob(req, res) {
 }
 
 
+
+async function unarchiveJob(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.unarchiveJob(companyId, currentUserId, jobId);
+  res.json(new Response(data, data?'job_unarchived_successful':'not_found', res));
+}
+
+
 async function deleteJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
@@ -197,6 +212,7 @@ async function searchJob(req, res) {
   filter.query = req.query.query;
   filter.company = [companyId];
   filter.department = req.query.department;
+
 
   let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
@@ -367,6 +383,29 @@ async function updateApplicationComment(req, res) {
   let data = await talentCtrl.updateApplicationComment(currentUserId, applicationId, commentId, comment);
 
   res.json(new Response(data, data?'comment_updated_successful':'not_found', res));
+}
+
+
+async function disqualifyApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let disqualification = req.body;
+
+  let data = await talentCtrl.disqualifyApplication(companyId, currentUserId, applicationId, disqualification);
+
+  res.json(new Response(data, data?'application_disqualified_successful':'not_found', res));
+}
+
+
+async function revertApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.revertApplication(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_reverted_successful':'not_found', res));
 }
 
 

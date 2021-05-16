@@ -2,11 +2,14 @@ const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
+const actionEnum = require('../const/actionEnum');
+const activityEnum = require('../const/activityEnum');
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
 const  ApplicationSearchParam = require('../const/applicationSearchParam');
 const Pagination = require('../utils/job.pagination');
 const JobService = require('../services/jobrequisition.service');
+const activityService = require('../services/activity.service');
 
 
 function findApplicationById(applicationId) {
@@ -223,6 +226,56 @@ function findAppliedCountByUserIdAndJobId(userId, jobId) {
 
 
 
+
+async function disqualifyApplication(applicationId, reason, userId) {
+  let data = null;
+
+  if(!applicationId || !reason || !userId){
+    return;
+  }
+
+  let application = await Application.findById(applicationId);
+
+  if(application.status==statusEnum.ACTIVE){
+    application.status = statusEnum.DISQUALIFIED;
+    application = await application.save();
+
+    if(application.status==statusEnum.DISQUALIFIED){
+      result = {status: statusEnum.DISQUALIFIED};
+
+      let job = await JobService.findJobId(application.jobId);
+      //Add activity
+      await activityService.addActivity({applicationId: ObjectID(applicationId), createdBy: userId, type: activityEnum.CANDIDATE, action: actionEnum.DISQUALIFIED, meta: {name: job.title, jobId: application.jobId, reason: reason}});
+    }
+  }
+  return result;
+}
+
+
+async function revertApplication(applicationId, userId) {
+  let data = null;
+
+  if(!applicationId || !userId){
+    return;
+  }
+
+  let application = await Application.findById(applicationId);
+  if(application.status==statusEnum.DISQUALIFIED){
+    application.status = statusEnum.ACTIVE;
+    application = await application.save();
+
+    if(application.status==statusEnum.ACTIVE){
+      result = {status: statusEnum.ACTIVE};
+
+      let job = await JobService.findJobId(application.jobId);
+      await activityService.addActivity({applicationId: ObjectID(applicationId), createdBy: userId, type: activityEnum.CANDIDATE, action: actionEnum.REVERTED, meta: {name: job.title, jobId: application.jobId}});
+    }
+  }
+  return result;
+}
+
+
+
 function applyJob(application) {
   let data = null;
 
@@ -278,5 +331,7 @@ module.exports = {
   findAppliedCountByJobId: findAppliedCountByJobId,
   findApplicationsByJobId:findApplicationsByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
+  disqualifyApplication:disqualifyApplication,
+  revertApplication:revertApplication,
   applyJob: applyJob
 }
