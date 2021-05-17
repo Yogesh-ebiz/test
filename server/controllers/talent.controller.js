@@ -9,6 +9,7 @@ let JobSearchParam = require('../const/jobSearchParam');
 const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
+const subjectType = require('../const/subjectType');
 
 const {categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
@@ -22,11 +23,14 @@ const {getDepartments, addDepartment} = require('../services/department.service'
 const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
 const {getPipelineByJobId, getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
 const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
-const {addApplicationProgress} = require('../services/applicationprogress.service');
+const applicationProgressService = require('../services/applicationprogress.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const memberService = require('../services/member.service');
 const poolService = require('../services/pool.service');
+const activityService = require('../services/activity.service');
+const commentService = require('../services/comment.service');
+const evaluationService = require('../services/evaluation.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -83,6 +87,10 @@ module.exports = {
   archiveJob,
   unarchiveJob,
   deleteJob,
+  getJobComments,
+  addJobComment,
+  deleteJobComment,
+  updateJobComment,
   searchJobs,
   getJobById,
   updateJobPipeline,
@@ -102,8 +110,11 @@ module.exports = {
   addApplicationComment,
   deleteApplicationComment,
   updateApplicationComment,
+  addApplicationProgressEvaluation,
+  removeApplicationProgressEvaluation,
   disqualifyApplication,
   revertApplication,
+  getApplicationActivities,
   searchCandidates,
   addCompanyDepartment,
   updateCompanyDepartment,
@@ -666,7 +677,6 @@ async function unarchiveJob(companyId, currentUserId, jobId) {
 }
 
 
-
 async function deleteJob(companyId, currentUserId, jobId) {
 
   if(!companyId || !currentUserId || !jobId){
@@ -686,6 +696,115 @@ async function deleteJob(companyId, currentUserId, jobId) {
 
   return result;
 }
+
+
+async function getJobComments(currentUserId, jobId, filter) {
+
+  if(!currentUserId || !jobId || !filter){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    result = await commentService.getComments(subjectType.JOB, jobId, filter);
+
+    let userIds = _.map(result.docs, 'createdBy');
+    let users = await lookupUserIds(userIds);
+    result.docs.forEach(function(comment){
+      let found = _.find(users, {id: comment.createdBy});
+      if(found){
+        comment.createdBy = convertToTalentUser(found);
+      }
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+}
+
+async function addJobComment(currentUserId, jobId, comment) {
+
+  if(!currentUserId || !jobId || !comment){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let job = await jobService.findJob_Id(jobId);
+
+
+    if(job) {
+      comment.subjectType = subjectType.JOB;
+      comment.subjectId = job._id;
+      comment.createdBy = currentUserId;
+      result = await commentService.addComment(comment);
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function deleteJobComment(currentUserId, jobId, commentId) {
+
+  if(!currentUserId || !jobId || !commentId){
+    return null;
+  }
+
+  let result;
+  try {
+    let comment = await commentService.findBy_Id(commentId);
+
+    if(comment) {
+      result = await comment.delete();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function updateJobComment(currentUserId, jobId, commentId, comment) {
+
+  if(!currentUserId || !jobId || !commentId || !comment){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let found = await commentService.findBy_Id(commentId);
+
+
+    if(found) {
+      found.message = comment.message;
+      found.lastUpdatedDate = Date.now();
+      result = await found.save()
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 
 
 async function getJobById(currentUserId, companyId, jobId, locale) {
@@ -878,7 +997,7 @@ async function payJob(currentUserId, jobId, payment) {
 
 async function searchApplications(currentUserId, jobId, filter, locale) {
 
-  if(currentUserId==null || jobId==null){
+  if(currentUserId==null || jobId==null || !filter){
     return null;
   }
 
@@ -986,7 +1105,7 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
         if(pipeline) {
           foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
           if(foundStage) {
-            progress = await  addApplicationProgress({
+            progress = await  applicationProgressService.addApplicationProgress({
               applicationId: application.applicationId,
               stageId: foundStage._id
             });
@@ -1170,18 +1289,27 @@ async function deleteApplicationLabel(currentUserId, applicationId, labelId) {
 
 
 
-async function getApplicationComments(currentUserId, applicationId) {
+async function getApplicationComments(currentUserId, applicationId, filter) {
 
-  if(!currentUserId || !applicationId){
+  if(!currentUserId || !applicationId || !filter){
     return null;
   }
 
-  let result;
+  let result=[];
   try {
 
 
-    result = await commentService.getComments(applicationId);
-
+    result = await commentService.getComments(subjectType.APPLICATION, applicationId, filter);
+    if(result) {
+      let userIds = _.map(result.docs, 'createdBy');
+      let users = await lookupUserIds(userIds);
+      result.docs.forEach(function (comment) {
+        let found = _.find(users, {id: comment.createdBy});
+        if (found) {
+          comment.createdBy = convertToTalentUser(found);
+        }
+      });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -1203,8 +1331,8 @@ async function addApplicationComment(currentUserId, applicationId, comment) {
 
 
     if(application) {
-      comment.applicationId = application._id;
-      comment.candidate = application.user;
+      comment.subjectType = subjectType.APPLICATION;
+      comment.subjectId = application._id;
       comment.createdBy = currentUserId;
       result = await commentService.addComment(comment);
 
@@ -1269,6 +1397,87 @@ async function updateApplicationComment(currentUserId, applicationId, commentId,
 }
 
 
+
+async function addApplicationProgressEvaluation(companyId, currentUserId, applicationId, applicationProgressId, form) {
+
+  if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !form){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
+
+    if(progress && !_.some(progress.evaluations, {createdBy: currentUserId})) {
+
+
+      form.createdBy = currentUserId;
+      form.applicationId=ObjectID(applicationId);
+      form.applicationProgressId=ObjectID(applicationProgressId);
+
+
+      let evaluation = await evaluationService.addEvaluation(form);
+      if(evaluation){
+        progress.evaluations.push(evaluation._id);
+        await progress.save();
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function removeApplicationProgressEvaluation(companyId, currentUserId, applicationId, applicationProgressId) {
+
+  if(!companyId || !currentUserId || !applicationId || !applicationProgressId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
+
+    console.log(progress)
+    if(progress && progress.evaluation) {
+      progress.evaluation.forEach(function(evaluation, index, object){
+        if(evaluation.createdBy==currentUserId){
+          object.splice(index, 1);
+        }
+      });
+      // let evaluation = _.find(progress.evaluations, {createdBy: currentUserId});
+      // if(evaluation){
+      //   console.log(evaluation)
+      //   await evaluation.delete();
+      //   // await found.save();
+      // }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 async function disqualifyApplication(companyId, currentUserId, applicationId, disqualification) {
 
   if(!companyId || !currentUserId || !applicationId || !disqualification){
@@ -1283,7 +1492,7 @@ async function disqualifyApplication(companyId, currentUserId, applicationId, di
   let result;
   try {
 
-    result = await applicationService.disqualifyApplication(applicationId, disqualification.reason, currentUserId);
+    result = await applicationService.disqualifyApplication(applicationId, disqualification.reason, member);
 
   } catch (error) {
     console.log(error);
@@ -1307,7 +1516,7 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
   let result;
   try {
 
-    result = await applicationService.revertApplication(applicationId, currentUserId);
+    result = await applicationService.revertApplication(applicationId, member);
 
   } catch (error) {
     console.log(error);
@@ -1316,6 +1525,29 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
   return result;
 }
 
+
+async function getApplicationActivities(companyId, currentUserId, applicationId, filter) {
+  if(!companyId || !currentUserId || !applicationId || !filter){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId, filter);
+    return new Pagination(result);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
 
 async function getBoard(currentUserId, jobId, locale) {
 
@@ -1846,7 +2078,7 @@ async function updateCompanyLabel(company, labelId, currentUserId, form) {
 
   try {
     if (isPartyActive(currentParty)) {
-      let label = await Label.findById(labelId);
+      let label = await labelService.findById(labelId);
       if(label){
         label.name = form.name;
         label.updatedBy = currentUserId;
@@ -1876,7 +2108,7 @@ async function deleteCompanyLabel(company, labelId, currentUserId) {
   try {
     if (isPartyActive(currentParty)) {
 
-      let label = await Label.findById(labelId);
+      let label = await labelService.findById(labelId);
       if(label){
         result = await label.delete();
         if(result){
@@ -1943,7 +2175,16 @@ async function getCompanyMembers(company, query, currentUserId, locale) {
   }
 
   let result = await memberService.getMembers(company, query);
+  let userIds = _.map(result, 'userId');
+  let users = await lookupUserIds(userIds);
+
   result.forEach(function(member){
+    let found = _.find(users, {id: member.userId});
+    if(found){
+      member.firstName = found.firstName;
+      member.lastName = found.lastName;
+      member.avatar = found.avatar;
+    }
     member.role = roleMinimal(member.role);
   });
 

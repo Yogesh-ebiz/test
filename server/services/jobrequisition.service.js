@@ -12,6 +12,7 @@ const Pipeline = require('../models/pipeline.model');
 const PipelineTemplate = require('../models/pipelineTemplate.model');
 const PipelineService = require('../services/pipeline.service');
 const memberService = require('../services/member.service');
+const feedService = require('../services/api/feed.service.api');
 
 let SearchParam = require('../const/searchParam');
 
@@ -250,7 +251,32 @@ async function getJobPipeline(jobId) {
     }]
   });
 
+
+
   if(job){
+    if(job.pipeline.stages) {
+      let userIds = _.reduce(job.pipeline.stages, function (res, stage) {
+        if (stage) {
+          res = _.union(res, _.map(stage.members, 'userId'));
+          return res;
+        }
+        return res;
+      }, []);
+
+      let users = await feedService.lookupUserIds(userIds);
+      job.pipeline.stages.forEach(function(stage){
+        stage.members.forEach(function(member){
+          let found = _.find(users, {id: member.userId});
+          if(found){
+            member.avatar = found.avatar;
+            member.firstName = found.firstName;
+            member.middleName = found.middleName;
+            member.lastName = found.lastName;
+          }
+        });
+      });
+
+    }
     data = job.pipeline;
 
   }
@@ -274,7 +300,6 @@ async function updateJobMembers(jobId, members, currentUserId, locale) {
     job.members = members
     job.updatedBy = currentUserId;
     data = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {members: members, updatedBy: currentUserId}});
-    console.log(data, jobId)
   }
 
 

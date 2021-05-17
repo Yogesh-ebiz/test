@@ -8,18 +8,27 @@ const ActivitySchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  createdBy: {
-    type: Number,
+  causer: {
+    type: Object,
+    required: false
+  },
+  causerType: {
+    type: String,
     required: true
   },
-  applicationId: {
-    type: Object
+  causerId: {
+    type: String,
+    required: true
   },
   action: {
     type: String,
     required: true
   },
-  type: {
+  subjectType: {
+    type: String,
+    required: true
+  },
+  subjectId: {
     type: String,
     required: true
   },

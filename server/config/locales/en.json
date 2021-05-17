@@ -152,5 +152,8 @@
 	"job_deleted_successful": "job_deleted_successful",
 	"answers_submitted_successful": "answers_submitted_successful",
 	"application_disqualified_successful": "application_disqualified_successful",
-	"application_reverted_successful": "application_reverted_successful"
+	"application_reverted_successful": "application_reverted_successful",
+	"label_deleted_successful": "label_deleted_successful",
+	"job_unarchived_successful": "job_unarchived_successful",
+	"application_evaluated_successful": "application_evaluated_successful"
 }

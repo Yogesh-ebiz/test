@@ -1,53 +1,38 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
-
+const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const EvaluationSchema = new mongoose.Schema({
-  id: {
+  createdAt: {
     type: Number,
-    required: true
+    default: Date.now
   },
-  sender: {
-    type: Object
-  },
-  receiver: {
-    type: Object
-  },
-  subject: {
-    type: String,
-    required: false
-  },
-  bodyHtml: {
-    type: String,
-    required: true
-  },
-  attachments: {
-    type: Array
-  },
-  user: {
+  createdBy: {
     type: Object,
     required: true
   },
-  createdDate: {
+  applicationId: {
+    type: Object,
+    required: true
+  },
+  applicationProgressId: {
+    type: Object,
+    required: true
+  },
+  rating: {
     type: Number,
-    required: false
+    required: true
   },
-  createdBy: {
-    type: Object
-  },
-  updatedDate: {
-    type: Number,
-    required: false
-  },
-  updatedBy: {
-    type: Object
-  },
+  assessment: { type: Schema.Types.ObjectId, ref: 'Assessment'},
+  answers: [{ type: Schema.Types.ObjectId, ref: 'Answer'}]
 }, {
   versionKey: false
 });
+
 EvaluationSchema.plugin(mongoosePaginate);
 
 
 module.exports = mongoose.model('Evaluation', EvaluationSchema);
+
 

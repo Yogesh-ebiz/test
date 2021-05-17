@@ -3,6 +3,20 @@ const statusEnum = require('../const/statusEnum');
 const Label = require('../models/label.model');
 
 
+
+function findById(labelId) {
+  let data = null;
+
+  if(labelId==null){
+    return;
+  }
+
+  data = Label.findById(labelId);
+  return data;
+
+}
+
+
 async function getLabels(company, query, type) {
   let data = null;
 
@@ -30,6 +44,7 @@ function addLabel(label) {
 
 
 module.exports = {
+  findById:findById,
   getLabels:getLabels,
   addLabel:addLabel
 }

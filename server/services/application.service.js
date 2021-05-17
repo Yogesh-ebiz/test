@@ -3,7 +3,7 @@ const ObjectID = require('mongodb').ObjectID;
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const actionEnum = require('../const/actionEnum');
-const activityEnum = require('../const/activityEnum');
+const subjectType = require('../const/subjectType');
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
 const  ApplicationSearchParam = require('../const/applicationSearchParam');
@@ -227,10 +227,10 @@ function findAppliedCountByUserIdAndJobId(userId, jobId) {
 
 
 
-async function disqualifyApplication(applicationId, reason, userId) {
-  let data = null;
+async function disqualifyApplication(applicationId, reason, member) {
+  let result = null;
 
-  if(!applicationId || !reason || !userId){
+  if(!applicationId || !reason || !member){
     return;
   }
 
@@ -245,17 +245,18 @@ async function disqualifyApplication(applicationId, reason, userId) {
 
       let job = await JobService.findJobId(application.jobId);
       //Add activity
-      await activityService.addActivity({applicationId: ObjectID(applicationId), createdBy: userId, type: activityEnum.CANDIDATE, action: actionEnum.DISQUALIFIED, meta: {name: job.title, jobId: application.jobId, reason: reason}});
+      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: applicationId, action: actionEnum.DISQUALIFIED, meta: {name: job.title, jobId: application.jobId, reason: reason}});
+      console.log(activity)
     }
   }
   return result;
 }
 
 
-async function revertApplication(applicationId, userId) {
-  let data = null;
+async function revertApplication(applicationId, member) {
+  let result = null;
 
-  if(!applicationId || !userId){
+  if(!applicationId || !member){
     return;
   }
 
@@ -268,9 +269,36 @@ async function revertApplication(applicationId, userId) {
       result = {status: statusEnum.ACTIVE};
 
       let job = await JobService.findJobId(application.jobId);
-      await activityService.addActivity({applicationId: ObjectID(applicationId), createdBy: userId, type: activityEnum.CANDIDATE, action: actionEnum.REVERTED, meta: {name: job.title, jobId: application.jobId}});
+      await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: applicationId, action: actionEnum.REVERTED, meta: {name: job.title, jobId: application.jobId}});
     }
   }
+  return result;
+}
+
+
+
+async function getApplicationActivities(applicationId) {
+  let data = null;
+
+  if(!applicationId){
+    return;
+  }
+
+  result = activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId);
+
+  return result;
+}
+
+
+async function getApplicationActivities(applicationId) {
+  let data = null;
+
+  if(!applicationId){
+    return;
+  }
+
+  result = activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId);
+
   return result;
 }
 
@@ -333,5 +361,6 @@ module.exports = {
   findCandidatesByCompanyId:findCandidatesByCompanyId,
   disqualifyApplication:disqualifyApplication,
   revertApplication:revertApplication,
+  getApplicationActivities:getApplicationActivities,
   applyJob: applyJob
 }

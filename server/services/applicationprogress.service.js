@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const Application = require('../models/application.model');
@@ -36,8 +37,20 @@ function addApplicationProgress(applicationProgress) {
 
 
 
+function getApplicationProgressEvaluations(applicationProgress_Id) {
+  let data = null;
+
+  if(applicationProgress_Id==null){
+    return;
+  }
+
+  return ApplicationProgress.findById(ObjectID(applicationProgress_Id)).populate('evaluations')
+}
+
+
 module.exports = {
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,
-  addApplicationProgress: addApplicationProgress
+  addApplicationProgress: addApplicationProgress,
+  getApplicationProgressEvaluations:getApplicationProgressEvaluations
 }
