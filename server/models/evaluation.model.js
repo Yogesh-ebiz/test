@@ -28,6 +28,10 @@ const EvaluationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  comment: {
+    type: String,
+    required: true
+  },
   assessment: { type: Schema.Types.ObjectId, ref: 'Assessment'},
   answers: [{ type: Schema.Types.ObjectId, ref: 'Answer'}]
 }, {

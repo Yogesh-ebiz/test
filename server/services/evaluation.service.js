@@ -14,27 +14,29 @@ const evaulationSchema = Joi.object({
   applicationProgressId: Joi.object(),
   candidateId: Joi.number(),
   rating: Joi.number(),
+  comment: Joi.string(),
   assessment: Joi.object().optional(),
   answer: Joi.array().optional()
 });
 
-async function addEvaluation(evaluation) {
+async function addEvaluation(form) {
 
-  if(!evaluation){
+  if(!form){
     return;
   }
 
-  evaluation = await Joi.validate(evaluation, evaulationSchema, {abortEarly: false});
+  form = await Joi.validate(form, evaulationSchema, {abortEarly: false});
 
-  if(evaluation.assessment){
-    evaluation.assessment.candidateId = evaluation.candidateId;
-    evaluation.assessment.createdBy = evaluation.createdBy;
-    let assessment = await assessmentService.addAssessment(evaluation.assessment);
+  if(form.assessment){
+    form.assessment.candidateId = form.candidateId;
+    form.assessment.createdBy = form.createdBy;
+    let assessment = await assessmentService.addAssessment(form.assessment);
     if(assessment){
-      evaluation.assessment = assessment._id;
+      form.assessment = assessment._id;
     }
   }
-  evaluation = new Evaluation(evaluation).save();
+  let evaluation = new Evaluation(form).save();
+
 
   return evaluation;
 

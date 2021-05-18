@@ -246,7 +246,6 @@ async function disqualifyApplication(applicationId, reason, member) {
       let job = await JobService.findJobId(application.jobId);
       //Add activity
       let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: applicationId, action: actionEnum.DISQUALIFIED, meta: {name: job.title, jobId: application.jobId, reason: reason}});
-      console.log(activity)
     }
   }
   return result;

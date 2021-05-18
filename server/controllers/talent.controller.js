@@ -10,6 +10,7 @@ const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 const subjectType = require('../const/subjectType');
+const actionEnum = require('../const/actionEnum');
 
 const {categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
@@ -1443,10 +1444,14 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
       {
         path: 'currentProgress',
         model: 'ApplicationProgress',
-        populate: {
+        populate: [{
           path: 'evaluations',
           model: 'Evaluation'
-        }
+        },
+          {
+            path: 'stage',
+            model: 'Stage'
+          }]
       }
     ]);
 
@@ -1464,6 +1469,8 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
       if(result){
         application.currentProgress.evaluations.push(result._id);
         await applicationProgressService.addApplicationProgressEvaluation(applicationProgressId, result._id);
+
+        let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {name: application.currentProgress.stage.name}});
       }
     }
 
