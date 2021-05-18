@@ -236,6 +236,7 @@ async function disqualifyApplication(applicationId, reason, member) {
 
   let application = await Application.findById(applicationId);
 
+  console.log(application)
   if(application.status==statusEnum.ACTIVE){
     application.status = statusEnum.DISQUALIFIED;
     application = await application.save();
@@ -270,6 +271,23 @@ async function revertApplication(applicationId, member) {
       let job = await JobService.findJobId(application.jobId);
       await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: applicationId, action: actionEnum.REVERTED, meta: {name: job.title, jobId: application.jobId}});
     }
+  }
+  return result;
+}
+
+
+
+async function followApplication(applicationId, member) {
+  let result = null;
+
+  if(!applicationId || !member){
+    return;
+  }
+
+  let application = await Application.findById(applicationId);
+  if(application){
+    application = await application.save();
+
   }
   return result;
 }
@@ -311,7 +329,7 @@ function applyJob(application) {
   }
 
   application.attachment = '';
-  application.status = applicationEnum.APPLIED;
+  application.status = applicationEnum.ACTIVE;
 
   // return new Application(application).save();
 

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const mongoosePaginate = require('mongoose-paginate-v2');
+// const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 
 const EvaluationSchema = new mongoose.Schema({
   createdAt: {

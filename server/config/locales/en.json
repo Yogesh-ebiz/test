@@ -156,5 +156,7 @@
 	"label_deleted_successful": "label_deleted_successful",
 	"job_unarchived_successful": "job_unarchived_successful",
 	"application_evaluated_successful": "application_evaluated_successful",
-	"evaluation_added_successful": "evaluation_added_successful"
+	"evaluation_added_successful": "evaluation_added_successful",
+	"application_subscribed_successful": "application_subscribed_successful",
+	"application_unsubscribeed_successful": "application_unsubscribeed_successful"
 }

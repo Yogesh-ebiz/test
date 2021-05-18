@@ -116,6 +116,8 @@ module.exports = {
   removeApplicationProgressEvaluation,
   disqualifyApplication,
   revertApplication,
+  subscribeApplication,
+  unsubscribeApplication,
   getApplicationActivities,
   searchCandidates,
   addCompanyDepartment,
@@ -150,8 +152,8 @@ module.exports = {
   addCompanyPool,
   updateCompanyPool,
   deleteCompanyPool,
-  followJob,
-  unfollowJob
+  subscribeJob,
+  unsubscribeJob
 }
 
 
@@ -1401,9 +1403,9 @@ async function updateApplicationComment(currentUserId, applicationId, commentId,
 
 
 
-async function getApplicationEvaluations(companyId, currentUserId, applicationId) {
+async function getApplicationEvaluations(companyId, currentUserId, candidateId, applicationId, progressId, filter) {
 
-  if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !form){
+  if(!companyId || !currentUserId || !candidateId || !filter){
     return null;
   }
 
@@ -1416,13 +1418,23 @@ async function getApplicationEvaluations(companyId, currentUserId, applicationId
   try {
 
 
-    let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
+    result = await evaluationService.getEvaluations(candidateId, companyId, applicationId, progressId, filter);
+    let userIds = _.map(result.docs, 'createdBy');
+    let users = await lookupUserIds(userIds);
+
+    console.log(users)
+    result.docs.forEach(function(evaluation){
+      let found = _.find(users, {id: evaluation.createdBy});
+      if(found){
+        evaluation.createdBy = convertToTalentUser(found);
+      }
+    });
 
   } catch (error) {
     console.log(error);
   }
 
-  return result;
+  return new Pagination(result);
 }
 
 
@@ -1577,6 +1589,56 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
   try {
 
     result = await applicationService.revertApplication(applicationId, member);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function subscribeApplication(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    let subscription = {createdBy: currentUserId, subjectType: subjectType.APPLICATION, subjectId: ObjectID(applicationId)};
+    result = await memberService.subscribe(subscription);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function unsubscribeApplication(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await memberService.unsubscribe(currentUserId, subjectType.APPLICATION, applicationId);
 
   } catch (error) {
     console.log(error);
@@ -2451,16 +2513,16 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
 }
 
 
-async function followJob(memberId, jobId) {
+async function subscribeJob(memberId, jobId) {
   if(!memberId || !jobId){
     return null;
   }
 
   let result;
   try {
-    result = await memberService.followJob(memberId, jobId);
+    result = await memberService.subscribeJob(memberId, jobId);
   } catch(e){
-    console.log('followJob: Error', e);
+    console.log('subscribeJob: Error', e);
   }
 
   return result;
@@ -2468,16 +2530,16 @@ async function followJob(memberId, jobId) {
 
 
 
-async function unfollowJob(memberId, jobId) {
+async function unsubscribeJob(memberId, jobId) {
   if(!memberId || !jobId){
     return null;
   }
 
   let result;
   try {
-    result = await memberService.unfollowJob(memberId, jobId);
+    result = await memberService.unsubscribeJob(memberId, jobId);
   } catch(e){
-    console.log('followJob: Error', e);
+    console.log('unsubscribeJob: Error', e);
   }
 
   return result;

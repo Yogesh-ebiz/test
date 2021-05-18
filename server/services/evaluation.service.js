@@ -74,7 +74,48 @@ async function findByUserIdAndProgressId(userId, applicationProgressId) {
 }
 
 
+
+async function getEvaluations(candidateId, companyId, applicationId, progressId, filter) {
+  if(!candidateId || !filter){
+    return;
+  }
+
+
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+  const aggregate = Evaluation.aggregate([{
+    $match: {candidateId: candidateId}
+  },
+    {
+      $lookup: {
+        from: 'assesment',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    }
+  ]);
+
+  return Evaluation.aggregatePaginate(aggregate, options);
+
+}
+
+
 module.exports = {
   addEvaluation:addEvaluation,
-  findByUserIdAndProgressId:findByUserIdAndProgressId
+  findByUserIdAndProgressId:findByUserIdAndProgressId,
+  getEvaluations:getEvaluations
 }

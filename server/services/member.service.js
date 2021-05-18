@@ -2,6 +2,7 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const Member = require('../models/member.model');
 const MemberInvitation = require('../models/memberInvitation.model');
+const MemberSubscribe = require('../models/membersubscribe.model');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const feedService = require('../services/api/feed.service.api');
@@ -20,6 +21,12 @@ const memberSchema = Joi.object({
   timezone: Joi.string().allow('').optional(),
   preferTimeFormat: Joi.string().allow('').optional(),
   userId: Joi.number()
+});
+
+const subscriptionSchema = Joi.object({
+  createdBy: Joi.number().required(),
+  subjectType: Joi.string().required(),
+  subjectId: Joi.object().required()
 });
 
 
@@ -214,6 +221,41 @@ async function unfollowJob(memberId, jobId) {
 
 
 
+async function subscribe(subscription) {
+
+  if(!subscription){
+    return;
+  }
+
+  subscription = await Joi.validate(subscription, subscriptionSchema, {abortEarly: false});
+  subscription = new MemberSubscribe(subscription).save();
+
+  return subscription;
+
+}
+
+
+async function unsubscribe(userId, subjectType, subjectId) {
+
+  if(!userId || !subjectType || !subjectId){
+    return;
+  }
+
+  let result;
+  let subscription = await MemberSubscribe.findOne({createdBy: userId, subjectType: subjectType, subjectId: ObjectID(subjectId)});
+
+  if(subscription){
+    result = await subscription.delete();
+    if(result){
+      result = {success: true};
+    }
+  }
+
+  return result;
+
+}
+
+
 module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
@@ -225,5 +267,7 @@ module.exports = {
   updateMember:updateMember,
   updateMemberRole:updateMemberRole,
   followJob: followJob,
-  unfollowJob: unfollowJob
+  unfollowJob: unfollowJob,
+  subscribe:subscribe,
+  unsubscribe:unsubscribe
 }

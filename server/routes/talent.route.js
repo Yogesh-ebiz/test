@@ -55,6 +55,9 @@ router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHa
 router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
 
 
+router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHandler(subscribeApplication));
+router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
+
 
 router.route('/company/:id/applications/:applicationId/activities').get(asyncHandler(getApplicationActivities));
 
@@ -64,8 +67,8 @@ router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipelin
 
 router.route('/company/:id/jobs/:jobId/members').post(asyncHandler(updateJobMembers));
 
-router.route('/company/:id/jobs/:jobId/follow').post(asyncHandler(followJob));
-router.route('/company/:id/jobs/:jobId/follow').delete(asyncHandler(unfollowJob));
+router.route('/company/:id/jobs/:jobId/subscribe').post(asyncHandler(subscribeJob));
+router.route('/company/:id/jobs/:jobId/subscribe').delete(asyncHandler(unsubscribeJob));
 
 
 router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updateJobApplicationForm));
@@ -74,7 +77,7 @@ router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 
 
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
-router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getApplicationEvaluations));
+router.route('/company/:id/candidates/:candidateId/evaluations').get(asyncHandler(getApplicationEvaluations));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));
@@ -455,9 +458,12 @@ async function updateApplicationComment(req, res) {
 async function getApplicationEvaluations(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = req.params.applicationId;
+  let candidateId = parseInt(req.params.candidateId);
+  let applicationId = req.query.applicationId;
+  let progressId = req.query.progressId;
+  let filter = req.body;
 
-  let data = await talentCtrl.getApplicationEvaluations(companyId, currentUserId, applicationId);
+  let data = await talentCtrl.getApplicationEvaluations(companyId, currentUserId, candidateId, applicationId, progressId, filter);
 
   res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
 }
@@ -510,6 +516,28 @@ async function revertApplication(req, res) {
 }
 
 
+async function subscribeApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.subscribeApplication(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_subscribed_successful':'not_found', res));
+}
+
+
+async function unsubscribeApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.unsubscribeApplication(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_unsubscribeed_successful':'not_found', res));
+}
+
+
 async function getApplicationActivities(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -556,6 +584,30 @@ async function updateJobMembers(req, res) {
 
 
 
+async function subscribeJob(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let memberId = req.header('memberId');
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.subscribeJob(memberId, jobId);
+
+  res.json(new Response(data, data?'job_subsribed_successful':'not_found', res));
+}
+
+
+async function unsubscribeJob(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let memberId = req.header('memberId');
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.unsubscribeJob(memberId, jobId);
+
+  res.json(new Response(data, data?'job_unsubscribed_successful':'not_found', res));
+}
+
+
 async function updateJobApplicationForm(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let jobId = req.params.jobId;
@@ -566,29 +618,6 @@ async function updateJobApplicationForm(req, res) {
 }
 
 
-
-async function followJob(req, res) {
-
-  let currentUserId = parseInt(req.header('UserId'));
-  let memberId = req.header('memberId');
-  let jobId = req.params.jobId;
-
-  let data = await talentCtrl.followJob(memberId, jobId);
-
-  res.json(new Response(data, data?'job_followed_successful':'not_found', res));
-}
-
-
-async function unfollowJob(req, res) {
-
-  let currentUserId = parseInt(req.header('UserId'));
-  let memberId = req.header('memberId');
-  let jobId = req.params.jobId;
-
-  let data = await talentCtrl.unfollowJob(memberId, jobId);
-
-  res.json(new Response(data, data?'job_unfollowed_successful':'not_found', res));
-}
 
 
 async function getBoard(req, res) {
