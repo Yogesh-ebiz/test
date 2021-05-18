@@ -58,10 +58,17 @@ const ApplicationSchema = new mongoose.Schema({
   resume: {
     type: Object
   },
+  percentMatched: {
+    type: Number
+  },
   hasSubmittedQuestion: {
     type: Boolean,
     default: false,
     required: false
+  },
+  hasFollowed: {
+    type: Boolean,
+    default: false
   },
   progress: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
   sources: {

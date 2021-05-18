@@ -110,6 +110,7 @@ module.exports = {
   addApplicationComment,
   deleteApplicationComment,
   updateApplicationComment,
+  getApplicationEvaluations,
   addApplicationProgressEvaluation,
   removeApplicationProgressEvaluation,
   disqualifyApplication,
@@ -1398,6 +1399,32 @@ async function updateApplicationComment(currentUserId, applicationId, commentId,
 
 
 
+
+async function getApplicationEvaluations(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !form){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 async function addApplicationProgressEvaluation(companyId, currentUserId, applicationId, applicationProgressId, form) {
 
   if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !form){
@@ -1455,19 +1482,29 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 
     let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
 
-    console.log(progress)
-    if(progress && progress.evaluation) {
-      progress.evaluation.forEach(function(evaluation, index, object){
-        if(evaluation.createdBy==currentUserId){
-          object.splice(index, 1);
-        }
-      });
+    if(progress && progress.evaluations.length) {
+      // progress.evaluations.forEach(function(evaluation, index, object){
+      //   console.log(evaluation.createdBy, currentUserId)
+      //   if(evaluation.createdBy==currentUserId){
+      //     console.log('yes')
+      //     await evaluation.delete();
+      //     object.splice(index, 1);
+      //   }
+      // });
       // let evaluation = _.find(progress.evaluations, {createdBy: currentUserId});
       // if(evaluation){
       //   console.log(evaluation)
       //   await evaluation.delete();
       //   // await found.save();
       // }
+
+      for(const [i, evaluation] of progress.evaluations.entries()){
+        if(evaluation.createdBy==currentUserId){
+          await evaluation.delete();
+          progress.evaluations.splice(i, 1);
+        }
+      }
+      await progress.save();
     }
 
   } catch (error) {
@@ -1581,6 +1618,13 @@ async function getBoard(currentUserId, jobId, locale) {
     //   boardStages.push(column);
     // }
 
+    // let applicationsGroupByStage = await Application.aggregate([
+    //   {$match: {jobId: job.jobId}},
+    //   {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
+    //   {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }},
+    //   {$group: {_id: '$currentProgress.stageId', applications: {$push: "$$ROOT"}}}
+    // ]);
+    //
     let applicationsGroupByStage = await Application.aggregate([
       {$match: {jobId: job.jobId}},
       {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
@@ -1589,8 +1633,8 @@ async function getBoard(currentUserId, jobId, locale) {
     ]);
 
 
-    let userIds = _.reduce(applicationsGroupByStage, function(res, item){ res.push(_.map(item.applications, 'user')); return res; }, []);
 
+    let userIds = _.reduce(applicationsGroupByStage, function(res, item){ res.push(_.map(item.applications, 'user')); return res; }, []);
     let users = await lookupUserIds(_.flatten(userIds));
 
     pipelineStages.forEach(function(item){

@@ -19,8 +19,18 @@ const QuestionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  noMaxSelection: {
+    type: Number
+  },
   hint: {
     type: String
+  },
+  required: {
+    type: Boolean,
+    default: true
+  },
+  options: {
+    type: Array
   }
 }, {
   versionKey: false

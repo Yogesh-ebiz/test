@@ -47,6 +47,7 @@ router.route('/company/:id/applications/:applicationId/comments').post(asyncHand
 router.route('/company/:id/applications/:applicationId/comments/:commentId').delete(asyncHandler(deleteApplicationComment));
 router.route('/company/:id/applications/:applicationId/comments/:commentId').put(asyncHandler(updateApplicationComment));
 
+router.route('/company/:id/applications/:applicationId/evaluate').post(asyncHandler(getApplicationEvaluations));
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').post(asyncHandler(addApplicationProgressEvaluation));
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').delete(asyncHandler(removeApplicationProgressEvaluation));
 
@@ -449,6 +450,17 @@ async function updateApplicationComment(req, res) {
   res.json(new Response(data, data?'comment_updated_successful':'not_found', res));
 }
 
+
+
+async function getApplicationEvaluations(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+
+  let data = await talentCtrl.getApplicationEvaluations(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
+}
 
 async function addApplicationProgressEvaluation(req, res) {
   let companyId = parseInt(req.params.id);

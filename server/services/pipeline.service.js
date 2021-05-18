@@ -27,14 +27,16 @@ function getPipelineById(pipeLineId) {
 }
 
 
-function getPipelineByJobId(jobId) {
+async function getPipelineByJobId(jobId) {
   let data = null;
 
   if(!jobId){
     return;
   }
 
-  return Pipeline.findOne({jobId: jobId}).populate('stages');
+  data = await Pipeline.findOne({jobId: jobId}).populate('stages');
+  console.log(data)
+  return data;
 }
 
 

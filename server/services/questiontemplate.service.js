@@ -10,11 +10,11 @@ const questionService = require('../services/question.service');
 
 const questionSchema = Joi.object({
   type: Joi.string(),
-  question: Joi.string().required(),
+  text: Joi.string().required(),
   hint: Joi.any().optional(),
   options: Joi.array().optional(),
-  attachment: Joi.any().optional(),
-  isRequired: Joi.boolean()
+  required: Joi.boolean(),
+  noMaxSelection: Joi.number().optional()
 });
 
 const questionTemplateSchema = Joi.object({
@@ -91,9 +91,33 @@ async function updateQuestionTemplate(id, form) {
   form = await Joi.validate(form, questionTemplateSchema, { abortEarly: false });
   let template = await QuestionTemplate.findById(id);
 
+
   if(template){
+    let questions = [];
     template.name = form.name;
-    template.questions = form.questions;
+
+    for (let question of form.questions) {
+
+      if (question._id) {
+        let found = await questionService.findById(question._id);
+
+        if (found) {
+          found.type = question.type;
+          found.text = question.text;
+          found.hint = question.hint;
+          found.noMaxSelection = question.noMaxSelection;
+          found.options = question.options;
+          question = await found.save();
+        }
+
+      } else {
+        question._id = new ObjectID();
+        question = await questionService.addQuestion(question)
+      }
+      questions.push(question._id);
+    }
+
+    template.questions = questions;
     template = await template.save();
   }
 

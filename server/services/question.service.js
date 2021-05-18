@@ -12,11 +12,13 @@ const questionSchema = Joi.object({
   _id: Joi.object().optional(),
   text: Joi.string().required(),
   type: Joi.string().required(),
+  noMaxSelection: Joi.number(),
   hint: Joi.string().allow('').optional(),
-  options: Joi.array().optional()
+  options: Joi.array().optional(),
+  required: Joi.boolean()
 });
 
-function getQuestionById(questionId) {
+function findById(questionId) {
   let data = null;
 
   if(!questionId){
@@ -45,6 +47,6 @@ async function addQuestion(question) {
 
 
 module.exports = {
-  getQuestionById:getQuestionById,
+  findById:findById,
   addQuestion:addQuestion
 }
