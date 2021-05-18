@@ -20,6 +20,10 @@ const EvaluationSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  candidateId: {
+    type: Object,
+    required: true
+  },
   rating: {
     type: Number,
     required: true

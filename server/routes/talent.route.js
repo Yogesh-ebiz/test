@@ -47,7 +47,6 @@ router.route('/company/:id/applications/:applicationId/comments').post(asyncHand
 router.route('/company/:id/applications/:applicationId/comments/:commentId').delete(asyncHandler(deleteApplicationComment));
 router.route('/company/:id/applications/:applicationId/comments/:commentId').put(asyncHandler(updateApplicationComment));
 
-router.route('/company/:id/applications/:applicationId/evaluate').post(asyncHandler(getApplicationEvaluations));
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').post(asyncHandler(addApplicationProgressEvaluation));
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').delete(asyncHandler(removeApplicationProgressEvaluation));
 
@@ -75,6 +74,7 @@ router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 
 
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
+router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getApplicationEvaluations));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));

@@ -44,7 +44,30 @@ function getApplicationProgressEvaluations(applicationProgress_Id) {
     return;
   }
 
-  return ApplicationProgress.findById(ObjectID(applicationProgress_Id)).populate('evaluations')
+  return ApplicationProgress.findById(ObjectID(applicationProgress_Id)).populate(
+    {
+      path: 'evaluations',
+      model: 'Evaluation',
+      populate: {
+        path: 'assessment',
+        model: 'Assessment'
+      }
+    })
+}
+
+
+function addApplicationProgressEvaluation(applicationProgress_Id, evaluationId) {
+  let data = null;
+
+  if(!applicationProgress_Id || !evaluationId){
+    return;
+  }
+
+  return ApplicationProgress.updateOne({_id: ObjectID(applicationProgress_Id)}, { $push: {
+    evaluations: {
+      $each: [ObjectID(evaluationId)]
+    }
+  }});
 }
 
 
@@ -52,5 +75,6 @@ module.exports = {
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,
   addApplicationProgress: addApplicationProgress,
-  getApplicationProgressEvaluations:getApplicationProgressEvaluations
+  getApplicationProgressEvaluations:getApplicationProgressEvaluations,
+  addApplicationProgressEvaluation:addApplicationProgressEvaluation
 }

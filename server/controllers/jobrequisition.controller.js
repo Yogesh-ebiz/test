@@ -23,7 +23,7 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
-const {getPipelineByJobId} = require('../services/pipeline.service');
+const {getPipelineById, getPipelineByJobId} = require('../services/pipeline.service');
 
 
 const {findJobId, getCountsGroupByCompany, getNewJobs, getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
@@ -783,6 +783,8 @@ async function applyJobById(currentUserId, jobId, application ) {
 
         let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
         if(!foundApplication){
+
+          let job = await findJobId(jobId)
           application.job = job._id;
 
           if(application.resumeId){
@@ -800,17 +802,23 @@ async function applyJobById(currentUserId, jobId, application ) {
           savedApplication = await applyJob(application);
 
           if(savedApplication){
-            let jobPipeline = await getPipelineByJobId(job.jobId);
-            let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'} );
+            let jobPipeline = await getPipelineById(job.pipeline);
+
+            if(jobPipeline) {
+              let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
+
+              let progress = await  addApplicationProgress({
+                applicationId: savedApplication.applicationId,
+                stage: applyStage._id
+              });
+              // progress.stage = applyStage._id;
+              savedApplication.progress.push(progress._id)
+              savedApplication.currentProgress = progress._id;
+              await savedApplication.save();
+
+            }
 
             await addApplicationHistory({applicationId: savedApplication.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
-
-
-            let progress = await  addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
-            // progress.stage = applyStage._id;
-            savedApplication.progress.push(progress._id)
-            savedApplication.currentProgress = progress._id;
-            await savedApplication.save();
 
             //Create Notification
             let meta = {companyId: job.company, jobId: application.jobId, jobTitle: job.title, applicationId: savedApplication.applicationId, applicantId: currentUserId, createdBy: job.createdBy};

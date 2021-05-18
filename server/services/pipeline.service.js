@@ -16,14 +16,14 @@ const pipelineSchema = Joi.object({
   stages: Joi.array().required()
 });
 
-function getPipelineById(pipeLineId) {
+async function getPipelineById(pipelineId) {
   let data = null;
 
-  if(!pipeLineId){
+  if(!pipelineId){
     return;
   }
 
-  return Pipeline.findById(pipeLineId).populate('stages');
+  return await Pipeline.findById(pipelineId).populate('stages');
 }
 
 
@@ -34,8 +34,7 @@ async function getPipelineByJobId(jobId) {
     return;
   }
 
-  data = await Pipeline.findOne({jobId: jobId}).populate('stages');
-  console.log(data)
+  data = Pipeline.findOne({jobId: jobId}).populate('stages');
   return data;
 }
 

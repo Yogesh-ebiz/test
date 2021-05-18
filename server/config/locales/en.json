@@ -155,5 +155,6 @@
 	"application_reverted_successful": "application_reverted_successful",
 	"label_deleted_successful": "label_deleted_successful",
 	"job_unarchived_successful": "job_unarchived_successful",
-	"application_evaluated_successful": "application_evaluated_successful"
+	"application_evaluated_successful": "application_evaluated_successful",
+	"evaluation_added_successful": "evaluation_added_successful"
 }

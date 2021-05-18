@@ -1439,21 +1439,31 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
   let result;
   try {
 
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'currentProgress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'evaluations',
+          model: 'Evaluation'
+        }
+      }
+    ]);
 
-    let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
-
-    if(progress && !_.some(progress.evaluations, {createdBy: currentUserId})) {
+    if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
 
       form.createdBy = currentUserId;
       form.applicationId=ObjectID(applicationId);
       form.applicationProgressId=ObjectID(applicationProgressId);
+      form.candidateId = application.user
 
 
-      let evaluation = await evaluationService.addEvaluation(form);
-      if(evaluation){
-        progress.evaluations.push(evaluation._id);
-        await progress.save();
+      result = await evaluationService.addEvaluation(form);
+
+      if(result){
+        application.currentProgress.evaluations.push(result._id);
+        await applicationProgressService.addApplicationProgressEvaluation(applicationProgressId, result._id);
       }
     }
 
@@ -1500,7 +1510,13 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 
       for(const [i, evaluation] of progress.evaluations.entries()){
         if(evaluation.createdBy==currentUserId){
-          await evaluation.delete();
+          if(evaluation){
+            if(evaluation.assessment){
+              await evaluation.assessment.delete();
+            }
+            await evaluation.delete();
+          }
+
           progress.evaluations.splice(i, 1);
         }
       }
@@ -1629,7 +1645,7 @@ async function getBoard(currentUserId, jobId, locale) {
       {$match: {jobId: job.jobId}},
       {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
       {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }},
-      {$group: {_id: '$currentProgress.stageId', applications: {$push: "$$ROOT"}}}
+      {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
     ]);
 
 
