@@ -60,6 +60,8 @@ const convertToAvatar = (user) => {
 const convertToCandidate = (user) => {
   return {
     id: user.id,
+    userId: user.userId,
+    company: user.company,
     name: user.name,
     firstName: user.firstName,
     middleName: user.middleName,

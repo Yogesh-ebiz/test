@@ -11,7 +11,7 @@ const Joi = require('joi');
 
 const pipelineSchema = Joi.object({
   createdBy: Joi.number().required(),
-  jobId: Joi.number().required(),
+  jobId: Joi.object().required(),
   pipelineTemplateId: Joi.string().required(),
   stages: Joi.array().required()
 });

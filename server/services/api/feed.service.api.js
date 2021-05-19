@@ -215,7 +215,6 @@ async function createNotification(userId, notificationType, eventType, meta) {
     meta: meta
 
   };
-  console.log('createNote', body)
   let response = await client.post(`/notifications`, body, options);
   return response.data.data;
 };

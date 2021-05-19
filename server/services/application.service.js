@@ -240,6 +240,16 @@ async function findCandidatesByCompanyId(company, filter) {
 }
 
 
+async function findApplicationsByUserId(userId) {
+  let data = null;
+
+  let result = await Application.find({user: userId});
+
+  return result;
+
+}
+
+
 async function getLatestCandidates(company) {
   let data = null;
 
@@ -315,7 +325,7 @@ function findApplicationByUserIdAndJobId(userId, jobId) {
     return;
   }
 
-  return Application.findOne({partyId: userId, jobId: jobId});
+  return Application.findOne({user: userId, jobId: ObjectID(jobId)});
 }
 
 function findAppliedCountByUserIdAndJobId(userId, jobId) {
@@ -482,6 +492,7 @@ module.exports = {
   findAppliedCountByJobId: findAppliedCountByJobId,
   findApplicationsByJobId:findApplicationsByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
+  findApplicationsByUserId:findApplicationsByUserId,
   getLatestCandidates:getLatestCandidates,
   disqualifyApplication:disqualifyApplication,
   revertApplication:revertApplication,

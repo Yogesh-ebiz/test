@@ -219,10 +219,10 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
   let pipeline=null;
 
-  let job = await JobRequisition.findById(jobId);
+  let job = await JobRequisition.findById(ObjectID(jobId));
   if(job) {
     form.createdBy = currentUserId
-    form.jobId = job.jobId;
+    form.jobId = job._id;
     pipeline = await PipelineService.addPipeline(jobId, form);
 
     if(pipeline){

@@ -1,5 +1,6 @@
 module.exports = {
   ADDED: 'ADDED',
+  APPLIED: 'APPLIED',
   SENT: "SENT",
   UPDATED: "UPDATED",
   DELETED: "DELETED",

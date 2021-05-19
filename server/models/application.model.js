@@ -16,6 +16,9 @@ const ApplicationSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  jobTitle: {
+    type: String
+  },
   //user = partyId
   user: {
     type: Object,

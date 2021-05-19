@@ -1,8 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+// const mongoosePaginate = require('mongoose-paginate-v2');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 
-const UserSchema = new mongoose.Schema({
+const statusEnum = require('../const/statusEnum');
+
+const CandidateSchema = new mongoose.Schema({
   userId: {
+    type: Number,
+    required: true
+  },
+  company: {
     type: Number,
     required: true
   },
@@ -12,7 +20,7 @@ const UserSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: true
+    default: statusEnum.ACTIVE
   },
   firstName: {
     type: String,
@@ -30,14 +38,39 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required:false
   },
-  middleName: {
+  phoneNumber: {
     type: String,
     required:false
   },
-  tags: { type: Schema.Types.ObjectId, ref: 'Label' }
+  jobTitle: {
+    type: String,
+    required:false
+  },
+  match: {
+    type: Number,
+    required:false
+  },
+  rating: {
+    type: Number,
+    required:false,
+    default: 0
+  },
+  noOfMonthExperiences: {
+    type: Number,
+    required:false,
+    default: 0
+  },
+  level: {
+    type: String,
+    required:false,
+    default: ''
+  },
+  tags: { type: Schema.Types.ObjectId, ref: 'Label' },
+  applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }]
 }, {
   versionKey: false
 });
+CandidateSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Candidate', CandidateSchema);

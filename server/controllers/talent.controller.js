@@ -32,6 +32,7 @@ const poolService = require('../services/pool.service');
 const activityService = require('../services/activity.service');
 const commentService = require('../services/comment.service');
 const evaluationService = require('../services/evaluation.service');
+const candidateService = require('../services/candidate.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -121,6 +122,7 @@ module.exports = {
   unsubscribeApplication,
   getApplicationActivities,
   searchCandidates,
+  getCandidateById,
   addCompanyDepartment,
   updateCompanyDepartment,
   deleteCompanyDepartment,
@@ -1565,8 +1567,8 @@ async function getBoard(currentUserId, jobId, locale) {
 
   let boardStages = [];
   let pipelineStages;
-  let job = await jobService.findJobId(jobId, locale);
-  let pipeline = await getPipelineByJobId(job.jobId);
+  let job = await jobService.findJob_Id(jobId, locale);
+  let pipeline = await getPipelineByJobId(job._id);
   if(pipeline.stages) {
 
 
@@ -1597,9 +1599,9 @@ async function getBoard(currentUserId, jobId, locale) {
     // ]);
     //
     let applicationsGroupByStage = await Application.aggregate([
-      {$match: {jobId: job.jobId}},
+      {$match: {jobId: job._id}},
       {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
-      {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }},
+      {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, sources: 1, note: 1, user: 1, jobTitle: 1, currentProgress: {$arrayElemAt: ['$currentProgress', 0]} }},
       {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
     ]);
 
@@ -1634,6 +1636,48 @@ async function getBoard(currentUserId, jobId, locale) {
 }
 
 
+// async function searchCandidates(currentUserId, company, filter, locale) {
+//
+//   if(!currentUserId || !company || !filter){
+//     return null;
+//   }
+//
+//   let result;
+//   let select = '';
+//   let limit = (filter.size && filter.size>0) ? filter.size:20;
+//   let page = (filter.page && filter.page==0) ? filter.page:1;
+//   let sortBy = {};
+//   sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+//
+//   let options = {
+//     limit:    limit,
+//     page: parseInt(filter.page)+1
+//   };
+//
+//   result = await applicationService.findCandidatesByCompanyId(company, filter);
+//   let userIds = _.map(result.docs, 'id');
+//   let users = await lookupUserIds(userIds)
+//
+//   for(var i=0; i<result.docs.length; i++){
+//     let foundUser = _.find(users, {id: result.docs[i].id});
+//     if(foundUser) {
+//       foundUser.noOfMonthExperiences = 68;
+//       foundUser.level = 'SENIOR'
+//       foundUser.match = 87;
+//
+//       foundUser = convertToCandidate(foundUser);
+//       foundUser.applications = result.docs[i].applications;
+//       result.docs[i] = foundUser
+//
+//     }
+//
+//   };
+//
+//
+//   return new Pagination(result);
+//
+// }
+
 async function searchCandidates(currentUserId, company, filter, locale) {
 
   if(!currentUserId || !company || !filter){
@@ -1652,16 +1696,14 @@ async function searchCandidates(currentUserId, company, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
-  result = await applicationService.findCandidatesByCompanyId(company, filter);
-  let userIds = _.map(result.docs, 'id');
+  result = await candidateService.findByCompany(company, filter);
+  let userIds = _.map(result.docs, 'userId');
   let users = await lookupUserIds(userIds)
 
   for(var i=0; i<result.docs.length; i++){
     let foundUser = _.find(users, {id: result.docs[i].id});
     if(foundUser) {
-      foundUser.noOfMonthExperiences = 68;
-      foundUser.level = 'SENIOR'
-      foundUser.match = 87;
+
 
       foundUser = convertToCandidate(foundUser);
       foundUser.applications = result.docs[i].applications;
@@ -1673,6 +1715,26 @@ async function searchCandidates(currentUserId, company, filter, locale) {
 
 
   return new Pagination(result);
+
+}
+
+
+
+async function getCandidateById(currentUserId, company, candidateId, locale) {
+
+  if(!currentUserId || !company || !candidateId){
+    return null;
+  }
+
+  let result;
+
+  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, company).populate('applications');
+
+  if(candidate){
+    result = convertToCandidate(candidate);
+  }
+
+  return result;
 
 }
 

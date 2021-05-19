@@ -74,6 +74,7 @@ router.route('/company/:id/applications/:applicationId/activities').get(asyncHan
 
 
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
+router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId/evaluations').get(asyncHandler(getApplicationEvaluations));
 
 
@@ -643,7 +644,7 @@ async function getBoard(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
 
   let filter = req.query;
-  let jobId = parseInt(req.params.id);
+  let jobId = req.params.id;
   let data = await talentCtrl.getBoard(currentUserId, jobId, filter, res.locale);
   res.json(new Response(data, data?'board_retrieved_successful':'not_found', res));
 }
@@ -663,6 +664,16 @@ async function searchCandidates(req, res) {
 }
 
 
+async function getCandidateById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+  let company = parseInt(req.params.id);
+  let candidateId = parseInt(req.params.candidateId);
+
+
+  data = await talentCtrl.getCandidateById(currentUserId, company, candidateId, res.locale);
+  res.json(new Response(data, data?'candidate_retrieved_successful':'not_found', res));
+}
 
 async function addCompanyDepartment(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

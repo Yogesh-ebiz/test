@@ -9,10 +9,14 @@ const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
 const notificationType = require('../const/notificationType');
-
+const subjectType = require('../const/subjectType');
+const actionEnum = require('../const/actionEnum');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const feedService = require('../services/api/feed.service.api');
+const candidateService = require('../services/candidate.service');
+const activityService = require('../services/activity.service');
+
 
 const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
@@ -53,6 +57,7 @@ let Pagination = require('../utils/pagination');
 let SearchParam = require('../const/searchParam');
 
 const applicationSchema = Joi.object({
+  jobTitle: Joi.string().allow(''),
   jobId: Joi.object().required(),
   user: Joi.number().required(),
   phoneNumber: Joi.string(),
@@ -185,7 +190,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
             let hasSaved = await findBookById(currentParty.id, job.jobId);
             job.hasSaved = (hasSaved) ? true : false;
 
-            let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job.jobId);
+            let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
             job.hasApplied = (hasApplied) ? true : false;
 
             partySkills = await findUserSkillsById(currentParty.id);
@@ -777,12 +782,11 @@ async function applyJobById(currentUserId, jobId, application ) {
 
       if(job) {
         application.jobId = job._id;
+        application.jobTitle = job.title;
         application = await Joi.validate(application, applicationSchema, {abortEarly: false});
 
         let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
         if (!foundApplication) {
-
-
 
           if (application.resumeId) {
             let resume = await feedService.getResumeById(currentUserId, application.resumeId);
@@ -821,6 +825,12 @@ async function applyJobById(currentUserId, jobId, application ) {
               action: {type: applicationEnum.APPLIED}
             });
 
+            let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
+            if(!candidate){
+              await candidateService.addCandidate({userId: currentUserId, company: job.company, firstName: currentParty.firstName, middleName: currentParty.middleName, lastName: currentParty.lastName,
+                jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber, applications: [savedApplication._id]});
+            }
+
             //Create Notification
             let meta = {
               companyId: job.company,
@@ -836,6 +846,9 @@ async function applyJobById(currentUserId, jobId, application ) {
             if (application.follow) {
               await followCompany(job.company, currentUserId);
             }
+
+            let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subjectId: ''+savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, jobId: job._id, jobTitle: job.title}});
+
 
           }
 
