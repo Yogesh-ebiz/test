@@ -13,7 +13,7 @@ const ApplicationSchema = new mongoose.Schema({
     required: true
   },
   jobId: {
-    type: Number,
+    type: Object,
     required: true
   },
   //user = partyId

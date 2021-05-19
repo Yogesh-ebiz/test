@@ -100,7 +100,8 @@ module.exports = {
   updateJobApplicationForm,
   getBoard,
   payJob,
-  searchApplications,
+  getJobActivities,
+  searchJobApplications,
   rejectApplication,
   updateApplicationProgress,
   getApplicationQuestions,
@@ -321,8 +322,20 @@ async function getStats(currentUserId, companyId) {
 
   let data = [];
 
-  let jobs = await JobRequisition.find({company: companyId}).limit(10);
+  let newApplications = await applicationService.getLatestCandidates(companyId);
+  let userIds = _.map(newApplications, 'user');
+  let users = await lookupUserIds(userIds);
+  newApplications.forEach(function(app){
+    let found = _.find(users, {id: app.user});
+    if(found){
+      app.user = convertToCandidate(found);
+    }
 
+    app.progress=[];
+
+  });
+
+  let jobs = await JobRequisition.find({company: companyId}).limit(10);
   jobs = _.reduce(jobs, function(res, job){
     job.responsibilities=null;
     job.qualifications=null;
@@ -332,206 +345,7 @@ async function getStats(currentUserId, companyId) {
   }, []);
 
   let result = {
-    newCandidates: [
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Yu",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_0_1609948186560.jpg",
-        "id": 0,
-        "headline": "I am Yu Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Chan",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_5_1603790757692.jpg",
-        "id": 5,
-        "headline": "I am Chan Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Winnie",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_7_1603790822635.jpg",
-        "id": 7,
-        "headline": "I am Winnie Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Pete",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_12_1603912315336.jpg",
-        "id": 12,
-        "headline": "I am Pete nhe ban",
-        "matches": 50
-      },
-      {
-        "cover": "person_63_1613525639.jpg",
-        "lastName": "Doe",
-        "firstName": "Austin",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_63_1613525674523.jpg",
-        "id": 63,
-        "headline": "I am Austin Doe",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Doe",
-        "firstName": "Brooklyn",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_75_1603789930127.png",
-        "id": 75,
-        "headline": "I am Brooklyn",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Doe",
-        "firstName": "Cade",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_80_1603790011021.jpg",
-        "id": 80,
-        "headline": "I am Cade Doe",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Trang",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_85_1617007079881.jpg",
-        "id": 85,
-        "headline": "I am Trang Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover.png",
-        "lastName": "Nguyen",
-        "firstName": "Minh",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_89_1603790258619.jpg",
-        "id": 89,
-        "headline": "I am Minh Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "cover4.png",
-        "lastName": "Nguyen",
-        "firstName": "Tuan",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "A",
-        "avatar": "person_91_1612156489438.jpg",
-        "id": 91,
-        "headline": "I am Tuan Nguyen",
-        "matches": 50
-      },
-      {
-        "cover": "person_187_1614103679.jpg",
-        "lastName": "Doe",
-        "firstName": "Casey",
-        "currentPosition": {
-          "employmentTitle": "Android",
-          "company": {
-            "name": "name",
-            "id": 1
-          }
-        },
-        "rating": 0,
-        "middleName": "",
-        "avatar": "person_187_1614103672779.jpg",
-        "id": 187,
-        "headline": "I am Casey Doe",
-        "matches": 50
-      }
-    ],
+    newApplications: newApplications,
     mostActiveJobs: jobs
   }
 
@@ -832,7 +646,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     if(job && _.find(job.members, {_id: ObjectID(member._id)})) {
 
 
-      let noApplied = await applicationService.findAppliedCountByJobId(job.jobId);
+      let noApplied = await applicationService.findAppliedCountByJobId(job._id);
       job.noApplied = noApplied;
 
 
@@ -999,13 +813,77 @@ async function payJob(currentUserId, jobId, payment) {
 
 }
 
-async function searchApplications(currentUserId, jobId, filter, locale) {
 
-  if(currentUserId==null || jobId==null || !filter){
+async function getJobActivities(companyId, currentUserId, jobId, filter) {
+  if(!companyId || !currentUserId || !jobId || !filter){
     return null;
   }
 
-  let results = await applicationService.findApplicationsByJobId(jobId, filter);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await activityService.findByJobId(jobId, filter);
+    let userIds = _.map(result.docs, 'causerId');
+    let users = await lookupUserIds(userIds);
+    result.docs.forEach(function(activity){
+      let found = _.find(users, {id: parseInt(activity.causerId)});
+      if(found){
+        activity.causer = convertToTalentUser(found);
+      }
+    });
+    return new Pagination(result);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
+
+async function searchJobApplications(currentUserId, jobId, filter, locale) {
+
+  if(!currentUserId || !jobId || !filter){
+    return null;
+  }
+
+  let result = await applicationService.findApplicationsByJobId(jobId, filter);
+  let userIds = _.map(result.docs, 'user');
+  let users = await lookupUserIds(userIds);
+
+  let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
+
+  result.docs.forEach(function(app){
+    let user = _.find(users, {id: app.user});
+    if(user){
+      app.user = user;
+    }
+
+    if(_.some(subscriptions, {subjectId: ObjectID(app._id)})){
+      app.hasFollowed = true;
+    }
+  })
+
+  return new Pagination(result);
+
+
+}
+
+
+async function searchCompanyApplications(currentUserId, companyId, filter, locale) {
+
+  if(!currentUserId || !companyId || !filter){
+    return null;
+  }
+
+  let results = await applicationService.findApplicationsByCompany(companyId, filter);
 
   let userIds = _.map(results.content, 'user');
   let users = await lookupUserIds(userIds);
@@ -1089,17 +967,30 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
     let application = await applicationService.findApplicationBy_Id(applicationId).populate([
       {
         path: 'currentProgress',
-        model: 'ApplicationProgress'
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
       },
       {
         path: 'progress',
-        model: 'ApplicationProgress'
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
       }
     ]);
 
 
     if(application) {
-      progress = _.find(application.progress, {stageId: ObjectID(newStage)})
+      let previousProgress = application.currentProgress;
+      _.forEach(application.progress, function(item){
+        if(item.stage._id==ObjectID(newStage)){
+          progress = item;
+        }
+      });
 
       if(progress){
         application.currentProgress = progress;
@@ -1111,7 +1002,7 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
           if(foundStage) {
             progress = await  applicationProgressService.addApplicationProgress({
               applicationId: application.applicationId,
-              stageId: foundStage._id
+              stage: foundStage._id
             });
 
             application.currentProgress = progress;
@@ -1123,6 +1014,10 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
         }
       }
 
+
+      let user = await lookupUserIds([application.user]);
+      let job = await jobService.findJobId(application.jobId);
+      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.MOVED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: foundStage.name}});
     }
 
   } catch (error) {
@@ -1179,25 +1074,6 @@ async function getApplicationQuestions(companyId, currentUserId, applicationId) 
 
 
 
-
-async function getJobApplications(currentUserId, jobId) {
-
-  if(!currentUserId || !jobId){
-    return null;
-  }
-
-  let result;
-  try {
-
-
-    result = await app.getComments(jobId);
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  return result;
-}
 
 
 
@@ -1481,8 +1357,8 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
       if(result){
         application.currentProgress.evaluations.push(result._id);
         await applicationProgressService.addApplicationProgressEvaluation(applicationProgressId, result._id);
-
-        let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {name: application.currentProgress.stage.name}});
+        let job = await jobService.findJobId(application.jobId);
+        let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {name: application.currentProgress.stage.name, jobId: job._id}});
       }
     }
 
@@ -1648,6 +1524,7 @@ async function unsubscribeApplication(companyId, currentUserId, applicationId) {
 }
 
 
+
 async function getApplicationActivities(companyId, currentUserId, applicationId, filter) {
   if(!companyId || !currentUserId || !applicationId || !filter){
     return null;
@@ -1662,6 +1539,14 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
   try {
 
     result = await activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId, filter);
+    let userIds = _.map(result.docs, 'causerId');
+    let users = await lookupUserIds(userIds);
+    result.docs.forEach(function(activity){
+      let found = _.find(users, {id: parseInt(activity.causerId)});
+      if(found){
+        activity.causer = convertToTalentUser(found);
+      }
+    });
     return new Pagination(result);
 
   } catch (error) {
@@ -1670,6 +1555,7 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
 
   return result;
 }
+
 
 async function getBoard(currentUserId, jobId, locale) {
 
@@ -2513,14 +2399,21 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
 }
 
 
-async function subscribeJob(memberId, jobId) {
-  if(!memberId || !jobId){
+async function subscribeJob(currentUserId, companyId, jobId) {
+  if(!currentUserId || !companyId || !jobId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
   let result;
   try {
-    result = await memberService.subscribeJob(memberId, jobId);
+    let subscription = {createdBy: currentUserId, subjectType: subjectType.JOB, subjectId: ObjectID(jobId)};
+    result = await memberService.subscribe(subscription);
   } catch(e){
     console.log('subscribeJob: Error', e);
   }
@@ -2530,14 +2423,20 @@ async function subscribeJob(memberId, jobId) {
 
 
 
-async function unsubscribeJob(memberId, jobId) {
-  if(!memberId || !jobId){
+async function unsubscribeJob(currentUserId, companyId, jobId) {
+  if(!memberId || !companyId || !jobId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
   let result;
   try {
-    result = await memberService.unsubscribeJob(memberId, jobId);
+    result = await memberService.unsubscribe(memberId, jobId);
   } catch(e){
     console.log('unsubscribeJob: Error', e);
   }

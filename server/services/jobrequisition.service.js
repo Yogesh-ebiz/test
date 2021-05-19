@@ -3,6 +3,9 @@ const ObjectID = require('mongodb').ObjectID;
 
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const subjectType = require('../const/subjectType');
+const actionEnum = require('../const/actionEnum');
+
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
 const QuestionTemplate = require('../models/questiontemplate.model');
@@ -13,6 +16,7 @@ const PipelineTemplate = require('../models/pipelineTemplate.model');
 const PipelineService = require('../services/pipeline.service');
 const memberService = require('../services/member.service');
 const feedService = require('../services/api/feed.service.api');
+const activityService = require('../services/activity.service');
 
 let SearchParam = require('../const/searchParam');
 
@@ -373,7 +377,10 @@ async function closeJob(jobId, currentUserId) {
     return;
   }
 
-  let result = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let user = await feedService.lookupUserIds([currentUserId]);
+  console.log('closed')
+  await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.CLOSED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
   return result;
 
 }
@@ -384,7 +391,10 @@ async function archiveJob(jobId, currentUserId) {
     return;
   }
 
-  let result = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let user = await feedService.lookupUserIds([currentUserId]);
+  await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.ARCHIVED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
+
   return result;
 
 }
@@ -396,7 +406,10 @@ async function unarchiveJob(jobId, currentUserId) {
     return;
   }
 
-  let result = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let user = await feedService.lookupUserIds([currentUserId]);
+  await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.UNARCHIVED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
+
   return result;
 
 }

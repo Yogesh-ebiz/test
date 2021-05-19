@@ -10,6 +10,7 @@ const  ApplicationSearchParam = require('../const/applicationSearchParam');
 const Pagination = require('../utils/job.pagination');
 const JobService = require('../services/jobrequisition.service');
 const activityService = require('../services/activity.service');
+const feedService = require('../services/api/feed.service.api');
 
 
 function findApplicationById(applicationId) {
@@ -49,6 +50,18 @@ function findApplicationBy_Id(applicationId) {
   return Application.findById(applicationId);
 }
 
+
+function findApplicationsByJobIds(listfJobIds) {
+  let data = null;
+
+  if(listfJobIds==null){
+    return;
+  }
+
+  return Application.find({jobId: {$in: listfJobIds}});
+}
+
+
 async function findApplicationsByJobId(jobId, filter) {
   let data = null;
 
@@ -73,9 +86,10 @@ async function findApplicationsByJobId(jobId, filter) {
   filter.jobId=jobId;
 
 
+  console.log(jobId)
   const aggregate = Application.aggregate([{
     $match: {
-      jobId: jobId
+      jobId: ObjectID(jobId)
     }
   },
     {
@@ -105,7 +119,69 @@ async function findApplicationsByJobId(jobId, filter) {
   //
   // ];
   let result = await Application.aggregatePaginate(aggregate, options);
-  return new Pagination(result);
+  return result;
+
+  // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
+}
+
+
+async function findAllApplications(companyId, filter) {
+  let data = null;
+
+  if(companyId==null || !filter){
+    return;
+  }
+
+  let select = '';
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+
+
+
+  const aggregate = Application.aggregate([{
+    $match: {
+      jobId: ObjectID(jobId)
+    }
+  },
+    {
+      $lookup: {
+        from: 'applicationprogresses',
+        localField: 'currentProgress',
+        foreignField: '_id',
+        as: 'currentProgress',
+      },
+    },
+
+  ]);
+
+  //   (filter = {}, skip = 0, limit = 10, sort = {}) => [{
+  //   $match: {
+  //     jobId: 1
+  //   }
+  // },
+  //   {
+  //     $lookup: {
+  //       from: 'applicationprogresses',
+  //       localField: 'currentProgress',
+  //       foreignField: '_id',
+  //       as: 'currentProgress',
+  //     },
+  //   },
+  //
+  // ];
+  let result = await Application.aggregatePaginate(aggregate, options);
+  return result;
 
   // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
 }
@@ -114,7 +190,7 @@ async function findApplicationsByJobId(jobId, filter) {
 async function findCandidatesByCompanyId(company, filter) {
   let data = null;
 
-  if(company==null || !filter){
+  if(!company || !filter){
     return;
   }
 
@@ -136,10 +212,14 @@ async function findCandidatesByCompanyId(company, filter) {
 
   let jobs = await JobService.findJobsByCompanyId(company);
 
+  let match = {
+    jobId: {$in: _.map(jobs, 'jobId')}
+  };
+
+
+
   const aggregate = Application.aggregate([{
-    $match: {
-      jobId: {$in: _.map(jobs, 'jobId')}
-    }
+    $match: match
   },
   {
     $lookup: {
@@ -154,6 +234,30 @@ async function findCandidatesByCompanyId(company, filter) {
   ]);
 
   let result = await Application.aggregatePaginate(aggregate, options);
+
+  return result;
+
+}
+
+
+async function getLatestCandidates(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  let jobs = await JobService.findJobsByCompanyId(company);
+
+
+  var from = new Date();
+  from.setDate(from.getDate()-1);
+  from.setMinutes(0);
+  from.setHours(0)
+  let now = Date.now();
+
+
+  let result = await Application.find({$and: [ {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] });
 
   return result;
 
@@ -235,18 +339,18 @@ async function disqualifyApplication(applicationId, reason, member) {
   }
 
   let application = await Application.findById(applicationId);
-
-  console.log(application)
-  if(application.status==statusEnum.ACTIVE){
+  if(application && application.status==statusEnum.ACTIVE){
     application.status = statusEnum.DISQUALIFIED;
     application = await application.save();
 
     if(application.status==statusEnum.DISQUALIFIED){
       result = {status: statusEnum.DISQUALIFIED};
 
+      let user = await feedService.lookupUserIds([application.user]);
+
       let job = await JobService.findJobId(application.jobId);
       //Add activity
-      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: applicationId, action: actionEnum.DISQUALIFIED, meta: {name: job.title, jobId: application.jobId, reason: reason}});
+      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: user[0].firstName + ' ' + user[0].lastName, jobTitle: job.title, jobId: job._id, reason: reason}});
     }
   }
   return result;
@@ -268,8 +372,9 @@ async function revertApplication(applicationId, member) {
     if(application.status==statusEnum.ACTIVE){
       result = {status: statusEnum.ACTIVE};
 
+      let user = await feedService.lookupUserIds([application.user]);
       let job = await JobService.findJobId(application.jobId);
-      await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: applicationId, action: actionEnum.REVERTED, meta: {name: job.title, jobId: application.jobId}});
+      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.REVERTED, meta: {candidate: user[0].firstName + ' ' + user[0].lastName, jobTitle: job.title, jobId: job._id}});
     }
   }
   return result;
@@ -370,12 +475,14 @@ function applyJob(application) {
 module.exports = {
   findApplicationById: findApplicationById,
   findApplicationBy_Id:findApplicationBy_Id,
+  findApplicationsByJobIds:findApplicationsByJobIds,
   findApplicationByUserId: findApplicationByUserId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
   findAppliedCountByJobId: findAppliedCountByJobId,
   findApplicationsByJobId:findApplicationsByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
+  getLatestCandidates:getLatestCandidates,
   disqualifyApplication:disqualifyApplication,
   revertApplication:revertApplication,
   getApplicationActivities:getApplicationActivities,

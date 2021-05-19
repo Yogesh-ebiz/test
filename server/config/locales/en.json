@@ -158,5 +158,6 @@
 	"application_evaluated_successful": "application_evaluated_successful",
 	"evaluation_added_successful": "evaluation_added_successful",
 	"application_subscribed_successful": "application_subscribed_successful",
-	"application_unsubscribeed_successful": "application_unsubscribeed_successful"
+	"application_unsubscribeed_successful": "application_unsubscribeed_successful",
+	"job_subsribed_successful": "job_subsribed_successful"
 }

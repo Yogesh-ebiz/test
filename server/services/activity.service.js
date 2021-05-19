@@ -55,7 +55,33 @@ async function findBySubjectTypeAndSubjectId(subjectType, subjectId, filter) {
 }
 
 
+async function findByJobId(jobId, filter) {
+  if(!jobId || !filter){
+    return;
+  }
+
+  let limit = (filter.size && filter.size>0) ? filter.size:20;
+  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let sortBy = {};
+  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+  return Activity.paginate({'meta.jobId': ObjectID(jobId)}, options);
+  // return Activity.find({subjectType: subjectType, subjectId: subjectId});
+
+}
+
+
 module.exports = {
   addActivity:addActivity,
-  findBySubjectTypeAndSubjectId:findBySubjectTypeAndSubjectId
+  findBySubjectTypeAndSubjectId:findBySubjectTypeAndSubjectId,
+  findByJobId:findByJobId
 }

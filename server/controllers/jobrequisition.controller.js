@@ -53,7 +53,7 @@ let Pagination = require('../utils/pagination');
 let SearchParam = require('../const/searchParam');
 
 const applicationSchema = Joi.object({
-  jobId: Joi.number().required(),
+  jobId: Joi.object().required(),
   user: Joi.number().required(),
   phoneNumber: Joi.string(),
   email: Joi.string().required(),
@@ -764,47 +764,44 @@ async function applyJobById(currentUserId, jobId, application ) {
     return null;
   }
 
-  application = await Joi.validate(application, applicationSchema, { abortEarly: false });
-
-
-
 
   let savedApplication;
   try {
-    let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE });
 
-    if(job) {
-      let currentParty = await findByUserId(currentUserId);
-      //Security Check if user is part of meeting attendees that is ACTIVE.
-      if (isPartyActive(currentParty)) {
+    let currentParty = await findByUserId(currentUserId);
+    //Security Check if user is part of meeting attendees that is ACTIVE.
+    if (isPartyActive(currentParty)) {
 
-        let candidate = null;
+      let candidate = null;
+      let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE });
+
+      if(job) {
+        application.jobId = job._id;
+        application = await Joi.validate(application, applicationSchema, {abortEarly: false});
+
+        let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
+        if (!foundApplication) {
 
 
-        let foundApplication = await findApplicationByUserIdAndJobId(currentParty.id, application.jobId);
-        if(!foundApplication){
 
-          let job = await findJobId(jobId)
-          application.job = job._id;
-
-          if(application.resumeId){
+          if (application.resumeId) {
             let resume = await feedService.getResumeById(currentUserId, application.resumeId);
-            if(resume){
+            if (resume) {
               application.resume = {filename: resume.name, fileType: resume.fileType}
             }
           }
 
 
-          if(application.source){
+          if (application.source) {
             application.sources.push(source);
           }
 
           savedApplication = await applyJob(application);
 
-          if(savedApplication){
+          if (savedApplication) {
             let jobPipeline = await getPipelineById(job.pipeline);
 
-            if(jobPipeline) {
+            if (jobPipeline) {
               let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
 
               let progress = await  addApplicationProgress({
@@ -818,23 +815,34 @@ async function applyJobById(currentUserId, jobId, application ) {
 
             }
 
-            await addApplicationHistory({applicationId: savedApplication.applicationId, partyId: currentParty.id, action: {type: applicationEnum.APPLIED} });
+            await addApplicationHistory({
+              applicationId: savedApplication.applicationId,
+              partyId: currentParty.id,
+              action: {type: applicationEnum.APPLIED}
+            });
 
             //Create Notification
-            let meta = {companyId: job.company, jobId: application.jobId, jobTitle: job.title, applicationId: savedApplication.applicationId, applicantId: currentUserId, createdBy: job.createdBy};
+            let meta = {
+              companyId: job.company,
+              jobId: job.jobId,
+              jobTitle: job.title,
+              applicationId: savedApplication.applicationId,
+              applicantId: currentUserId,
+              createdBy: job.createdBy
+            };
             await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
             //TODO: Call Follow API
-            if(application.follow){
+            if (application.follow) {
               await followCompany(job.company, currentUserId);
             }
 
           }
 
-
         }
       }
     }
+
 
   } catch (error) {
     console.log(error);

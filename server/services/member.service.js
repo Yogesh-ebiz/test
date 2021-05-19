@@ -256,6 +256,31 @@ async function unsubscribe(userId, subjectType, subjectId) {
 }
 
 
+
+async function findMemberSubscribed(userId, subjectType, subjectId) {
+
+  if(!userId || !subjectType || !subjectId){
+    return;
+  }
+
+  let result = await MemberSubscribe.find({createdBy: userId, subjectType: subjectType, subjectId: ObjectID(subjectId)});
+  return result;
+
+}
+
+
+async function findMemberSubscribedToSubjectType(userId, subjectType) {
+
+  if(!userId || !subjectType){
+    return;
+  }
+
+  let result = await MemberSubscribe.find({createdBy: userId, subjectType: subjectType});
+  return result;
+
+}
+
+
 module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
@@ -269,5 +294,7 @@ module.exports = {
   followJob: followJob,
   unfollowJob: unfollowJob,
   subscribe:subscribe,
-  unsubscribe:unsubscribe
+  unsubscribe:unsubscribe,
+  findMemberSubscribed:findMemberSubscribed,
+  findMemberSubscribedToSubjectType:findMemberSubscribedToSubjectType
 }

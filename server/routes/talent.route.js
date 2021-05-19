@@ -30,11 +30,22 @@ router.route('/company/:id/jobs/:jobId/comments/:commentId').delete(asyncHandler
 router.route('/company/:id/jobs/:jobId/comments/:commentId').put(asyncHandler(updateJobComment));
 
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
+router.route('/company/:id/jobs/:jobId/activities').get(asyncHandler(getJobActivities));
+router.route('/company/:id/jobs/:jobId/applications').get(asyncHandler(searchJobApplications));
 
-router.route('/company/:id/applications').get(asyncHandler(searchApplications));
+router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
+router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
+router.route('/company/:id/jobs/:jobId/members').post(asyncHandler(updateJobMembers));
+
+router.route('/company/:id/jobs/:jobId/subscribe').post(asyncHandler(subscribeJob));
+router.route('/company/:id/jobs/:jobId/subscribe').delete(asyncHandler(unsubscribeJob));
+router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updateJobApplicationForm));
+router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
 
+
+// router.route('/company/:id/applications').get(asyncHandler(searchAllApplications));
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
 router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
 
@@ -58,22 +69,8 @@ router.route('/company/:id/applications/:applicationId/revert').post(asyncHandle
 router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHandler(subscribeApplication));
 router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
 
-
 router.route('/company/:id/applications/:applicationId/activities').get(asyncHandler(getApplicationActivities));
 
-
-router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
-router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
-
-router.route('/company/:id/jobs/:jobId/members').post(asyncHandler(updateJobMembers));
-
-router.route('/company/:id/jobs/:jobId/subscribe').post(asyncHandler(subscribeJob));
-router.route('/company/:id/jobs/:jobId/subscribe').delete(asyncHandler(unsubscribeJob));
-
-
-router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updateJobApplicationForm));
-
-router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 
 
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
@@ -310,13 +307,33 @@ async function payJob(req, res) {
 
 
 
-async function searchApplications(req, res) {
+async function getJobActivities(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = req.params.jobId;
+  let filter = req.query;
+  let data = await talentCtrl.getJobActivities(companyId, currentUserId, jobId, filter);
+
+  res.json(new Response(data, data?'application_reverted_successful':'not_found', res));
+}
+
+
+
+async function searchJobApplications(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.query;
-  let jobId = parseInt(req.query.jobId);
-  let data = await talentCtrl.searchApplications(currentUserId, jobId, filter, res.locale);
+  let jobId = req.params.jobId;
+  let data = await talentCtrl.searchJobApplications(currentUserId, jobId, filter, res.locale);
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
+//
+// async function searchAllApplications(req, res) {
+//   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+//   let companyId = parseInt(req.params.id);
+//   let filter = req.query;
+//   let data = await talentCtrl.searchAllApplications(currentUserId, companyId, filter, res.locale);
+//   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
+// }
 
 
 async function rejectApplication(req, res) {
@@ -538,6 +555,8 @@ async function unsubscribeApplication(req, res) {
 }
 
 
+
+
 async function getApplicationActivities(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -576,7 +595,6 @@ async function updateJobMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let jobId = req.params.jobId;
   let members = req.body.members;
-  console.log(members)
 
   let data = await talentCtrl.updateJobMembers(jobId, currentUserId, members);
   res.json(new Response(data, data?'job_member_updated_successful':'not_found', res));
@@ -585,24 +603,24 @@ async function updateJobMembers(req, res) {
 
 
 async function subscribeJob(req, res) {
-
+  let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let memberId = req.header('memberId');
   let jobId = req.params.jobId;
 
-  let data = await talentCtrl.subscribeJob(memberId, jobId);
+  let data = await talentCtrl.subscribeJob(currentUserId, companyId, jobId);
 
   res.json(new Response(data, data?'job_subsribed_successful':'not_found', res));
 }
 
 
 async function unsubscribeJob(req, res) {
-
+  let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let memberId = req.header('memberId');
   let jobId = req.params.jobId;
 
-  let data = await talentCtrl.unsubscribeJob(memberId, jobId);
+  let data = await talentCtrl.unsubscribeJob(currentUserId, companyId, jobId);
 
   res.json(new Response(data, data?'job_unsubscribed_successful':'not_found', res));
 }
@@ -610,6 +628,7 @@ async function unsubscribeJob(req, res) {
 
 async function updateJobApplicationForm(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
   let jobId = req.params.jobId;
   let form = req.body;
 

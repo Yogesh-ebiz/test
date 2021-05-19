@@ -1,8 +1,16 @@
 const _ = require('lodash');
-const statusEnum = require('../const/statusEnum');
-const Comment = require('../models/comment.model');
-const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
+const ObjectID = require('mongodb').ObjectID;
+
+const statusEnum = require('../const/statusEnum');
+const subjectType = require('../const/subjectType');
+const actionEnum = require('../const/actionEnum');
+
+const Comment = require('../models/comment.model');
+const feedService = require('../services/api/feed.service.api');
+const activityService = require('../services/activity.service');
+const jobService = require('../services/jobrequisition.service');
+const applicationService = require('../services/application.service');
 
 
 const commentSchema = Joi.object({
@@ -63,7 +71,23 @@ async function addComment(comment) {
 
   comment = await Joi.validate(comment, commentSchema, {abortEarly: false});
 
-  comment = new Comment(comment).save();
+  comment = await new Comment(comment).save();
+
+  let job;
+  if(comment.subjectType==subjectType.JOB){
+    job = await jobService.findJob_Id(comment.subjectId);
+  } else if(comment.subjectType==subjectType.APPLICATION) {
+    let application = await applicationService.findApplicationBy_Id(comment.subjectId);
+    if(application){
+      job = await jobService.findJobId(application.jobId);
+    }
+
+  }
+
+  let user = await feedService.lookupUserIds([comment.createdBy]);
+  await activityService.addActivity({causerId: ''+comment.createdBy, causerType: subjectType.MEMBER, subjectType: comment.subjectType, subjectId: ''+comment.subjectId, action: actionEnum.COMMENTED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: job.title, jobId: job._id}});
+
+
   return comment;
 
 }
