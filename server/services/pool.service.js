@@ -27,7 +27,7 @@ async function getPools(company, query) {
   return pools
 }
 
-async function findPoolBy_Id(poolId) {
+function findPoolBy_Id(poolId) {
   let data = null;
 
   if(poolId==null){

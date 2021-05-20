@@ -160,5 +160,7 @@
 	"application_subscribed_successful": "application_subscribed_successful",
 	"application_unsubscribeed_successful": "application_unsubscribeed_successful",
 	"job_subsribed_successful": "job_subsribed_successful",
-	"candidate_retrieved_successful": "candidate_retrieved_successful"
+	"candidate_retrieved_successful": "candidate_retrieved_successful",
+	"candidate_added_successful": "candidate_added_successful",
+	"candidate_removed_successful": "candidate_removed_successful"
 }

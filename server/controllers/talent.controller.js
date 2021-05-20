@@ -155,6 +155,8 @@ module.exports = {
   addCompanyPool,
   updateCompanyPool,
   deleteCompanyPool,
+  addPoolCandidates,
+  removePoolCandidate,
   subscribeJob,
   unsubscribeJob
 }
@@ -1701,14 +1703,10 @@ async function searchCandidates(currentUserId, company, filter, locale) {
   let users = await lookupUserIds(userIds)
 
   for(var i=0; i<result.docs.length; i++){
-    let foundUser = _.find(users, {id: result.docs[i].id});
+    let foundUser = _.find(users, {id: result.docs[i].userId});
     if(foundUser) {
-
-
-      foundUser = convertToCandidate(foundUser);
-      foundUser.applications = result.docs[i].applications;
+      foundUser = convertToCandidate(_.merge(foundUser, result.docs[i]));
       result.docs[i] = foundUser
-
     }
 
   };
@@ -2406,23 +2404,24 @@ async function addCompanyPool(company, form, currentUserId) {
 }
 
 async function updateCompanyPool(company, poolId, currentUserId, form) {
-  console.log(company, poolId, currentUserId, form)
   if(!company || !currentUserId || !poolId || !form){
     return null;
   }
 
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
-
-
   try {
-    if (isPartyActive(currentParty)) {
-      form.department = ObjectID(form.department);
+    form.department = ObjectID(form.department);
 
-      result = await poolService.updatePool(poolId, form);
+    result = await poolService.updatePool(poolId, form);
 
-
-    }
   } catch(e){
     console.log('updateCompanyPool: Error', e);
   }
@@ -2436,24 +2435,103 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
     return null;
   }
 
-  let result = null;
-  let currentParty = await findByUserId(currentUserId);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
 
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
 
   try {
-    if (isPartyActive(currentParty)) {
-      let pool = await poolService.findPoolBy_Id(poolId);
-      if(pool){
-        result = await pool.delete();
-        if(result){
-          result = {deleted: 1};
-        }
-
+    let pool = await poolService.findPoolBy_Id(poolId);
+    if(pool){
+      result = await pool.delete();
+      if(result){
+        result = {deleted: 1};
       }
 
     }
+
+
   } catch(e){
     console.log('deleteCompanyPool: Error', e);
+  }
+
+
+  return result
+}
+
+async function addPoolCandidates(company, poolId, candidateIds, currentUserId) {
+  if(!company || !poolId || !candidateIds || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+
+  try {
+    let candidates = await candidateService.getListofCandidates(candidateIds, company);
+    if(candidates.length) {
+      let pool = await poolService.findPoolBy_Id(poolId).populate('candidates');
+      if (pool) {
+        candidates.forEach(function(candidate){
+          let exists = _.some(pool.candidates, {userId: candidate.userId});
+          if (!exists) {
+            pool.candidates.push(candidate)
+          }
+        })
+        result = await pool.save();
+
+      }
+    }
+
+
+  } catch(e){
+    console.log('addPoolCandidate: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+async function removePoolCandidate(company, poolId, candidateId, currentUserId) {
+  if(!company || !poolId || !candidateId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+  try {
+    let pool = await poolService.findPoolBy_Id(poolId).populate('candidates');
+    if (pool) {
+      for(const [i, candidate] of pool.candidates.entries()){
+        if(candidate.userId==candidateId){
+          pool.candidates.splice(i, 1);
+        }
+      }
+      await pool.save();
+      result = {success: true};
+
+    }
+
+  } catch(e){
+    console.log('addPoolCandidate: Error', e);
   }
 
 

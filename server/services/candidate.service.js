@@ -92,10 +92,20 @@ function findByUserIdAndCompanyId(userId, companyId) {
   return Candidate.findOne({userId: userId, company: companyId});
 }
 
+function getListofCandidates(userIds, companyId) {
+
+
+  if(!userIds || !companyId){
+    return;
+  }
+  return Candidate.find({userId: {$in: userIds}, company: companyId});
+}
+
 
 module.exports = {
   addCandidate:addCandidate,
   findByUserId:findByUserId,
   findByCompany:findByCompany,
-  findByUserIdAndCompanyId:findByUserIdAndCompanyId
+  findByUserIdAndCompanyId:findByUserIdAndCompanyId,
+  getListofCandidates:getListofCandidates
 }

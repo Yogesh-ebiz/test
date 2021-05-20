@@ -73,6 +73,9 @@ const ApplicationSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  attachment: {
+    type: String
+  },
   progress: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
   sources: {
     type: Array

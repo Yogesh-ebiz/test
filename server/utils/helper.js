@@ -58,6 +58,10 @@ const convertToAvatar = (user) => {
 }
 
 const convertToCandidate = (user) => {
+  if(!user){
+    return;
+  }
+
   return {
     id: user.id,
     userId: user.userId,

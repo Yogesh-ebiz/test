@@ -119,6 +119,10 @@ router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
 router.route('/company/:id/pools/:poolId').put(asyncHandler(updateCompanyPool));
 router.route('/company/:id/pools/:poolId').delete(asyncHandler(deleteCompanyPool));
 
+router.route('/company/:id/pools/:poolId/candidates').post(asyncHandler(addPoolCandidates));
+router.route('/company/:id/pools/:poolId/candidates/:candidateId').delete(asyncHandler(removePoolCandidate));
+
+
 async function getInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
@@ -1066,4 +1070,27 @@ async function deleteCompanyPool(req, res) {
 
   let data = await talentCtrl.deleteCompanyPool(company, poolId, currentUserId);
   res.json(new Response(data, data?'pool_deleted_successful':'not_found', res));
+}
+
+
+async function addPoolCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let poolId = req.params.poolId;
+  let candidates = req.body.candidates;
+
+  candidates.forEach(function(id){ id = parseInt(id); });
+  let data = await talentCtrl.addPoolCandidates(company, poolId, candidates, currentUserId);
+  res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
+}
+
+
+async function removePoolCandidate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let poolId = req.params.poolId;
+  let candidateId = req.params.candidateId;
+
+  let data = await talentCtrl.removePoolCandidate(company, poolId, candidateId, currentUserId);
+  res.json(new Response(data, data?'candidate_removed_successful':'not_found', res));
 }
