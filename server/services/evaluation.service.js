@@ -40,32 +40,59 @@ async function addEvaluation(form) {
 }
 
 
-async function removeEvaluation(userId, applicationProgressId) {
+async function removeEvaluation(userId, applicationId, applicationProgressId) {
 
   if(!userId || !applicationProgressId){
     return;
   }
 
   let result;
-  let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
+  // let progress = await applicationProgressService.getApplicationProgressEvaluations(applicationProgressId);
+  let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+    {
+      path: 'currentProgress',
+      model: 'ApplicationProgress',
+      populate: [{
+        path: 'evaluations',
+        model: 'Evaluation'
+      },
+        {
+          path: 'stage',
+          model: 'Stage'
+        }]
+    },
+    {
+      path: 'user',
+      model: 'Candidate'
+    }
+  ]);
 
-  if(progress && progress.evaluations.length) {
+  console.log(application)
+  if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
-
-    for(const [i, evaluation] of progress.evaluations.entries()){
+    for(const [i, evaluation] of application.currentProgress.evaluations.entries()){
       if(evaluation.createdBy==userId){
         if(evaluation){
           if(evaluation.assessment){
             await evaluation.assessment.delete();
           }
-          await evaluation.delete();
+          result = await evaluation.delete();
         }
 
-        progress.evaluations.splice(i, 1);
+        application.currentProgress.evaluations.splice(i, 1);
       }
     }
-    progress = await progress.save();
-    if(progress){
+
+    for(const [i, evaluation] of application.user.evaluations.entries()){
+      if(evaluation.createdBy==userId){
+        application.user.evaluations.splice(i, 1);
+      }
+    }
+
+    await application.currentProgress.save();
+    await application.user.save();
+
+    if(result){
       result = {success: true}
     }
   }

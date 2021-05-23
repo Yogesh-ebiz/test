@@ -328,8 +328,10 @@ async function getStats(currentUserId, companyId) {
   let data = [];
 
   let newApplications = await applicationService.getLatestCandidates(companyId);
-  let userIds = _.map(newApplications, 'user');
+  let userIds = _.reduce(newApplications, function(res, app){ res.push(app.user.userId); return res;}, []);
   let users = await lookupUserIds(userIds);
+
+
   newApplications.forEach(function(app){
     // let found = _.find(users, {id: app.user});
     // if(found){
@@ -367,6 +369,7 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   }
 
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.JOB);
 
   if(!member){
     return null;
@@ -378,7 +381,6 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   let sortBy = {};
   sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
 
-  console.log(filter)
   let options = {
     select:   select,
     sort:     sortBy,
@@ -399,7 +401,7 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
     job.isHot = false;
     job.isNew = false;
     job.company = convertToCompany(company);
-    job.hasSaved = _.some(member.followedJobs, job._id);
+    job.hasSaved = _.some(jobSubscribed, {subjectId: job._id});
 
     let createdBy = _.find(users, {id: job.createdBy});
     if(createdBy){
@@ -1410,7 +1412,6 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
     ]);
 
 
-    console.log(application.user)
     if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
       form.createdBy = currentUserId;
