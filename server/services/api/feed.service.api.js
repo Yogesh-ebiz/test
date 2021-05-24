@@ -154,6 +154,15 @@ async function findCategoryByShortCode(shortCode, locale) {
 };
 
 
+async function findCategoryByType(type, locale) {
+  const options = {
+    'Accept-Language': locale
+  };
+  let response = await client.get(`/categories/list?query=&type=${type}`, options);
+  return response.data.data;
+};
+
+
 async function findIndustry(query, shortCodes, locale) {
   const options = {
     'Accept-Language': locale
@@ -189,6 +198,13 @@ async function searchUsers(userId, query, ids) {
 
 async function lookupUserIds(ids) {
   let response = await client.get(`/search/users/lookup?ids=${ids}`, null, options);
+  return response.data.data;
+};
+
+
+
+async function lookupCompaniesIds(ids) {
+  let response = await client.get(`/search/company/lookup?ids=${ids}`, null, options);
   return response.data.data;
 };
 
@@ -243,25 +259,36 @@ async function addUserResume(id, name, fileType) {
 };
 
 async function getResumeById(userId, id) {
-  let file = null;
+  let data = null;
   try {
     let response = await client.get(`/user/${userId}/resumes/${id}`);
-    file = response.data.data;
+    data = response.data.data;
   } catch(error) {
     console.log("getResumeById: error", error);
   }
-  return file;
+  return data;
+};
+
+async function getUserLinks(userId) {
+  let data = null;
+  try {
+    let response = await client.get(`/people/${userId}/links`);
+    data = response.data.data;
+  } catch(error) {
+    console.log("getUserLinks: error", error);
+  }
+  return data;
 };
 
 async function updateResumeDefault(userId, id) {
-  let file = null;
+  let data = null;
   try {
     let response = await client.post(`/user/${userId}/resumes/${id}/default`);
-    file = response.data.data;
+    data = response.data.data;
   } catch(error) {
     console.log("getResumeById: error", error);
   }
-  return file;
+  return data;
 };
 
 module.exports = {
@@ -284,13 +311,16 @@ module.exports = {
   findJobfunction:findJobfunction,
   searchUsers: searchUsers,
   lookupUserIds:lookupUserIds,
+  lookupCompaniesIds:lookupCompaniesIds,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,
   findCategoryById:findCategoryById,
   findCategoryByShortCode:findCategoryByShortCode,
+  findCategoryByType:findCategoryByType,
   getUserLast5Resumes:getUserLast5Resumes,
   addUserResume:addUserResume,
   getResumeById:getResumeById,
+  getUserLinks:getUserLinks,
   updateResumeDefault:updateResumeDefault,
   update(userId, data) {
     return client.put(`/user/${userId}`, data);

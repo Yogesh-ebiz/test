@@ -172,5 +172,7 @@
 	"product_updated_successful": "product_updated_successful",
 	"product_removed_successful": "product_removed_successful",
 	"applicagion_retrieved_successful": "applicagion_retrieved_successful",
-	"evaluation_removed_successful": "evaluation_removed_successful"
+	"evaluation_removed_successful": "evaluation_removed_successful",
+	"candidates_removed_successful": "candidates_removed_successful",
+	"tag_added_successful": "tag_added_successful"
 }

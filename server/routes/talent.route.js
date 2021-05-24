@@ -77,6 +77,10 @@ router.route('/company/:id/applications/:applicationId/activities').get(asyncHan
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId/evaluations').get(asyncHandler(getApplicationEvaluations));
+router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
+router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
+router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
+router.route('/company/:id/candidates/:candidateId/sources/:sourceId').delete(asyncHandler(removeCandidateSource));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));
@@ -120,8 +124,10 @@ router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
 router.route('/company/:id/pools/:poolId').put(asyncHandler(updateCompanyPool));
 router.route('/company/:id/pools/:poolId').delete(asyncHandler(deleteCompanyPool));
 
+router.route('/company/:id/pools/:poolId/candidates').get(asyncHandler(getPoolCandidates));
 router.route('/company/:id/pools/:poolId/candidates').post(asyncHandler(addPoolCandidates));
 router.route('/company/:id/pools/:poolId/candidates/:candidateId').delete(asyncHandler(removePoolCandidate));
+router.route('/company/:id/pools/:poolId/candidates').delete(asyncHandler(removePoolCandidates));
 
 
 async function getInsights(req, res) {
@@ -504,6 +510,8 @@ async function getApplicationEvaluations(req, res) {
   res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
 }
 
+
+
 async function addApplicationProgressEvaluation(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -692,6 +700,59 @@ async function getCandidateById(req, res) {
   data = await talentCtrl.getCandidateById(currentUserId, company, candidateId, res.locale);
   res.json(new Response(data, data?'candidate_retrieved_successful':'not_found', res));
 }
+
+
+
+async function addCandidateTag(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = req.params.candidateId;
+  let tagId = req.body.tag;
+
+  let data = await talentCtrl.addCandidateTag(companyId, currentUserId, candidateId, tagId);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
+
+
+async function removeCandidateTag(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = req.params.candidateId;
+  let tagId = req.params.tagId;
+
+  let data = await talentCtrl.removeCandidateTag(companyId, currentUserId, candidateId, tagId);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
+
+
+async function addCandidateSource(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = req.params.candidateId;
+  let sourceId = req.body.source;
+
+  let data = await talentCtrl.addCandidateSource(companyId, currentUserId, candidateId, sourceId);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
+
+
+async function removeCandidateSource(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = req.params.candidateId;
+  let sourceId = req.params.sourceId;
+
+  let data = await talentCtrl.removeCandidateSource(companyId, currentUserId, candidateId, sourceId);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
 
 async function addCompanyDepartment(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -1087,6 +1148,15 @@ async function deleteCompanyPool(req, res) {
 }
 
 
+async function getPoolCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let poolId = req.params.poolId;
+
+  let data = await talentCtrl.getPoolCandidates(company, poolId, currentUserId);
+  res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
+}
+
 async function addPoolCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -1107,4 +1177,15 @@ async function removePoolCandidate(req, res) {
 
   let data = await talentCtrl.removePoolCandidate(company, poolId, candidateId, currentUserId);
   res.json(new Response(data, data?'candidate_removed_successful':'not_found', res));
+}
+
+
+async function removePoolCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let poolId = req.params.poolId;
+  let candidates = req.body.candidates;
+
+  let data = await talentCtrl.removePoolCandidates(company, poolId, candidates, currentUserId);
+  res.json(new Response(data, data?'candidates_removed_successful':'not_found', res));
 }

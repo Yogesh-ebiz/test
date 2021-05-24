@@ -63,7 +63,7 @@ const convertToCandidate = (user) => {
   }
 
   return {
-    id: user.id,
+    id: user._id,
     userId: user.userId,
     createdDate: user.createdDate,
     company: user.company,
@@ -81,9 +81,9 @@ const convertToCandidate = (user) => {
     match:user.match?user.match:0,
     overallRating: user.overallRating?user.overallRating:0,
     teamRating: user.teamRating?user.teamRating:0,
-    socialLinks: user.socialLinks?user.socialLinks:[],
-    tags: user.tags,
-    sources: user.sources,
+    partyLink: user.partyLink?user.partyLink:null,
+    tags: user.tags?user.tags:[],
+    sources: user.sources?user.sources:[],
     applications: user.applications?user.applications:[]
   };
 }
@@ -177,6 +177,27 @@ const jobMinimal = (job) => {
     company: job.company
   };
 }
+
+
+const skillMinimal = (job) => {
+  if(!job){
+    return null;
+  }
+  return {
+    _id: job._id,
+    jobId: job.jobId,
+    title: job.title,
+    hasSaved: job.hasSaved,
+    level: job.level,
+    employmentType: job.employmentType,
+    city: job.city,
+    state: job.state,
+    country: job.country,
+    company: job.company
+  };
+}
+
+
 
 module.exports = {
   capitalizeLocale:capitalizeLocale,

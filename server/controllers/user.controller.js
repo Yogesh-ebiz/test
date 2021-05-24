@@ -1649,13 +1649,13 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         filter.partyId=currentParty.id;
 
 
-        const aggregate = Application.aggregate([{
-          $match: {
-            user: currentUserId
-          }
-        }
+        const aggregate = Application.aggregate([
+          { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+          { $unwind: '$user'},
+          { $match: {'user.userId': currentUserId}}
         ]);
         result = await Application.aggregatePaginate(aggregate, options);
+
         let jobIds = _.map(result.docs, 'jobId');
 
         let jobs = await findJob_Ids(jobIds);

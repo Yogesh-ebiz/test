@@ -194,6 +194,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
             job.hasSaved = (hasSaved) ? true : false;
 
             let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
+            console.log(hasApplied)
             job.hasApplied = (hasApplied) ? true : false;
 
             partySkills = await findUserSkillsById(currentParty.id);
@@ -371,7 +372,19 @@ async function reportJobById(currentUserId, jobId, report) {
   return newReport;
 }
 
+async function getCategories(locale) {
 
+  let result = [];
+  try {
+    let categories = feedService.findCategoryByType('JOB', locale);
+    console.log(categories)
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
 
 async function getJobLanding(currentUserId, locale) {
 
@@ -568,8 +581,7 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
   let users = await lookupUserIds(userIds);
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-  let res = await searchCompany('', listOfCompanyIds, currentUserId);
-  let foundCompanies = res.content;
+  let foundCompanies = await feedService.lookupCompaniesIds(listOfCompanyIds);
 
   let hasSaves = [];
 
@@ -673,11 +685,9 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
     let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
     let listOfSkills = await findSkillsById(skills);
 
+
     let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-
-    let res = await searchParties(listOfCompanyIds, partyEnum.COMPANY);
-    let foundCompanies = res.data.data.content;
-
+    let foundCompanies = await feedService.lookupCompaniesIds(listOfCompanyIds);
 
     let hasSaves = await findBookByUserId(currentUserId);
 
@@ -799,10 +809,10 @@ async function applyJobById(currentUserId, jobId, application ) {
         application.jobId = job._id;
         application.jobTitle = job.title;
 
-        console.log(application)
         application = await Joi.validate(application, applicationSchema, {abortEarly: false});
         application.company = job.company
 
+        console.log(candidate)
         let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
         if (!foundApplication) {
 
@@ -837,7 +847,8 @@ async function applyJobById(currentUserId, jobId, application ) {
               savedApplication.currentProgress = progress._id;
 
 
-              await candidate.applications.push(savedApplication._id);
+              candidate.applications.push(savedApplication._id);
+              await candidate.save();
               await savedApplication.save();
 
             }

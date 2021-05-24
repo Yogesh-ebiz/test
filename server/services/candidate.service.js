@@ -33,6 +33,16 @@ async function addCandidate(candidate) {
 
 }
 
+
+async function findById(id) {
+
+  if(!id){
+    return;
+  }
+
+  return await Candidate.findById(id);
+}
+
 async function findByUserId(userId) {
 
   if(!userId){
@@ -92,6 +102,7 @@ function findByUserIdAndCompanyId(userId, companyId) {
   return Candidate.findOne({userId: userId, company: companyId});
 }
 
+
 function getListofCandidates(userIds, companyId) {
 
 
@@ -104,6 +115,7 @@ function getListofCandidates(userIds, companyId) {
 
 module.exports = {
   addCandidate:addCandidate,
+  findById:findById,
   findByUserId:findByUserId,
   findByCompany:findByCompany,
   findByUserIdAndCompanyId:findByUserIdAndCompanyId,

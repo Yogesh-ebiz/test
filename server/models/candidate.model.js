@@ -79,12 +79,12 @@ const CandidateSchema = new mongoose.Schema({
     required:false,
     default: 0
   },
-  socialLinks: {
-    type: Array,
+  partyLink: {
+    type: Object,
     required:false
   },
-  tags: { type: Schema.Types.ObjectId, ref: 'Label' },
-  sources: { type: Schema.Types.ObjectId, ref: 'Label' },
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
+  sources: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
   evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }]
 }, {

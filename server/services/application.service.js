@@ -334,8 +334,12 @@ function findApplicationByUserIdAndJobId(userId, jobId) {
     return;
   }
 
-  console.log(userId, jobId)
-  return Application.findOne({user: ObjectID(userId), jobId: ObjectID(jobId)});
+  return Application.aggregate([
+    //{user: ObjectID(userId), jobId: ObjectID(jobId)}
+    { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+    { $unwind: '$user'},
+    { $match: {'user.userId': userId, jobId: ObjectID(jobId)} }
+  ]);
 }
 
 function findAppliedCountByUserIdAndJobId(userId, jobId) {
