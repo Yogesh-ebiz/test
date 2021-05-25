@@ -14,11 +14,33 @@ const productSchema = Joi.object({
 });
 
 
-async function getProducts() {
+async function getProducts(filter, sort) {
   let data = null;
 
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
 
-  let products = Product.find();
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+
+  let products = Product.paginate({}, options);
+  return products
+}
+
+
+async function getAvailableProducts() {
+  let data = null;
+
+  let products = await Product.find();
   return products
 }
 
@@ -71,6 +93,7 @@ async function updateProduct(productId, form) {
 
 module.exports = {
   getProducts:getProducts,
+  getAvailableProducts:getAvailableProducts,
   addProduct:addProduct,
   findById:findById,
   updateProduct:updateProduct

@@ -327,19 +327,25 @@ function findApplicationByIdAndUserId(applicationId, userId) {
 }
 
 
-function findApplicationByUserIdAndJobId(userId, jobId) {
+async function findApplicationByUserIdAndJobId(userId, jobId) {
   let data = null;
 
   if(userId==null || jobId==null){
     return;
   }
 
-  return Application.aggregate([
+  let application = await Application.aggregate([
     //{user: ObjectID(userId), jobId: ObjectID(jobId)}
     { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
     { $unwind: '$user'},
-    { $match: {'user.userId': userId, jobId: ObjectID(jobId)} }
+    { $match: {'user.userId': userId, jobId: ObjectID(jobId)} },
+    { $limit: 1 }
   ]);
+
+
+  data = application.length?application[0]:null;
+
+  return data;
 }
 
 function findAppliedCountByUserIdAndJobId(userId, jobId) {
@@ -362,7 +368,8 @@ async function disqualifyApplication(applicationId, reason, member) {
     return;
   }
 
-  let application = await Application.findById(applicationId);
+  let application = await Application.findById(applicationId).populate('user');
+
   if(application && application.status==statusEnum.ACTIVE){
     application.status = statusEnum.DISQUALIFIED;
     application = await application.save();
@@ -370,11 +377,9 @@ async function disqualifyApplication(applicationId, reason, member) {
     if(application.status==statusEnum.DISQUALIFIED){
       result = {status: statusEnum.DISQUALIFIED};
 
-      let user = await feedService.lookupUserIds([application.user]);
-
-      let job = await jobService.findJobId(application.jobId);
+      let job = await jobService.findJob_Id(ObjectID(application.jobId));
       //Add activity
-      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: user[0].firstName + ' ' + user[0].lastName, jobTitle: job.title, jobId: job._id, reason: reason}});
+      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, jobTitle: job.title, jobId: job._id, reason: reason}});
     }
   }
   return result;
@@ -388,7 +393,7 @@ async function revertApplication(applicationId, member) {
     return;
   }
 
-  let application = await Application.findById(applicationId);
+  let application = await Application.findById(applicationId).populate('user');
   if(application.status==statusEnum.DISQUALIFIED){
     application.status = statusEnum.ACTIVE;
     application = await application.save();
@@ -396,9 +401,8 @@ async function revertApplication(applicationId, member) {
     if(application.status==statusEnum.ACTIVE){
       result = {status: statusEnum.ACTIVE};
 
-      let user = await feedService.lookupUserIds([application.user]);
-      let job = await jobService.findJobId(application.jobId);
-      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.REVERTED, meta: {candidate: user[0].firstName + ' ' + user[0].lastName, jobTitle: job.title, jobId: job._id}});
+      let job = await jobService.findJob_Id(ObjectID(application.jobId));
+      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.REVERTED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, jobTitle: job.title, jobId: job._id}});
     }
   }
   return result;
@@ -496,6 +500,91 @@ function applyJob(application) {
 }
 
 
+
+async function getInsight(duration) {
+  let data = [];
+
+  if(!duration){
+    return;
+  }
+
+  let date;
+  let group = {
+    _id: null,
+    viewers: {$push: '$$ROOT.partyId'},
+    count: {'$sum': 1}
+  };
+
+  if(duration=='1M'){
+    date = new Date();
+    date.setDate(date.getDate()-30);
+    date.setMinutes(0);
+    date.setHours(0)
+    group._id= {day: {$dayOfMonth: '$createdDate'}, month: { $month: "$createdDate" } };
+  } else if(duration=='3M'){
+    date = new Date();
+    date.setMonth(date.getMonth()-3);
+    date.setDate(1);
+    console.log(date)
+    group._id= {month: { $month: "$createdDate" } };
+  } else if(duration=='6M'){
+    date = new Date();
+    date.setMonth(date.getMonth()-6);
+    date.setDate(1);
+    group._id= {month: { $month: "$createdDate" } };
+  }
+
+  let result  = await Application.aggregate([
+    {$match: {createdDate: {$gt: date}}},
+    {
+      $group: group
+    }
+  ]);
+
+  if(result){
+    if(duration=='1M'){
+      date = new Date();
+      for(var i=1; i<=30; i++){
+        let item = {};
+
+        let found = _.find(result, {_id: {day: date.getDate(), month: date.getMonth()+1}});
+        if(found){
+          item = {date: date.getDate()+'/'+(parseInt(date.getMonth())+1), value: found.count};
+        } else {
+          item = {date: date.getDate()+'/'+(parseInt(date.getMonth())+1), value: 0};
+        }
+        data.push(item);
+        date.setDate(date.getDate()-1);
+      }
+    } else {
+      date = new Date();
+      var noOfItems =  duration=='3M'?3:duration=='6M'?6:duration=='12M'?12:0;
+      for(var i=1; i<=noOfItems; i++){
+        let item = {};
+
+        let found = _.find(result, {_id: {month: date.getMonth()+1}});
+        if(found){
+          item = {date: parseInt(date.getMonth())+1+'/'+date.getFullYear(), value: found.count};
+        } else {
+          item = {date: parseInt(date.getMonth())+1+'/'+date.getFullYear(), value: 0};
+        }
+        data.push(item);
+        date.setMonth(date.getMonth()-1);
+      }
+    }
+  }
+
+  let current = data[0];
+  let previous = data[1];
+  let total = _.sum(_.map(data, 'value'));
+  var change=(current.value-previous.value)/current.value*100.0;
+
+
+  return {type: 'APPLIED', total: total, change: change?change:0, data: data};
+}
+
+
+
 module.exports = {
   findApplicationById: findApplicationById,
   findApplicationBy_Id:findApplicationBy_Id,
@@ -511,5 +600,6 @@ module.exports = {
   disqualifyApplication:disqualifyApplication,
   revertApplication:revertApplication,
   getApplicationActivities:getApplicationActivities,
-  applyJob: applyJob
+  applyJob: applyJob,
+  getInsight: getInsight
 }

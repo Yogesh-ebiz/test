@@ -182,23 +182,23 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
           let currentParty = await findByUserId(currentUserId);
 
           if (isPartyActive(currentParty)) {
-            let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
-            if (!jobView) {
-              await addJobViewByUserId(currentParty.id, job._id);
-            } else {
-              jobView.viewCount++
-              await jobView.save();
-            }
 
             let hasSaved = await findBookById(currentParty.id, job.jobId);
             job.hasSaved = (hasSaved) ? true : false;
 
             let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
-            console.log(hasApplied)
             job.hasApplied = (hasApplied) ? true : false;
 
             partySkills = await findUserSkillsById(currentParty.id);
             partySkills = _.map(partySkills, "id");
+
+            // let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
+            // if (!jobView) {
+              await addJobViewByUserId(currentParty.id, job.company.id, job._id);
+            // } else {
+            //   jobView.viewCount++
+            //   await jobView.save();
+            // }
           }
 
 
@@ -567,7 +567,12 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
   }
 
   filter.status = statusEnum.ACTIVE;
-  let result = await JobRequisition.paginate(new SearchParam(filter), options);
+
+  const aggregate = JobRequisition.aggregate([{
+    $match: new SearchParam(filter)
+  }
+  ]);
+  let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let docs = [];
 
   // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
@@ -812,7 +817,6 @@ async function applyJobById(currentUserId, jobId, application ) {
         application = await Joi.validate(application, applicationSchema, {abortEarly: false});
         application.company = job.company
 
-        console.log(candidate)
         let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
         if (!foundApplication) {
 

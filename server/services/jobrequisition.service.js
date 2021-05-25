@@ -17,6 +17,7 @@ const PipelineService = require('../services/pipeline.service');
 const memberService = require('../services/member.service');
 const feedService = require('../services/api/feed.service.api');
 const activityService = require('../services/activity.service');
+const labelService = require('../services/label.service');
 
 let SearchParam = require('../const/searchParam');
 
@@ -138,8 +139,21 @@ async function updateJob(jobId, currentUserId, form) {
     job.employmentType = form.employmentType;
     job.education = form.education;
     job.industry = form.industry;
-    job.tags = form.tags;
+    // job.tags = form.tags;
     job.allowRemote=form.allowRemote;
+
+
+    for(index in form.tags){
+      if(!form.tags[index]._id){
+        let newLabel = {name: form.tags[index].name, type: 'TAG', company: job.company, createdBy: currentUserId};
+        newLabel = await labelService.addLabel(newLabel);
+        if(newLabel){
+          form.tags[index]._id = newLabel._id;
+        }
+      }
+    };
+    let tagIds = _.reduce(form.tags, function(res, tag){res.push(tag._id); return res;}, []);
+    job.tags = tagIds;
 
     if(form.department){
       job.department =  ObjectID(form.department);
@@ -148,6 +162,9 @@ async function updateJob(jobId, currentUserId, form) {
     job.updatedBy = currentUserId;
     job.updatedDate = Date.now();
     result = new JobRequisition(job).save();
+
+    let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+job._id, action: actionEnum.UPDATED, meta: {jobId: job._id, jobTitle: job.title}});
+
   }
 
   return result;

@@ -123,11 +123,19 @@ router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
 router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
 router.route('/company/:id/pools/:poolId').put(asyncHandler(updateCompanyPool));
 router.route('/company/:id/pools/:poolId').delete(asyncHandler(deleteCompanyPool));
-
 router.route('/company/:id/pools/:poolId/candidates').get(asyncHandler(getPoolCandidates));
 router.route('/company/:id/pools/:poolId/candidates').post(asyncHandler(addPoolCandidates));
 router.route('/company/:id/pools/:poolId/candidates/:candidateId').delete(asyncHandler(removePoolCandidate));
 router.route('/company/:id/pools/:poolId/candidates').delete(asyncHandler(removePoolCandidates));
+
+router.route('/company/:id/projects').get(asyncHandler(getCompanyProjects));
+router.route('/company/:id/projects').post(asyncHandler(addCompanyProject));
+router.route('/company/:id/projects/:projectId').put(asyncHandler(updateCompanyProject));
+router.route('/company/:id/projects/:projectId').delete(asyncHandler(deleteCompanyProject));
+router.route('/company/:id/projects/:projectId/candidates').get(asyncHandler(getProjectCandidates));
+router.route('/company/:id/projects/:projectId/candidates').post(asyncHandler(addProjectCandidates));
+router.route('/company/:id/projects/:projectId/candidates/:candidateId').delete(asyncHandler(removeProjectCandidate));
+router.route('/company/:id/projects/:projectId/candidates').delete(asyncHandler(removeProjectCandidates));
 
 
 async function getInsights(req, res) {
@@ -706,10 +714,10 @@ async function getCandidateById(req, res) {
 async function addCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = req.params.candidateId;
-  let tagId = req.body.tag;
+  let candidateId = parseInt(req.params.candidateId);
+  let tags = req.body.tags;
 
-  let data = await talentCtrl.addCandidateTag(companyId, currentUserId, candidateId, tagId);
+  let data = await talentCtrl.addCandidateTag(companyId, currentUserId, candidateId, tags);
 
   res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
@@ -719,7 +727,7 @@ async function addCandidateTag(req, res) {
 async function removeCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = req.params.candidateId;
+  let candidateId = parseInt(req.params.candidateId);
   let tagId = req.params.tagId;
 
   let data = await talentCtrl.removeCandidateTag(companyId, currentUserId, candidateId, tagId);
@@ -732,10 +740,10 @@ async function removeCandidateTag(req, res) {
 async function addCandidateSource(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = req.params.candidateId;
-  let sourceId = req.body.source;
+  let candidateId = parseInt(req.params.candidateId);
+  let sources = req.body.sources;
 
-  let data = await talentCtrl.addCandidateSource(companyId, currentUserId, candidateId, sourceId);
+  let data = await talentCtrl.addCandidateSource(companyId, currentUserId, candidateId, sources);
 
   res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
@@ -745,7 +753,7 @@ async function addCandidateSource(req, res) {
 async function removeCandidateSource(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = req.params.candidateId;
+  let candidateId = parseInt(req.params.candidateId);
   let sourceId = req.params.sourceId;
 
   let data = await talentCtrl.removeCandidateSource(companyId, currentUserId, candidateId, sourceId);
@@ -1187,5 +1195,91 @@ async function removePoolCandidates(req, res) {
   let candidates = req.body.candidates;
 
   let data = await talentCtrl.removePoolCandidates(company, poolId, candidates, currentUserId);
+  res.json(new Response(data, data?'candidates_removed_successful':'not_found', res));
+}
+
+
+
+async function getCompanyProjects(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query;
+
+  let data = await talentCtrl.getCompanyProjects(company, query, currentUserId, res.locale);
+  res.json(new Response(data, data?'projects_retrieved_successful':'not_found', res));
+}
+
+
+async function addCompanyProject(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let project = req.body;
+  project.company = company;
+
+
+  let data = await talentCtrl.addCompanyProject(company, project, currentUserId);
+  res.json(new Response(data, data?'project_added_successful':'not_found', res));
+}
+
+async function updateCompanyProject(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let projectId = req.params.projectId;
+  let project = req.body;
+  project.company = company;
+
+  let data = await talentCtrl.updateCompanyProject(company, projectId, currentUserId, project);
+  res.json(new Response(data, data?'project_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyProject(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let projectId = req.params.projectId;
+
+  let data = await talentCtrl.deleteCompanyProject(company, projectId, currentUserId);
+  res.json(new Response(data, data?'project_deleted_successful':'not_found', res));
+}
+
+
+async function getProjectCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let projectId = req.params.projectId;
+
+  let data = await talentCtrl.getPoolCandidates(company, projectId, currentUserId);
+  res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
+}
+
+async function addProjectCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let projectId = req.params.projectId;
+  let candidates = req.body.candidates;
+
+  candidates.forEach(function(id){ id = parseInt(id); });
+  let data = await talentCtrl.addProjectCandidates(company, projectId, candidates, currentUserId);
+  res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
+}
+
+
+async function removeProjectCandidate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let projectId = req.params.projectId;
+  let candidateId = req.params.candidateId;
+
+  let data = await talentCtrl.removeProjectCandidate(company, projectId, candidateId, currentUserId);
+  res.json(new Response(data, data?'candidate_removed_successful':'not_found', res));
+}
+
+
+async function removeProjectCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let projectId = req.params.projectId;
+  let candidates = req.body.candidates;
+
+  let data = await talentCtrl.removeProjectCandidates(company, projectId, candidates, currentUserId);
   res.json(new Response(data, data?'candidates_removed_successful':'not_found', res));
 }

@@ -20,7 +20,7 @@ const BookmarkSchema = new mongoose.Schema({
     type: Object
   },
   createdDate: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   status: {

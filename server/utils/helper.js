@@ -72,6 +72,8 @@ const convertToCandidate = (user) => {
     middleName: user.middleName,
     lastName: user.lastName,
     avatar: user.avatar?user.avatar:'',
+    email: user.email,
+    phoneNumber: user.phoneNumber,
     isOnline: user.isOnline,
     partyType: user.partyType?user.partyType:'',
     jobTitle: user.jobTitle?user.jobTitle:'',
@@ -81,10 +83,11 @@ const convertToCandidate = (user) => {
     match:user.match?user.match:0,
     overallRating: user.overallRating?user.overallRating:0,
     teamRating: user.teamRating?user.teamRating:0,
-    partyLink: user.partyLink?user.partyLink:null,
+    links: user.links?user.links:[],
     tags: user.tags?user.tags:[],
     sources: user.sources?user.sources:[],
-    applications: user.applications?user.applications:[]
+    applications: user.applications?user.applications:[],
+    evaluations: user.evaluations?user.evaluations:[]
   };
 }
 

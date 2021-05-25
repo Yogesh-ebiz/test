@@ -16,12 +16,16 @@ const JobViewSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  company: {
+    type: Number,
+    required: true
+  },
   viewCount: {
     type: Number,
     default: 1
   },
   createdDate: {
-    type: Number,
+    type: Date,
     default: Date.now
   }
 }, {

@@ -14,7 +14,7 @@ const promotionRoutes = require('./promotion.route');
 const suggestionRoutes = require('./suggestion.route');
 const companyRoutes = require('./company.route');
 const talentRoutes = require('./talent.route');
-const planRoutes = require('./plan.route');
+const adminRoutes = require('./admin.route');
 const productRoutes = require('./product.route');
 
 const filterRoutes = require('./filter.route');
@@ -31,6 +31,7 @@ router.get('/health-check', (req, res) =>
 
 router.use('/auth', authRoutes);
 
+router.use('/admin', adminRoutes);
 
 router.use('/applications', applicationRoutes);
 router.use('/employmenttypes', employmentTypeRoutes);
@@ -48,7 +49,6 @@ router.use('/workflows', workflowRoutes);
 router.use('/company', companyRoutes);
 router.use('/talent', talentRoutes);
 router.use('/policies', policyRoutes);
-router.use('/plans', planRoutes);
 router.use('/products', productRoutes);
 
 

@@ -61,8 +61,7 @@ const CandidateSchema = new mongoose.Schema({
   },
   noOfMonthExperiences: {
     type: Number,
-    required:false,
-    default: 0
+    required:false
   },
   level: {
     type: String,
@@ -79,8 +78,8 @@ const CandidateSchema = new mongoose.Schema({
     required:false,
     default: 0
   },
-  partyLink: {
-    type: Object,
+  links: {
+    type: Array,
     required:false
   },
   tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],

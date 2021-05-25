@@ -16,13 +16,14 @@ const ApplicationProgress = require('../models/applicationprogress.model');
 const {addUserResume, syncExperiences, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, findEmployeeById, searchCompany} = require('../services/api/feed.service.api');
 const {getCompanyById,  isPartyActive} = require('../services/party.service');
 
+const questionSubmissionService = require('../services/questionsubmission.service');
+const candidateService = require('../services/candidate.service');
 const jobService = require('../services/jobrequisition.service');
 const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
 const {findWorkflowById} = require('../services/workflow.service');
 
 const {createEvent, acceptEvent, declineEvent} = require('../services/calendar.service');
-const questionSubmissionService = require('../services/questionsubmission.service');
 
 
 
@@ -515,8 +516,8 @@ async function submitApplicationQuestions(currentUserId, applicationId, form) {
 
     if(isPartyActive(currentParty)) {
       application = await findApplicationById(applicationId);
-
-      if (application && !application.hasSubmittedQuestion && application.user==currentUserId) {
+      let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, application.company);
+      if (application && !application.hasSubmittedQuestion && application.user.equals(candidate._id)) {
         form.createdBy = currentUserId;
         let questionSubmission = await questionSubmissionService.addSubmission(form);
 

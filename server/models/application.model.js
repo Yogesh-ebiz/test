@@ -41,7 +41,7 @@ const ApplicationSchema = new mongoose.Schema({
     required: false
   },
   createdDate: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   lastUpdatedDate: {

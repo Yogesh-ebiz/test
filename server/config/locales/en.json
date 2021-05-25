@@ -174,5 +174,10 @@
 	"applicagion_retrieved_successful": "applicagion_retrieved_successful",
 	"evaluation_removed_successful": "evaluation_removed_successful",
 	"candidates_removed_successful": "candidates_removed_successful",
-	"tag_added_successful": "tag_added_successful"
+	"tag_added_successful": "tag_added_successful",
+	"job_updated_successful": "job_updated_successful",
+	"project_added_successful": "project_added_successful",
+	"projects_retrieved_successful": "projects_retrieved_successful",
+	"project_updated_successful": "project_updated_successful",
+	"project_deleted_successful": "project_deleted_successful"
 }

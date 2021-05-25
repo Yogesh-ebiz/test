@@ -6,6 +6,8 @@ let CustomPagination = require('../utils/custompagination');
 let Pagination = require('../utils/pagination');
 
 let JobSearchParam = require('../const/jobSearchParam');
+let SearchParam = require('../const/searchParam');
+
 const partyEnum = require('../const/partyEnum');
 let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
@@ -29,10 +31,13 @@ const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const memberService = require('../services/member.service');
 const poolService = require('../services/pool.service');
+const projectService = require('../services/project.service');
 const activityService = require('../services/activity.service');
 const commentService = require('../services/comment.service');
 const evaluationService = require('../services/evaluation.service');
 const candidateService = require('../services/candidate.service');
+const jobViewService = require('../services/jobview.service');
+const bookmarkService = require('../services/bookmark.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -164,6 +169,13 @@ module.exports = {
   addPoolCandidates,
   removePoolCandidate,
   removePoolCandidates,
+  getCompanyProjects,
+  addCompanyProject,
+  updateCompanyProject,
+  deleteCompanyProject,
+  addProjectCandidates,
+  removeProjectCandidate,
+  removeProjectCandidates,
   subscribeJob,
   unsubscribeJob
 }
@@ -231,10 +243,9 @@ async function getCompanies(currentUserId) {
 }
 
 
-async function getInsights(currentUserId, companyId, timeframe) {
+async function getInsights(currentUserId, companyId, duration) {
 
 
-  console.log(currentUserId, companyId)
   if(!currentUserId || !companyId){
     return null;
   }
@@ -242,7 +253,7 @@ async function getInsights(currentUserId, companyId, timeframe) {
 
   let data = [];
   let min = 10, max = 100;
-  let numOfItems = timeframe=='3M'?12:timeframe=='6M'?24:timeframe=='1Y'?52:30;
+  let numOfItems = duration=='3M'?12:duration=='6M'?24:duration=='1Y'?52:30;
 
     for(var i=0; i<4; i++){
       let sample = [];
@@ -317,6 +328,22 @@ async function getInsights(currentUserId, companyId, timeframe) {
     ]
   }
 
+
+  let viewedData = await jobViewService.getInsight(duration);
+  let savedData = await bookmarkService.getInsight(duration);
+  let appliedDate = await applicationService.getInsight(duration);
+
+  let sharedData = {...viewedData}
+  sharedData.type="SHARED"
+  let likedData = {...savedData}
+  likedData.type="LIKED"
+
+  result.impressions=[];
+  result.impressions.push(viewedData);
+  result.impressions.push(savedData);
+  result.impressions.push(appliedDate);
+  result.impressions.push(sharedData);
+  result.impressions.push(likedData);
 
 
   return result;
@@ -396,10 +423,25 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   };
 
 
-  filter.member = member._id;
+  filter.member = [member._id];
 
   let company = await findCompanyById(companyId, currentUserId);
-  let result = await JobRequisition.paginate(new JobSearchParam(filter), options);
+
+  const aggregate = JobRequisition.aggregate([{
+    $match: new SearchParam(filter)
+  },
+    {
+      $lookup: {
+        from: 'departments',
+        localField: 'department',
+        foreignField: '_id',
+        as: 'department',
+      },
+    },
+    { $unwind: '$department'}
+  ]);
+
+  let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
   let users = await lookupUserIds(userIds);
 
@@ -1714,16 +1756,11 @@ async function searchCandidates(currentUserId, company, filter, locale) {
   };
 
   result = await candidateService.findByCompany(company, filter);
-  let userIds = _.map(result.docs, 'userId');
-  let users = await lookupUserIds(userIds)
 
-  for(var i=0; i<result.docs.length; i++){
-    let foundUser = _.find(users, {id: result.docs[i].userId});
-    if(foundUser) {
-      foundUser = convertToCandidate(_.merge(foundUser, result.docs[i]));
-      result.docs[i] = foundUser
-    }
-
+  for(index in result.docs){
+    result.docs[index].source=[];
+    result.docs[index].tags=[];
+    result.docs[index] = convertToCandidate(result.docs[index]);
   };
 
 
@@ -1759,7 +1796,10 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
   if(candidate){
     candidate.match = 78;
     let partyLink = await getUserLinks(candidate.userId);
-    candidate.partyLink = partyLink;
+    if(partyLink){
+      candidate.links = partyLink.links;
+    }
+
     result = convertToCandidate(candidate);
   }
 
@@ -1769,9 +1809,9 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
 
 
 
-async function addCandidateTag(companyId, currentUserId, candidateId, tagId) {
+async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
 
-  if(!companyId || !currentUserId || !currentUserId || !candidateId){
+  if(!companyId || !currentUserId || !candidateId || !tags){
     return null;
   }
 
@@ -1782,21 +1822,28 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tagId) {
 
   let result;
   try {
-    let candidate = await candidateService.findById(ObjectID(candidateId));
+    let candidate = await candidateService.findByUserId(candidateId);
 
 
     if(candidate) {
-      let exists = false
-      candidate.tags.forEach(function(tag){
-        if(tag==tagId){
-          exists = true;
+      for(index in tags){
+        if(!tags[index]._id){
+          let newLabel = {name: tags[index].name, type: 'TAG', company: companyId, createdBy: currentUserId};
+          newLabel = await labelService.addLabel(newLabel);
+          if(newLabel){
+            tags[index]._id = newLabel._id;
+          }
         }
-      });
-      if(!exists){
-        candidate.tags.push(tagId);
-        result = await candidate.save();
-        result = result.tags;
-      }
+      };
+
+      let tagIds = _.reduce(tags, function(res, tag){
+        res.push(tag._id);
+        return res;
+      }, []);
+
+      candidate.tags = tagIds;
+      result = await candidate.save();
+
     }
 
   } catch (error) {
@@ -1820,7 +1867,7 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
 
   let result;
   try {
-    let candidate = await candidateService.findById(candidateId);
+    let candidate = await candidateService.findByUserId(candidateId);
 
     for(const [i, tag] of candidate.tags.entries()){
       if(tag==tagId){
@@ -1837,9 +1884,9 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
 }
 
 
-async function addCandidateSource(companyId, currentUserId, candidateId, sourceId) {
+async function addCandidateSource(companyId, currentUserId, candidateId, sources) {
 
-  if(!companyId || !currentUserId || !currentUserId || !sourceId){
+  if(!companyId || !currentUserId || !currentUserId || !sources){
     return null;
   }
 
@@ -1850,21 +1897,28 @@ async function addCandidateSource(companyId, currentUserId, candidateId, sourceI
 
   let result;
   try {
-    let candidate = await candidateService.findById(ObjectID(candidateId));
+    let candidate = await candidateService.findByUserId(candidateId);
 
 
     if(candidate) {
-      let exists = false
-      candidate.sources.forEach(function(tag){
-        if(tag==sourceId){
-          exists = true;
+      for(index in sources){
+        if(!sources[index]._id){
+          let newLabel = {name: sources[index].name, type: 'SOURCE', company: companyId, createdBy: currentUserId  };
+          newLabel = await labelService.addLabel(newLabel);
+          if(newLabel){
+            sources[index]._id = newLabel._id;
+          }
         }
-      });
-      if(!exists){
-        candidate.sources.push(sourceId);
-        result = await candidate.save();
-        result = result.sources;
-      }
+      };
+
+      let sourceIds = _.reduce(sources, function(res, source){
+        res.push(source._id);
+        return res;
+      }, []);
+
+      candidate.sources = sourceIds;
+      result = await candidate.save();
+
     }
 
   } catch (error) {
@@ -1888,7 +1942,7 @@ async function removeCandidateSource(companyId, currentUserId, candidateId, sour
 
   let result;
   try {
-    let candidate = await candidateService.findById(candidateId);
+    let candidate = await candidateService.findByUserId(candidateId);
 
     for(const [i, source] of candidate.sources.entries()){
       if(source==sourceId){
@@ -2578,7 +2632,7 @@ async function updateCompanyPool(company, poolId, currentUserId, form) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
 
   if(!member){
     return null;
@@ -2604,7 +2658,7 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
 
   if(!member){
     return null;
@@ -2631,8 +2685,6 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
 
   return result
 }
-
-
 
 async function getPoolCandidates(company, poolId, currentUserId) {
   if(!company || !poolId || !currentUserId){
@@ -2706,8 +2758,6 @@ async function addPoolCandidates(company, poolId, candidateIds, currentUserId) {
   return result
 }
 
-
-
 async function removePoolCandidate(company, poolId, candidateId, currentUserId) {
   if(!company || !poolId || !candidateId || !currentUserId){
     return null;
@@ -2741,7 +2791,6 @@ async function removePoolCandidate(company, poolId, candidateId, currentUserId) 
 
   return result
 }
-
 
 async function removePoolCandidates(company, poolId, candidateIds, currentUserId) {
   if(!company || !poolId || !candidateIds || !currentUserId){
@@ -2777,6 +2826,243 @@ async function removePoolCandidates(company, poolId, candidateIds, currentUserId
 
   } catch(e){
     console.log('addPoolCandidate: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+async function getCompanyProjects(company, query, currentUserId, locale) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await projectService.getProjects(company);
+
+  return result;
+
+}
+
+async function addCompanyProject(company, form, currentUserId) {
+  if(!company || !form){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await projectService.addProject(currentUserId, form);
+
+  } catch(e){
+    console.log('addCompanyProject: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyProject(company, projectId, currentUserId, form) {
+  if(!company || !currentUserId || !projectId || !form){
+    return null;
+  }
+
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+  try {
+
+    result = await projectService.updateProject(projectId, form);
+
+  } catch(e){
+    console.log('updateCompanyProject: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyProject(company, projectId, currentUserId) {
+  if(!company || !currentUserId || !projectId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+
+  try {
+    let project = await projectService.findProjectBy_Id(projectId);
+    if(project){
+      result = await project.delete();
+      if(result){
+        result = {deleted: 1};
+      }
+
+    }
+
+
+  } catch(e){
+    console.log('deleteCompanyProject: Error', e);
+  }
+
+
+  return result
+}
+
+async function getProjectCandidates(company, projectId, currentUserId) {
+  if(!company || !projectId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = [];
+
+
+  try {
+    let project = await projectService.findProjectBy_Id(projectId).populate('candidates');
+    if(project){
+      result = project.candidates;
+    }
+
+
+  } catch(e){
+    console.log('getProjectCandidates: Error', e);
+  }
+
+
+  return result
+}
+
+async function addProjectCandidates(company, projectId, candidateIds, currentUserId) {
+  if(!company || !projectId || !candidateIds || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+
+  try {
+    let project = await projectService.findProjectBy_Id(projectId);
+    if (project) {
+      candidateIds.forEach(function(candidate){
+
+        let exists = false;
+        project.candidates.forEach(function(item){
+          if(item==candidate){
+            exists = true;
+          }
+        });
+        if (!exists) {
+          project.candidates.push(candidate);
+        }
+      })
+      result = await project.save();
+
+    }
+
+
+
+  } catch(e){
+    console.log('addProjectCandidates: Error', e);
+  }
+
+
+  return result
+}
+
+async function removeProjectCandidate(company, projectId, candidateId, currentUserId) {
+  if(!company || !projectId || !candidateId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+  try {
+    let project = await projectService.findProjectBy_Id(projectId);
+    if (project) {
+      for(const [i, candidate] of project.candidates.entries()){
+        if(candidate==candidateId){
+          project.candidates.splice(i, 1);
+        }
+      }
+      await project.save();
+      result = {success: true};
+
+    }
+
+  } catch(e){
+    console.log('removeProjectCandidate: Error', e);
+  }
+
+
+  return result
+}
+
+async function removeProjectCandidates(company, projectId, candidateIds, currentUserId) {
+  if(!company || !projectId || !candidateIds || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+  try {
+    let project = await projectService.findProjectBy_Id(projectId);
+    if (project && project.candidates) {
+      for(const [i, candidate] of project.candidates.entries()){
+        let exists = false;
+        candidateIds.forEach(function(item){
+          if(item==candidate){
+            exists = true;
+          }
+        });
+        if(exists){
+          project.candidates.splice(i, 1);
+        }
+      }
+      await project.save();
+      result = {success: true};
+
+    }
+
+  } catch(e){
+    console.log('removeProjetCandidates: Error', e);
   }
 
 

@@ -6,13 +6,19 @@ let Pagination = require('../utils/pagination');
 
 let statusEnum = require('../const/statusEnum');
 const planService = require('../services/plan.service');
+const productService = require('../services/product.service');
 
 module.exports = {
   getPlans,
   getPlanById,
   addPlan,
   deletePlan,
-  updatePlan
+  updatePlan,
+  getProducts,
+  getProductById,
+  addProduct,
+  deleteProduct,
+  updateProduct
 }
 
 
@@ -98,6 +104,96 @@ async function updatePlan(currentUserId, planId, form) {
   let result;
   try {
     result = await planService.updatePlan(planId, form)
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function getProducts(currentUserId, filter, sort, locale) {
+
+  if(!currentUserId || !filter || !sort){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await productService.getProducts(filter, sort);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+}
+
+
+async function getProductById(currentUserId, productId) {
+
+  if(!currentUserId || productId){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await productService.findById(productId);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function addProduct(currentUserId, form) {
+
+  if(!currentUserId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await productService.addProduct(currentUserId, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function deleteProduct(currentUserId, productId) {
+
+  if(!currentUserId || !productId){
+    return null;
+  }
+
+  let result;
+  try {
+    let product = await productService.findById(productId);
+
+    if(product) {
+      result = await product.delete();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function updateProduct(currentUserId, productId, form) {
+
+  if(!currentUserId || !productId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await productService.updateProduct(productId, form)
   } catch (error) {
     console.log(error);
   }
