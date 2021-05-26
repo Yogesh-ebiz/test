@@ -1749,7 +1749,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       filter.partyId=currentParty.id;
 
-      result = await Bookmark.paginate(new BookmarkSearchParam(filter), options);
+      result = await Bookmark.aggregatePaginate(new BookmarkSearchParam(filter), options);
       let jobIds = _.map(result.docs, 'jobId');
       let jobs = await findJob_Ids(jobIds);
 
@@ -1766,7 +1766,6 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       _.forEach(result.docs, function(bookmark, idx) {
         let job = _.find(jobs, {_id: ObjectID(bookmark.jobId)});
-        console.log(job)
         if(job) {
           job.hasSaved = true;
           job.description = null;
@@ -1787,7 +1786,6 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
           job.industry = industry;
 
-          console.log(job)
           bookmark.job = jobMinimal(job);
         }
 
@@ -2013,8 +2011,7 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       filter.partyId=currentParty.id;
 
-      result = await JobView.paginate(new SearchParam(filter), options);
-
+      result = await JobView.aggregatePaginate(new SearchParam(filter), options);
       let jobIds = _.map(result.docs, 'jobId');
 
       let hasSaves = await findBookByUserId(currentUserId);

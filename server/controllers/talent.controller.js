@@ -86,7 +86,7 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
-  getInsights,
+  getCompanyInsights,
   getImpressionCandidates,
   getStats,
   getUserSession,
@@ -108,6 +108,7 @@ module.exports = {
   updateJobApplicationForm,
   getBoard,
   payJob,
+  getJobInsights,
   getJobActivities,
   searchJobApplications,
   getApplicationById,
@@ -246,7 +247,7 @@ async function getCompanies(currentUserId) {
 }
 
 
-async function getInsights(currentUserId, companyId, timeframe) {
+async function getCompanyInsights(currentUserId, companyId, timeframe) {
 
 
   if(!currentUserId || !companyId){
@@ -256,7 +257,7 @@ async function getInsights(currentUserId, companyId, timeframe) {
 
   let data = [];
   let min = 10, max = 100;
-  let numOfItems = duration=='3M'?12:duration=='6M'?24:duration=='1Y'?52:30;
+  let numOfItems = timeframe=='3M'?12:timeframe=='6M'?24:timeframe=='1Y'?52:30;
 
     for(var i=0; i<4; i++){
       let sample = [];
@@ -332,9 +333,9 @@ async function getInsights(currentUserId, companyId, timeframe) {
   }
 
 
-  let viewedData = await jobViewService.getInsight(duration);
-  let savedData = await bookmarkService.getInsight(duration);
-  let appliedDate = await applicationService.getInsight(duration);
+  let viewedData = await jobViewService.getCompanyInsight(timeframe);
+  let savedData = await bookmarkService.getCompanyInsight(timeframe);
+  let appliedDate = await applicationService.getCompanyInsight(timeframe);
 
   let sharedData = {...viewedData}
   sharedData.type="SHARED"
@@ -976,6 +977,45 @@ async function payJob(currentUserId, jobId, payment) {
 
   return job;
 
+
+}
+
+
+
+async function getJobInsights(currentUserId, companyId, jobId) {
+
+
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+
+  let data = [];
+  let min = 10, max = 100;
+
+  let result = {
+
+  }
+
+
+  let viewedData = await jobViewService.getJobInsight(ObjectID(jobId));
+  let savedData = await bookmarkService.getJobInsight(ObjectID(jobId));
+  let appliedDate = await applicationService.getJobInsight(ObjectID(jobId));
+  //
+  let sharedData = {...viewedData}
+  sharedData.type="SHARED"
+  let likedData = {...savedData}
+  likedData.type="LIKED"
+
+  result.impressions=[];
+  result.impressions.push(viewedData);
+  result.impressions.push(savedData);
+  result.impressions.push(appliedDate);
+  result.impressions.push(sharedData);
+  result.impressions.push(likedData);
+
+
+  return result;
 
 }
 

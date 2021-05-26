@@ -72,7 +72,9 @@ const applicationSchema = Joi.object({
   resumeId: Joi.any().optional(),
   questionAnswers: Joi.array(),
   coverLetter: Joi.string().allow('').optional(),
-  source: Joi.string().allow('').optional()
+  source: Joi.string().allow('').optional(),
+  desiredSalary: Joi.number().optional(),
+  currency: Joi.string().optional(),
 });
 
 
@@ -686,7 +688,7 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
     filter.employmentType=null;
 
 
-    result = await JobRequisition.paginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
+    result = await JobRequisition.aggregatePaginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
     let docs = [];
 
     let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));

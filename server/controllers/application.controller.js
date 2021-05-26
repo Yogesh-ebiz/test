@@ -113,14 +113,14 @@ async function uploadCV(currentUserId, applicationId, files, name) {
     let currentParty = await findByUserId(currentUserId);
     if (isPartyActive(currentParty)) {
 
-      let application = await findApplicationById(applicationId);
+      let application = await findApplicationById(applicationId).populate('user');
 
-      if (application && application.user == currentUserId) {
-
-        let progress = application.progress[0];
-
+      if (application && application.user.userId == currentUserId) {
+        let type;
+        let progress = application.currentProress;
         //------------Upload CV----------------
         if(files.file) {
+
           let cv = files.file;
           let fileName = name ? name.split('.') : cv.originalFilename.split('.');
           let fileExt = fileName[fileName.length - 1];
@@ -129,7 +129,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
           let path = basePath + currentUserId + '/_resumes/' + name;
           let response = await upload(path, cv);
-          let type;
+
           switch (fileExt) {
             case 'pdf':
               type = 'PDF';

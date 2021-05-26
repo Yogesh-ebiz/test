@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const BookMark = require('../models/bookmark.model');
+const jobService = require('../services/jobrequisition.service');
 
 
 
@@ -76,7 +77,7 @@ async function findMostBookmarked() {
 }
 
 
-async function getInsight(duration) {
+async function getCompanyInsight(duration) {
   let data = [];
 
   if(!duration){
@@ -100,7 +101,6 @@ async function getInsight(duration) {
     date = new Date();
     date.setMonth(date.getMonth()-3);
     date.setDate(1);
-    console.log(date)
     group._id= {month: { $month: "$createdDate" } };
   } else if(duration=='6M'){
     date = new Date();
@@ -123,10 +123,10 @@ async function getInsight(duration) {
         let item = {};
 
         let found = _.find(result, {_id: {day: date.getDate(), month: date.getMonth()+1}});
-        if(found){
-          item = {date: date.getDate()+'/'+(parseInt(date.getMonth())+1), value: found.count};
+        if (found) {
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: found.count}};
         } else {
-          item = {date: date.getDate()+'/'+(parseInt(date.getMonth())+1), value: 0};
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: 0} };
         }
         data.push(item);
         date.setDate(date.getDate()-1);
@@ -138,10 +138,10 @@ async function getInsight(duration) {
         let item = {};
 
         let found = _.find(result, {_id: {month: date.getMonth()+1}});
-        if(found){
-          item = {date: parseInt(date.getMonth())+1+'/'+date.getFullYear(), value: found.count};
+        if (found) {
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: found.count}};
         } else {
-          item = {date: parseInt(date.getMonth())+1+'/'+date.getFullYear(), value: 0};
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: 0} };
         }
         data.push(item);
         date.setMonth(date.getMonth()-1);
@@ -158,6 +158,69 @@ async function getInsight(duration) {
   return {type: 'SAVED', total: total, change: change?change:0, data: data};
 }
 
+
+async function getJobInsight(jobId) {
+
+  if(!jobId){
+    return;
+  }
+
+  let job = await jobService.findJob_Id(jobId);
+
+  let data=[], total=0, change=0;
+  if(job) {
+
+    let group = {
+      _id: null,
+      viewers: {$push: '$$ROOT.partyId'},
+      count: {'$sum': 1}
+    };
+
+
+    let date = new Date();
+    // To calculate the time difference of two dates
+    var Difference_In_Time = date.getTime() - job.createdDate;
+
+    // To calculate the no. of days between two dates
+    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)
+
+    date.setDate(date.getDate() - Difference_In_Days);
+    date.setMinutes(0);
+    date.setHours(0)
+    group._id = {day: {$dayOfMonth: '$createdDate'}, month: {$month: "$createdDate"}};
+
+    let result = await BookMark.aggregate([
+      {$match: {jobId: jobId, createdDate: {$gt: date}}},
+      {
+        $group: group
+      }
+    ]);
+
+
+    if (result.length) {
+      date = new Date();
+      for (var i = 1; i <= Difference_In_Days; i++) {
+        let item = {};
+
+        let found = _.find(result, {_id: {day: date.getDate(), month: date.getMonth() + 1}});
+        if (found) {
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: found.count}};
+        } else {
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: 0} };
+        }
+        data.push(item);
+        date.setDate(date.getDate() - 1);
+      }
+      let current = data[0];
+      let previous = data[1];
+      total = _.sum(_.map(data, 'value'));
+      change = (current.value - previous.value) / current.value * 100.0;
+    }
+
+  }
+
+  return {type: 'SAVED', total: total, change: change, data: data};
+}
 
 
 async function getInsightCandidates(from, to, companyId, jobId, options) {
@@ -189,6 +252,7 @@ module.exports = {
   addBook: addBook,
   removeBookById: removeBookById,
   findMostBookmarked:findMostBookmarked,
-  getInsight:getInsight,
+  getCompanyInsight:getCompanyInsight,
+  getJobInsight:getJobInsight,
   getInsightCandidates:getInsightCandidates
 }

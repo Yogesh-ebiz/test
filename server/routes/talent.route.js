@@ -30,7 +30,7 @@ router.route('/company/:id/jobs/:jobId/comments').post(asyncHandler(addJobCommen
 router.route('/company/:id/jobs/:jobId/comments/:commentId').delete(asyncHandler(deleteJobComment));
 router.route('/company/:id/jobs/:jobId/comments/:commentId').put(asyncHandler(updateJobComment));
 
-router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
+router.route('/company/:id/jobs/:jobId/insights').get(asyncHandler(getJobInsights));
 router.route('/company/:id/jobs/:jobId/activities').get(asyncHandler(getJobActivities));
 router.route('/company/:id/jobs/:jobId/applications').get(asyncHandler(searchJobApplications));
 
@@ -45,6 +45,7 @@ router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
 
+router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
 // router.route('/company/:id/applications').get(asyncHandler(searchAllApplications));
 router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
@@ -147,7 +148,7 @@ async function getInsights(req, res) {
   let companyId = parseInt(req.params.id);
   let timeframe = req.query.timeframe
 
-  let data = await talentCtrl.getInsights(currentUserId, companyId, timeframe);
+  let data = await talentCtrl.getCompanyInsights(currentUserId, companyId, timeframe);
   res.json(new Response(data, data?'get_insights_successful':'not_found', res));
 }
 
@@ -346,6 +347,16 @@ async function payJob(req, res) {
   res.json(new Response(data, data?'job_paid_successful':'not_found', res));
 }
 
+
+
+async function getJobInsights(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+  let jobId = req.params.jobId;
+
+  let data = await talentCtrl.getJobInsights(currentUserId, companyId, jobId);
+  res.json(new Response(data, data?'get_insights_successful':'not_found', res));
+}
 
 
 async function getJobActivities(req, res) {

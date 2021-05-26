@@ -73,8 +73,11 @@ const ApplicationSchema = new mongoose.Schema({
   resume: {
     type: Object
   },
-  percentMatched: {
+  desiredSalary: {
     type: Number
+  },
+  currency: {
+    type: String
   },
   hasSubmittedQuestion: {
     type: Boolean,

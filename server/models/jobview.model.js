@@ -8,11 +8,7 @@ const JobViewSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  user: {
-    type: Number,
-    required: true
-  },
-  company: {
+  partyId: {
     type: Number,
     required: true
   },
