@@ -146,10 +146,38 @@ async function getInsight(duration) {
   return {type: 'VIEWED', total: total, change: change, data: data};
 }
 
+
+async function getInsightCandidates(from, to, companyId, jobId, options) {
+
+  if(!from || !to || !companyId || !options){
+    return;
+  }
+
+  let result;
+  let match = {$and: [{company: companyId}] } ;
+
+  if(jobId){
+    match.$and.push({jobId: jobId});
+  }
+
+
+  console.log(match)
+  const aggregate = JobView.aggregate([{
+    $match: match
+  },
+
+  ]);
+
+
+  result = await JobView.aggregatePaginate(aggregate, options);
+  return result;
+}
+
 module.exports = {
   findJobViewByUserId: findJobViewByUserId,
   findJobViewByUserIdAndJobId:findJobViewByUserIdAndJobId,
   addJobViewByUserId: addJobViewByUserId,
   findMostViewed:findMostViewed,
-  getInsight: getInsight
+  getInsight: getInsight,
+  getInsightCandidates:getInsightCandidates
 }

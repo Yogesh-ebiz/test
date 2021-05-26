@@ -148,6 +148,10 @@ function SearchParam(filter) {
     this.query.distance =  { $in: filter.distance};
   }
 
+  if (filter.members) {
+    this.query.members =  { $in: filter.members};
+  }
+
   return this.query;
 }
 

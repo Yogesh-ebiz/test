@@ -26,14 +26,14 @@ function findBookByUserId(userId, size) {
   return size?BookMark.find({partyId: userId}).sort({createdDate: -1}).limit(size):BookMark.find({partyId: userId}).sort({createdDate: -1});
 }
 
-function addBookById(userId, jobId) {
+function addBook(userId, company, jobId) {
   let data = null;
 
-  if(userId==null || jobId==null){
+  if(userId==null || !company || jobId==null){
     return;
   }
 
-  let bookmark = {partyId: userId, jobId: jobId};
+  let bookmark = {partyId: userId, company: company, jobId: jobId};
   return new BookMark(bookmark).save();
 }
 
@@ -159,11 +159,36 @@ async function getInsight(duration) {
 }
 
 
+
+async function getInsightCandidates(from, to, companyId, jobId, options) {
+
+  if(!from || !to || !companyId || !options){
+    return;
+  }
+
+  let result;
+  let match = {$and: [{company: companyId}] } ;
+
+  if(jobId){
+    match.$and.push({jobId: jobId});
+  }
+
+  const aggregate = BookMark.aggregate([{
+    $match: match
+  },
+  ]);
+
+
+  result = await BookMark.aggregatePaginate(aggregate, options);
+  return result;
+}
+
 module.exports = {
   findBookById: findBookById,
   findBookByUserId: findBookByUserId,
-  addBookById: addBookById,
+  addBook: addBook,
   removeBookById: removeBookById,
   findMostBookmarked:findMostBookmarked,
-  getInsight:getInsight
+  getInsight:getInsight,
+  getInsightCandidates:getInsightCandidates
 }

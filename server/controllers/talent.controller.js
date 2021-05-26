@@ -15,7 +15,7 @@ const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 
 const {categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
-const {getUserLinks, lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {getUserLinks, lookupPeopleIds, lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
 const applicationService = require('../services/application.service');
@@ -38,6 +38,7 @@ const evaluationService = require('../services/evaluation.service');
 const candidateService = require('../services/candidate.service');
 const jobViewService = require('../services/jobview.service');
 const bookmarkService = require('../services/bookmark.service');
+const departmentService = require('../services/department.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -86,6 +87,7 @@ const labelSchema = Joi.object({
 
 module.exports = {
   getInsights,
+  getImpressionCandidates,
   getStats,
   getUserSession,
   createJob,
@@ -133,6 +135,7 @@ module.exports = {
   removeCandidateTag,
   addCandidateSource,
   removeCandidateSource,
+  updateCandidatePool,
   addCompanyDepartment,
   updateCompanyDepartment,
   deleteCompanyDepartment,
@@ -243,7 +246,7 @@ async function getCompanies(currentUserId) {
 }
 
 
-async function getInsights(currentUserId, companyId, duration) {
+async function getInsights(currentUserId, companyId, timeframe) {
 
 
   if(!currentUserId || !companyId){
@@ -350,6 +353,112 @@ async function getInsights(currentUserId, companyId, duration) {
 
 }
 
+
+async function getImpressionCandidates(company, currentUserId, type, timeframe, jobId, sort, locale) {
+  if(!currentUserId || !company || !type || !sort){
+    return null;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: page
+  };
+
+  let result;
+  let from, to;
+
+  if(jobId){
+    jobId = ObjectID(jobId);
+    let job = await jobService.findJob_Id(jobId);
+    if(job){
+      from = new Date(job.createdDate);
+      to = new Date();
+    }
+  }
+
+  if(timeframe){
+    if(timeframe=='1M'){
+      date = new Date();
+      date.setDate(date.getDate()-30);
+      date.setMinutes(0);
+      date.setHours(0)
+      from = date;
+      to = new Date();
+    } else if(timeframe=='3M'){
+      date = new Date();
+      date.setMonth(date.getMonth()-3);
+      date.setDate(1);
+      from = date;
+      to = new Date();
+    } else if(timeframe=='6M'){
+      date = new Date();
+      date.setMonth(date.getMonth()-6);
+      date.setDate(1);
+      from = date;
+      to = new Date();
+    }
+  }
+
+  if(type=='viewed') {
+    result = await jobViewService.getInsightCandidates(from, to, company, jobId, options);
+  } else if(type=='saved') {
+    result = await bookmarkService.getInsightCandidates(from, to, company, jobId, options);
+  } else if(type=='applied') {
+    result = await applicationService.getInsightCandidates(from, to, company, jobId, options);
+  }
+
+  if(result){
+    let userIds = _.map(result.docs, 'partyId');
+    let users = await lookupPeopleIds(userIds);
+
+    for(i in result.docs){
+
+      let found = _.find(users, {id: result.docs[i].partyId});
+      if(found){
+        result.docs[i] = found;
+      }
+    }
+  }
+
+
+  // if(result.docs.length) {
+  //   let currentProgressIds = _.reduce(result.docs, function (res, candidate) {
+  //     let currentProgresses = _.reduce(candidate.applications, function(res, app) {
+  //       res.push(ObjectID(app.currentProgress));
+  //       return res;
+  //     }, []);
+  //
+  //     res = res.concat(currentProgresses);
+  //     return res;
+  //   }, [])
+  //
+  //   let progresses = await applicationProgressService.findApplicationProgresssByIds(currentProgressIds);
+  //   for (i in result.docs) {
+  //     result.docs[i].source = [];
+  //     result.docs[i].tags = [];
+  //
+  //     for(j in result.docs[i].applications){
+  //       result.docs[i].applications[j].currentProgress = _.find(progresses, function(progress){
+  //         return progress._id.equals(result.docs[i].applications[j].currentProgress)
+  //       });
+  //     }
+  //     result.docs[i] = convertToCandidate(result.docs[i]);
+  //
+  //   }
+  // }
+  return new Pagination(result);
+
+}
+
 async function getStats(currentUserId, companyId) {
 
 
@@ -423,34 +532,30 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   };
 
 
-  filter.member = [member._id];
+  filter.members = [member._id];
 
   let company = await findCompanyById(companyId, currentUserId);
 
+  console.log( new SearchParam(filter))
   const aggregate = JobRequisition.aggregate([{
     $match: new SearchParam(filter)
-  },
-    {
-      $lookup: {
-        from: 'departments',
-        localField: 'department',
-        foreignField: '_id',
-        as: 'department',
-      },
-    },
-    { $unwind: '$department'}
+  }
   ]);
+
 
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
   let users = await lookupUserIds(userIds);
+
+  let departmentIds = _.map(result.docs, 'department');
+  let departments = await departmentService.getDepartmentsByList(departmentIds);
 
   const loadPromises = result.docs.map(job => {
     job.isHot = false;
     job.isNew = false;
     job.company = convertToCompany(company);
     job.hasSaved = _.some(jobSubscribed, {subjectId: job._id});
-
+    job.department = _.find(departments, {_id: job.department});
     let createdBy = _.find(users, {id: job.createdBy});
     if(createdBy){
       job.createdBy = convertToAvatar(createdBy);
@@ -1738,7 +1843,6 @@ async function getBoard(currentUserId, jobId, locale) {
 // }
 
 async function searchCandidates(currentUserId, company, filter, locale) {
-
   if(!currentUserId || !company || !filter){
     return null;
   }
@@ -1757,13 +1861,33 @@ async function searchCandidates(currentUserId, company, filter, locale) {
 
   result = await candidateService.findByCompany(company, filter);
 
-  for(index in result.docs){
-    result.docs[index].source=[];
-    result.docs[index].tags=[];
-    result.docs[index] = convertToCandidate(result.docs[index]);
-  };
+  if(result.docs.length) {
+    let currentProgressIds = _.reduce(result.docs, function (res, candidate) {
+      let currentProgresses = _.reduce(candidate.applications, function(res, app) {
+        res.push(ObjectID(app.currentProgress));
+        return res;
+      }, []);
+
+      res = res.concat(currentProgresses);
+      return res;
+    }, [])
+
+    let progresses = await applicationProgressService.findApplicationProgresssByIds(currentProgressIds);
+    for (i in result.docs) {
+      result.docs[i].source = [];
+      result.docs[i].tags = [];
+
+      for(j in result.docs[i].applications){
+        result.docs[i].applications[j].currentProgress = _.find(progresses, function(progress){
+          return progress._id.equals(result.docs[i].applications[j].currentProgress)
+        });
+      }
+      result.docs[i] = convertToCandidate(result.docs[i]);
+
+    }
 
 
+  }
   return new Pagination(result);
 
 }
@@ -1958,6 +2082,64 @@ async function removeCandidateSource(companyId, currentUserId, candidateId, sour
   return result;
 }
 
+
+
+async function updateCandidatePool(company, currentUserId, candidateId, poolIds) {
+  if(!company || !currentUserId || !candidateId || !poolIds){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+
+  try {
+    let pools = await poolService.findByCompany(company);
+    if (pools) {
+      for([i, pool] of pools.entries()){
+
+        let existPool = _.find(poolIds, function(item){ console.log(item); return ObjectID(item).equals(pool._id); });
+        if(!existPool){
+          for(const [i, candidate] of pool.candidates.entries()){
+            if(candidate==candidateId){
+              pool.candidates.splice(i, 1);
+            }
+          }
+
+          await pool.save();
+        } else {
+          let existCandidate= false;
+          for(const [i, candidate] of pool.candidates.entries()){
+            if(candidate==candidateId){
+              existCandidate = true
+            }
+          }
+          if(!existCandidate){
+            pool.candidates.push(candidateId);
+            await pool.save();
+          }
+
+        }
+
+
+      }
+
+    }
+
+
+
+  } catch(e){
+    console.log('addPoolCandidate: Error', e);
+  }
+
+
+  return result
+}
 
 
 /************************** DEPARTMENTS *****************************/
@@ -2593,16 +2775,16 @@ async function deleteCompanyMember(company, memberId, currentUserId) {
 
 
 
-async function getCompanyPools(company, query, currentUserId, locale) {
+async function getCompanyPools(company, currentUserId, query, candidateId, locale) {
 
   if(!company || !currentUserId){
     return null;
   }
 
-  let result = await poolService.getPools(company);
-  // result.forEach(function(member){
-  //   member.role = roleMinimal(member.role);
-  // });
+  let result = await poolService.findByCompany(company, query);
+  result.forEach(function(pool){
+    pool.isIn = _.some(pool.candidates, ObjectID(candidateId))
+  });
 
   return result;
 
@@ -2686,33 +2868,47 @@ async function deleteCompanyPool(company, poolId, currentUserId) {
   return result
 }
 
-async function getPoolCandidates(company, poolId, currentUserId) {
+async function getPoolCandidates(company, currentUserId, poolId, sort) {
   if(!company || !poolId || !currentUserId){
     return null;
   }
 
+  let result;
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
 
   if(!member){
     return null;
   }
 
-  let result = [];
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: page
+  };
+
 
 
   try {
-    let pool = await poolService.findPoolBy_Id(poolId).populate('candidates');
-    if(pool){
-      result = pool.candidates;
-    }
-
-
+    let pool = await poolService.findPoolBy_Id(poolId);
+    let candidateIds = pool.candidates;
+    result = await candidateService.searchCandidates(candidateIds, options);
+    for(i in result.docs){
+      result.docs[i] = convertToCandidate(result.docs[i]);
+    };
   } catch(e){
     console.log('getPoolCandidates: Error', e);
   }
 
 
-  return result
+  return new Pagination(result);
 }
 
 async function addPoolCandidates(company, poolId, candidateIds, currentUserId) {
@@ -3115,5 +3311,6 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
 
   return result;
 }
+
 
 

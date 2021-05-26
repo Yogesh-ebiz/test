@@ -24,7 +24,6 @@ const {getListofSkillTypes} = require('../services/skilltype.service');
 const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findApplicationByCurrentStatus, findApplicationProgresssById, addApplicationProgress} = require('../services/applicationprogress.service');
 const {findApplicationHistoryById, addApplicationHistory} = require('../services/applicationhistory.service');
-const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
@@ -39,6 +38,8 @@ const {getTopCategory} = require('../services/category.service');
 const {getTopIndustry} = require('../services/industry.service');
 
 const filterService = require('../services/filter.service');
+const bookmarkService = require('../services/bookmark.service');
+
 
 const JobRequisition = require('../models/jobrequisition.model');
 const Skilltype = require('../models/skilltype.model');
@@ -62,6 +63,7 @@ const applicationSchema = Joi.object({
   jobTitle: Joi.string().allow(''),
   jobId: Joi.object().required(),
   user: Joi.object().required(),
+  partyId: Joi.number().required(),
   phoneNumber: Joi.string(),
   email: Joi.string().required(),
   availableDate: Joi.number(),
@@ -183,7 +185,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
           if (isPartyActive(currentParty)) {
 
-            let hasSaved = await findBookById(currentParty.id, job.jobId);
+            let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
             job.hasSaved = (hasSaved) ? true : false;
 
             let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
@@ -393,14 +395,14 @@ async function getJobLanding(currentUserId, locale) {
     let industries = await getTopIndustry();
 
     let viewed = await findJobViewByUserId(currentUserId, 4)
-    let saved = await findBookByUserId(currentUserId, 4);
+    let saved = await bookmarkService.findBookByUserId(currentUserId, 4);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
     let newJobs = await getNewJobs();
     let popularJobs = await findMostViewed();
 
 
     if(!popularJobs.length){
-      popularJobs = await findMostBookmarked();
+      popularJobs = await bookmarkService.findMostBookmarked();
     }
 
     let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, 'jobId')).concat(_.map(highlight, '_id')).concat(_.map(newJobs, '_id'));
@@ -591,7 +593,7 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
   let hasSaves = [];
 
   if(currentUserId){
-    hasSaves=await findBookByUserId(currentUserId);
+    hasSaves=await bookmarkService.findBookByUserId(currentUserId);
   }
 
 
@@ -694,7 +696,7 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
     let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
     let foundCompanies = await feedService.lookupCompaniesIds(listOfCompanyIds);
 
-    let hasSaves = await findBookByUserId(currentUserId);
+    let hasSaves = await bookmarkService.findBookByUserId(currentUserId);
 
 
     _.forEach(result.docs, function(job){
@@ -813,6 +815,7 @@ async function applyJobById(currentUserId, jobId, application ) {
         application.user = candidate._id;
         application.jobId = job._id;
         application.jobTitle = job.title;
+        application.partyId = currentParty.id;
 
         application = await Joi.validate(application, applicationSchema, {abortEarly: false});
         application.company = job.company
@@ -845,14 +848,17 @@ async function applyJobById(currentUserId, jobId, application ) {
                 applicationId: savedApplication.applicationId,
                 stage: applyStage._id
               });
+
+              job.noOfApplied+=1;
               // progress.stage = applyStage._id;
               savedApplication.progress.push(progress._id);
               savedApplication.allProgress.push(progress._id)
               savedApplication.currentProgress = progress._id;
 
-
+              candidate.jobTitle = currentParty.jobTitle;
               candidate.applications.push(savedApplication._id);
               await candidate.save();
+              await job.save();
               await savedApplication.save();
 
             }
@@ -909,10 +915,10 @@ async function addBookmark(currentUserId, jobId) {
   try {
     let job = await JobRequisition.findOne({_id: ObjectID(jobId), status: statusEnum.ACTIVE });
     if(job) {
-      result = await findBookById(currentUserId, ObjectID(jobId));
+      result = await bookmarkService.findBookById(currentUserId, ObjectID(jobId));
 
       if(!result) {
-        result = await addBookById(currentUserId, ObjectID(jobId));
+        result = await bookmarkService.addBook(currentUserId, job.company, job._id);
       }
 
 
@@ -936,7 +942,7 @@ async function removeBookmark(currentUserId, jobId) {
   let result;
   try {
 
-      let deleted = await removeBookById(currentUserId, ObjectID(jobId));
+      let deleted = await bookmarkService.removeBookById(currentUserId, ObjectID(jobId));
 
       if(deleted && deleted.deletedCount>0){
         result = {success: true};
@@ -1004,7 +1010,7 @@ async function searchCandidates(currentUserId, jobId, filter, locale) {
   let hasSaves = [];
 
   if(currentUserId){
-    hasSaves=await findBookByUserId(currentUserId);
+    hasSaves=await bookmarkService.findBookByUserId(currentUserId);
   }
 
 

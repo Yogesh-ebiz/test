@@ -16,6 +16,18 @@ function findApplicationProgresssById(applicationProgressId) {
   return ApplicationProgress.findOne({applicationProgressId: applicationProgressId}).populate('application').populate('progress');
 }
 
+
+
+function findApplicationProgresssByIds(applicationProgressIds) {
+  let data = null;
+
+  if(applicationProgressIds==null){
+    return;
+  }
+
+  return ApplicationProgress.find({_id: {$in: applicationProgressIds}}).populate('stage');
+}
+
 function findApplicationByCurrentStatus(applicationId) {
   let data = null;
 
@@ -73,6 +85,7 @@ function addApplicationProgressEvaluation(applicationProgress_Id, evaluationId) 
 
 module.exports = {
   findApplicationProgresssById: findApplicationProgresssById,
+  findApplicationProgresssByIds:findApplicationProgresssByIds,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,
   addApplicationProgress: addApplicationProgress,
   getApplicationProgressEvaluations:getApplicationProgressEvaluations,

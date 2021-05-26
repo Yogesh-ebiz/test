@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const statusEnum = require('../const/statusEnum');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 
 
 const PoolSchema = new mongoose.Schema({
@@ -29,10 +30,15 @@ const PoolSchema = new mongoose.Schema({
   description: {
     type: String,
     required: false
+  },
+  isIn: {
+    type: Boolean,
+    default: false
   }
 }, {
   versionKey: false
 });
+PoolSchema.plugin(mongoosePaginate);
 
 
 module.exports = mongoose.model('Pool', PoolSchema);

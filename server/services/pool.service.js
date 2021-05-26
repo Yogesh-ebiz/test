@@ -16,7 +16,7 @@ const poolSchema = Joi.object({
 });
 
 
-async function getPools(company, query) {
+async function findByCompany(company, query) {
   let data = null;
 
   if(company==null){
@@ -35,6 +35,47 @@ function findPoolBy_Id(poolId) {
   }
 
   let pool = Pool.findById(poolId);
+  return pool
+}
+
+
+async function getPoolCandidates(poolId) {
+  let data = null;
+
+  if(poolId==null){
+    return;
+  }
+
+  const aggregate = Pool.aggregate([{
+    $match: {_id: ObjectID(poolId)}
+  },
+    {
+      $lookup: {
+        from: 'candidates',
+        localField: 'candidates',
+        foreignField: '_id',
+        as: 'candidates',
+      },
+    },
+    {
+      $project: {
+        candidates: {
+          $slice: [{
+            "$filter": {
+              "input": "$candidates",
+              "as": "item",
+              "cond": { "$eq": [] }
+            }
+          }, (perPage * page), perPage]
+        }
+      }
+    }
+  ]);
+
+  console.log(poolId)
+
+  let pool = await Pool.aggregatePaginate(aggregate, {});
+  console.log(pool)
   return pool
 }
 
@@ -76,8 +117,9 @@ async function updatePool(poolId, form) {
 
 
 module.exports = {
-  getPools:getPools,
+  findByCompany:findByCompany,
   addPool:addPool,
   findPoolBy_Id:findPoolBy_Id,
+  getPoolCandidates: getPoolCandidates,
   updatePool:updatePool
 }

@@ -202,6 +202,10 @@ async function lookupUserIds(ids) {
 };
 
 
+async function lookupPeopleIds(ids) {
+  let response = await client.get(`/people/lookup?ids=${ids}`, null, options);
+  return response.data.data;
+};
 
 async function lookupCompaniesIds(ids) {
   let response = await client.get(`/search/company/lookup?ids=${ids}`, null, options);
@@ -311,6 +315,7 @@ module.exports = {
   findJobfunction:findJobfunction,
   searchUsers: searchUsers,
   lookupUserIds:lookupUserIds,
+  lookupPeopleIds:lookupPeopleIds,
   lookupCompaniesIds:lookupCompaniesIds,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,

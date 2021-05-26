@@ -584,6 +584,30 @@ async function getInsight(duration) {
 }
 
 
+async function getInsightCandidates(from, to, companyId, jobId, options) {
+
+  if(!from || !to || !companyId || !options){
+    return;
+  }
+
+  let result;
+  let match = {$and: [{company: companyId}] } ;
+
+  if(jobId){
+    match.$and.push({jobId: jobId});
+  }
+
+
+  const aggregate = Application.aggregate([{
+    $match: match
+  },
+
+  ]);
+
+  result = await Application.aggregatePaginate(aggregate, options);
+  return result;
+}
+
 
 module.exports = {
   findApplicationById: findApplicationById,
@@ -601,5 +625,6 @@ module.exports = {
   revertApplication:revertApplication,
   getApplicationActivities:getApplicationActivities,
   applyJob: applyJob,
-  getInsight: getInsight
+  getInsight: getInsight,
+  getInsightCandidates:getInsightCandidates
 }

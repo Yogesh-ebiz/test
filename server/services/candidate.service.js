@@ -85,7 +85,15 @@ async function findByCompany(company, filter) {
         foreignField: '_id',
         as: 'applications',
       },
-    }
+    },
+    {
+      $lookup: {
+        from: 'candidates',
+        localField: 'application.currentProgress',
+        foreignField: '_id',
+        as: 'currentProgress',
+      }
+    },
   ]);
   return await Candidate.aggregatePaginate(aggregate, options);
 }
@@ -113,11 +121,31 @@ function getListofCandidates(userIds, companyId) {
 }
 
 
+function searchCandidates(candidateIds, options) {
+
+
+  if(!candidateIds || !options){
+    return;
+  }
+
+  const aggregate = Candidate.aggregate([{
+    $match: {_id: {$in: candidateIds}}
+  }
+  ]);
+
+
+  let result = Candidate.aggregatePaginate(aggregate, options);
+
+  return result;
+}
+
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
   findByUserId:findByUserId,
   findByCompany:findByCompany,
   findByUserIdAndCompanyId:findByUserIdAndCompanyId,
-  getListofCandidates:getListofCandidates
+  getListofCandidates:getListofCandidates,
+  searchCandidates:searchCandidates
 }

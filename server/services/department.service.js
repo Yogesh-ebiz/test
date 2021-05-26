@@ -28,9 +28,20 @@ function addDepartment(department) {
 
 }
 
+function getDepartmentsByList(departments) {
+  let data = null;
 
+  if(departments==null){
+    return;
+  }
+
+  data = Department.find({_id: {$in: departments}});
+  return data;
+
+}
 
 module.exports = {
   getDepartments:getDepartments,
+  getDepartmentsByList:getDepartmentsByList,
   addDepartment:addDepartment
 }

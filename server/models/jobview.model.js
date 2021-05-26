@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const statusEnum = require('../const/statusEnum');
 
@@ -8,7 +8,11 @@ const JobViewSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  partyId: {
+  user: {
+    type: Number,
+    required: true
+  },
+  company: {
     type: Number,
     required: true
   },

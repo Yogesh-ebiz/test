@@ -28,6 +28,10 @@ const ApplicationSchema = new mongoose.Schema({
   //   required: false
   // },
   user: { type: Schema.Types.ObjectId, ref: 'Candidate' },
+  partyId: {
+    type: Number,
+    required: true
+  },
   company: {
     type: Number,
     required: false
