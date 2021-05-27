@@ -501,9 +501,9 @@ function applyJob(application) {
 
 
 
-async function getCompanyInsight(duration) {
+async function getCompanyInsight(company, duration) {
 
-  if(!duration){
+  if(!company || !duration){
     return;
   }
 
@@ -534,7 +534,7 @@ async function getCompanyInsight(duration) {
 
   let data=[], total=0, change=0;
   let result  = await Application.aggregate([
-    {$match: {createdDate: {$gt: date}}},
+    {$match: {company: company, createdDate: {$gt: date}}},
     {
       $group: group
     }
@@ -571,15 +571,17 @@ async function getCompanyInsight(duration) {
         date.setMonth(date.getMonth()-1);
       }
     }
+
+    let current = data[0];
+    let previous = data[1];
+    total = _.sum(_.reduce(data, function(res, item) {
+      res.push(item.data.paid+item.data.free);
+      return res;
+    }, []));
+    change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
+
   }
 
-  let current = data[0];
-  let previous = data[1];
-  total = _.sum(_.reduce(data, function(res, item) {
-    res.push(item.data.paid+item.data.free);
-    return res;
-  }, []));
-  change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
 
 
   return {type: 'APPLIED', total: total, change: change?change:0, data: data};
@@ -654,6 +656,80 @@ async function getJobInsight(jobId) {
 }
 
 
+async function getCompanyCandidatesSource(company, duration) {
+
+  if(!company || !duration){
+    return;
+  }
+
+  let result= {}, date;
+
+  if(duration=='1M'){
+    date = new Date();
+    date.setDate(date.getDate()-30);
+    date.setMinutes(0);
+    date.setHours(0)
+  } else if(duration=='3M'){
+    date = new Date();
+    date.setMonth(date.getMonth()-3);
+    date.setDate(1);
+  } else if(duration=='6M'){
+    date = new Date();
+    date.setMonth(date.getMonth()-6);
+    date.setDate(1);
+  }
+
+  // let applications  = await Application.aggregate([
+  //   { $match: {company: company, createdDate: {$gt: date}}},
+  //   { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+  //   { $unwind: '$user' },
+  //   { $project: {_id: 0, sources: '$user.sources'} }
+  // ]);
+
+  let groupCandidateSources  = await Application.aggregate([
+    { $match: {company: company, createdDate: {$gt: date}}},
+    {$lookup:{
+        from:"candidates",
+        let:{user: '$user'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$user","$_id"]}}},
+          {
+            $lookup: {
+              from: 'labels',
+              localField: "sources",
+              foreignField: "_id",
+              as: "sources"
+            }
+          },
+        ],
+        as: 'user'
+      }},
+    {$unwind: '$user'},
+    { $group:{_id: { _id: '$user._id', sources: '$user.sources'}, applications: {$push: '$$ROOT'}, count:{$sum:1} }},
+    { $project:{_id: 0, sources: '$_id.sources'}},
+  ]);
+
+  if(groupCandidateSources){
+    let total = 0;
+    let data = {};
+    for(i in groupCandidateSources){
+      for(j in groupCandidateSources[i].sources) {
+        if (data[groupCandidateSources[i].sources[j].labelId]) {
+          data.id.count += 1;
+        } else {
+          console.log()
+          data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
+        }
+        total++;
+      }
+    }
+    result = {total: total, data: data};
+  }
+
+  return result;
+}
+
+
 async function getInsightCandidates(from, to, companyId, jobId, options) {
 
   if(!from || !to || !companyId || !options){
@@ -697,5 +773,6 @@ module.exports = {
   applyJob: applyJob,
   getCompanyInsight: getCompanyInsight,
   getJobInsight:getJobInsight,
+  getCompanyCandidatesSource:getCompanyCandidatesSource,
   getInsightCandidates:getInsightCandidates
 }

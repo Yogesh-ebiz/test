@@ -65,9 +65,9 @@ async function findMostViewed() {
   return data;
 }
 
-async function getCompanyInsight(duration) {
+async function getCompanyInsight(company, duration) {
 
-  if(!duration){
+  if(!company || !duration){
     return;
   }
 
@@ -135,15 +135,17 @@ async function getCompanyInsight(duration) {
         date.setMonth(date.getMonth()-1);
       }
     }
-  }
 
-  let current = data[0];
-  let previous = data[1];
-  total = _.sum(_.reduce(data, function(res, item) {
-    res.push(item.data.paid+item.data.free);
-    return res;
-  }, []));
-  change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
+    let current = data[0];
+    let previous = data[1];
+    total = _.sum(_.reduce(data, function (res, item) {
+      res.push(item.data.paid + item.data.free);
+      return res;
+    }, []));
+    change = ((current.data.paid + current.data.free) - (previous.data.paid + previous.data.free)) / (current.data.paid + current.data.free) * 100.0;
+
+
+  }
 
 
   return {type: 'VIEWED', total: total, change: change, data: data};

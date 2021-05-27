@@ -330,13 +330,14 @@ async function getCompanyInsights(currentUserId, companyId, timeframe) {
         name: 'CXO',
         value: 5.6
       }
-    ]
+    ],
+    sources: {}
   }
 
 
-  let viewedData = await jobViewService.getCompanyInsight(timeframe);
-  let savedData = await bookmarkService.getCompanyInsight(timeframe);
-  let appliedDate = await applicationService.getCompanyInsight(timeframe);
+  let viewedData = await jobViewService.getCompanyInsight(companyId, timeframe);
+  let savedData = await bookmarkService.getCompanyInsight(companyId, timeframe);
+  let appliedDate = await applicationService.getCompanyInsight(companyId, timeframe);
 
   let sharedData = {...viewedData}
   sharedData.type="SHARED"
@@ -350,6 +351,8 @@ async function getCompanyInsights(currentUserId, companyId, timeframe) {
   result.impressions.push(sharedData);
   result.impressions.push(likedData);
 
+
+  let sources = await applicationService.getCompanyCandidatesSource(companyId, timeframe);
 
   return result;
 
@@ -2049,9 +2052,9 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
 }
 
 
-async function addCandidateSource(companyId, currentUserId, candidateId, sources) {
+async function addCandidateSource(companyId, currentUserId, userId, sources) {
 
-  if(!companyId || !currentUserId || !currentUserId || !sources){
+  if(!companyId || !currentUserId || !userId || !sources){
     return null;
   }
 
@@ -2062,7 +2065,7 @@ async function addCandidateSource(companyId, currentUserId, candidateId, sources
 
   let result;
   try {
-    let candidate = await candidateService.findByUserId(candidateId);
+    let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
 
 
     if(candidate) {
