@@ -180,6 +180,7 @@ module.exports = {
   addProjectCandidates,
   removeProjectCandidate,
   removeProjectCandidates,
+  updateCandidateProject,
   subscribeJob,
   unsubscribeJob,
   getFiles
@@ -3339,6 +3340,63 @@ async function removeProjectCandidates(company, projectId, candidateIds, current
 }
 
 
+
+async function updateCandidateProject(company, currentUserId, candidateId, projectIds) {
+  if(!company || !currentUserId || !candidateId || !projectIds){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+
+  try {
+    let projects = await projectService.findByCompany(company);
+    if (projects) {
+      for([i, project] of projects.entries()){
+
+        let existproject = _.find(projectIds, function(item){ return ObjectID(item).equals(project._id); });
+        if(!existproject){
+          for(const [i, candidate] of project.candidates.entries()){
+            if(candidate==candidateId){
+              project.candidates.splice(i, 1);
+            }
+          }
+
+          await project.save();
+        } else {
+          let existCandidate= false;
+          for(const [i, candidate] of project.candidates.entries()){
+            if(candidate==candidateId){
+              existCandidate = true
+            }
+          }
+          if(!existCandidate){
+            project.candidates.push(candidateId);
+            await project.save();
+          }
+
+        }
+
+
+      }
+
+    }
+
+
+
+  } catch(e){
+    console.log('updateCandidateProject: Error', e);
+  }
+
+
+  return result
+}
 
 async function subscribeJob(currentUserId, companyId, jobId) {
   if(!currentUserId || !companyId || !jobId){

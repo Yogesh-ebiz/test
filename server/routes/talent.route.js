@@ -142,6 +142,8 @@ router.route('/company/:id/projects/:projectId/candidates').post(asyncHandler(ad
 router.route('/company/:id/projects/:projectId/candidates/:candidateId').delete(asyncHandler(removeProjectCandidate));
 router.route('/company/:id/projects/:projectId/candidates').delete(asyncHandler(removeProjectCandidates));
 
+router.route('/company/:id/people/:peopleId/projects').post(asyncHandler(updateCandidateProject));
+
 router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 
 
@@ -1330,6 +1332,18 @@ async function removeProjectCandidates(req, res) {
 
   let data = await talentCtrl.removeProjectCandidates(company, projectId, candidates, currentUserId);
   res.json(new Response(data, data?'candidates_removed_successful':'not_found', res));
+}
+
+
+async function updateCandidateProject(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let peopleId = req.params.peopleId;
+  let projectIdss = req.body.projects;
+
+  let data = await talentCtrl.updateCandidateProject(companyId, currentUserId, peopleId, projectIdss);
+
+  res.json(new Response(data, data?'projects_added_successful':'not_found', res));
 }
 
 

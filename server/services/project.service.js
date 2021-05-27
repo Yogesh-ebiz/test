@@ -14,6 +14,30 @@ const projectSchema = Joi.object({
 });
 
 
+
+async function findByCompany(company, query) {
+  let data = null;
+
+  if(company==null){
+    return;
+  }
+
+  let projects = Project.find({company: company});
+  return projects
+}
+
+function findPoolBy_Id(poolId) {
+  let data = null;
+
+  if(poolId==null){
+    return;
+  }
+
+  let pool = Pool.findById(poolId);
+  return pool
+}
+
+
 async function getProjects(company, query) {
   let data = null;
 
@@ -71,6 +95,7 @@ async function updateProject(projectId, form) {
 
 
 module.exports = {
+  findByCompany:findByCompany,
   getProjects:getProjects,
   addProject:addProject,
   findProjectBy_Id:findProjectBy_Id,
