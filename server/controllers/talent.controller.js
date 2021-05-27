@@ -490,18 +490,11 @@ async function getStats(currentUserId, companyId) {
 
   });
 
-  let jobs = await JobRequisition.find({company: companyId}).limit(10);
-  jobs = _.reduce(jobs, function(res, job){
-    job.responsibilities=null;
-    job.qualifications=null;
-    job.skills = null;
-    res.push(job);
-    return res;
-  }, []);
+  let jobs = await jobViewService.findMostViewed();
 
   let result = {
     newApplications: newApplications,
-    mostActiveJobs: jobs
+    mostViewedJobs: jobs
   }
 
 

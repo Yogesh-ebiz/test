@@ -31,7 +31,6 @@ function addJobViewByUserId(userId, company, jobId) {
     return;
   }
 
-
   let timestamp = Date.now();
 
   let jobView = {partyId: userId, company: company, jobId: jobId, createdDate: timestamp}
@@ -43,21 +42,74 @@ async function findMostViewed() {
   let data = null;
 
   let group = {
-    _id: {jobId: '$jobId'},
+    _id: {
+      jobId: '$jobId._id', title: '$jobId.title', department: '$jobId.department', city: '$jobId.city', state: '$jobId.state', country: '$jobId.country', company: '$jobId.company',
+      status: '$jobId.status', description: '$jobId.description',
+      minMonthExperience: '$jobId.minMonthExperience',
+      maxMonthExperience: '$jobId.maxMonthExperience',
+      expirationDate: '$jobId.expirationDate',
+      salaryRangeLow: '$jobId.salaryRangeLow',
+      salaryRangeHigh: '$jobId.salaryRangeHigh',
+      salaryFixed: '$jobId.salaryFixed',
+      jobFunction: '$jobId.jobFunction',
+      responsibilities:'$jobId.responsibilities',
+      qualifications: '$jobId.qualifications',
+      minimumQualifications: '$jobId.minimumQualifications',
+      skills: '$jobId.skills',
+      industry: '$jobId.industry'
+    },
     count: {'$sum': 1}
   };
 
   data = await JobView.aggregate([
-    {$match: {}},
-    {
-      $group: group
-    },
+    // { $lookup: {from: 'jobrequisitions', localField: 'jobId', foreignField: '_id', as: 'jobId' } },
+    {$lookup:{
+        from:"jobrequisitions",
+        let:{jobId: '$jobId'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$jobId","$_id"]}}},
+          {
+            $lookup: {
+              from: 'departments',
+              localField: "department",
+              foreignField: "_id",
+              as: "department"
+            }
+          },
+        ],
+        as: 'jobId'
+      }},
+    { $unwind: '$jobId'},
+    // { $lookup: {from: 'departments', localField: 'department', foreignField: '_id', as: 'department' } },
+    // { $unwind: '$department'},
+    { $group: group },
+
     { $limit: 10 },
     {
       $project: {
         _id: 0,
-        jobId: '$_id.jobId',
-        count: '$count'
+        _id: '$_id._id',
+        title: '$_id.title',
+        department: '$_id.department',
+        city: '$_id.city',
+        state: '$_id.state',
+        country: '$_id.country',
+        company: '$_id.company',
+        noOfViews: '$count',
+        status: '$_id.status',
+        description: '',
+        minMonthExperience: '',
+        maxMonthExperience: '',
+        expirationDate: '',
+        salaryRangeLow: '',
+        salaryRangeHigh: '',
+        salaryFixed: '',
+        jobFunction: '',
+        responsibilities: '',
+        qualifications: [],
+        minimumQualifications: [],
+        skills: [],
+        industry: []
       }
     }
   ]);
