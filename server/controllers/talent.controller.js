@@ -352,7 +352,8 @@ async function getCompanyInsights(currentUserId, companyId, timeframe) {
   result.impressions.push(likedData);
 
 
-  let sources = await applicationService.getCompanyCandidatesSource(companyId, timeframe);
+  let sources = await applicationService.getCandidatesSourceByCompanyId(companyId, timeframe);
+  result.sources = sources;
 
   return result;
 
@@ -993,7 +994,6 @@ async function getJobInsights(currentUserId, companyId, jobId) {
     return null;
   }
 
-
   let data = [];
   let min = 10, max = 100;
 
@@ -1002,9 +1002,9 @@ async function getJobInsights(currentUserId, companyId, jobId) {
   }
 
 
-  let viewedData = await jobViewService.getJobInsight(ObjectID(jobId));
-  let savedData = await bookmarkService.getJobInsight(ObjectID(jobId));
-  let appliedDate = await applicationService.getJobInsight(ObjectID(jobId));
+  let viewedData = await jobViewService.getJobInsight(jobId);
+  let savedData = await bookmarkService.getJobInsight(jobId);
+  let appliedDate = await applicationService.getJobInsight(jobId);
   //
   let sharedData = {...viewedData}
   sharedData.type="SHARED"
@@ -1018,6 +1018,42 @@ async function getJobInsights(currentUserId, companyId, jobId) {
   result.impressions.push(sharedData);
   result.impressions.push(likedData);
 
+  result.impressionByRoles= [
+    {
+      name: 'Senior',
+      value: 85.7
+    },
+    {
+      name: 'Entry',
+      value: 14.9
+    },
+    {
+      name: 'Director',
+      value: 12.3
+    },{
+      name: 'Owner',
+      value: 11.9
+    },
+    {
+      name: 'Other',
+      value: 11.9
+    },
+    {
+      name: 'Manager',
+      value: 9
+    },
+    {
+      name: 'VP',
+      value: 7.9
+    },
+    {
+      name: 'CXO',
+      value: 5.6
+    }
+  ];
+
+  let sources = await applicationService.getCandidatesSourceByJobId(jobId);
+  result.sources = sources;
 
   return result;
 

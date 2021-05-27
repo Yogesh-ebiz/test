@@ -656,7 +656,7 @@ async function getJobInsight(jobId) {
 }
 
 
-async function getCompanyCandidatesSource(company, duration) {
+async function getCandidatesSourceByCompanyId(company, duration) {
 
   if(!company || !duration){
     return;
@@ -755,6 +755,60 @@ async function getInsightCandidates(from, to, companyId, jobId, options) {
 }
 
 
+
+async function getCandidatesSourceByJobId(jobId) {
+
+  if(!jobId){
+    return;
+  }
+
+  let result= {}, date;
+
+  let groupCandidateSources  = await Application.aggregate([
+    { $match: {jobId:jobId}},
+    {$lookup:{
+        from:"candidates",
+        let:{user: '$user'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$user","$_id"]}}},
+          {
+            $lookup: {
+              from: 'labels',
+              localField: "sources",
+              foreignField: "_id",
+              as: "sources"
+            }
+          },
+        ],
+        as: 'user'
+      }},
+    {$unwind: '$user'},
+    { $group:{_id: { _id: '$user._id', sources: '$user.sources'}, applications: {$push: '$$ROOT'}, count:{$sum:1} }},
+    { $project:{_id: 0, sources: '$_id.sources'}}
+  ]);
+
+  console.log(groupCandidateSources)
+
+  if(groupCandidateSources){
+    let total = 0;
+    let data = {};
+    for(i in groupCandidateSources){
+      for(j in groupCandidateSources[i].sources) {
+        if (data[groupCandidateSources[i].sources[j].labelId]) {
+          data.id.count += 1;
+        } else {
+          console.log()
+          data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
+        }
+        total++;
+      }
+    }
+    result = {total: total, data: data};
+  }
+
+  return result;
+}
+
 module.exports = {
   findApplicationById: findApplicationById,
   findApplicationBy_Id:findApplicationBy_Id,
@@ -773,6 +827,7 @@ module.exports = {
   applyJob: applyJob,
   getCompanyInsight: getCompanyInsight,
   getJobInsight:getJobInsight,
-  getCompanyCandidatesSource:getCompanyCandidatesSource,
-  getInsightCandidates:getInsightCandidates
+  getCandidatesSourceByCompanyId:getCandidatesSourceByCompanyId,
+  getInsightCandidates:getInsightCandidates,
+  getCandidatesSourceByJobId:getCandidatesSourceByJobId
 }

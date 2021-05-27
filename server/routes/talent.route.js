@@ -3,6 +3,7 @@ const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const companyCtrl = require('../controllers/company.controller');
 const talentCtrl = require('../controllers/talent.controller');
+const ObjectID = require('mongodb').ObjectID;
 
 let Response = require('../const/response');
 
@@ -353,7 +354,7 @@ async function payJob(req, res) {
 async function getJobInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let jobId = req.params.jobId;
+  let jobId = ObjectID(req.params.jobId);
 
   let data = await talentCtrl.getJobInsights(currentUserId, companyId, jobId);
   res.json(new Response(data, data?'get_insights_successful':'not_found', res));
