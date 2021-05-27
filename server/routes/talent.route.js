@@ -73,6 +73,7 @@ router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHan
 router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
 
 router.route('/company/:id/applications/:applicationId/activities').get(asyncHandler(getApplicationActivities));
+router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(getFiles));
 
 
 
@@ -1331,3 +1332,12 @@ async function removeProjectCandidates(req, res) {
 }
 
 
+
+async function getFiles(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let data = await talentCtrl.getFiles(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'files_retrieved_successful':'not_found', res));
+}

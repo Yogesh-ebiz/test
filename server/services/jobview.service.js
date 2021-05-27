@@ -66,12 +66,12 @@ async function findMostViewed() {
 }
 
 async function getCompanyInsight(duration) {
-  let data = [];
 
   if(!duration){
     return;
   }
 
+  let data=[], total=0, change=0;
   let date;
   let group = {
     _id: null,
@@ -139,8 +139,11 @@ async function getCompanyInsight(duration) {
 
   let current = data[0];
   let previous = data[1];
-  let total = _.sum(_.map(data, 'value'));
-  var change=(current.value-previous.value)/current.value*100.0;
+  total = _.sum(_.reduce(data, function(res, item) {
+    res.push(item.data.paid+item.data.free);
+    return res;
+  }, []));
+  change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
 
 
   return {type: 'VIEWED', total: total, change: change, data: data};
@@ -202,8 +205,11 @@ async function getJobInsight(jobId) {
         }
       let current = data[0];
       let previous = data[1];
-      total = _.sum(_.map(data, 'value'));
-      change = (current.value - previous.value) / current.value * 100.0;
+      total = _.sum(_.reduce(data, function(res, item) {
+        res.push(item.data.paid+item.data.free);
+        return res;
+      }, []));
+      change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
     }
 
   }

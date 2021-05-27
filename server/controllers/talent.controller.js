@@ -181,7 +181,8 @@ module.exports = {
   removeProjectCandidate,
   removeProjectCandidates,
   subscribeJob,
-  unsubscribeJob
+  unsubscribeJob,
+  getFiles
 }
 
 
@@ -3345,6 +3346,40 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
   let result;
   try {
     result = await memberService.unsubscribe(memberId, jobId);
+  } catch(e){
+    console.log('unsubscribeJob: Error', e);
+  }
+
+  return result;
+}
+
+
+
+
+async function getFiles(companyId, currentUserId, applicationId) {
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result=[];
+  try {
+    let application = await applicationService.findApplicationBy_Id(ObjectID(applicationId)).populate([
+      {
+        path: 'files',
+        model: 'File'
+      }
+    ]);
+
+    if (application) {
+      result = application.files;
+    }
+
   } catch(e){
     console.log('unsubscribeJob: Error', e);
   }

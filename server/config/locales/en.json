@@ -179,5 +179,6 @@
 	"project_added_successful": "project_added_successful",
 	"projects_retrieved_successful": "projects_retrieved_successful",
 	"project_updated_successful": "project_updated_successful",
-	"project_deleted_successful": "project_deleted_successful"
+	"project_deleted_successful": "project_deleted_successful",
+	"files_retrieved_successful": "files_retrieved_successful"
 }

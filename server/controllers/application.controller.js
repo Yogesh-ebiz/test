@@ -19,6 +19,8 @@ const {getCompanyById,  isPartyActive} = require('../services/party.service');
 const questionSubmissionService = require('../services/questionsubmission.service');
 const candidateService = require('../services/candidate.service');
 const jobService = require('../services/jobrequisition.service');
+const fileService = require('../services/file.service');
+
 const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
 const {findWorkflowById} = require('../services/workflow.service');
@@ -35,7 +37,8 @@ module.exports = {
   decline,
   addProgress,
   updateProgress,
-  submitApplicationQuestions
+  submitApplicationQuestions,
+  getFiles
 }
 
 
@@ -129,7 +132,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
           let path = basePath + currentUserId + '/_resumes/' + name;
           let response = await upload(path, cv);
-
+          console.log(response)
           switch (fileExt) {
             case 'pdf':
               type = 'PDF';
@@ -143,6 +146,10 @@ async function uploadCV(currentUserId, applicationId, files, name) {
 
           }
           application.resume = {filename: name, type: type};
+          let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+          if(file){
+            application.files.push(file._id);
+          }
         }
 
         //------------Upload Photo----------------
@@ -169,6 +176,10 @@ async function uploadCV(currentUserId, applicationId, files, name) {
 
           }
           application.photo = {filename: path, type: type};
+          let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+          if(file){
+            application.files.push(file._id);
+          }
         }
 
         result = await application.save();
@@ -208,7 +219,7 @@ async function uploadOffer(currentUserId, applicationId, file) {
         let job = application.job;
         let currentProgress = _.find(application.progress, {type: 'OFFER'});
 
-        console.log('file', file);
+        console.log(application.job);
         if(application.partyId == currentUserId || job.partyId==currentParty.id){
           let fileName = file.originalFilename.split('.');
           let fileExt = fileName[fileName.length - 1];
@@ -539,4 +550,74 @@ async function submitApplicationQuestions(currentUserId, applicationId, form) {
   }
 
   return {hasSubmittedQuestion: result};
+}
+
+
+
+async function getFiles(company, currentUserId, applicationId) {
+
+  if(!company || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let application;
+  try {
+    let currentParty = await findByUserId(currentUserId);
+
+
+    if(isPartyActive(currentParty)) {
+      application = await findApplicationById(applicationId).populate([
+        {
+          path: 'currentProgress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        },
+        {
+          path: 'progress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        }
+      ]);
+      if (application) {
+        let job = await jobService.findJob_Id(application.jobId);
+        let company = await findCompanyById(job.company, currentUserId);
+        // application.job.company = company;
+        // application.job.responsibilities=[];
+        // application.job.qualifications = [];
+        // application.job.skills = []
+        job.company = convertToCompany(company);
+        application.job = jobMinimal(job);
+        application.progress = _.reduce(application.progress, function(res, progress){
+
+          progress.stage.evaluations = [];
+          progress.stage.members = [];
+          progress.stage.tasks = [];
+          res.push(progress);
+          return res;
+        }, [])
+
+        // application.job = job;
+
+      } else {
+        application=null;
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
 }

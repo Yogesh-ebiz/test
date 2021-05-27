@@ -186,7 +186,7 @@ async function getCompanyJobs(currentUserId, filter, pagination, locale) {
   };
 
 
-  let result = await JobRequisition.paginate(new SearchParam(filter), options);
+  let result = await JobRequisition.aggregatePaginate(new SearchParam(filter), options);
   let docs = [];
 
   // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));

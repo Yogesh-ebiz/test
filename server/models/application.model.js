@@ -99,8 +99,8 @@ const ApplicationSchema = new mongoose.Schema({
   labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   progress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
   allProgress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
-  currentProgress: { type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }
-
+  currentProgress: { type: Schema.Types.ObjectId, ref: 'ApplicationProgress' },
+  files: [{ type: Schema.Types.ObjectId, ref: 'File' }],
 }, {
   versionKey: false
 });
