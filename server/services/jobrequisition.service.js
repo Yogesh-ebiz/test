@@ -94,7 +94,7 @@ async function addJob(companyId, currentUserId, form) {
   form.members = [member._id];
   result = await new JobRequisition(form).save();
 
-  let subscription = {createdBy: currentUserId, subjectType: subjectType.JOB, subjectId: result._id};
+  let subscription = {memberId: member._id, createdBy: currentUserId, subjectType: subjectType.JOB, subjectId: result._id};
   await memberService.subscribe(subscription);
 
   return result;

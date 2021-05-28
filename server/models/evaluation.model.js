@@ -25,6 +25,14 @@ const EvaluationSchema = new mongoose.Schema({
     type: Object,
     required: true
   },
+  partyId: {
+    type: Number,
+    required: true
+  },
+  companyId: {
+    type: Number,
+    required: true
+  },
   rating: {
     type: Number,
     required: true

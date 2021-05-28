@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const subjectType = require('../const/subjectType');
 const Member = require('../models/member.model');
 const MemberInvitation = require('../models/memberInvitation.model');
 const MemberSubscribe = require('../models/membersubscribe.model');
@@ -25,6 +26,7 @@ const memberSchema = Joi.object({
 
 const subscriptionSchema = Joi.object({
   createdBy: Joi.number().required(),
+  memberId: Joi.object().required(),
   subjectType: Joi.string().required(),
   subjectId: Joi.object().required()
 });
@@ -186,7 +188,6 @@ async function followJob(memberId, jobId) {
     return;
   }
 
-  console.log(memberId, jobId)
   let member = await findMemberBy_Id(memberId);
 
   if(member){
@@ -281,6 +282,68 @@ async function findMemberSubscribedToSubjectType(userId, subjectType) {
 }
 
 
+
+async function findSubscribeByMemberIdAndSubjectType(memberId, sType, sort) {
+  if(!memberId || !sType){
+    return;
+  }
+
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: page
+  };
+
+  let joinWith = sType==subjectType.JOB?'jobrequisitions':'applications';
+
+  const aggregate = MemberSubscribe.aggregate([{
+    $match: {
+      memberId: memberId,
+      subjectType: sType
+    }
+  },
+    {
+      $lookup: {
+        from: joinWith,
+        localField: 'subjectId',
+        foreignField: '_id',
+        as: 'subject',
+      },
+    },
+    { $unwind: '$subject'}
+
+  ]);
+
+  let result = await MemberSubscribe.aggregatePaginate(aggregate, options);
+  return result;
+
+}
+
+
+async function findSubscribeByUserIdAndSubjectTypeAndSubjectIds(userId, sType, subjectIds) {
+  if(!userId || !sType || !subjectIds){
+    return;
+  }
+
+  let result = await MemberSubscribe.find({
+    createdBy: userId,
+    subjectType: sType,
+    subjectId: { $in: subjectIds }
+  });
+  return result;
+
+}
+
+
 module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
@@ -296,5 +359,7 @@ module.exports = {
   subscribe:subscribe,
   unsubscribe:unsubscribe,
   findMemberSubscribed:findMemberSubscribed,
-  findMemberSubscribedToSubjectType:findMemberSubscribedToSubjectType
+  findMemberSubscribedToSubjectType:findMemberSubscribedToSubjectType,
+  findSubscribeByMemberIdAndSubjectType:findSubscribeByMemberIdAndSubjectType,
+  findSubscribeByUserIdAndSubjectTypeAndSubjectIds:findSubscribeByUserIdAndSubjectTypeAndSubjectIds
 }

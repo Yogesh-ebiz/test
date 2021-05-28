@@ -6,7 +6,7 @@ const Assessment = require('../models/assessment.model');
 const Joi = require('joi');
 
 const assessmentSchema = Joi.object({
-  createdBy: Joi.number(),
+  createdBy: Joi.object(),
   candidateId: Joi.object(),
   workExperience: Joi.number(),
   skillCompetencies: Joi.number(),

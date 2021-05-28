@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const mongoosePaginate = require('mongoose-paginate-v2');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const MemberSubscribeSchema = new mongoose.Schema({
@@ -12,6 +12,10 @@ const MemberSubscribeSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  memberId: {
+    type: Object,
+    required: true
+  },
   subjectType: {
     type: String,
     required: true
@@ -19,6 +23,9 @@ const MemberSubscribeSchema = new mongoose.Schema({
   subjectId: {
     type: Object,
     required: true
+  },
+  subject: {
+    type: Object
   }
 }, {
   versionKey: false

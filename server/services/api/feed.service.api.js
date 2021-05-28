@@ -196,6 +196,24 @@ async function searchUsers(userId, query, ids) {
   return response.data.data;
 };
 
+
+async function searchPeopleByIds(userId, query, ids, sort) {
+  const requestBody = {
+    "ids": ids,
+    "city": [],
+    "state": [],
+    "country":[],
+    "rating": []
+  };
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+  let response = await client.post(`/people/search?query=${query}`, requestBody, options);
+  return response.data.data;
+};
+
 async function lookupUserIds(ids) {
   let response = await client.get(`/search/users/lookup?ids=${ids}`, null, options);
   return response.data.data;
@@ -314,6 +332,7 @@ module.exports = {
   findIndustry:findIndustry,
   findJobfunction:findJobfunction,
   searchUsers: searchUsers,
+  searchPeopleByIds:searchPeopleByIds,
   lookupUserIds:lookupUserIds,
   lookupPeopleIds:lookupPeopleIds,
   lookupCompaniesIds:lookupCompaniesIds,

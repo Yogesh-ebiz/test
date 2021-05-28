@@ -8,15 +8,40 @@ const applicationProgressService = require('../services/applicationprogress.serv
 
 
 const evaulationSchema = Joi.object({
-  createdBy: Joi.number().optional(),
+  createdBy: Joi.object().optional(),
   applicationId: Joi.object(),
   applicationProgressId: Joi.object(),
   candidateId: Joi.object(),
+  partyId: Joi.number(),
+  companyId: Joi.number(),
   rating: Joi.number(),
   comment: Joi.string(),
   assessment: Joi.object().optional(),
   answer: Joi.array().optional()
 });
+
+
+async function findById(evaluationId) {
+
+  if(!evaluationId){
+    return;
+  }
+
+  let evaluation = await Evaluation.findById(evaluationId).populate([
+    {
+      path: 'createdBy',
+      model: 'Member'
+    },
+    {
+      path: 'assessment',
+      model: 'Assessment'
+    }
+  ]);
+
+  return evaluation;
+
+}
+
 
 async function addEvaluation(form) {
 
@@ -38,6 +63,8 @@ async function addEvaluation(form) {
   return evaluation;
 
 }
+
+
 
 
 async function removeEvaluation(userId, applicationId, applicationProgressId) {
@@ -112,16 +139,16 @@ async function findByUserIdAndProgressId(userId, applicationProgressId) {
 
 
 
-async function getEvaluations(candidateId, companyId, applicationId, progressId, filter) {
+async function getEvaluations(candidateId, companyId, applicationId, progressId, sort) {
   if(!candidateId || !filter){
     return;
   }
 
 
-  let limit = (filter.size && filter.size>0) ? filter.size:20;
-  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
   let sortBy = {};
-  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
 
 
   let select = '';
@@ -151,9 +178,160 @@ async function getEvaluations(candidateId, companyId, applicationId, progressId,
 }
 
 
+async function getEvaluationsByCandidate(userId, sort) {
+  if(!userId || !sort){
+    return;
+  }
+
+
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+  const aggregate = Evaluation.aggregate([{
+    $match: {partyId: userId}
+  },
+    {
+      $lookup: {
+        from: 'members',
+        localField: 'createdBy',
+        foreignField: '_id',
+        as: 'createdBy',
+      },
+    },
+    { $unwind: '$createdBy' },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+  ]);
+
+  return Evaluation.aggregatePaginate(aggregate, options);
+
+}
+
+
+async function getEvaluationsByCandidateAndCompany(userId, companyId, sort) {
+  if(!userId || !sort){
+    return;
+  }
+
+
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+  const aggregate = Evaluation.aggregate([{
+    $match: {partyId: userId, companyId: companyId}
+  },
+    {
+      $lookup: {
+        from: 'members',
+        localField: 'createdBy',
+        foreignField: '_id',
+        as: 'createdBy',
+      },
+    },
+    { $unwind: '$createdBy' },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+  ]);
+
+  return Evaluation.aggregatePaginate(aggregate, options);
+
+}
+
+
+async function getEvaluationsByCandidateAndApplicationId(userId, applicationId, sort) {
+  if(!userId || !applicationId || !sort){
+    return;
+  }
+
+
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+  const aggregate = Evaluation.aggregate([{
+    $match: {partyId: userId, applicationId: applicationId}
+  },
+    {
+      $lookup: {
+        from: 'members',
+        localField: 'createdBy',
+        foreignField: '_id',
+        as: 'createdBy',
+      },
+    },
+    { $unwind: '$createdBy' },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+  ]);
+
+  return Evaluation.aggregatePaginate(aggregate, options);
+
+}
+
+
 module.exports = {
+  findById:findById,
   addEvaluation:addEvaluation,
   removeEvaluation:removeEvaluation,
   findByUserIdAndProgressId:findByUserIdAndProgressId,
-  getEvaluations:getEvaluations
+  getEvaluations:getEvaluations,
+  getEvaluationsByCandidate:getEvaluationsByCandidate,
+  getEvaluationsByCandidateAndCompany:getEvaluationsByCandidateAndCompany,
+  getEvaluationsByCandidateAndApplicationId:getEvaluationsByCandidateAndApplicationId
 }

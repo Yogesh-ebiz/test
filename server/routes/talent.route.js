@@ -52,6 +52,7 @@ router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
 router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
+router.route('/company/:id/applications/:applicationId/evaluations').get(asyncHandler(getApplicationEvaluations));
 
 router.route('/company/:id/applications/:applicationId/labels').get(asyncHandler(getApplicationLabels));
 router.route('/company/:id/applications/:applicationId/labels').post(asyncHandler(addApplicationLabel));
@@ -69,7 +70,6 @@ router.route('/company/:id/applications/:applicationId/progress/:progressId/eval
 router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHandler(disqualifyApplication));
 router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
 
-
 router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHandler(subscribeApplication));
 router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
 
@@ -80,7 +80,7 @@ router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(
 
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
-router.route('/company/:id/candidates/:candidateId/evaluations').get(asyncHandler(getApplicationEvaluations));
+router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getCandidateEvaluations));
 router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
 router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
 router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
@@ -124,6 +124,9 @@ router.route('/company/:id/members/:memberId').put(asyncHandler(updateCompanyMem
 router.route('/company/:id/members/:memberId/role').put(asyncHandler(updateCompanyMemberRole));
 router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompanyMember));
 
+router.route('/company/:id/members/:memberId/jobs/subscribes').get(asyncHandler(getJobsSubscribed));
+router.route('/company/:id/members/:memberId/applications/subscribes').get(asyncHandler(getApplicationsSubscribed));
+
 router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
 router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
 router.route('/company/:id/pools/:poolId').put(asyncHandler(updateCompanyPool));
@@ -145,6 +148,8 @@ router.route('/company/:id/projects/:projectId/candidates').delete(asyncHandler(
 router.route('/company/:id/people/:peopleId/projects').post(asyncHandler(updateCandidateProject));
 
 router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
+
+router.route('/company/:id/evaluations/:evaluationId').get(asyncHandler(getEvaluationById));
 
 
 async function getInsights(req, res) {
@@ -542,6 +547,7 @@ async function updateApplicationComment(req, res) {
 
 
 
+//NOT DONE
 async function getApplicationEvaluations(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -746,6 +752,19 @@ async function getCandidateById(req, res) {
   res.json(new Response(data, data?'candidate_retrieved_successful':'not_found', res));
 }
 
+
+
+async function getCandidateEvaluations(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = parseInt(req.params.candidateId);
+  let filter = req.body;
+  let sort = req.query;
+
+  let data = await talentCtrl.getCandidateEvaluations(companyId, currentUserId, candidateId, filter, sort);
+
+  res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
+}
 
 
 async function addCandidateTag(req, res) {
@@ -1160,6 +1179,22 @@ async function deleteCompanyMember(req, res) {
 
 
 
+async function getJobsSubscribed(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let sort = req.query;
+  let data = await talentCtrl.getJobsSubscribed(company, currentUserId, sort);
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
+}
+
+
+async function getApplicationsSubscribed(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let sort = req.query;
+  let data = await talentCtrl.getApplicationsSubscribed(company, currentUserId, sort);
+  res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
+}
 
 
 async function getCompanyPools(req, res) {
@@ -1296,8 +1331,9 @@ async function getProjectCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let projectId = req.params.projectId;
+  let sort = req.query;
 
-  let data = await talentCtrl.getPoolCandidates(company, projectId, currentUserId);
+  let data = await talentCtrl.getProjectCandidates(company, projectId, currentUserId, sort);
   res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
 }
 
@@ -1355,4 +1391,16 @@ async function getFiles(req, res) {
   let data = await talentCtrl.getFiles(companyId, currentUserId, applicationId);
 
   res.json(new Response(data, data?'files_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getEvaluationById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let evaluationId = req.params.evaluationId;
+
+
+  let data = await talentCtrl.getEvaluationById(company, currentUserId, evaluationId, res.locale);
+  res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
 }

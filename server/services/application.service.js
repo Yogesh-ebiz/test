@@ -507,6 +507,7 @@ async function getCompanyInsight(company, duration) {
     return;
   }
 
+  let maxDays = 30;
   let date;
   let group = {
     _id: null,
@@ -578,13 +579,16 @@ async function getCompanyInsight(company, duration) {
       res.push(item.data.paid+item.data.free);
       return res;
     }, []));
-    change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
-
+    if(data.length==0 || data.length==1) {
+      change = 0;
+    } else {
+      change = ((current.data.paid + current.data.free) - (previous.data.paid + previous.data.free)) / (current.data.paid + current.data.free) * 100.0;
+    }
   }
 
 
 
-  return {type: 'APPLIED', total: total, change: change?change:0, data: data};
+  return {type: 'APPLIED', total: total, change: change?change:0, data: data.reverse()};
 }
 
 
@@ -606,13 +610,17 @@ async function getJobInsight(jobId) {
       count: {'$sum': 1}
     };
 
-
+    let maxDays = 30;
     let date = new Date();
     // To calculate the time difference of two dates
     var Difference_In_Time = date.getTime() - job.createdDate;
 
     // To calculate the no. of days between two dates
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)
+
+    if(Difference_In_Days<maxDays){
+      maxDays = Difference_In_Days;
+    }
 
     date.setDate(date.getDate() - Difference_In_Days);
     date.setMinutes(0);
@@ -629,30 +637,33 @@ async function getJobInsight(jobId) {
 
     if (result.length) {
       date = new Date();
-      for (var i = 1; i <= Difference_In_Days; i++) {
+      for (var i = 0; i <= Difference_In_Days; i++) {
         let item = {};
 
         let found = _.find(result, {_id: {day: date.getDate(), month: date.getMonth() + 1}});
         if (found) {
           item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: found.count}};
         } else {
-          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: 0} };
+          item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: 0}};
         }
         data.push(item);
         date.setDate(date.getDate() - 1);
       }
       let current = data[0];
       let previous = data[1];
-      total = _.sum(_.reduce(data, function(res, item) {
-        res.push(item.data.paid+item.data.free);
+      total = _.sum(_.reduce(data, function (res, item) {
+        res.push(item.data.paid + item.data.free);
         return res;
       }, []));
-      change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
+      if (data.length == 0 || data.length == 1) {
+        change = 0;
+      } else {
+        change = ((current.data.paid + current.data.free) - (previous.data.paid + previous.data.free)) / (current.data.paid + current.data.free) * 100.0;
+      }
     }
-
   }
 
-  return {type: 'APPLIED', total: total, change: change, data: data};
+  return {type: 'APPLIED', total: total, change: change, data: data.reverse()};
 }
 
 
@@ -679,12 +690,6 @@ async function getCandidatesSourceByCompanyId(company, duration) {
     date.setDate(1);
   }
 
-  // let applications  = await Application.aggregate([
-  //   { $match: {company: company, createdDate: {$gt: date}}},
-  //   { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
-  //   { $unwind: '$user' },
-  //   { $project: {_id: 0, sources: '$user.sources'} }
-  // ]);
 
   let groupCandidateSources  = await Application.aggregate([
     { $match: {company: company, createdDate: {$gt: date}}},
@@ -715,9 +720,8 @@ async function getCandidatesSourceByCompanyId(company, duration) {
     for(i in groupCandidateSources){
       for(j in groupCandidateSources[i].sources) {
         if (data[groupCandidateSources[i].sources[j].labelId]) {
-          data.id.count += 1;
+          data[groupCandidateSources[i].sources[j].labelId].count += 1;
         } else {
-          console.log()
           data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
         }
         total++;
@@ -787,7 +791,6 @@ async function getCandidatesSourceByJobId(jobId) {
     { $project:{_id: 0, sources: '$_id.sources'}}
   ]);
 
-  console.log(groupCandidateSources)
 
   if(groupCandidateSources){
     let total = 0;
@@ -797,7 +800,6 @@ async function getCandidatesSourceByJobId(jobId) {
         if (data[groupCandidateSources[i].sources[j].labelId]) {
           data.id.count += 1;
         } else {
-          console.log()
           data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
         }
         total++;
@@ -808,6 +810,60 @@ async function getCandidatesSourceByJobId(jobId) {
 
   return result;
 }
+
+
+
+async function applicationsEndingSoon(company) {
+  let result = null;
+
+  if(!company){
+    return;
+  }
+
+
+  let applications = await Application.aggregate([
+    { $match: {company: company} },
+    { $lookup:{
+        from:"applicationprogresses",
+        let:{currentProgress: '$currentProgress'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$currentProgress","$_id"]}}},
+          {
+            $lookup: {
+              from: 'stages',
+              localField: "stage",
+              foreignField: "_id",
+              as: "stage"
+            }
+          },
+          { $unwind: '$stage' },
+          { $addFields:
+              {
+                timeLeft: {$round: [ {$divide : [{$subtract: [{ $add:[ {$toDate: "$createdDate"}, {$multiply: ['$stage.timeLimit', 1*24*60*60000] } ] }, "$$NOW"]}, 86400000]}, 0 ] }
+              }
+          },
+
+        ],
+        as: 'currentProgress'
+      }},
+    { $unwind: '$currentProgress'},
+    { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+    { $unwind: '$user' },
+    {
+      $match: {'currentProgress.timeLeft': {$lte: 1}}
+    }
+  ])
+
+
+
+
+
+
+
+
+  return applications;
+}
+
 
 module.exports = {
   findApplicationById: findApplicationById,
@@ -829,5 +885,6 @@ module.exports = {
   getJobInsight:getJobInsight,
   getCandidatesSourceByCompanyId:getCandidatesSourceByCompanyId,
   getInsightCandidates:getInsightCandidates,
-  getCandidatesSourceByJobId:getCandidatesSourceByJobId
+  getCandidatesSourceByJobId:getCandidatesSourceByJobId,
+  applicationsEndingSoon:applicationsEndingSoon
 }

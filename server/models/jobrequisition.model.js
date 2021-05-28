@@ -23,6 +23,9 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  publishedDate: {
+    type: Number
+  },
   jobId: {
     type: Number,
     required: true

@@ -43,7 +43,10 @@ async function findMostViewed() {
 
   let group = {
     _id: {
-      jobId: '$jobId._id', title: '$jobId.title', department: '$jobId.department', city: '$jobId.city', state: '$jobId.state', country: '$jobId.country', company: '$jobId.company',
+      _id: '$jobId._id',
+      jobId: '$jobId.jobId',
+      title: '$jobId.title',
+      department: '$jobId.department', city: '$jobId.city', state: '$jobId.state', country: '$jobId.country', company: '$jobId.company',
       status: '$jobId.status', description: '$jobId.description',
       minMonthExperience: '$jobId.minMonthExperience',
       maxMonthExperience: '$jobId.maxMonthExperience',
@@ -56,7 +59,9 @@ async function findMostViewed() {
       qualifications: '$jobId.qualifications',
       minimumQualifications: '$jobId.minimumQualifications',
       skills: '$jobId.skills',
-      industry: '$jobId.industry'
+      industry: '$jobId.industry',
+      createdDate: '$jobId.createdDate',
+      hasSaved: '$jobId.hasSaved'
     },
     count: {'$sum': 1}
   };
@@ -76,6 +81,7 @@ async function findMostViewed() {
               as: "department"
             }
           },
+          // { $unwind: '$department'}
         ],
         as: 'jobId'
       }},
@@ -89,6 +95,7 @@ async function findMostViewed() {
       $project: {
         _id: 0,
         _id: '$_id._id',
+        jobId: '$_id.jobId',
         title: '$_id.title',
         department: '$_id.department',
         city: '$_id.city',
@@ -97,6 +104,8 @@ async function findMostViewed() {
         company: '$_id.company',
         noOfViews: '$count',
         status: '$_id.status',
+        hasSaved: '$_id.hasSaved',
+        createdDate: '$_id.createdDate',
         description: '',
         minMonthExperience: '',
         maxMonthExperience: '',
@@ -114,7 +123,7 @@ async function findMostViewed() {
     }
   ]);
 
-  return data;
+  return _.orderBy(data, ['noOfViews'], ['desc']);
 }
 
 async function getCompanyInsight(company, duration) {
@@ -122,7 +131,7 @@ async function getCompanyInsight(company, duration) {
   if(!company || !duration){
     return;
   }
-
+  let maxDays = 30;
   let data=[], total=0, change=0;
   let date;
   let group = {
@@ -174,7 +183,7 @@ async function getCompanyInsight(company, duration) {
     } else {
       date = new Date();
       var noOfItems =  duration=='3M'?3:duration=='6M'?6:duration=='12M'?12:0;
-      for(var i=1; i<=noOfItems; i++){
+      for(var i=0; i<=noOfItems; i++){
         let item = {};
 
         let found = _.find(result, {_id: {month: date.getMonth()+1}});
@@ -194,13 +203,16 @@ async function getCompanyInsight(company, duration) {
       res.push(item.data.paid + item.data.free);
       return res;
     }, []));
-    change = ((current.data.paid + current.data.free) - (previous.data.paid + previous.data.free)) / (current.data.paid + current.data.free) * 100.0;
-
+    if(data.length==0 || data.length==1) {
+      change = 0;
+    } else {
+      change = ((current.data.paid + current.data.free) - (previous.data.paid + previous.data.free)) / (current.data.paid + current.data.free) * 100.0;
+    }
 
   }
 
 
-  return {type: 'VIEWED', total: total, change: change, data: data};
+  return {type: 'VIEWED', total: total, change: change, data: data.reverse()};
 }
 
 
@@ -223,14 +235,19 @@ async function getJobInsight(jobId) {
     };
 
 
+    let maxDays = 30;
     let date = new Date();
     // To calculate the time difference of two dates
-    var Difference_In_Time = date.getTime() - job.createdDate;
+    var Difference_In_Time = date.getTime() - job.publishedDate;
 
     // To calculate the no. of days between two dates
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)
 
-    date.setDate(date.getDate() - Difference_In_Days);
+    if(Difference_In_Days<maxDays){
+      maxDays = Difference_In_Days;
+    }
+
+    date.setDate(date.getDate() - maxDays);
     date.setMinutes(0);
     date.setHours(0)
     group._id = {day: {$dayOfMonth: '$createdDate'}, month: {$month: "$createdDate"}};
@@ -242,12 +259,12 @@ async function getJobInsight(jobId) {
       }
     ]);
 
-
+    console.log(result)
     if (result.length) {
         date = new Date();
-        for (var i = 1; i <= Difference_In_Days; i++) {
+        for (var i = 0; i < maxDays; i++) {
           let item = {};
-
+          console.log(date.getDate(),date.getMonth()+1)
           let found = _.find(result, {_id: {day: date.getDate(), month: date.getMonth() + 1}});
           if (found) {
             item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: found.count}};
@@ -263,12 +280,17 @@ async function getJobInsight(jobId) {
         res.push(item.data.paid+item.data.free);
         return res;
       }, []));
-      change = ((current.data.paid+current.data.free) - (previous.data.paid+previous.data.free) ) / (current.data.paid+current.data.free) * 100.0;
+
+      if(data.length==0 || data.length==1) {
+        change = 0;
+      } else {
+        change = ((current.data.paid + current.data.free) - (previous.data.paid + previous.data.free)) / (current.data.paid + current.data.free) * 100.0;
+      }
     }
 
   }
 
-  return {type: 'VIEWED', total: total, change: change, data: data};
+  return {type: 'VIEWED', total: total, change: change, data: data.reverse()};
 }
 
 
