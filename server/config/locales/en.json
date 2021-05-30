@@ -182,5 +182,10 @@
 	"project_deleted_successful": "project_deleted_successful",
 	"files_retrieved_successful": "files_retrieved_successful",
 	"evaluation_retrieved_successful": "evaluation_retrieved_successful",
-	"evaluations_retrieved_successful": "evaluations_retrieved_successful"
+	"evaluations_retrieved_successful": "evaluations_retrieved_successful",
+	"evlaluation_deleted_successful": "evlaluation_deleted_successful",
+	"emails_retrieved_successful": "emails_retrieved_successful",
+	"email_added_successful": "email_added_successful",
+	"email_updated_successful": "email_updated_successful",
+	"email_deleted_successful": "email_deleted_successful"
 }

@@ -3,23 +3,15 @@ const Schema = mongoose.Schema;
 
 
 const EmailSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true
-  },
-  sender: {
-    type: Object
-  },
-  subject: {
-    type: String,
-    required: false
+  name: {
+    type: String
   },
   bodyHtml: {
     type: String,
     required: true
   },
-  attachments: {
-    type: Array
+  company: {
+    type: Number
   },
   createdDate: {
     type: Number,
@@ -41,5 +33,5 @@ const EmailSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model('Email', EmailSchema);
+module.exports = mongoose.model('EmailTemplate', EmailSchema);
 

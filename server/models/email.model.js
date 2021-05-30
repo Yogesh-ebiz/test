@@ -10,7 +10,7 @@ const EmailSchema = new mongoose.Schema({
   sender: {
     type: Object
   },
-  receiver: {
+  recipients: {
     type: Object
   },
   subject: {
@@ -24,16 +24,20 @@ const EmailSchema = new mongoose.Schema({
   attachments: {
     type: Array
   },
-  users: {
-    type: Array
+  whenToSend: {
+    type: Date,
+    required: true
+  },
+  hasSent: {
+    type: Boolean,
+    default: false
   },
   createdDate: {
     type: Number,
-    required: false
+    required: false,
+    default: Date.now
   },
-  createdBy: {
-    type: Object
-  },
+  createdBy:{ type: Schema.Types.ObjectId, ref: 'Member'},
   updatedDate: {
     type: Number,
     required: false

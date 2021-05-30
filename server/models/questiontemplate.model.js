@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
-const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const QuestionTemplateSchema = new mongoose.Schema({
   createdAt: {
@@ -23,12 +22,6 @@ const QuestionTemplateSchema = new mongoose.Schema({
   }
 }, {
   versionKey: false
-});
-QuestionTemplateSchema.plugin(autoIncrement, {
-  model: 'QuestionTemplate',
-  field: 'questionTemplateId',
-  startAt: 100000,
-  incrementBy: 1
 });
 QuestionTemplateSchema.plugin(mongoosePaginate);
 

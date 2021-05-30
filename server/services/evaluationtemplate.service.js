@@ -27,6 +27,20 @@ const evaluationTemplateSchema = Joi.object({
   updatedBy: Joi.number().optional()
 });
 
+
+
+function findById(id) {
+  let data = null;
+
+  if(id==null){
+    return;
+  }
+
+  console.log(id)
+  return EvaluationTemplate.findById(id).populate('questions');
+}
+
+
 function search(company, query) {
   let data = null;
 
@@ -72,10 +86,10 @@ async function update(id, form) {
     return;
   }
 
-  form = await Joi.validate(form, questionTemplateSchema, { abortEarly: false });
-  let template = await QuestionTemplate.findById(id);
+  form = await Joi.validate(form, evaluationTemplateSchema, { abortEarly: false });
+  let template = await findById(id);
 
-
+  console.log(template)
   if(template){
     let questions = [];
     template.name = form.name;
@@ -91,6 +105,8 @@ async function update(id, form) {
           found.hint = question.hint;
           found.noMaxSelection = question.noMaxSelection;
           found.options = question.options;
+          found.required = question.required;
+          found.description = question.description;
           question = await found.save();
         }
 
@@ -116,10 +132,10 @@ async function remove(questionTemplateId) {
     return;
   }
 
-
-  let question = await QuestionTemplate.findById(questionTemplateId);
-  if(question){
-    let result = await question.delete();
+  let template = await QuestionTemplate.findById(questionTemplateId);
+  if(template){
+    template.status = statusEnum.DELETED;
+    let result = await template.save();
     if(result){
       data = {success: true};
     }
@@ -134,5 +150,6 @@ module.exports = {
   add:add,
   update:update,
   remove:remove,
-  search: search
+  search: search,
+  findById:findById
 }

@@ -36,6 +36,7 @@ const activityService = require('../services/activity.service');
 const commentService = require('../services/comment.service');
 const evaluationService = require('../services/evaluation.service');
 const evaluationTemplateService = require('../services/evaluationtemplate.service');
+const emailTemplateService = require('../services/emailtemplate.service');
 const candidateService = require('../services/candidate.service');
 const jobViewService = require('../services/jobview.service');
 const bookmarkService = require('../services/bookmark.service');
@@ -193,7 +194,11 @@ module.exports = {
   getCompanyEvaluationTemplates,
   addCompanyEvaluationTemplate,
   updateCompanyEvaluationTemplate,
-  deleteCompanyEvaluationTemplate
+  deleteCompanyEvaluationTemplate,
+  getCompanyEmailTemplates,
+  addCompanyEmailTemplate,
+  updateCompanyEmailTemplate,
+  deleteCompanyEmailTemplate
 }
 
 
@@ -3764,7 +3769,7 @@ async function updateCompanyEvaluationTemplate(companyId, templateId, currentUse
   let result = null;
   try {
 
-    result = await evaluationTemplateService.update(templateId, form);
+    result = await evaluationTemplateService.update(ObjectID(templateId), form);
 
   } catch(e){
     console.log('updateCompanyEvaluationTemplate: Error', e);
@@ -3789,7 +3794,7 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
   let result = null;
 
   try {
-    let evaluation = await evaluationTemplateService.findById(templateId);
+    let evaluation = await evaluationTemplateService.findById(ObjectID(templateId));
     if(evaluation){
       result = await evaluation.delete();
       if(result){
@@ -3801,6 +3806,107 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
 
   } catch(e){
     console.log('deleteCompanyEvaluationTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+
+/************************** EMAILTEMPLATES *****************************/
+
+async function getCompanyEmailTemplates(companyId, query, currentUserId, locale)  {
+
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let result = await emailTemplateService.search(companyId);
+
+  return result;
+
+}
+
+async function addCompanyEmailTemplate(companyId, form, currentUserId) {
+  if(!companyId || !form){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    form.company = companyId;
+    form.createdBy = currentUserId;
+    result = await emailTemplateService.add(form);
+
+  } catch(e){
+    console.log('addCompanyEmailTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function updateCompanyEmailTemplate(companyId, templateId, currentUserId, form) {
+  if(!companyId || !currentUserId || !templateId || !form){
+    return null;
+  }
+
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+  try {
+
+    result = await emailTemplateService.update(ObjectID(templateId), form);
+
+  } catch(e){
+    console.log('updateCompanyEmailTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function deleteCompanyEmailTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+
+  try {
+    let evaluation = await emailTemplateService.findById(ObjectID(templateId));
+    if(evaluation){
+      result = await evaluation.delete();
+      if(result){
+        result = {success: true};
+      }
+
+    }
+
+
+  } catch(e){
+    console.log('deleteCompanyEmailTemplate: Error', e);
   }
 
 

@@ -156,6 +156,12 @@ router.route('/company/:id/evaluations/templates/:templateId').put(asyncHandler(
 router.route('/company/:id/evaluations/templates/:templateId').delete(asyncHandler(deleteCompanyEvaluationTemplate));
 
 
+router.route('/company/:id/emails/templates').get(asyncHandler(getCompanyEmailTemplates));
+router.route('/company/:id/emails/templates').post(asyncHandler(addCompanyEmailTemplate));
+router.route('/company/:id/emails/templates/:templateId').put(asyncHandler(updateCompanyEmailTemplate));
+router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(deleteCompanyEmailTemplate));
+
+
 async function getInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
@@ -1441,10 +1447,10 @@ async function updateCompanyEvaluationTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let templateId = req.params.templateId;
-  let evlaluation = req.body;
-  evlaluation.company = company;
+  let template = req.body;
+  template.company = company;
 
-  let data = await talentCtrl.updateCompanyEvaluationTemplate(company, evaluationId, currentUserId, templateId);
+  let data = await talentCtrl.updateCompanyEvaluationTemplate(company, templateId, currentUserId, template);
   res.json(new Response(data, data?'evaluation_updated_successful':'not_found', res));
 }
 
@@ -1455,5 +1461,49 @@ async function deleteCompanyEvaluationTemplate(req, res) {
 
   let data = await talentCtrl.deleteCompanyEvaluationTemplate(company, templateId, currentUserId);
   res.json(new Response(data, data?'evlaluation_deleted_successful':'not_found', res));
+}
+
+
+
+async function getCompanyEmailTemplates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query;
+
+
+  let data = await talentCtrl.getCompanyEmailTemplates(company, query, currentUserId, res.locale);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
+
+
+async function addCompanyEmailTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let evlaluation = req.body;
+  evlaluation.company = company;
+
+
+  let data = await talentCtrl.addCompanyEmailTemplate(company, evlaluation, currentUserId);
+  res.json(new Response(data, data?'email_added_successful':'not_found', res));
+}
+
+async function updateCompanyEmailTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+  let template = req.body;
+  template.company = company;
+
+  let data = await talentCtrl.updateCompanyEmailTemplate(company, templateId, currentUserId, template);
+  res.json(new Response(data, data?'email_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyEmailTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+
+  let data = await talentCtrl.deleteCompanyEmailTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'email_deleted_successful':'not_found', res));
 }
 
