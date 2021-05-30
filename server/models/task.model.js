@@ -4,6 +4,36 @@ const { autoIncrement } = require('mongoose-plugin-autoinc');
 const Schema = mongoose.Schema;
 
 const TaskSchema = new mongoose.Schema({
+  required: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  allowChange: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  isCompleted: {
+    type: Boolean,
+    required: false
+  },
+  type: {
+    type: String,
+    required: true
+  },
+  options: {
+    type: Object,
+    required: false
+  },
+  template: {
+    type: Object,
+    required: false
+  },
+  data: {
+    type: Object,
+    required: false
+  },
   createdAt: {
     type: Number,
     default: Date.now
@@ -19,28 +49,6 @@ const TaskSchema = new mongoose.Schema({
   updatedBy: {
     type: Number
   },
-  required: {
-    type: Boolean,
-    required: true,
-    default: false
-  },
-  allowChange: {
-    type: Boolean,
-    required: true,
-    default: false
-  },
-  type: {
-    type: String,
-    required: true
-  },
-  options: {
-    type: Object,
-    required: false
-  },
-  data: {
-    type: Object,
-    required: false
-  }
 }, {
   versionKey: false
 });

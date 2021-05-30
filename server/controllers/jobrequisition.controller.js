@@ -407,7 +407,7 @@ async function getJobLanding(currentUserId, locale) {
       popularJobs = await bookmarkService.findMostBookmarked();
     }
 
-    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, 'jobId')).concat(_.map(highlight, '_id')).concat(_.map(newJobs, '_id'));
+    let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, '_id')).concat(_.map(highlight, '_id')).concat(_.map(newJobs, '_id'));
     let jobs = await JobRequisition.find({_id: {$in: ids}});
     let listOfCompanyIds = _.map(jobs, 'company');
 

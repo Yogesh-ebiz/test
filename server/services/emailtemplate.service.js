@@ -57,7 +57,6 @@ async function add(form) {
     return;
   }
 
-  console.log(form)
   form = await Joi.validate(form, emailTemplateSchema, { abortEarly: false });
 
   let template = await new EmailTemplate(form).save();
