@@ -857,10 +857,6 @@ async function applicationsEndingSoon(company) {
 
 
 
-
-
-
-
   return applications;
 }
 

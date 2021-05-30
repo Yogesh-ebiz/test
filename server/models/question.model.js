@@ -11,19 +11,13 @@ const QuestionSchema = new mongoose.Schema({
   createdBy: {
     type: Number
   },
-  text: {
-    type: String,
-    required: true
-  },
   type: {
     type: String,
     required: true
   },
-  noMaxSelection: {
-    type: Number
-  },
-  hint: {
-    type: String
+  text: {
+    type: String,
+    required: true
   },
   required: {
     type: Boolean,
@@ -31,15 +25,19 @@ const QuestionSchema = new mongoose.Schema({
   },
   options: {
     type: Array
-  }
+  },
+  noMaxSelection: {
+    type: Number
+  },
+  hint: {
+    type: String
+  },
+  description: {
+    type: String
+  },
+
 }, {
   versionKey: false
-});
-QuestionSchema.plugin(autoIncrement, {
-  model: 'Question',
-  field: 'questionId',
-  startAt: 100000,
-  incrementBy: 1
 });
 QuestionSchema.plugin(mongoosePaginate);
 

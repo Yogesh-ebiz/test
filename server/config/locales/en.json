@@ -181,5 +181,6 @@
 	"project_updated_successful": "project_updated_successful",
 	"project_deleted_successful": "project_deleted_successful",
 	"files_retrieved_successful": "files_retrieved_successful",
-	"evaluation_retrieved_successful": "evaluation_retrieved_successful"
+	"evaluation_retrieved_successful": "evaluation_retrieved_successful",
+	"evaluations_retrieved_successful": "evaluations_retrieved_successful"
 }

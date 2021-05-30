@@ -12,10 +12,11 @@ const questionSchema = Joi.object({
   _id: Joi.object().optional(),
   text: Joi.string().required(),
   type: Joi.string().required(),
+  required: Joi.boolean().required(),
+  options: Joi.array().optional(),
   noMaxSelection: Joi.number(),
   hint: Joi.string().allow('').optional(),
-  options: Joi.array().optional(),
-  required: Joi.boolean()
+  description: Joi.string().allow('').optional()
 });
 
 function findById(questionId) {
@@ -36,7 +37,6 @@ async function addQuestion(question) {
     return;
   }
 
-  console.log(question)
   question = await Joi.validate(question, questionSchema, {abortEarly: false});
   question = new Question(question).save();
 

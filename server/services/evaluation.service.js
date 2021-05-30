@@ -7,7 +7,7 @@ const assessmentService = require('../services/assessment.service');
 const applicationProgressService = require('../services/applicationprogress.service');
 
 
-const evaulationSchema = Joi.object({
+const evaluationSchema = Joi.object({
   createdBy: Joi.object().optional(),
   applicationId: Joi.object(),
   applicationProgressId: Joi.object(),
@@ -43,13 +43,13 @@ async function findById(evaluationId) {
 }
 
 
-async function addEvaluation(form) {
+async function add(form) {
 
   if(!form){
     return;
   }
 
-  form = await Joi.validate(form, evaulationSchema, {abortEarly: false});
+  form = await Joi.validate(form, evaluationSchema, {abortEarly: false});
 
   if(form.assessment){
     form.assessment.candidateId = form.candidateId;
@@ -67,7 +67,7 @@ async function addEvaluation(form) {
 
 
 
-async function removeEvaluation(userId, applicationId, applicationProgressId) {
+async function remove(userId, applicationId, applicationProgressId) {
 
   if(!userId || !applicationProgressId){
     return;
@@ -94,7 +94,6 @@ async function removeEvaluation(userId, applicationId, applicationProgressId) {
     }
   ]);
 
-  console.log(application)
   if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
     for(const [i, evaluation] of application.currentProgress.evaluations.entries()){
@@ -139,7 +138,7 @@ async function findByUserIdAndProgressId(userId, applicationProgressId) {
 
 
 
-async function getEvaluations(candidateId, companyId, applicationId, progressId, sort) {
+async function search(candidateId, companyId, applicationId, progressId, sort) {
   if(!candidateId || !filter){
     return;
   }
@@ -178,7 +177,7 @@ async function getEvaluations(candidateId, companyId, applicationId, progressId,
 }
 
 
-async function getEvaluationsByCandidate(userId, sort) {
+async function findByCandidate(userId, sort) {
   if(!userId || !sort){
     return;
   }
@@ -227,7 +226,7 @@ async function getEvaluationsByCandidate(userId, sort) {
 }
 
 
-async function getEvaluationsByCandidateAndCompany(userId, companyId, sort) {
+async function findByCandidateAndCompany(userId, companyId, sort) {
   if(!userId || !sort){
     return;
   }
@@ -276,7 +275,7 @@ async function getEvaluationsByCandidateAndCompany(userId, companyId, sort) {
 }
 
 
-async function getEvaluationsByCandidateAndApplicationId(userId, applicationId, sort) {
+async function findByCandidateAndApplicationId(userId, applicationId, sort) {
   if(!userId || !applicationId || !sort){
     return;
   }
@@ -327,11 +326,11 @@ async function getEvaluationsByCandidateAndApplicationId(userId, applicationId, 
 
 module.exports = {
   findById:findById,
-  addEvaluation:addEvaluation,
-  removeEvaluation:removeEvaluation,
+  add:add,
+  remove:remove,
   findByUserIdAndProgressId:findByUserIdAndProgressId,
-  getEvaluations:getEvaluations,
-  getEvaluationsByCandidate:getEvaluationsByCandidate,
-  getEvaluationsByCandidateAndCompany:getEvaluationsByCandidateAndCompany,
-  getEvaluationsByCandidateAndApplicationId:getEvaluationsByCandidateAndApplicationId
+  search:search,
+  findByCandidate:findByCandidate,
+  findByCandidateAndCompany:findByCandidateAndCompany,
+  findByCandidateAndApplicationId:findByCandidateAndApplicationId
 }

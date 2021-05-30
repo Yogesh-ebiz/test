@@ -608,6 +608,32 @@ async function getGroupOfCompanyJobs(listOfCompanyIds) {
 
 
 
+async function getJobsEndingSoon(company) {
+  let data = null;
+
+  if(company==null){
+    return;
+  }
+
+
+  return await JobRequisition.aggregate([
+    {$match: {company: company, status: 'ACTIVE'} },
+    { $addFields:
+        {
+          timeLeft: {$round: [ {$divide : [{$subtract: [{ $add:[ {$toDate: "$publishedDate"}, {$multiply: [30, 1*24*60*60000] } ] }, "$$NOW"]}, 86400000]}, 0 ] } ,
+          datePublished: { $toDate: '$publishedDate' },
+          after30: { $add:[ {$toDate: "$publishedDate"}, {$multiply: [30, 1*24*60*60000] } ] }
+        }
+    },
+    {
+      $match: { timeLeft: { $lte: 5 } }
+    }
+  ]);
+
+
+}
+
+
 
 
 
@@ -632,5 +658,6 @@ module.exports = {
   getJobCount:getJobCount,
   getNewJobs:getNewJobs,
   findJobsByCompanyId:findJobsByCompanyId,
-  getGroupOfCompanyJobs:getGroupOfCompanyJobs
+  getGroupOfCompanyJobs:getGroupOfCompanyJobs,
+  getJobsEndingSoon:getJobsEndingSoon
 }

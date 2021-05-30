@@ -86,6 +86,7 @@ router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHan
 router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
 router.route('/company/:id/candidates/:candidateId/sources/:sourceId').delete(asyncHandler(removeCandidateSource));
 router.route('/company/:id/candidates/:candidateId/pools').post(asyncHandler(updateCandidatePool));
+router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));
@@ -149,7 +150,10 @@ router.route('/company/:id/people/:peopleId/projects').post(asyncHandler(updateC
 
 router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 
-router.route('/company/:id/evaluations/:evaluationId').get(asyncHandler(getEvaluationById));
+router.route('/company/:id/evaluations/templates').get(asyncHandler(getCompanyEvaluationTemplates));
+router.route('/company/:id/evaluations/templates').post(asyncHandler(addCompanyEvaluationTemplate));
+router.route('/company/:id/evaluations/templates/:templateId').put(asyncHandler(updateCompanyEvaluationTemplate));
+router.route('/company/:id/evaluations/templates/:templateId').delete(asyncHandler(deleteCompanyEvaluationTemplate));
 
 
 async function getInsights(req, res) {
@@ -562,7 +566,6 @@ async function getApplicationEvaluations(req, res) {
 }
 
 
-
 async function addApplicationProgressEvaluation(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -828,6 +831,22 @@ async function updateCandidatePool(req, res) {
   res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
 
+
+
+
+async function getCandidateEvaluationById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let evaluationId = req.params.evaluationId;
+
+
+  let data = await talentCtrl.getCandidateEvaluationById(company, currentUserId, evaluationId, res.locale);
+  res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
+}
+
+
+
+/************************** DEPARTMENT *****************************/
 
 async function addCompanyDepartment(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -1395,12 +1414,46 @@ async function getFiles(req, res) {
 
 
 
-async function getEvaluationById(req, res) {
+
+async function getCompanyEvaluationTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let evaluationId = req.params.evaluationId;
+  let query = req.query.query;
 
 
-  let data = await talentCtrl.getEvaluationById(company, currentUserId, evaluationId, res.locale);
-  res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
+  let data = await talentCtrl.getCompanyEvaluationTemplates(company, query, currentUserId, res.locale);
+  res.json(new Response(data, data?'evaluations_retrieved_successful':'not_found', res));
 }
+
+
+async function addCompanyEvaluationTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let evlaluation = req.body;
+  evlaluation.company = company;
+
+
+  let data = await talentCtrl.addCompanyEvaluationTemplate(company, evlaluation, currentUserId);
+  res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
+}
+
+async function updateCompanyEvaluationTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+  let evlaluation = req.body;
+  evlaluation.company = company;
+
+  let data = await talentCtrl.updateCompanyEvaluationTemplate(company, evaluationId, currentUserId, templateId);
+  res.json(new Response(data, data?'evaluation_updated_successful':'not_found', res));
+}
+
+async function deleteCompanyEvaluationTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+
+  let data = await talentCtrl.deleteCompanyEvaluationTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'evlaluation_deleted_successful':'not_found', res));
+}
+
