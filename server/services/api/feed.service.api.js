@@ -171,6 +171,14 @@ async function findIndustry(query, shortCodes, locale) {
   return response.data.data;
 };
 
+async function getIndustryFeatured(locale) {
+  const options = {
+    'Accept-Language': locale
+  };
+  let response = await client.get(`/common/industry/feature}`);
+  return response.data.data;
+};
+
 async function findJobfunction(query, shortCodes, locale) {
   const options = {
     'Accept-Language': locale
@@ -330,6 +338,7 @@ module.exports = {
   findSkillsById:findSkillsById,
   findUserSkillsById:findUserSkillsById,
   findIndustry:findIndustry,
+  getIndustryFeatured:getIndustryFeatured,
   findJobfunction:findJobfunction,
   searchUsers: searchUsers,
   searchPeopleByIds:searchPeopleByIds,

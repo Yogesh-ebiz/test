@@ -13,7 +13,7 @@ const stageSchema = Joi.object({
   default: Joi.boolean().required(),
   name: Joi.string().required(),
   type: Joi.string().required(),
-  timeLimit: Joi.string().required(),
+  timeLimit: Joi.number().required(),
   tasks: Joi.array().optional(),
   members: Joi.array().optional()
 });

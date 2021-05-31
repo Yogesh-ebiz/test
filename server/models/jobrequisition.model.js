@@ -144,7 +144,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   industry: {
     type: Array,
-    required: false,
+    required: true,
     default: []
   },
   education: {

@@ -178,7 +178,8 @@ const jobMinimal = (job) => {
     state: job.state,
     country: job.country,
     company: job.company,
-    createdBy: job.createdBy
+    createdBy: job.createdBy,
+    department: job.department
   };
 }
 

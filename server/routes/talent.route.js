@@ -152,6 +152,7 @@ router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getIm
 
 router.route('/company/:id/evaluations/templates').get(asyncHandler(getCompanyEvaluationTemplates));
 router.route('/company/:id/evaluations/templates').post(asyncHandler(addCompanyEvaluationTemplate));
+router.route('/company/:id/evaluations/templates/:templateId').get(asyncHandler(getCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/templates/:templateId').put(asyncHandler(updateCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/templates/:templateId').delete(asyncHandler(deleteCompanyEvaluationTemplate));
 
@@ -1441,6 +1442,17 @@ async function addCompanyEvaluationTemplate(req, res) {
 
   let data = await talentCtrl.addCompanyEvaluationTemplate(company, evlaluation, currentUserId);
   res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
+}
+
+
+
+async function getCompanyEvaluationTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+
+  let data = await talentCtrl.getCompanyEvaluationTemplate(company, templateId, currentUserId);
+  res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
 }
 
 async function updateCompanyEvaluationTemplate(req, res) {

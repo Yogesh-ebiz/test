@@ -274,7 +274,7 @@ async function updateJobById(jobId, currentUserId, jobForm, locale) {
       job.skills = jobForm.skills;
       job.employmentType = jobForm.employmentType;
       job.education = jobForm.education;
-      job.category = jobForm.category;
+      job.industry = jobForm.industry;
       job.promotion = jobForm.promotion;
       job.hiringManager = jobForm.hiringManager;
       job.district = jobForm.district;
@@ -395,7 +395,6 @@ async function getJobLanding(currentUserId, locale) {
   let result = {categories: [], popularJobs: [], popularCompanies: [], viewedJobs: [], savedJobs: [], newJobs: [], highlightJobs: []};
   try {
     let industries = await getTopIndustry();
-
     let viewed = await findJobViewByUserId(currentUserId, 4)
     let saved = await bookmarkService.findBookByUserId(currentUserId, 4);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
@@ -421,7 +420,6 @@ async function getJobLanding(currentUserId, locale) {
     _.forEach(jobs, function(job){
       job.company = _.find(foundCompanies, {id: job.company});
       job.description = null;
-      job.industry = [];
       job.responsibilities = [];
       job.qualifications = [];
       job.skills = [];

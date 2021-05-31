@@ -37,7 +37,7 @@ const StageSchema = new mongoose.Schema({
     required: true
   },
   timeLimit: {
-    type: String,
+    type: Number,
     required: false
   },
   mandatory: {

@@ -327,8 +327,6 @@ async function findSubscribeByMemberIdAndSubjectType(memberId, sType, sort) {
   return result;
 
 }
-
-
 async function findSubscribeByUserIdAndSubjectTypeAndSubjectIds(userId, sType, subjectIds) {
   if(!userId || !sType || !subjectIds){
     return;
@@ -342,6 +340,148 @@ async function findSubscribeByUserIdAndSubjectTypeAndSubjectIds(userId, sType, s
   return result;
 
 }
+
+
+async function findJobSubscriptions(memberId, sort) {
+  if(!memberId || !sort){
+    return;
+  }
+
+
+  console.log(sort)
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page+1:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: page
+  };
+
+  const aggregate = MemberSubscribe.aggregate([{
+    $match: {
+      memberId: memberId,
+      subjectType: subjectType.JOB
+    }
+  },
+    // {
+    //   $lookup: {
+    //     from: 'jobrequisitions',
+    //     localField: 'subjectId',
+    //     foreignField: '_id',
+    //     as: 'subject',
+    //   },
+    // },
+    // { $unwind: '$subject'}
+    {$lookup:{
+        from:"jobrequisitions",
+        let:{subjectId: '$subjectId'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$subjectId","$_id"]}}},
+          {
+            $lookup: {
+              from: 'departments',
+              localField: "department",
+              foreignField: "_id",
+              as: "department"
+            }
+          },
+        ],
+        as: 'subject'
+      }},
+    { $unwind: '$subject'}
+  ]);
+
+  let result = await MemberSubscribe.aggregatePaginate(aggregate, options);
+  return result;
+
+}
+
+
+async function findApplicationSubscriptions(memberId, sort) {
+  if(!memberId || !sort){
+    return;
+  }
+
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page+1:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: page
+  };
+
+
+  const aggregate = MemberSubscribe.aggregate([{
+    $match: {
+      memberId: memberId,
+      subjectType: subjectType.APPLICATION
+    }
+  },
+    // {
+    //   $lookup: {
+    //     from: 'jobrequisitions',
+    //     localField: 'subjectId',
+    //     foreignField: '_id',
+    //     as: 'subject',
+    //   },
+    // },
+    // { $unwind: '$subject'}
+    {$lookup:{
+        from:"applications",
+        let:{subjectId: '$subjectId'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$subjectId","$_id"]}}},
+          {
+            $lookup: {
+              from: 'candidates',
+              localField: "user",
+              foreignField: "_id",
+              as: "user"
+            }
+          },
+          { $unwind: '$user'},
+          {$lookup:{
+              from:"applicationprogresses",
+              let:{currentProgress: '$currentProgress'},
+              pipeline:[
+                {$match:{$expr:{$eq:["$$currentProgress","$_id"]}}},
+                {
+                  $lookup: {
+                    from: 'stages',
+                    localField: "stage",
+                    foreignField: "_id",
+                    as: "stage"
+                  }
+                },
+                { $unwind: '$stage'},
+              ],
+              as: "currentProgress"
+            }},
+          { $unwind: '$currentProgress'},
+        ],
+        as: 'subject'
+      }},
+    { $unwind: '$subject'}
+  ]);
+
+  let result = await MemberSubscribe.aggregatePaginate(aggregate, options);
+  return result;
+
+}
+
 
 
 module.exports = {
@@ -361,5 +501,7 @@ module.exports = {
   findMemberSubscribed:findMemberSubscribed,
   findMemberSubscribedToSubjectType:findMemberSubscribedToSubjectType,
   findSubscribeByMemberIdAndSubjectType:findSubscribeByMemberIdAndSubjectType,
-  findSubscribeByUserIdAndSubjectTypeAndSubjectIds:findSubscribeByUserIdAndSubjectTypeAndSubjectIds
+  findSubscribeByUserIdAndSubjectTypeAndSubjectIds:findSubscribeByUserIdAndSubjectTypeAndSubjectIds,
+  findJobSubscriptions:findJobSubscriptions,
+  findApplicationSubscriptions:findApplicationSubscriptions
 }

@@ -193,6 +193,7 @@ module.exports = {
   getFiles,
   getCompanyEvaluationTemplates,
   addCompanyEvaluationTemplate,
+  getCompanyEvaluationTemplate,
   updateCompanyEvaluationTemplate,
   deleteCompanyEvaluationTemplate,
   getCompanyEmailTemplates,
@@ -2431,8 +2432,8 @@ async function getCompanyDepartments(company, query, currentUserId, locale) {
 
 
 /************************** QUESTIONTEMPLATES *****************************/
-async function addCompanyQuestionTemplate(company, currentUserId, form) {
-  if(!company || !currentUserId || !form){
+async function addCompanyQuestionTemplate(companyId, currentUserId, form) {
+  if(!companyId || !currentUserId || !form){
     return null;
   }
 
@@ -2446,7 +2447,7 @@ async function addCompanyQuestionTemplate(company, currentUserId, form) {
 
   try {
     form.createdBy = currentUserId;
-    form.company = company;
+    form.company = companyId;
     result = await addQuestionTemplate(form);
 
   } catch(e){
@@ -3012,7 +3013,14 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
 
   let result = null;
   try {
-    result = await memberService.findSubscribeByMemberIdAndSubjectType(member._id, subjectType.JOB, sort);
+    result = await memberService.findJobSubscriptions(member._id, sort);
+    let company = await lookupCompaniesIds([companyId]);
+    company = convertToCompany(company[0]);
+    result.docs.forEach(function(sub){
+      sub.subject.hasSaved = true;
+      sub.subject.company = company;
+      sub.subject = jobMinimal(sub.subject)
+    });
 
   } catch(e){
     console.log('getJobsSubscribed: Error', e);
@@ -3035,7 +3043,11 @@ async function getApplicationsSubscribed(companyId, currentUserId, sort) {
 
   let result = null;
   try {
-    result = await memberService.findSubscribeByMemberIdAndSubjectType(member._id, subjectType.APPLICATION, sort);
+    result = await memberService.findApplicationSubscriptions(member._id, sort);
+
+    result.docs.forEach(function(sub){
+      sub.subject.user = convertToCandidate(sub.subject.user);
+    });
 
   } catch(e){
     console.log('getApplicationsSubscribed: Error', e);
@@ -3747,6 +3759,32 @@ async function addCompanyEvaluationTemplate(companyId, form, currentUserId) {
 
   } catch(e){
     console.log('addCompanyEvaluationTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function getCompanyEvaluationTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+  try {
+
+    result = await evaluationTemplateService.findById(ObjectID(templateId));
+
+  } catch(e){
+    console.log('getCompanyEvaluationTemplate: Error', e);
   }
 
 

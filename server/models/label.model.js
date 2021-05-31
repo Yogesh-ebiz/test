@@ -30,13 +30,6 @@ const LabelSchema = new mongoose.Schema({
   versionKey: false
 });
 
-
-LabelSchema.plugin(autoIncrement, {
-  model: 'Label',
-  field: 'labelId',
-  startAt: 100000,
-  incrementBy: 1
-});
 LabelSchema.plugin(mongoosePaginate);
 
 

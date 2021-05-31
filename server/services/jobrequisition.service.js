@@ -5,6 +5,7 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
+const labelType = require('../const/labelType');
 
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
@@ -35,8 +36,7 @@ const jobSchema = Joi.object({
   noOfResources: Joi.number(),
   type: Joi.string(),
   department: Joi.object().optional(),
-  industry: Joi.array().optional(),
-  category: Joi.string(),
+  industry: Joi.array(),
   internalCode: Joi.string().optional(),
   jobFunction: Joi.string(),
   expirationDate: Joi.number(),
@@ -65,7 +65,7 @@ const jobSchema = Joi.object({
   applicationPreferences: Joi.object(),
   profileField: Joi.object(),
   autoConfirmationEmail: Joi.object(),
-  pipeLine: Joi.object()
+  pipeline: Joi.object()
 });
 
 
@@ -89,9 +89,19 @@ async function addJob(companyId, currentUserId, form) {
   }
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
-
   form.companyId = companyId
   form.members = [member._id];
+
+  for (let tag of form.tags) {
+    if(tag instanceof Object) {
+      tag._id = new ObjectID();
+      tag = await labelService.addLabel({name: tag.name, company: companyId, type: labelType.KEYWORD})
+    } else {
+
+      tag = ObjectID(tag);
+    }
+  }
+
   result = await new JobRequisition(form).save();
 
   let subscription = {memberId: member._id, createdBy: currentUserId, subjectType: subjectType.JOB, subjectId: result._id};
