@@ -47,6 +47,12 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  hasEvaluated: {
+    type: Boolean
+  },
+  hasScheduled: {
+    type: Boolean
+  },
   attachment: {
     type: Object,
     required: false

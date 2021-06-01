@@ -25,6 +25,7 @@ let SearchParam = require('../const/searchParam');
 
 
 const jobSchema = Joi.object({
+  company: Joi.number(),
   jobId: Joi.number().optional(),
   createdBy: Joi.number(),
   title: Joi.string().required(),
@@ -53,10 +54,10 @@ const jobSchema = Joi.object({
   allowRemote: Joi.boolean(),
   education: Joi.string().allow(''),
   company: Joi.number(),
-  district: Joi.any().optional(),
-  city: Joi.any().optional(),
-  state: Joi.string(),
-  country: Joi.string(),
+  district: Joi.string().allow('').optional(),
+  city: Joi.string().allow('').optional(),
+  state: Joi.string().allow(''),
+  country: Joi.string().allow(''),
   postalCode: Joi.string(),
   externalUrl: Joi.string(),
   hasApplied: Joi.boolean(),
@@ -95,7 +96,9 @@ async function addJob(companyId, currentUserId, form) {
   for (let tag of form.tags) {
     if(tag instanceof Object) {
       tag._id = new ObjectID();
-      tag = await labelService.addLabel({name: tag.name, company: companyId, type: labelType.KEYWORD})
+      tag.company = companyId;
+      tag.type = labelType.KEYWORD;
+      tag = await labelService.addLabel(tag)
     } else {
 
       tag = ObjectID(tag);
@@ -153,17 +156,34 @@ async function updateJob(jobId, currentUserId, form) {
     job.allowRemote=form.allowRemote;
 
 
-    for(index in form.tags){
-      if(!form.tags[index]._id){
-        let newLabel = {name: form.tags[index].name, type: 'TAG', company: job.company, createdBy: currentUserId};
-        newLabel = await labelService.addLabel(newLabel);
-        if(newLabel){
-          form.tags[index]._id = newLabel._id;
-        }
+    for (let tag of form.tags) {
+      if(tag instanceof Object) {
+        tag._id = new ObjectID();
+        tag.company = job.company;
+        tag.type = labelType.KEYWORD;
+        tag = await labelService.addLabel(tag)
+      } else {
+
+        tag = ObjectID(tag);
       }
-    };
-    let tagIds = _.reduce(form.tags, function(res, tag){res.push(tag._id); return res;}, []);
-    job.tags = tagIds;
+    }
+    //
+    // for(index in form.tags){
+    //   if(tag instanceof Object) {
+    //     tag._id = new ObjectID();
+    //     tag.company = companyId;
+    //     tag.type = labelType.KEYWORD;
+    //     tag = await labelService.addLabel(tag)
+    //   } else {
+    //
+    //     tag = ObjectID(form.tags[i]);
+    //   }
+    //
+    // };
+    // let tagIds = _.reduce(form.tags, function(res, tag){res.push(tag._id); return res;}, []);
+    job.tags = form.tags;
+
+
 
     if(form.department){
       job.department =  ObjectID(form.department);
@@ -171,7 +191,8 @@ async function updateJob(jobId, currentUserId, form) {
 
     job.updatedBy = currentUserId;
     job.updatedDate = Date.now();
-    result = new JobRequisition(job).save();
+
+    result = await job.save();
 
     let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+job._id, action: actionEnum.UPDATED, meta: {jobId: job._id, jobTitle: job.title}});
 
@@ -205,7 +226,7 @@ async function findJobId(jobId, locale) {
   // let propLocale = '$name.'+localeStr;
 
 
-  data = JobRequisition.findOne({jobId: jobId}).populate('tags');
+  data = await JobRequisition.findOne({jobId: jobId}).populate('tags');
 
   // Promotion.populate(data, {path: "promotion"});
 
@@ -222,7 +243,7 @@ async function findJob_Id(jobId, locale) {
   if(jobId==null){
     return;
   }
-  data = JobRequisition.findById(jobId).populate('department').populate('tags').populate('members');
+  data = await JobRequisition.findById(jobId).populate('department').populate('tags').populate('members');
   return data;
 
   // return JobRequisition.findOne({jobId: jobId});

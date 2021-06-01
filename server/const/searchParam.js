@@ -1,13 +1,14 @@
 const _ = require('lodash');
 const dateEnum = require('../const/dateEnum')
+const ObjectID = require('mongodb').ObjectID;
 
 
 function SearchParam(filter) {
   this.query = {};
 
 
-  if(filter.status){
-    this.query.status =  filter.status;
+  if(filter.status.length){
+    this.query.status =  { $in: filter.status };
   }
 
   if(filter.partyId){
@@ -28,7 +29,6 @@ function SearchParam(filter) {
 
 
   if(filter.tags && filter.tags.length>0){
-
     this.query.tags =  { $in: filter.tags };
   }
 
@@ -56,101 +56,84 @@ function SearchParam(filter) {
         break;
     }
 
-    this.query.createdDate =  { $gte: start.getTime(), $lte: end.getTime() };
+    1619888400000
+    1622536712092
+    1619874012000
+    console.log(start.getTime())
+    this.query.createdDate =  { $gte: start.getTime()};
   }
 
 
   if (filter.query && filter.query!="") {
-    // this.query.title =  { $regex: filter.query, $options: 'i' };
-    // this.query.$text = { $search: filter.query, $caseSensitive: true };
     this.query.$text = { $search: filter.query, $diacriticSensitive: true, $caseSensitive: false };
   }
 
-  if (filter.level && filter.level!="") {
-    // this.query.level =  { $in: filter.level.split(',') };
+  if (filter.level.length) {
     this.query.level = { $in: filter.level };
   }
 
-  if (filter.jobFunction && filter.jobFunction!="") {
-    // let jobFunctions = _.reduce(filter.jobFunction.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
-    // this.query.jobFunction =  { $in: jobFunctions };
+  if (filter.jobFunction && filter.jobFunction.length) {
     this.query.jobFunction =  { $in: filter.jobFunction };
   }
 
-  if (filter.employmentType && filter.employmentType!="") {
-    // let employmentType = _.reduce(filter.employmentType.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
-    // this.query.employmentType =  { $in: employmentType};
+  if (filter.employmentType.length) {
     this.query.employmentType =  { $in: filter.employmentType};
   }
 
-  if (filter.industry && filter.industry!="") {
-    // let industry = _.reduce(filter.industry.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
-    // this.query.industry =  { $in: industry };
+  if (filter.industry.length) {
     this.query.industry =  { $in: filter.industry };
   }
 
   if (filter.company && filter.company!="") {
 
-    // let company = _.reduce(filter.company.split(','), function(result, value, key) {
-    //   result.push(parseInt(value));
-    //   return result;
-    // }, []);
-
-    // this.query.company = { $in: company };
     this.query.company = { $in: filter.company };
   }
 
-  if (filter.city && filter.city!="") {
-    // let city = _.reduce(filter.city.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
-
-    // this.query.city =  { $in: city};
+  if (filter.city.length) {
     this.query.city =  { $in: filter.city};
   }
 
-  if (filter.state && filter.state!="") {
-    // let state = _.reduce(filter.state.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
-    // this.query.state =  { $in: state};
+  if (filter.state.length) {
     this.query.state =  { $in: filter.state};
   }
 
-  if (filter.country && filter.country!="") {
-    // let country = _.reduce(filter.country.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
-
-    // this.query.country =  { $in: country};
+  if (filter.country.length) {
     this.query.country =  { $in: filter.country};
   }
 
-  if (filter.distance && filter.distance!="") {
-    // let distance = _.reduce(filter.distance.split(','), function(result, value, key) {
-    //   result.push(value.trim());
-    //   return result;
-    // }, []);
+  if (filter.department.length) {
+    filter.department = _.reduce(filter.department, function(res, item){
+      res.push(ObjectID(item));
+      return res;
+    }, []);
+    this.query.department =  { $in: filter.department};
+  }
 
-    // this.query.distance =  { $in: distance};
+  if (filter.distance && filter.distance!="") {
     this.query.distance =  { $in: filter.distance};
   }
 
   if (filter.members) {
     this.query.members =  { $in: filter.members};
   }
+
+  if (filter.createdBy && filter.createdBy.length) {
+    this.query.createdBy =  { $in: filter.createdBy};
+  }
+
+  // if (filter.createdDate && filter.createdBy.length) {
+  //   let date = new Date();
+  //   switch (filter.createdDate){
+  //     case 'PASTDAY':
+  //       date = date.setDate(date.getDate()-1);
+  //       console.log(date.getTime())
+  //       break;
+  //
+  //   }
+  //   this.query.createdDate =  { $gte: date.getTime()};
+  // }
+
+
 
   return this.query;
 }

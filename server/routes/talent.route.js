@@ -18,7 +18,7 @@ router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHand
 router.route('/company/:id/stats').get(asyncHandler(getStats));
 
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
-router.route('/company/:id/jobs').get(asyncHandler(searchJob));
+router.route('/company/:id/jobs/search').post(asyncHandler(searchJob));
 router.route('/company/:id/jobs/:jobId').get(asyncHandler(getJobById));
 router.route('/company/:id/jobs/:jobId').put(asyncHandler(updateJob));
 router.route('/company/:id/jobs/:jobId/close').post(asyncHandler(closeJob));
@@ -232,7 +232,9 @@ async function updateJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = req.params.jobId;
   let companyId = parseInt(req.params.id);
-  let data = await talentCtrl.updateJob(companyId, currentUserId, jobId, req.body);
+  let job = req.body;
+  job.company = companyId;
+  let data = await talentCtrl.updateJob(companyId, currentUserId, jobId, job);
   res.json(new Response(data, data?'job_updated_successful':'not_found', res));
 }
 
@@ -336,13 +338,13 @@ async function updateJobComment(req, res) {
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let filter = req.query;
+  let sort = req.query;
+  let filter = req.body;
   let pagination = req.query;
   filter.company = [companyId];
-  filter.department = req.query.department;
 
 
-  let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, res.locale);
+  let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, sort, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

@@ -190,7 +190,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   state: {
     type: String,
-    required: true
+    required: false
   },
   country: {
     type: String,

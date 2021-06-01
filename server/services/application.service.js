@@ -854,10 +854,60 @@ async function applicationsEndingSoon(company) {
     }
   ])
 
-
-
-
   return applications;
+}
+
+
+async function getApplicationsStagesByJobId(jobId) {
+  let result = null;
+
+  if(!jobId){
+    return;
+  }
+
+
+  let applications = await Application.aggregate([
+    { $match: {jobId: jobId} },
+    { $lookup:{
+        from:"applicationprogresses",
+        let:{currentProgress: '$currentProgress'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$currentProgress","$_id"]}}},
+          {
+            $lookup: {
+              from: 'stages',
+              localField: "stage",
+              foreignField: "_id",
+              as: "stage"
+            }
+          },
+          { $unwind: '$stage' },
+          { $addFields:
+              {
+                timeLeft: {$round: [ {$divide : [{$subtract: [{ $add:[ {$toDate: "$createdDate"}, {$multiply: ['$stage.timeLimit', 1*24*60*60000] } ] }, "$$NOW"]}, 86400000]}, 0 ] }
+              }
+          },
+
+        ],
+        as: 'currentProgress'
+      }},
+    { $unwind: '$currentProgress'},
+    { $group: {_id: { _id: '$currentProgress.stage', stageId: '$currentProgress.stage._id', name: '$currentProgress.stage.name', type: '$currentProgress.stage.type'}, count: {$sum: 1}}},
+    { $project: {_id: 0, stageId: '$_id.stageId', name: '$_id.name', type: '$_id.type', count: '$count'}}
+  ])
+
+  if(applications){
+    let total = 0;
+    let data = {};
+    for(i in applications){
+
+      data[applications[i].stageId] = applications[i];
+      total+=applications[i].count;
+
+    }
+    result = {total: total, data: data};
+  }
+  return result;
 }
 
 
@@ -882,5 +932,6 @@ module.exports = {
   getCandidatesSourceByCompanyId:getCandidatesSourceByCompanyId,
   getInsightCandidates:getInsightCandidates,
   getCandidatesSourceByJobId:getCandidatesSourceByJobId,
-  applicationsEndingSoon:applicationsEndingSoon
+  applicationsEndingSoon:applicationsEndingSoon,
+  getApplicationsStagesByJobId:getApplicationsStagesByJobId,
 }

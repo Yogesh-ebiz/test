@@ -16,8 +16,8 @@ module.exports = {
   getIndustryById
 }
 
-async function insert(experience) {
-  return await new ExperienceLevel(experience).save();
+async function insert(industry) {
+  return await new Industry(industry).save();
 }
 
 async function getAllIndustries(query, locale) {

@@ -24,7 +24,6 @@ async function getLabels(company, query, type) {
     return;
   }
 
-  console.log(company, query, type)
   return Label.find({company: company, name: { $regex: query, $options: "si" },type: type});
 }
 

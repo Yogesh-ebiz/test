@@ -159,7 +159,7 @@ async function getCompanyInsight(company, duration) {
   }
 
   let result  = await JobView.aggregate([
-    {$match: {createdDate: {$gt: date}}},
+    {$match: {company: company, createdDate: {$gt: date}}},
     {
       $group: group
     }

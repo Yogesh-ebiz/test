@@ -561,9 +561,9 @@ async function getStats(currentUserId, companyId) {
 
 }
 
-async function searchJobs(currentUserId, companyId, filter, locale) {
+async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 
-  if(!currentUserId || !companyId){
+  if(!currentUserId || !companyId || !filter || !sort){
     return null;
   }
 
@@ -575,10 +575,10 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
   }
 
   let select = '';
-  let limit = (filter.size && filter.size>0) ? filter.size:20;
-  let page = (filter.page && filter.page==0) ? filter.page:1;
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
   let sortBy = {};
-  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
+  sortBy[sort.sortBy] = (sort.direction && filter.direction=="DESC") ? -1:1;
 
   let options = {
     select:   select,
@@ -588,11 +588,9 @@ async function searchJobs(currentUserId, companyId, filter, locale) {
     page: parseInt(filter.page)+1
   };
 
-
-  filter.members = [member._id];
-
   let company = await findCompanyById(companyId, currentUserId);
 
+  console.log(new SearchParam(filter))
   const aggregate = JobRequisition.aggregate([{
     $match: new SearchParam(filter)
   }
@@ -864,7 +862,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     let propLocale = '$name.'+localeStr;
     job = await jobService.findJob_Id(jobId, locale);
 
-
+    console.log(job.tags)
     if(job && _.find(job.members, {_id: ObjectID(member._id)})) {
 
 
@@ -1105,6 +1103,9 @@ async function getJobInsights(currentUserId, companyId, jobId) {
 
   let sources = await applicationService.getCandidatesSourceByJobId(jobId);
   result.sources = sources;
+
+  let applicationByStages = await applicationService.getApplicationsStagesByJobId(jobId);
+  result.stages = applicationByStages;
 
   return result;
 
