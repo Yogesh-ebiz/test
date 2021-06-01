@@ -577,12 +577,11 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page:1;
-  let sortBy = {};
-  sortBy[sort.sortBy] = (sort.direction && filter.direction=="DESC") ? -1:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
 
   let options = {
     select:   select,
-    sort:     sortBy,
+    sort:     null,
     lean:     true,
     limit:    limit,
     page: parseInt(filter.page)+1
@@ -590,11 +589,19 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 
   let company = await findCompanyById(companyId, currentUserId);
 
-  console.log(new SearchParam(filter))
-  const aggregate = JobRequisition.aggregate([{
-    $match: new SearchParam(filter)
+  let aList = [];
+  let aMatch = { $match: new SearchParam(filter)};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+
+  if(sort && sort.sortBy=='mostView'){
+    aSort = { $sort: { noOfViews: direction} };
+    aList.push(aSort);
+  } else {
+    aList.push(aSort);
   }
-  ]);
+  const aggregate = JobRequisition.aggregate(aList);
 
 
   let result = await JobRequisition.aggregatePaginate(aggregate, options);

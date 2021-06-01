@@ -133,6 +133,28 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     job = await findJobId(jobId, locale);
 
     if(job) {
+      if (currentUserId) {
+
+        let currentParty = await findByUserId(currentUserId);
+
+        if (isPartyActive(currentParty)) {
+
+          let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
+          job.hasSaved = (hasSaved) ? true : false;
+
+          let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
+          job.hasApplied = (hasApplied) ? true : false;
+
+          partySkills = await findUserSkillsById(currentParty.id);
+          partySkills = _.map(partySkills, "id");
+
+          console.log(job.employmentType)
+          await addJobViewByUserId(currentParty.id, job.company.id, job._id);
+          job.noOfViews++;
+          await job.save();
+        }
+
+      }
 
       let company = await findCompanyById(job.company, currentUserId);
       job.company = convertToCompany(company);
@@ -181,32 +203,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         // let promotion = await JobRequisition.populate(job, 'promotion')
 
         let currentParty, partySkills = [];
-        if (currentUserId) {
 
-          let currentParty = await findByUserId(currentUserId);
-
-          if (isPartyActive(currentParty)) {
-
-            let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
-            job.hasSaved = (hasSaved) ? true : false;
-
-            let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
-            job.hasApplied = (hasApplied) ? true : false;
-
-            partySkills = await findUserSkillsById(currentParty.id);
-            partySkills = _.map(partySkills, "id");
-
-            // let jobView = await findJobViewByUserIdAndJobId(currentParty.id, jobId);
-            // if (!jobView) {
-              await addJobViewByUserId(currentParty.id, job.company.id, job._id);
-            // } else {
-            //   jobView.viewCount++
-            //   await jobView.save();
-            // }
-          }
-
-
-        }
         let skills = _.reduce(jobSkills, function (res, skill, key) {
           let temp = _.clone(skill);
 

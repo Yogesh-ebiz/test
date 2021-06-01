@@ -56,10 +56,6 @@ function SearchParam(filter) {
         break;
     }
 
-    1619888400000
-    1622536712092
-    1619874012000
-    console.log(start.getTime())
     this.query.createdDate =  { $gte: start.getTime()};
   }
 
