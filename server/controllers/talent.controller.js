@@ -584,7 +584,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
     sort:     null,
     lean:     true,
     limit:    limit,
-    page: parseInt(filter.page)+1
+    page: parseInt(sort.page)+1
   };
 
   let company = await findCompanyById(companyId, currentUserId);
@@ -1997,6 +1997,7 @@ async function getBoard(currentUserId, jobId, locale) {
 //
 // }
 
+/*
 async function searchCandidates(currentUserId, company, filter, locale) {
   if(!currentUserId || !company || !filter){
     return null;
@@ -2046,7 +2047,28 @@ async function searchCandidates(currentUserId, company, filter, locale) {
   return new Pagination(result);
 
 }
+*/
 
+
+
+
+async function searchCandidates(currentUserId, companyId, filter, sort, locale) {
+
+  if(!currentUserId || !companyId || !filter || !sort){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  result = await candidateService.search(filter, sort);
+
+  return new Pagination(result);
+
+}
 
 
 async function getCandidateById(currentUserId, company, candidateId, locale) {

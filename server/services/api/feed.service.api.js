@@ -233,6 +233,13 @@ async function lookupPeopleIds(ids) {
   return response.data.data;
 };
 
+
+async function getCandidateById(id) {
+  let response = await client.get(`/people/candidates/${id}`, null, options);
+  return response.data.data;
+};
+
+
 async function lookupCompaniesIds(ids) {
   let response = await client.get(`/search/company/lookup?ids=${ids}`, null, options);
   return response.data.data;
@@ -344,6 +351,7 @@ module.exports = {
   searchPeopleByIds:searchPeopleByIds,
   lookupUserIds:lookupUserIds,
   lookupPeopleIds:lookupPeopleIds,
+  getCandidateById:getCandidateById,
   lookupCompaniesIds:lookupCompaniesIds,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,

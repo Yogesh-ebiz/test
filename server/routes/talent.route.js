@@ -744,11 +744,11 @@ async function searchCandidates(req, res) {
   let data;
   let company = parseInt(req.params.id);
   let filter = req.body;
-  let pagination = req.query;
+  let sort = req.query;
   filter.query = req.query.query;
 
 
-  data = await talentCtrl.searchCandidates(currentUserId, company, filter, res.locale);
+  data = await talentCtrl.searchCandidates(currentUserId, company, filter, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 

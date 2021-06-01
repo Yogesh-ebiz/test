@@ -5,7 +5,7 @@ const ObjectID = require('mongodb').ObjectID;
 
 const {jobMinimal, convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
-const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {getCandidateById, lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -516,27 +516,27 @@ async function getTopFiveJobs(companies, locale) {
 
 
 
-async function searchJob(currentUserId, jobId, filter, pagination, locale) {
+async function searchJob(currentUserId, jobId, filter, sort, locale) {
 
-  if(!filter || !pagination){
+  if(!filter || !sort){
     return null;
   }
 
   let foundJob = null;
   let select = '-description -qualifications -responsibilities';
-  let limit = (pagination.size && pagination.size>0) ? pagination.size:20;
-  let page = (pagination.page && pagination.page==0) ? pagination.page:1;
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
   let sortBy = {};
-  pagination.sortBy = (pagination.sortyBy) ? pagination.sortyBy : 'createdDate';
-  pagination.direction = (pagination.direction && pagination.direction=="ASC") ? "ASC" : 'DESC';
-  sortBy[pagination.sortBy] = (pagination.direction == "DESC") ? -1 : 1;
+  sort.sortBy = (sort.sortyBy) ? sort.sortyBy : 'createdDate';
+  sort.direction = (sort.direction && sort.direction=="ASC") ? "ASC" : 'DESC';
+  sortBy[sort.sortBy] = (sort.direction == "DESC") ? -1 : 1;
 
   let options = {
     select:   select,
     sort:     sortBy,
     lean:     true,
     limit:    limit,
-    page: parseInt(pagination.page)+1
+    page: parseInt(sort.page)+1
   };
 
 
@@ -565,8 +565,7 @@ async function searchJob(currentUserId, jobId, filter, pagination, locale) {
     }
   }
 
-  filter.status = statusEnum.ACTIVE;
-
+  filter.status = [statusEnum.ACTIVE];
   const aggregate = JobRequisition.aggregate([{
     $match: new SearchParam(filter)
   }
@@ -796,7 +795,7 @@ async function applyJobById(currentUserId, jobId, application ) {
   let savedApplication;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await getCandidateById(currentUserId);
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
 
@@ -806,7 +805,10 @@ async function applyJobById(currentUserId, jobId, application ) {
         let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
         if(!candidate){
           candidate = await candidateService.addCandidate({userId: currentUserId, avatar: currentParty.avatar, company: job.company, firstName: currentParty.firstName, middleName: currentParty.middleName, lastName: currentParty.lastName,
-            jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber});
+            jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber,
+            city: currentParty.primaryAddress.city, state: currentParty.primaryAddress.state, country: currentParty.primaryAddress.country,
+            skills: _.map(currentParty.skills, 'id')
+          });
         }
 
         application.user = candidate._id;

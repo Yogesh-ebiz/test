@@ -97,7 +97,7 @@ function SearchParam(filter) {
     this.query.country =  { $in: filter.country};
   }
 
-  if (filter.department.length) {
+  if (filter.department && filter.department.length) {
     filter.department = _.reduce(filter.department, function(res, item){
       res.push(ObjectID(item));
       return res;
@@ -116,6 +116,17 @@ function SearchParam(filter) {
   if (filter.createdBy && filter.createdBy.length) {
     this.query.createdBy =  { $in: filter.createdBy};
   }
+
+  if (filter.skills && filter.skills.length) {
+    this.query.skills =  { $in: filter.skills};
+  }
+
+
+  if (filter.minYear && filter.maxYear) {
+    this.query.$and =  [{noOfMonthExperiences:  {$gte: (filter.minYear * 12)} }, {noOfMonthExperiences: { $lte: (filter.maxYear * 12)}}];
+  }
+
+
 
   // if (filter.createdDate && filter.createdBy.length) {
   //   let date = new Date();

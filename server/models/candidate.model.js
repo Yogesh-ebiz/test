@@ -30,7 +30,15 @@ const CandidateSchema = new mongoose.Schema({
     type: String,
     required:false
   },
-  lastName: {
+  city: {
+    type: String,
+    required:false
+  },
+  state: {
+    type: String,
+    required:false
+  },
+  country: {
     type: String,
     required:false
   },
@@ -79,6 +87,10 @@ const CandidateSchema = new mongoose.Schema({
     default: 0
   },
   links: {
+    type: Array,
+    required:false
+  },
+  skills: {
     type: Array,
     required:false
   },

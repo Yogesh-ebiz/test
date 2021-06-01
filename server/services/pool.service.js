@@ -72,10 +72,8 @@ async function getPoolCandidates(poolId) {
     }
   ]);
 
-  console.log(poolId)
 
   let pool = await Pool.aggregatePaginate(aggregate, {});
-  console.log(pool)
   return pool
 }
 

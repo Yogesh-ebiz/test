@@ -107,9 +107,9 @@ async function getTopFiveJobs(req, res) {
 async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.body;
-  let pagination = req.query;
+  let sort = req.query;
   filter.query = req.query.query;
-  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, pagination, res.locale);
+  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, sort, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

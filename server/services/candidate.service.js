@@ -1,9 +1,11 @@
 const _ = require('lodash');
+const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
 
+let SearchParam = require('../const/searchParam');
 const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
-const Joi = require('joi');
+
 
 
 const candidateSchema = Joi.object({
@@ -13,6 +15,10 @@ const candidateSchema = Joi.object({
   firstName: Joi.string(),
   lastName: Joi.string(),
   middleName: Joi.string().allow('').optional(),
+  city: Joi.string().allow('').optional(),
+  state: Joi.string().allow('').optional(),
+  country: Joi.string().allow('').optional(),
+  skills: Joi.array().optional(),
   jobTitle: Joi.string().allow('').optional(),
   phoneNumber: Joi.string().allow(''),
   email: Joi.string(),
@@ -140,6 +146,88 @@ function searchCandidates(candidateIds, options) {
 }
 
 
+
+async function search(filter, sort) {
+
+  if(!filter || !sort){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = { $match: new SearchParam(filter)};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+
+  if(filter.stages.length){
+    filter.stages = _.reduce(filter.stages, function (res, stage) {
+      res.push(ObjectID(stage));
+      return res;
+    }, []);
+
+    aList.push(
+      {$lookup:{
+          from:"applications",
+          let:{user:"$_id"},
+          pipeline:[
+            {$match:{$expr:{$eq:["$user","$$user"]}}},
+            {$lookup:{
+                from:"applicationprogresses",
+                let:{currentProgress:"$currentProgress"},
+                pipeline:[
+                  {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+                ],
+                as: 'currentProgress'
+              }},
+            { $unwind: '$currentProgress'},
+
+          ],
+          as: 'applications'
+        }},
+      { $match: {'applications.currentProgress.stage': {$in: filter.stages} } }
+    );
+  }
+
+  if(filter.sources.length){
+    filter.sources = _.reduce(filter.sources, function (res, source) {
+      res.push(ObjectID(source));
+      return res;
+    }, []);
+
+    aList.push(
+      {$lookup: {from: 'labels', localField: 'sources', foreignField: '_id', as: 'sources' } },
+      // { $match: {'sources': {$in: filter.sources} } }
+    );
+  }
+
+  if(sort && sort.sortBy=='rating'){
+    aSort = { $sort: { rating: direction} };
+    aList.push(aSort);
+  } else {
+    aList.push(aSort);
+  }
+
+
+  const aggregate = Candidate.aggregate(aList);
+
+  return await Candidate.aggregatePaginate(aggregate, options);
+}
+
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
@@ -147,5 +235,6 @@ module.exports = {
   findByCompany:findByCompany,
   findByUserIdAndCompanyId:findByUserIdAndCompanyId,
   getListofCandidates:getListofCandidates,
-  searchCandidates:searchCandidates
+  searchCandidates:searchCandidates,
+  search:search
 }
