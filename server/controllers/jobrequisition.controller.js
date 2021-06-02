@@ -39,6 +39,7 @@ const {getTopIndustry} = require('../services/industry.service');
 
 const filterService = require('../services/filter.service');
 const bookmarkService = require('../services/bookmark.service');
+const questionSubmissionService = require('../services/questionsubmission.service');
 
 
 const JobRequisition = require('../models/jobrequisition.model');
@@ -75,6 +76,7 @@ const applicationSchema = Joi.object({
   source: Joi.string().allow('').optional(),
   desiredSalary: Joi.number().optional(),
   currency: Joi.string().optional(),
+  applicationQuestions: Joi.object().optional()
 });
 
 
@@ -148,8 +150,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
           partySkills = await findUserSkillsById(currentParty.id);
           partySkills = _.map(partySkills, "id");
 
-          console.log(job.employmentType)
-          await addJobViewByUserId(currentParty.id, job.company.id, job._id);
+          await addJobViewByUserId(currentParty.id, job.company, job._id);
           job.noOfViews++;
           await job.save();
         }
@@ -854,6 +855,18 @@ async function applyJobById(currentUserId, jobId, application ) {
               savedApplication.allProgress.push(progress._id)
               savedApplication.currentProgress = progress._id;
 
+
+              if(application.applicationQuestions) {
+                application.applicationQuestions.createdBy = currentUserId;
+                let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
+
+                if (questionSubmission) {
+                  savedApplication.questionSubmission = questionSubmission._id;
+                  savedApplication.hasSubmittedQuestion = true;
+                }
+              }
+
+
               candidate.jobTitle = currentParty.jobTitle;
               candidate.applications.push(savedApplication._id);
               await candidate.save();
@@ -867,6 +880,8 @@ async function applyJobById(currentUserId, jobId, application ) {
             //   partyId: currentParty.id,
             //   action: {type: applicationEnum.APPLIED}
             // });
+
+
 
 
             //Create Notification

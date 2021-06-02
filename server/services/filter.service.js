@@ -273,7 +273,15 @@ function getAllSkillTypes(filter, locale) {
 
 
 function getAllJobLocations(filter) {
-  let data = JobRequisition.aggregate([{ $group: {_id:{city:"$city", state: '$state', country: '$country'}, count:{$sum:1} } } ]);
+  let aggregate = [];
+  if(filter.company){
+    aggregate.push({$match: {company: parseInt(filter.company)}});
+  }
+
+  let group = { $group: {_id:{district:"$district", city:"$city", state: '$state', country: '$country'}, count:{$sum:1} } };
+  aggregate.push(group);
+
+  let data = JobRequisition.aggregate(aggregate);
   return data;
 }
 

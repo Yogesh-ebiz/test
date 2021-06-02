@@ -30,6 +30,10 @@ const CandidateSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  lastName: {
+    type: String,
+    required:false
+  },
   city: {
     type: String,
     required:false

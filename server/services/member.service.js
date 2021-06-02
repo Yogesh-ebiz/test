@@ -391,6 +391,16 @@ async function findJobSubscriptions(memberId, sort) {
               as: "department"
             }
           },
+          { $unwind: '$department'},
+          {
+            $lookup: {
+              from: 'members',
+              localField: "createdBy",
+              foreignField: "userId",
+              as: "createdBy"
+            }
+          },
+          { $unwind: '$createdBy'}
         ],
         as: 'subject'
       }},

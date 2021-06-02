@@ -27,13 +27,12 @@ function findJobViewByUserIdAndJobId(userId, jobId) {
 function addJobViewByUserId(userId, company, jobId) {
   let data = null;
 
+  console.log(userId, company, jobId)
   if(!userId || !company || !jobId){
     return;
   }
 
-  let timestamp = Date.now();
-
-  let jobView = {partyId: userId, company: company, jobId: jobId, createdDate: timestamp}
+  let jobView = {partyId: userId, company: company, jobId: jobId}
   return new JobView(jobView).save();
 }
 

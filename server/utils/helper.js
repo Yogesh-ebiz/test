@@ -81,6 +81,7 @@ const convertToCandidate = (user) => {
     noOfMonthExperiences: user.noOfMonthExperiences?user.noOfMonthExperiences:6.5,
     level:user.level?user.level:'SENIOR',
     match:user.match?user.match:0,
+    rating: user.rating?user.rating:0,
     overallRating: user.overallRating?user.overallRating:0,
     teamRating: user.teamRating?user.teamRating:0,
     links: user.links?user.links:[],

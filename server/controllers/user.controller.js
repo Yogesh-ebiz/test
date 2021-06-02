@@ -1982,6 +1982,7 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
 
 async function getJobViewsByUserId(currentUserId, filter, locale) {
 
+  console.log(currentUserId)
   if(currentUserId==null || filter==null){
     return null;
   }

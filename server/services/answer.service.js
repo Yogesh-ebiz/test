@@ -11,7 +11,7 @@ const Joi = require('joi');
 
 const answerSchema = Joi.object({
   _id: Joi.object().optional(),
-  answer: Joi.string().allow('').required(),
+  answer: Joi.string().allow(''),
   options: Joi.array().optional(),
   question: Joi.object()
 });

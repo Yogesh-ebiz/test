@@ -7,7 +7,7 @@ function SearchParam(filter) {
   this.query = {};
 
 
-  if(filter.status.length){
+  if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };
   }
 
@@ -64,7 +64,7 @@ function SearchParam(filter) {
     this.query.$text = { $search: filter.query, $diacriticSensitive: true, $caseSensitive: false };
   }
 
-  if (filter.level.length) {
+  if (filter.level && filter.level.length) {
     this.query.level = { $in: filter.level };
   }
 
@@ -72,11 +72,11 @@ function SearchParam(filter) {
     this.query.jobFunction =  { $in: filter.jobFunction };
   }
 
-  if (filter.employmentType.length) {
+  if (filter.employmentType && filter.employmentType.length) {
     this.query.employmentType =  { $in: filter.employmentType};
   }
 
-  if (filter.industry.length) {
+  if (filter.industry && filter.industry.length) {
     this.query.industry =  { $in: filter.industry };
   }
 
@@ -85,15 +85,15 @@ function SearchParam(filter) {
     this.query.company = { $in: filter.company };
   }
 
-  if (filter.city.length) {
+  if (filter.city && filter.city.length) {
     this.query.city =  { $in: filter.city};
   }
 
-  if (filter.state.length) {
+  if (filter.state && filter.state.length) {
     this.query.state =  { $in: filter.state};
   }
 
-  if (filter.country.length) {
+  if (filter.country && filter.country.length) {
     this.query.country =  { $in: filter.country};
   }
 
@@ -109,7 +109,7 @@ function SearchParam(filter) {
     this.query.distance =  { $in: filter.distance};
   }
 
-  if (filter.members) {
+  if (filter.members && filter.members.length) {
     this.query.members =  { $in: filter.members};
   }
 

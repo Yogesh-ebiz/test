@@ -516,6 +516,7 @@ async function updateProgress(currentUserId, applicationId, progress) {
 
 async function submitApplicationQuestions(currentUserId, applicationId, form) {
 
+  console.log(form)
   if(!currentUserId || !applicationId || !form){
     return null;
   }

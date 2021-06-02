@@ -9,8 +9,7 @@ const AnswerSchema = new mongoose.Schema({
     default: Date.now
   },
   answer: {
-    type: Object,
-    required: true
+    type: String
   },
   options: {
     type: Array,

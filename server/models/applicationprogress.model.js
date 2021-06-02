@@ -47,6 +47,9 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  requireEvaluation: {
+    type: Boolean
+  },
   hasEvaluated: {
     type: Boolean
   },

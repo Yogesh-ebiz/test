@@ -136,6 +136,7 @@ module.exports = {
   searchCandidates,
   getCandidateById,
   getCandidateEvaluations,
+  getCandidateEvaluationsStats,
   addCandidateTag,
   removeCandidateTag,
   addCandidateSource,
@@ -1153,13 +1154,13 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
 
 
 
-async function searchJobApplications(currentUserId, jobId, filter, locale) {
+async function searchJobApplications(currentUserId, jobId, filter, sort, locale) {
 
   if(!currentUserId || !jobId || !filter){
     return null;
   }
 
-  let result = await applicationService.findApplicationsByJobId(jobId, filter);
+  let result = await applicationService.findApplicationsByJobId(jobId, filter, sort);
     // let userIds = _.map(result.docs, 'user');
     // let users = await lookupUserIds(userIds);
 
@@ -1222,23 +1223,38 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
     application = await applicationService.findApplicationBy_Id(applicationId).populate([
       {
-        path: 'currentProgress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
-      },
-      {
         path: 'progress',
         model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
+        populate: [
+          {
+            path: 'stage',
+            model: 'Stage'
+          },
+          {
+            path: 'evaluations',
+            model: 'Evaluation'
+          }
+        ]
       }
     ]);
     if (application) {
+      let requiredEvaluation = false;
+      let hasEvaluated = false
+      let noOfEvaluations=0;
+      let rating=0;
+      for([i, progress] of application.progress.entries()){
+        for([i, evaluation] of progress.evaluations.entries()){
+          rating += evaluation.rating
+          noOfEvaluations += 1;
+        }
+      }
+      application.noOfEvaluations = noOfEvaluations;
+      application.overallRating = Math.round(rating / noOfEvaluations * 10) /10;
+
+      application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
+      hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
+      application.currentProgress.hasEvaluated = hasEvaluated;
+      application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
 
 
     } else {
@@ -1761,7 +1777,7 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 
   let result;
   try {
-    result = await evaluationService.remove(currentUserId, ObjectID(applicationProgressId));
+    result = await evaluationService.remove(member._id, ObjectID(applicationId), ObjectID(applicationProgressId));
   } catch (error) {
     console.log(error);
   }
@@ -2091,9 +2107,26 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
     {
       path: 'sources',
       model: 'Label'
+    },
+    {
+      path: 'evaluations',
+      model: 'Evaluation'
     }
-    ]);
+  ]);
 
+  if(candidate.evaluations) {
+    let companyEvaluations = _.filter(candidate.evaluations, {companyId: company});
+
+    if(companyEvaluations) {
+      candidate.teamRating = Math.round(_.reduce(companyEvaluations, function (res, e) {
+        return res + e.rating;
+      }, 0) / companyEvaluations.length * 10)/ 10;
+    }
+
+    candidate.overallRating = Math.round(_.reduce(candidate.evaluations, function (res, e) {
+      return res + e.rating;
+    }, 0) / candidate.evaluations.length * 10) / 10;
+  }
   if(candidate){
     candidate.match = 78;
     let partyLink = await getUserLinks(candidate.userId);
@@ -2112,7 +2145,7 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
 
 async function getCandidateEvaluations(companyId, currentUserId, candidateId, filter, sort) {
 
-  if(!companyId || !currentUserId || !candidateId || !sort){
+  if(!companyId || !currentUserId || !candidateId || !filter || !sort){
     return null;
   }
 
@@ -2133,8 +2166,15 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
       result = await evaluationService.findByCandidate(candidateId, sort);
     }
 
+    let userIds = _.reduce(result.docs, function(res, item){res.push(item.createdBy.userId); return res;}, []);
+    let users = await lookupUserIds(userIds);
+
     result.docs.forEach(function(evaluation){
-        evaluation.createdBy.followJobs = [];
+      let found = _.find(users, {id: evaluation.createdBy.userId});
+      if(found){
+        evaluation.createdBy.avatar = found.avatar;
+      }
+      evaluation.createdBy.followJobs = [];
 
     });
 
@@ -2143,6 +2183,30 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
   }
 
   return new Pagination(result);
+}
+
+
+async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type) {
+  if(!companyId || !currentUserId || !candidateId || !type){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
 }
 
 

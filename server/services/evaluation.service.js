@@ -4,6 +4,7 @@ const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const Evaluation = require('../models/evaluation.model');
 const assessmentService = require('../services/assessment.service');
+const applicationService = require('../services/application.service');
 const applicationProgressService = require('../services/applicationprogress.service');
 
 
@@ -67,9 +68,8 @@ async function add(form) {
 
 
 
-async function remove(userId, applicationId, applicationProgressId) {
-
-  if(!userId || !applicationProgressId){
+async function remove(memberId, applicationId, applicationProgressId) {
+  if(!memberId || !applicationId || !applicationProgressId){
     return;
   }
 
@@ -81,12 +81,16 @@ async function remove(userId, applicationId, applicationProgressId) {
       model: 'ApplicationProgress',
       populate: [{
         path: 'evaluations',
-        model: 'Evaluation'
+        model: 'Evaluation',
+        populate: {
+          path: 'assessment',
+          model: 'Assessment'
+        }
       },
-        {
-          path: 'stage',
-          model: 'Stage'
-        }]
+      {
+        path: 'stage',
+        model: 'Stage'
+      }]
     },
     {
       path: 'user',
@@ -94,26 +98,35 @@ async function remove(userId, applicationId, applicationProgressId) {
     }
   ]);
 
-  if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
+  let isAllow = false;
+  let evaluation;
+  application.currentProgress.evaluations.forEach(function(ev){
+    if(ev.createdBy.equals(memberId)){
+      isAllow = true;
+      evaluation = ev
+    }
+  });
+
+  if(application && application.currentProgress && isAllow) {
+
+
+    for(const [i, ev] of application.user.evaluations.entries()){
+      if(ev.equals(evaluation._id)){
+        application.user.evaluations.splice(i, 1);
+      }
+    }
 
     for(const [i, evaluation] of application.currentProgress.evaluations.entries()){
-      if(evaluation.createdBy==userId){
-        if(evaluation){
-          if(evaluation.assessment){
-            await evaluation.assessment.delete();
-          }
-          result = await evaluation.delete();
+      if(evaluation.equals(evaluation._id)){
+        if(evaluation.assessment){
+          await evaluation.assessment.delete();
         }
-
+        result = await evaluation.delete();
         application.currentProgress.evaluations.splice(i, 1);
       }
     }
 
-    for(const [i, evaluation] of application.user.evaluations.entries()){
-      if(evaluation.createdBy==userId){
-        application.user.evaluations.splice(i, 1);
-      }
-    }
+
 
     await application.currentProgress.save();
     await application.user.save();
@@ -324,6 +337,67 @@ async function findByCandidateAndApplicationId(userId, applicationId, sort) {
 }
 
 
+
+async function getCandidateEvaluationsStats(userId, companyId, type) {
+  if(!userId || !companyId || !type){
+    return;
+  }
+
+  let result;
+  let match = {partyId: userId};
+  if(type==='INTERNAL'){
+    match.companyId = companyId;
+  } else if(type==='EXTERNAL'){
+    match.companyId = {$ne: companyId };
+  }
+
+  let evaluations = await Evaluation.aggregate([{
+    $match: match
+  },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+  ]);
+
+  if(evaluations) {
+
+    result = _.reduce(evaluations, function (res, evaluation) {
+      let assessment = _.omit(evaluation.assessment, ['_id', 'createdBy', 'createdDate', 'candidateId',])
+
+
+      for (const prop in assessment) {
+        if (res[evaluation.companyId] && res[evaluation.companyId][prop]) {
+          res[evaluation.companyId][prop] += evaluation.assessment[prop];
+        } else {
+          res[evaluation.companyId] = {};
+          res[evaluation.companyId][prop] = evaluation.assessment[prop];
+        }
+      }
+
+      res.rating += evaluation.rating;
+      return res;
+    }, {rating: 0});
+
+
+    console.log(result);
+    result.rating = result.rating / evaluations.length;
+    // for (const prop in result.assessment) {
+    //   if (result.assessment[prop]) {
+    //     result.assessment[prop] = result.assessment[prop] / evaluations.length;
+    //   }
+    // }
+  }
+  return result;
+
+}
+
+
 module.exports = {
   findById:findById,
   add:add,
@@ -332,5 +406,6 @@ module.exports = {
   search:search,
   findByCandidate:findByCandidate,
   findByCandidateAndCompany:findByCandidateAndCompany,
-  findByCandidateAndApplicationId:findByCandidateAndApplicationId
+  findByCandidateAndApplicationId:findByCandidateAndApplicationId,
+  getCandidateEvaluationsStats:getCandidateEvaluationsStats
 }

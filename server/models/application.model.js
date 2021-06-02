@@ -79,6 +79,12 @@ const ApplicationSchema = new mongoose.Schema({
   currency: {
     type: String
   },
+  overallRating: {
+    type: Number
+  },
+  noOfEvaluations: {
+    type: Number
+  },
   hasSubmittedQuestion: {
     type: Boolean,
     default: false,
