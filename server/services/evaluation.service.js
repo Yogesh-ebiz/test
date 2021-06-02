@@ -190,7 +190,7 @@ async function search(candidateId, companyId, applicationId, progressId, sort) {
 }
 
 
-async function findByCandidate(userId, sort) {
+async function findByCandidate(userId, filter, sort) {
   if(!userId || !sort){
     return;
   }
@@ -211,7 +211,7 @@ async function findByCandidate(userId, sort) {
     page: parseInt(sort.page)+1
   };
 
-  const aggregate = Evaluation.aggregate([{
+  let aList = [{
     $match: {partyId: userId}
   },
     {
@@ -232,15 +232,40 @@ async function findByCandidate(userId, sort) {
       },
     },
     { $unwind: '$assessment' },
-  ]);
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
 
-  return Evaluation.aggregatePaginate(aggregate, options);
+
+  if(filter.stages && filter.stages.length){
+    aList.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
+  }
+
+  const aggregate = Evaluation.aggregate(aList);
+
+  return await Evaluation.aggregatePaginate(aggregate, options);
 
 }
 
 
-async function findByCandidateAndCompany(userId, companyId, sort) {
-  if(!userId || !sort){
+async function findByCandidateAndCompany(userId, filter, sort) {
+  if(!userId || !filter || !sort){
     return;
   }
 
@@ -260,8 +285,8 @@ async function findByCandidateAndCompany(userId, companyId, sort) {
     page: parseInt(sort.page)+1
   };
 
-  const aggregate = Evaluation.aggregate([{
-    $match: {partyId: userId, companyId: companyId}
+  let aList = [{
+    $match: {partyId: userId, companyId: filter.companyId}
   },
     {
       $lookup: {
@@ -281,15 +306,40 @@ async function findByCandidateAndCompany(userId, companyId, sort) {
       },
     },
     { $unwind: '$assessment' },
-  ]);
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
 
-  return Evaluation.aggregatePaginate(aggregate, options);
+  if(filter.stages && filter.stages.length){
+    aList.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
+  }
+
+  const aggregate = Evaluation.aggregate(aList);
+
+  return await Evaluation.aggregatePaginate(aggregate, options);
 
 }
 
 
-async function findByCandidateAndApplicationId(userId, applicationId, sort) {
-  if(!userId || !applicationId || !sort){
+
+async function findByCandidateAndApplicationId(userId, filter, sort) {
+  if(!userId || !filter || !sort){
     return;
   }
 
@@ -309,8 +359,8 @@ async function findByCandidateAndApplicationId(userId, applicationId, sort) {
     page: parseInt(sort.page)+1
   };
 
-  const aggregate = Evaluation.aggregate([{
-    $match: {partyId: userId, applicationId: applicationId}
+  let aList = [{
+    $match: {partyId: userId, applicationId: filter.applicationId}
   },
     {
       $lookup: {
@@ -330,20 +380,45 @@ async function findByCandidateAndApplicationId(userId, applicationId, sort) {
       },
     },
     { $unwind: '$assessment' },
-  ]);
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
 
-  return Evaluation.aggregatePaginate(aggregate, options);
+  if(filter.stages && filter.stages.length){
+    aList.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
+  }
+
+  const aggregate = Evaluation.aggregate(aList);
+
+  return await Evaluation.aggregatePaginate(aggregate, options);
 
 }
 
 
 
-async function getCandidateEvaluationsStats(userId, companyId, type) {
-  if(!userId || !companyId || !type){
+
+async function getCandidateEvaluationsStats(userId, companyId, type, stages) {
+  if(!userId || !companyId || !type || !stages){
     return;
   }
 
-  let result;
+  let result = {internal: {}, external: {}};
   let match = {partyId: userId};
   if(type==='INTERNAL'){
     match.companyId = companyId;
@@ -351,7 +426,7 @@ async function getCandidateEvaluationsStats(userId, companyId, type) {
     match.companyId = {$ne: companyId };
   }
 
-  let evaluations = await Evaluation.aggregate([{
+  let aggregate = [{
     $match: match
   },
     {
@@ -363,35 +438,87 @@ async function getCandidateEvaluationsStats(userId, companyId, type) {
       },
     },
     { $unwind: '$assessment' },
-  ]);
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
+
+  if(stages.length){
+    aggregate.push({ $match: {'applicationProgressId.stage.type': {$in: stages} } });
+  }
+  let evaluations = await Evaluation.aggregate(aggregate);
 
   if(evaluations) {
 
-    result = _.reduce(evaluations, function (res, evaluation) {
+
+    let data = _.reduce(evaluations, function (res, evaluation) {
       let assessment = _.omit(evaluation.assessment, ['_id', 'createdBy', 'createdDate', 'candidateId',])
 
 
       for (const prop in assessment) {
-        if (res[evaluation.companyId] && res[evaluation.companyId][prop]) {
-          res[evaluation.companyId][prop] += evaluation.assessment[prop];
+
+        if (res.group[evaluation.companyId] && res.group[evaluation.companyId][prop]) {
+          res.group[evaluation.companyId][prop] += evaluation.assessment[prop];
         } else {
-          res[evaluation.companyId] = {};
-          res[evaluation.companyId][prop] = evaluation.assessment[prop];
+          if(!res.group[evaluation.companyId]){
+            res.group[evaluation.companyId] = {};
+          }
+
+          res.group[evaluation.companyId][prop] = {};
+          res.group[evaluation.companyId][prop] = evaluation.assessment[prop];
         }
       }
 
       res.rating += evaluation.rating;
       return res;
-    }, {rating: 0});
+    }, {rating: 0, group: {}});
 
+    result.rating = Math.round(data.rating / evaluations.length * 10)/10;
+    delete data.rating;
+    for (const company in data.group) {
+      let external = {};
+      if(company==companyId){
+        result.internal = data.group[company];
 
-    console.log(result);
-    result.rating = result.rating / evaluations.length;
-    // for (const prop in result.assessment) {
-    //   if (result.assessment[prop]) {
-    //     result.assessment[prop] = result.assessment[prop] / evaluations.length;
-    //   }
-    // }
+        for (const prop in result.internal) {
+          result.internal[prop] = result.internal[prop] / evaluations.length;
+        }
+      } else {
+        for (const prop in data.group[company]) {
+          if(result.external[data.group[company][prop]]){
+            result.external[prop] += data.group[company][prop];
+          } else {
+            result.external[prop] = data.group[company][prop];
+          }
+        }
+
+        for (const prop in result.external) {
+          result.external[prop] = result.external[prop] / evaluations.length;
+        }
+
+      }
+
+      if (type==='INTERNAL') {
+        result.external = null;
+      } else if (type==='EXTERNAL'){
+        result.internal = null;
+      }
+    }
   }
   return result;
 

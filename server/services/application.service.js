@@ -1,12 +1,12 @@
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
+let ApplicationSearchParam = require('../const/applicationSearchParam');
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const actionEnum = require('../const/actionEnum');
 const subjectType = require('../const/subjectType');
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
-const  ApplicationSearchParam = require('../const/applicationSearchParam');
 const Pagination = require('../utils/job.pagination');
 const jobService = require('../services/jobrequisition.service');
 const activityService = require('../services/activity.service');
@@ -45,94 +45,6 @@ function findApplicationsByJobIds(listfJobIds) {
   return Application.find({jobId: {$in: listfJobIds}});
 }
 
-
-async function findApplicationsByJobId(jobId, filter) {
-  let data = null;
-
-  if(jobId==null || !filter){
-    return;
-  }
-
-  let select = '';
-  let limit = (filter.size && filter.size>0) ? filter.size:20;
-  let page = (filter.page && filter.page==0) ? filter.page:1;
-  let sortBy = {};
-  sortBy[filter.sortBy] = (filter.direction && filter.direction=="DESC") ? -1:1;
-
-  let options = {
-    select:   select,
-    sort:     {createdDate: -1},
-    lean:     true,
-    limit:    limit,
-    page: parseInt(filter.page)+1
-  };
-
-  filter.jobId=jobId;
-
-
-  const aggregate = Application.aggregate([{
-    $match: {
-      jobId: ObjectID(jobId)
-    }
-  },
-    {
-      $lookup: {
-        from: 'applicationprogresses',
-        localField: 'currentProgress',
-        foreignField: '_id',
-        as: 'currentProgress',
-      },
-    },
-    {$unwind: '$currentProgress'},
-    {
-      $lookup: {
-        from: 'candidates',
-        localField: 'user',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    {$unwind: '$user'}
-  ]);
-
-  //   (filter = {}, skip = 0, limit = 10, sort = {}) => [{
-  //   $match: {
-  //     jobId: 1
-  //   }
-  // },
-  //   {
-  //     $lookup: {
-  //       from: 'applicationprogresses',
-  //       localField: 'currentProgress',
-  //       foreignField: '_id',
-  //       as: 'currentProgress',
-  //     },
-  //   },
-  //
-  // ];
-  let result = await Application.aggregatePaginate(aggregate, options);
-  if(result.docs.length){
-    let job = await jobService.findJob_Id(result.docs[0].jobId);
-    let pipeline = await pipelineService.getPipelineByJobId(job._id);
-
-    if(pipeline){
-      result.docs.forEach(function(app){
-        let stage = _.find(pipeline.stages, {_id: ObjectID(app.currentProgress.stage)});
-        if(stage) {
-          stage.members = [];
-          stage.tasks = [];
-          stage.evaluations = [];
-          app.currentProgress.stage = stage;
-        }
-      })
-    }
-
-  }
-
-  return result;
-
-  // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
-}
 
 
 async function findAllApplications(companyId, filter) {
@@ -798,7 +710,7 @@ async function getCandidatesSourceByJobId(jobId) {
     for(i in groupCandidateSources){
       for(j in groupCandidateSources[i].sources) {
         if (data[groupCandidateSources[i].sources[j].labelId]) {
-          data.id.count += 1;
+          data[groupCandidateSources[i].sources[j].labelId].count += 1;
         } else {
           data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
         }
@@ -911,6 +823,87 @@ async function getApplicationsStagesByJobId(jobId) {
 }
 
 
+async function search(jobId, filter, sort) {
+  let data = null;
+
+  if(jobId==null || !filter || !sort){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(filter.page)+1
+  };
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = {};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push({ $match: {jobId: jobId} });
+  aList.push(
+    {
+      $lookup: {
+        from: 'applicationprogresses',
+        localField: 'currentProgress',
+        foreignField: '_id',
+        as: 'currentProgress',
+      },
+    },
+    {$unwind: '$currentProgress'}
+  );
+
+  aList.push(
+    {
+      $lookup: {
+        from: 'candidates',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {$unwind: '$user'}
+  );
+
+  let params = new ApplicationSearchParam(filter);
+
+
+
+  const aggregate = Application.aggregate(aList);
+
+  let result = await Application.aggregatePaginate(aggregate, options);
+  if(result.docs.length){
+    let job = await jobService.findJob_Id(result.docs[0].jobId);
+    let pipeline = await pipelineService.getPipelineByJobId(job._id);
+
+    if(pipeline){
+      result.docs.forEach(function(app){
+        let stage = _.find(pipeline.stages, {_id: ObjectID(app.currentProgress.stage)});
+        if(stage) {
+          stage.members = [];
+          stage.tasks = [];
+          stage.evaluations = [];
+          app.currentProgress.stage = stage;
+        }
+      })
+    }
+
+  }
+
+  return result;
+
+  // return await Application.find({jobId: jobId}).sort({createdDate: -1}).populate('currentProgress');
+}
+
+
 module.exports = {
   findApplicationById: findApplicationById,
   findApplicationBy_Id:findApplicationBy_Id,
@@ -919,7 +912,6 @@ module.exports = {
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
   findAppliedCountByJobId: findAppliedCountByJobId,
-  findApplicationsByJobId:findApplicationsByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
   findApplicationsByUserId:findApplicationsByUserId,
   getLatestCandidates:getLatestCandidates,
@@ -934,4 +926,6 @@ module.exports = {
   getCandidatesSourceByJobId:getCandidatesSourceByJobId,
   applicationsEndingSoon:applicationsEndingSoon,
   getApplicationsStagesByJobId:getApplicationsStagesByJobId,
+  search:search,
+
 }

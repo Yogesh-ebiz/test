@@ -1,13 +1,18 @@
 const _ = require('lodash');
+const dateEnum = require('../const/dateEnum')
+const ObjectID = require('mongodb').ObjectID;
 
 
-function ApplicationSearchParam(filter) {
+function SearchParam(filter) {
   this.query = {};
 
 
-  if(filter.user){
+  if(filter.status && filter.status.length){
+    this.query.status =  { $in: filter.status };
+  }
 
-    this.query.user =  { $eq: filter.user };
+  if(filter.partyId){
+    this.query.partyId =  { $eq: filter.partyId };
   }
 
   if(filter.id){
@@ -15,19 +20,104 @@ function ApplicationSearchParam(filter) {
       res.push(parseInt(i));
       return res;
     }, []);
-    this.query.applicationId =  { $in: ids };
+    this.query.jobId =  { $in: ids };
   }
 
-  if(filter.jobId){
-    this.query.jobId =  filter.jobId;
+  if(filter.similarId){
+    this.query.jobId =  { $nin: [filter.similarId] };
   }
+
+
+  if(filter.tags && filter.tags.length>0){
+    this.query.tags =  { $in: filter.tags };
+  }
+
+  if(filter.createdDate){
+    let start, end;
+
+
+    start = new Date();
+    start.setHours(0,0,0,0);
+
+    end = new Date();
+
+    switch (filter.createdDate) {
+      case dateEnum.PASTDAY:
+        start.setDate(start.getDate() - 1);
+        break;
+      case dateEnum.PASTWEEK:
+        start.setDate(start.getDate() - 7);
+        break;
+      case dateEnum.PASTBIWEEK:
+        start.setDate(start.getDate() - 14);
+        break;
+      case dateEnum.PASTMONTH:
+        start.setDate(start.getDate() - 30);
+        break;
+    }
+
+    this.query.createdDate =  { $gte: start.getTime()};
+  }
+
 
   if (filter.query && filter.query!="") {
-    this.query.title =  { $regex: filter.query, $options: 'i' };
+    this.query.$text = { $search: filter.query, $diacriticSensitive: true, $caseSensitive: false };
+  }
+
+  if (filter.level && filter.level.length) {
+    this.query.level = { $in: filter.level };
+  }
+
+  if (filter.jobFunction && filter.jobFunction.length) {
+    this.query.jobFunction =  { $in: filter.jobFunction };
+  }
+
+  if (filter.employmentType && filter.employmentType.length) {
+    this.query.employmentType =  { $in: filter.employmentType};
+  }
+
+  if (filter.industry && filter.industry.length) {
+    this.query.industry =  { $in: filter.industry };
+  }
+
+  if (filter.company && filter.company!="") {
+
+    this.query.company = { $in: filter.company };
+  }
+
+  if (filter.city && filter.city.length) {
+    this.query.user.city =  { $in: filter.city};
+  }
+
+  if (filter.state && filter.state.length) {
+    this.query.user.state =  { $in: filter.state};
+  }
+
+  if (filter.country && filter.country.length) {
+    this.query.user = {};
+    this.query.user.country =  { $in: filter.country};
+  }
+
+
+  if (filter.distance && filter.distance!="") {
+    this.query.distance =  { $in: filter.distance};
+  }
+
+  if (filter.createdBy && filter.createdBy.length) {
+    this.query.createdBy =  { $in: filter.createdBy};
+  }
+
+  if (filter.skills && filter.skills.length) {
+    this.query.skills =  { $in: filter.skills};
+  }
+
+
+  if (filter.minYear && filter.maxYear) {
+    this.query.$and =  [{noOfMonthExperiences:  {$gte: (filter.minYear * 12)} }, {noOfMonthExperiences: { $lte: (filter.maxYear * 12)}}];
   }
 
 
   return this.query;
 }
 
-module.exports = ApplicationSearchParam;
+module.exports = SearchParam;

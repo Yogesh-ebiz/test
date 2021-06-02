@@ -112,7 +112,7 @@ module.exports = {
   payJob,
   getJobInsights,
   getJobActivities,
-  searchJobApplications,
+  searchApplications,
   getApplicationById,
   rejectApplication,
   updateApplicationProgress,
@@ -1154,13 +1154,13 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
 
 
 
-async function searchJobApplications(currentUserId, jobId, filter, sort, locale) {
+async function searchApplications(currentUserId, jobId, filter, sort, locale) {
 
   if(!currentUserId || !jobId || !filter){
     return null;
   }
 
-  let result = await applicationService.findApplicationsByJobId(jobId, filter, sort);
+  let result = await applicationService.search(jobId, filter, sort);
     // let userIds = _.map(result.docs, 'user');
     // let users = await lookupUserIds(userIds);
 
@@ -2159,11 +2159,11 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
 
 
     if(filter.companyId) {
-      result = await evaluationService.findByCandidateAndCompany(candidateId, filter.companyId, sort);
-    } if(filter.applicationId) {
-      result = await evaluationService.findByCandidateAndApplicationId(candidateId, ObjectID(filter.applicationId), sort);
+      result = await evaluationService.findByCandidateAndCompany(candidateId, filter, sort);
+    } else if(filter.applicationId) {
+      result = await evaluationService.findByCandidateAndApplicationId(candidateId, filter, sort);
     } else {
-      result = await evaluationService.findByCandidate(candidateId, sort);
+      result = await evaluationService.findByCandidate(candidateId, filter, sort);
     }
 
     let userIds = _.reduce(result.docs, function(res, item){res.push(item.createdBy.userId); return res;}, []);
@@ -2186,8 +2186,8 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
 }
 
 
-async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type) {
-  if(!companyId || !currentUserId || !candidateId || !type){
+async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages) {
+  if(!companyId || !currentUserId || !candidateId || !type || !stages){
     return null;
   }
 
@@ -2198,8 +2198,7 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
 
   let result;
   try {
-
-    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type);
+    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type, stages);
 
 
   } catch (error) {

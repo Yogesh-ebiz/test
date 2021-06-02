@@ -33,7 +33,7 @@ router.route('/company/:id/jobs/:jobId/comments/:commentId').put(asyncHandler(up
 
 router.route('/company/:id/jobs/:jobId/insights').get(asyncHandler(getJobInsights));
 router.route('/company/:id/jobs/:jobId/activities').get(asyncHandler(getJobActivities));
-router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchJobApplications));
+router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchApplications));
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
 router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
@@ -394,12 +394,12 @@ async function getJobActivities(req, res) {
 
 
 
-async function searchJobApplications(req, res) {
+async function searchApplications(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.body;
   let sort = req.query;
-  let jobId = req.params.jobId;
-  let data = await talentCtrl.searchJobApplications(currentUserId, jobId, filter, sort, res.locale);
+  let jobId = ObjectID(req.params.jobId);
+  let data = await talentCtrl.searchApplications(currentUserId, jobId, filter, sort, res.locale);
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
 //
@@ -857,10 +857,10 @@ async function getCandidateEvaluationsStats(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let candidateId = parseInt(req.params.candidateId);
-  let filter = req.body;
   let type = req.query.type;
+  let stages = req.query.stage?req.query.stage.split(','):[]
 
-  let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type);
+  let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages);
 
   res.json(new Response(data, data?'evaluationstats_retrieved_successful':'not_found', res));
 }
