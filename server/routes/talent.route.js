@@ -66,6 +66,7 @@ router.route('/company/:id/applications/:applicationId/comments/:commentId').put
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').post(asyncHandler(addApplicationProgressEvaluation));
 router.route('/company/:id/applications/:applicationId/progress/:progressId/evaluate').delete(asyncHandler(removeApplicationProgressEvaluation));
 
+router.route('/company/:id/applications/:applicationId/progress/:progressId/event').post(asyncHandler(updateApplicationProgressEvent));
 
 router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHandler(disqualifyApplication));
 router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
@@ -88,6 +89,8 @@ router.route('/company/:id/candidates/:candidateId/pools').post(asyncHandler(upd
 router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getCandidateEvaluations));
 router.route('/company/:id/candidates/:candidateId/evaluations/stats').get(asyncHandler(getCandidateEvaluationsStats));
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
+
+router.route('/company/:id/candidates/filter/skills').get(asyncHandler(getAllCandidatesSkills));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));
@@ -601,6 +604,19 @@ async function removeApplicationProgressEvaluation(req, res) {
 }
 
 
+async function updateApplicationProgressEvent(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let progressId = req.params.progressId;
+  let event = req.body;
+
+  let data = await talentCtrl.updateApplicationProgressEvent(companyId, currentUserId, applicationId, progressId, event);
+
+  res.json(new Response(data, data?'application_event_updated_successful':'not_found', res));
+}
+
+
 async function disqualifyApplication(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -863,6 +879,18 @@ async function getCandidateEvaluationsStats(req, res) {
   let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages);
 
   res.json(new Response(data, data?'evaluationstats_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getAllCandidatesSkills(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let evaluationId = req.params.evaluationId;
+
+
+  let data = await talentCtrl.getAllCandidatesSkills(company, currentUserId, res.locale);
+  res.json(new Response(data, data?'skills_retrieved_successful':'not_found', res));
 }
 
 /************************** DEPARTMENT *****************************/

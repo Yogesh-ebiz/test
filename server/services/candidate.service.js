@@ -22,7 +22,8 @@ const candidateSchema = Joi.object({
   jobTitle: Joi.string().allow('').optional(),
   phoneNumber: Joi.string().allow(''),
   email: Joi.string(),
-  applications: Joi.array().optional()
+  applications: Joi.array().optional(),
+  url: Joi.string().allow('').optional()
 });
 
 
@@ -262,6 +263,22 @@ async function search(filter, sort) {
 }
 
 
+
+async function getAllCandidatesSkills(company) {
+
+  if(!company){
+    return;
+  }
+
+  let skills = await Candidate.find({company: company}).select({skills: 1});
+
+  skills = _.reduce(skills, function(res, candidate){
+    res = res.concat(candidate.skills);
+    return res;
+  }, []);
+  return skills
+}
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
@@ -270,5 +287,6 @@ module.exports = {
   findByUserIdAndCompanyId:findByUserIdAndCompanyId,
   getListofCandidates:getListofCandidates,
   searchCandidates:searchCandidates,
-  search:search
+  search:search,
+  getAllCandidatesSkills:getAllCandidatesSkills
 }

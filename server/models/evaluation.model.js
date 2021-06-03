@@ -42,7 +42,7 @@ const EvaluationSchema = new mongoose.Schema({
     required: true
   },
   assessment: { type: Schema.Types.ObjectId, ref: 'Assessment'},
-  answers: [{ type: Schema.Types.ObjectId, ref: 'Answer'}]
+  evaluationForm: [{ type: Schema.Types.ObjectId, ref: 'Answer'}]
 }, {
   versionKey: false
 });

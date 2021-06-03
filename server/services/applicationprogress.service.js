@@ -83,11 +83,28 @@ function addApplicationProgressEvaluation(applicationProgress_Id, evaluationId) 
 }
 
 
+function updateApplicationProgressEvent(applicationProgress_Id, eventId) {
+  let data = null;
+
+  if(!applicationProgress_Id || !eventId){
+    return;
+  }
+
+  return ApplicationProgress.updateOne({_id: ObjectID(applicationProgress_Id)}, { $push: {
+      evaluations: {
+        $each: [ObjectID(evaluationId)]
+      }
+    }});
+}
+
+
 module.exports = {
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationProgresssByIds:findApplicationProgresssByIds,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,
   addApplicationProgress: addApplicationProgress,
   getApplicationProgressEvaluations:getApplicationProgressEvaluations,
-  addApplicationProgressEvaluation:addApplicationProgressEvaluation
+  addApplicationProgressEvaluation:addApplicationProgressEvaluation,
+  updateApplicationProgressEvent:updateApplicationProgressEvent
+
 }

@@ -808,7 +808,7 @@ async function applyJobById(currentUserId, jobId, application ) {
           candidate = await candidateService.addCandidate({userId: currentUserId, avatar: currentParty.avatar, company: job.company, firstName: currentParty.firstName, middleName: currentParty.middleName, lastName: currentParty.lastName,
             jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber,
             city: currentParty.primaryAddress.city, state: currentParty.primaryAddress.state, country: currentParty.primaryAddress.country,
-            skills: _.map(currentParty.skills, 'id')
+            skills: _.map(currentParty.skills, 'id'), url: currentParty.shareUrl
           });
         }
 

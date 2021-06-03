@@ -6,6 +6,7 @@ const Evaluation = require('../models/evaluation.model');
 const assessmentService = require('../services/assessment.service');
 const applicationService = require('../services/application.service');
 const applicationProgressService = require('../services/applicationprogress.service');
+const answerService = require('../services/answer.service');
 
 
 const evaluationSchema = Joi.object({
@@ -18,7 +19,7 @@ const evaluationSchema = Joi.object({
   rating: Joi.number(),
   comment: Joi.string(),
   assessment: Joi.object().optional(),
-  answer: Joi.array().optional()
+  evaluationForm: Joi.array().optional()
 });
 
 
@@ -58,6 +59,18 @@ async function add(form) {
     let assessment = await assessmentService.addAssessment(form.assessment);
     if(assessment){
       form.assessment = assessment._id;
+    }
+
+    if(assessment){
+      form.assessment = assessment._id;
+    }
+
+    if(form.evaluationForm) {
+      for (let answer of form.evaluationForm) {
+        answer._id = new ObjectID();
+        answer = await answerService.addAnswer(answer);
+      }
+
     }
   }
   let evaluation = new Evaluation(form).save();
@@ -360,7 +373,7 @@ async function findByCandidateAndApplicationId(userId, filter, sort) {
   };
 
   let aList = [{
-    $match: {partyId: userId, applicationId: filter.applicationId}
+    $match: {partyId: userId, applicationId: ObjectID(filter.applicationId)}
   },
     {
       $lookup: {
@@ -406,8 +419,8 @@ async function findByCandidateAndApplicationId(userId, filter, sort) {
 
   const aggregate = Evaluation.aggregate(aList);
 
-  return await Evaluation.aggregatePaginate(aggregate, options);
-
+  let evaluations = await Evaluation.aggregatePaginate(aggregate, options);
+  return evaluations;
 }
 
 

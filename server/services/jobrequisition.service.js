@@ -281,15 +281,56 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
   let pipeline=null;
 
-  let job = await JobRequisition.findById(ObjectID(jobId));
-  if(job) {
-    form.createdBy = currentUserId
-    form.jobId = job._id;
-    pipeline = await PipelineService.addPipeline(jobId, form);
+  let job = await JobRequisition.findById(ObjectID(jobId)).populate(
+    {
+      path: 'pipeline',
+      model: 'Pipeline',
+      populate: {
+        path: 'stages',
+        model: 'Stage',
+        populate: {
+          path: 'tasks',
+          model: 'Task'
+        }
+      }
+    }
+  );
 
-    if(pipeline){
-      job.pipeline=pipeline._id;
-      await job.save();
+  if(job) {
+    if(!job.pipeline) {
+      form.createdBy = currentUserId
+      form.jobId = job._id;
+      pipeline = await PipelineService.addPipeline(jobId, form);
+
+      if (pipeline) {
+        job.pipeline = pipeline._id;
+        await job.save();
+      }
+    } else {
+      if(job.pipeline.pipelineTemplateId===form.pipelineTemplateId){
+        for([i, stage] of job.pipeline.stages.entries()){
+          let foundStage = _.find(form.stages, {_id: stage._id.toString()});
+          if(foundStage){
+
+            if(foundStage.tasks.length){
+              for([j, task] of stage.tasks.entries()){
+                let foundTask = _.find(foundStage.tasks, {type: task.type});
+                if(foundTask){
+                  task.members = foundTask.members;
+                  task.options = foundTask.options;
+                  await task.save();
+                }
+              }
+              stage.members = foundStage.members;
+              await stage.save();
+            }
+
+          }
+
+        }
+        pipeline = job.pipeline;
+      }
+
     }
   }
 
@@ -441,7 +482,6 @@ async function closeJob(jobId, currentUserId) {
 
   let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: currentUserId, updatedDate: Date.now()}});
   let user = await feedService.lookupUserIds([currentUserId]);
-  console.log('closed')
   await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.CLOSED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
   return result;
 

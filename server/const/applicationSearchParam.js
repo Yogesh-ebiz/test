@@ -17,7 +17,7 @@ function SearchParam(filter) {
 
 
   if(filter.tags && filter.tags.length>0){
-    this.query['user.tags'] =  { $in: filter.tags };
+    this.query['user.tags.name'] =  { $in: filter.tags };
   }
 
 
@@ -60,6 +60,14 @@ function SearchParam(filter) {
 
   if (filter.skills && filter.skills.length) {
     this.query['user.skills'] =  { $in: filter.skills};
+  }
+
+  if (filter.sources && filter.sources.length) {
+    this.query['user.sources.name'] =  { $in: filter.sources};
+  }
+
+  if (filter.stages && filter.stages.length) {
+    this.query['currentProgress.stage.type'] =  { $in: filter.stages};
   }
 
 

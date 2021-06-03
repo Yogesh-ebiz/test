@@ -128,6 +128,7 @@ module.exports = {
   getApplicationEvaluations,
   addApplicationProgressEvaluation,
   removeApplicationProgressEvaluation,
+  updateApplicationProgressEvent,
   disqualifyApplication,
   revertApplication,
   subscribeApplication,
@@ -137,6 +138,7 @@ module.exports = {
   getCandidateById,
   getCandidateEvaluations,
   getCandidateEvaluationsStats,
+  getAllCandidatesSkills,
   addCandidateTag,
   removeCandidateTag,
   addCandidateSource,
@@ -1219,7 +1221,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
   let application;
   try {
-    let currentParty = await findByUserId(currentUserId);
 
     application = await applicationService.findApplicationBy_Id(applicationId).populate([
       {
@@ -1228,7 +1229,11 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         populate: [
           {
             path: 'stage',
-            model: 'Stage'
+            model: 'Stage',
+            populate: {
+              path: 'tasks',
+              model: 'Task'
+            }
           },
           {
             path: 'evaluations',
@@ -1255,6 +1260,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
       hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
       application.currentProgress.hasEvaluated = hasEvaluated;
       application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
+
 
 
     } else {
@@ -1786,6 +1792,29 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 }
 
 
+
+async function updateApplicationProgressEvent(companyId, currentUserId, applicationId, applicationProgressId, event) {
+
+  if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !event){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await applicationProgressService.remove(member._id, ObjectID(applicationId), ObjectID(applicationProgressId));
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 async function disqualifyApplication(companyId, currentUserId, applicationId, disqualification) {
 
   if(!companyId || !currentUserId || !applicationId || !disqualification){
@@ -2209,6 +2238,30 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
 }
 
 
+
+async function getAllCandidatesSkills(companyId, currentUserId, locale) {
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let skills = await candidateService.getAllCandidatesSkills(companyId);
+    result = await findSkillsById(skills)
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 /************************** CANDIDATE TAGS *****************************/
 
 async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
@@ -2289,7 +2342,6 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
 /************************** CANDIDATE SOURCE *****************************/
 
 async function addCandidateSource(companyId, currentUserId, userId, sources) {
-
   if(!companyId || !currentUserId || !userId || !sources){
     return null;
   }
@@ -2302,6 +2354,7 @@ async function addCandidateSource(companyId, currentUserId, userId, sources) {
   let result;
   try {
     let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
+    console.log(candidate)
 
 
     if(candidate) {

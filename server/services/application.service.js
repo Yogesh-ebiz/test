@@ -603,8 +603,8 @@ async function getCandidatesSourceByCompanyId(company, duration) {
   }
 
 
-  let groupCandidateSources  = await Application.aggregate([
-    { $match: {company: company, createdDate: {$gt: date}}},
+  let candidateSources  = await Application.aggregate([
+    { $match: {company: company}},
     {$lookup:{
         from:"candidates",
         let:{user: '$user'},
@@ -622,21 +622,23 @@ async function getCandidatesSourceByCompanyId(company, duration) {
         as: 'user'
       }},
     {$unwind: '$user'},
-    { $group:{_id: { _id: '$user._id', sources: '$user.sources'}, applications: {$push: '$$ROOT'}, count:{$sum:1} }},
-    { $project:{_id: 0, sources: '$_id.sources'}},
+    { $project:{_id: 0, user: '$user.userId', sources: '$user.sources'}},
   ]);
 
-  if(groupCandidateSources){
+  console.log(candidateSources)
+  if(candidateSources){
     let total = 0;
     let data = {};
-    for(i in groupCandidateSources){
-      for(j in groupCandidateSources[i].sources) {
-        if (data[groupCandidateSources[i].sources[j].labelId]) {
-          data[groupCandidateSources[i].sources[j].labelId].count += 1;
-        } else {
-          data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
+    for(i in candidateSources){
+      if(candidateSources[i].sources.length) {
+        for (const [j, source] of candidateSources[i].sources.entries()) {
+          if (data[source._id]) {
+            data[source._id].count += 1;
+          } else {
+            data[source._id] = {name: source.name, count: 1};
+          }
+          total++;
         }
-        total++;
       }
     }
     result = {total: total, data: data};
@@ -680,7 +682,7 @@ async function getCandidatesSourceByJobId(jobId) {
 
   let result= {}, date;
 
-  let groupCandidateSources  = await Application.aggregate([
+  let candidateSources  = await Application.aggregate([
     { $match: {jobId:jobId}},
     {$lookup:{
         from:"candidates",
@@ -699,27 +701,27 @@ async function getCandidatesSourceByJobId(jobId) {
         as: 'user'
       }},
     {$unwind: '$user'},
-    { $group:{_id: { _id: '$user._id', sources: '$user.sources'}, applications: {$push: '$$ROOT'}, count:{$sum:1} }},
-    { $project:{_id: 0, sources: '$_id.sources'}}
+    { $project:{_id: 0, sources: '$user.sources'}}
   ]);
 
 
-  if(groupCandidateSources){
+  if(candidateSources){
     let total = 0;
     let data = {};
-    for(i in groupCandidateSources){
-      for(j in groupCandidateSources[i].sources) {
-        if (data[groupCandidateSources[i].sources[j].labelId]) {
-          data[groupCandidateSources[i].sources[j].labelId].count += 1;
-        } else {
-          data[groupCandidateSources[i].sources[j].labelId] = {name: groupCandidateSources[i].sources[j].name, count: 1};
+    for(i in candidateSources){
+      if(candidateSources[i].sources.length) {
+        for (const [j, source] of candidateSources[i].sources.entries()) {
+          if (data[source._id]) {
+            data[source._id].count += 1;
+          } else {
+            data[source._id] = {name: source.name, count: 1};
+          }
+          total++;
         }
-        total++;
       }
     }
     result = {total: total, data: data};
   }
-
   return result;
 }
 
@@ -834,10 +836,13 @@ async function search(jobId, filter, sort) {
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page:1;
   let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+  let aSort = { $sort: {createdDate: direction} };
 
   let options = {
     select:   select,
-    sort:     null,
+    sort:     sortBy,
     lean:     true,
     limit:    limit,
     page: parseInt(filter.page)+1
@@ -846,7 +851,7 @@ async function search(jobId, filter, sort) {
   let aList = [];
   let aLookup = [];
   let aMatch = {};
-  let aSort = { $sort: {createdDate: direction} };
+
 
   aList.push({ $match: {jobId: jobId} });
   aList.push(
@@ -860,7 +865,6 @@ async function search(jobId, filter, sort) {
     },
     {$unwind: '$currentProgress'}
   );
-
 
   aList.push(
     {$lookup:{
@@ -883,10 +887,8 @@ async function search(jobId, filter, sort) {
   );
 
 
-
   let params = new ApplicationSearchParam(filter);
   aList.push({ $match: params});
-
 
   const aggregate = Application.aggregate(aList);
 
