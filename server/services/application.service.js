@@ -861,20 +861,31 @@ async function search(jobId, filter, sort) {
     {$unwind: '$currentProgress'}
   );
 
+
   aList.push(
-    {
-      $lookup: {
-        from: 'candidates',
-        localField: 'user',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
+    {$lookup:{
+        from:"candidates",
+        let:{user:"$user"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$user"]}}},
+          {
+            $lookup: {
+                from: 'labels',
+                localField: 'sources',
+                foreignField: '_id',
+                as: 'sources',
+            },
+          },
+        ],
+        as: 'user'
+      }},
     {$unwind: '$user'}
   );
 
-  let params = new ApplicationSearchParam(filter);
 
+
+  let params = new ApplicationSearchParam(filter);
+  aList.push({ $match: params});
 
 
   const aggregate = Application.aggregate(aList);

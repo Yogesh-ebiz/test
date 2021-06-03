@@ -7,65 +7,22 @@ function SearchParam(filter) {
   this.query = {};
 
 
-  if(filter.status && filter.status.length){
-    this.query.status =  { $in: filter.status };
-  }
-
-  if(filter.partyId){
-    this.query.partyId =  { $eq: filter.partyId };
-  }
-
-  if(filter.id){
-    let ids = _.reduce(filter.id.split(','), function(res, i){
-      res.push(parseInt(i));
-      return res;
-    }, []);
-    this.query.jobId =  { $in: ids };
-  }
-
-  if(filter.similarId){
-    this.query.jobId =  { $nin: [filter.similarId] };
-  }
-
-
-  if(filter.tags && filter.tags.length>0){
-    this.query.tags =  { $in: filter.tags };
-  }
-
-  if(filter.createdDate){
-    let start, end;
-
-
-    start = new Date();
-    start.setHours(0,0,0,0);
-
-    end = new Date();
-
-    switch (filter.createdDate) {
-      case dateEnum.PASTDAY:
-        start.setDate(start.getDate() - 1);
-        break;
-      case dateEnum.PASTWEEK:
-        start.setDate(start.getDate() - 7);
-        break;
-      case dateEnum.PASTBIWEEK:
-        start.setDate(start.getDate() - 14);
-        break;
-      case dateEnum.PASTMONTH:
-        start.setDate(start.getDate() - 30);
-        break;
-    }
-
-    this.query.createdDate =  { $gte: start.getTime()};
-  }
-
-
   if (filter.query && filter.query!="") {
     this.query.$text = { $search: filter.query, $diacriticSensitive: true, $caseSensitive: false };
   }
 
+  if(filter.status && filter.status.length){
+    this.query.status =  { $in: filter.status };
+  }
+
+
+  if(filter.tags && filter.tags.length>0){
+    this.query['user.tags'] =  { $in: filter.tags };
+  }
+
+
   if (filter.level && filter.level.length) {
-    this.query.level = { $in: filter.level };
+    this.query['user.level'] = { $in: filter.level };
   }
 
   if (filter.jobFunction && filter.jobFunction.length) {
@@ -86,21 +43,15 @@ function SearchParam(filter) {
   }
 
   if (filter.city && filter.city.length) {
-    this.query.user.city =  { $in: filter.city};
+    this.query['user.city'] =  { $in: filter.city};
   }
 
   if (filter.state && filter.state.length) {
-    this.query.user.state =  { $in: filter.state};
+    this.query['user.state'] =  { $in: filter.state};
   }
 
   if (filter.country && filter.country.length) {
-    this.query.user = {};
-    this.query.user.country =  { $in: filter.country};
-  }
-
-
-  if (filter.distance && filter.distance!="") {
-    this.query.distance =  { $in: filter.distance};
+    this.query['user.country'] =  { $in: filter.country};
   }
 
   if (filter.createdBy && filter.createdBy.length) {
@@ -108,7 +59,12 @@ function SearchParam(filter) {
   }
 
   if (filter.skills && filter.skills.length) {
-    this.query.skills =  { $in: filter.skills};
+    this.query['user.skills'] =  { $in: filter.skills};
+  }
+
+
+  if (filter.distance && filter.distance!="") {
+    this.query.distance =  { $in: filter.distance};
   }
 
 
