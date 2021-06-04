@@ -61,7 +61,6 @@ const convertToCandidate = (user) => {
   if(!user){
     return;
   }
-  console.log(user.noOfMonthExperiences?user.noOfMonthExperiences:6.5);
   return {
     id: user._id,
     userId: user.userId,

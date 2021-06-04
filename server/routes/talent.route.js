@@ -17,6 +17,9 @@ router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 router.route('/company/:id/stats').get(asyncHandler(getStats));
 
+router.route('/company/:id/payment/cards').post(asyncHandler(addCard));
+
+
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
 router.route('/company/:id/jobs/search').post(asyncHandler(searchJob));
 router.route('/company/:id/jobs/:jobId').get(asyncHandler(getJobById));
@@ -33,6 +36,7 @@ router.route('/company/:id/jobs/:jobId/comments/:commentId').put(asyncHandler(up
 
 router.route('/company/:id/jobs/:jobId/insights').get(asyncHandler(getJobInsights));
 router.route('/company/:id/jobs/:jobId/activities').get(asyncHandler(getJobActivities));
+router.route('/company/:id/jobs/:jobId/candidates/suggestions').post(asyncHandler(getJobCandidatesSuggestion));
 router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchApplications));
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
@@ -89,8 +93,9 @@ router.route('/company/:id/candidates/:candidateId/pools').post(asyncHandler(upd
 router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getCandidateEvaluations));
 router.route('/company/:id/candidates/:candidateId/evaluations/stats').get(asyncHandler(getCandidateEvaluationsStats));
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
+router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 
-router.route('/company/:id/candidates/filter/skills').get(asyncHandler(getAllCandidatesSkills));
+router.route('/company/:id/filter/skills').get(asyncHandler(getAllCandidatesSkills));
 
 
 router.route('/company/:id/departments').post(asyncHandler(addCompanyDepartment));
@@ -212,13 +217,21 @@ async function getUserSession(req, res) {
   res.json(new Response(data, data?'get_session_successful':'not_found', res));
 }
 
-
-
 async function getCompanies(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
 
   let data = await talentCtrl.getCompanies(currentUserId);
   res.json(new Response(data, data?'companies_retrieved_successful':'not_found', res));
+}
+
+
+
+async function addCard(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let card = req.body;
+  let data = await talentCtrl.addCard(companyId, currentUserId, card);
+  res.json(new Response(data, data?'card_created_successful':'not_found', res));
 }
 
 
@@ -396,6 +409,17 @@ async function getJobActivities(req, res) {
 }
 
 
+async function getJobCandidatesSuggestion(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = req.params.jobId;
+  let data = await talentCtrl.getJobCandidatesSuggestion(currentUserId, jobId);
+
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+
 
 async function searchApplications(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -437,6 +461,7 @@ async function updateApplication(req, res) {
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
+
 
 
 
@@ -866,6 +891,17 @@ async function getCandidateEvaluationById(req, res) {
 
   let data = await talentCtrl.getCandidateEvaluationById(company, currentUserId, evaluationId, res.locale);
   res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
+}
+
+
+async function getCandidatesSimilar(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = req.params.candidateId;
+
+
+  let data = await talentCtrl.getCandidatesSimilar(company, currentUserId, candidateId, res.locale);
+  res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 
 
@@ -1447,6 +1483,7 @@ async function updateCandidateProject(req, res) {
 
   res.json(new Response(data, data?'projects_added_successful':'not_found', res));
 }
+
 
 
 

@@ -39,6 +39,10 @@ const ProductSchema = new mongoose.Schema({
   },
   image_url: {
     type: String
+  },
+  isRecommended: {
+    type: Boolean,
+    default: false
   }
 }, {
   versionKey: false

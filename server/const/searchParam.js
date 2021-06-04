@@ -32,7 +32,7 @@ function SearchParam(filter) {
     this.query.tags =  { $in: filter.tags };
   }
 
-  if(filter.postedDate){
+  if(filter.createdDate){
     let start, end;
 
 

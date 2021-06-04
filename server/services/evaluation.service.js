@@ -284,7 +284,6 @@ async function findByCandidate(userId, filter, sort) {
 
 }
 
-
 async function findByCandidateAndCompany(userId, filter, sort) {
   if(!userId || !filter || !sort){
     return;
@@ -357,8 +356,6 @@ async function findByCandidateAndCompany(userId, filter, sort) {
 
 }
 
-
-
 async function findByCandidateAndApplicationId(userId, filter, sort) {
   if(!userId || !filter || !sort){
     return;
@@ -430,8 +427,6 @@ async function findByCandidateAndApplicationId(userId, filter, sort) {
   let evaluations = await Evaluation.aggregatePaginate(aggregate, options);
   return evaluations;
 }
-
-
 
 
 async function getCandidateEvaluationsStats(userId, companyId, type, stages) {
@@ -545,6 +540,28 @@ async function getCandidateEvaluationsStats(userId, companyId, type, stages) {
 
 }
 
+async function getCandidateEvaluations(userId) {
+  if(!userId){
+    return;
+  }
+
+
+  return await Evaluation.find({partyId: userId});
+
+}
+
+
+async function getEvaluationsByCandidateList(userIds) {
+  if(!userIds){
+    return;
+  }
+
+  return await Evaluation.aggregate([
+    {$match: {partyId: {$in: userIds} } },
+    {$group: {_id: '$partyId',  evaluations: {$push: "$$ROOT"}, count: {$sum: 1}} }
+  ]);
+
+}
 
 module.exports = {
   findById:findById,
@@ -555,5 +572,7 @@ module.exports = {
   findByCandidate:findByCandidate,
   findByCandidateAndCompany:findByCandidateAndCompany,
   findByCandidateAndApplicationId:findByCandidateAndApplicationId,
-  getCandidateEvaluationsStats:getCandidateEvaluationsStats
+  getCandidateEvaluationsStats:getCandidateEvaluationsStats,
+  getCandidateEvaluations:getCandidateEvaluations,
+  getEvaluationsByCandidateList:getEvaluationsByCandidateList
 }

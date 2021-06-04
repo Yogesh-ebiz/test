@@ -10,7 +10,8 @@ const productSchema = Joi.object({
   description: Joi.string().allow(''),
   type: Joi.string().allow(''),
   category: Joi.string().allow(''),
-  listPrice: Joi.number()
+  listPrice: Joi.number(),
+  isRecommended: Joi.boolean()
 });
 
 

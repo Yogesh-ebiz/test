@@ -206,6 +206,13 @@ async function searchUsers(userId, query, ids) {
 };
 
 
+async function searchPeople(filter, params) {
+
+  params = new URLSearchParams(params).toString();
+  let response = await client.post(`/people/search?${params}`, filter, null);
+  return response.data.data;
+};
+
 async function searchPeopleByIds(userId, query, ids, sort) {
   const requestBody = {
     "ids": ids,
@@ -223,6 +230,8 @@ async function searchPeopleByIds(userId, query, ids, sort) {
   return response.data.data;
 };
 
+
+
 async function lookupUserIds(ids) {
   let response = await client.get(`/search/users/lookup?ids=${ids}`, null, options);
   return response.data.data;
@@ -235,7 +244,8 @@ async function lookupPeopleIds(ids) {
 };
 
 
-async function getCandidateById(id) {
+async function findPeopleById(id) {
+  console.log(id)
   let response = await client.get(`/people/candidates/${id}`, null, options);
   return response.data.data;
 };
@@ -349,10 +359,11 @@ module.exports = {
   getIndustryFeatured:getIndustryFeatured,
   findJobfunction:findJobfunction,
   searchUsers: searchUsers,
+  searchPeople:searchPeople,
   searchPeopleByIds:searchPeopleByIds,
+  findPeopleById:findPeopleById,
   lookupUserIds:lookupUserIds,
   lookupPeopleIds:lookupPeopleIds,
-  getCandidateById:getCandidateById,
   lookupCompaniesIds:lookupCompaniesIds,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,

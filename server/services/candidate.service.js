@@ -5,7 +5,10 @@ const ObjectID = require('mongodb').ObjectID;
 let SearchParam = require('../const/searchParam');
 const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
+const evaluationService = require('../services/evaluation.service');
+const feedService = require('../services/api/feed.service.api');
 
+const {convertToCandidate} = require('../utils/helper');
 
 
 const candidateSchema = Joi.object({
@@ -279,6 +282,32 @@ async function getAllCandidatesSkills(company) {
   return skills
 }
 
+
+
+async function getCandidatesSimilar(userId) {
+
+
+  if(!userId){
+    return;
+  }
+  let candidates = await Candidate.find({userId: {$ne: userId}}).limit(10);
+  let candidateIds = _.map(candidates, 'userId');
+  let evaluations = await feed.getEvaluationsByCandidateList(candidateIds);
+  for(let [i, candidate] in candidates.entries()){
+    let found = _.find(evaluations, {_id: candidate.userId});
+    if(found){
+      candidate.overallRating = Math.round(_.reduce(found.evaluations, function (res, e) {
+        return res + e.rating;
+      }, 0) / found.evaluations.length * 100) / 100;
+      candidate = convertToCandidate(candidate);
+    }
+  };
+
+  return candidates;
+}
+
+
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
@@ -288,5 +317,6 @@ module.exports = {
   getListofCandidates:getListofCandidates,
   searchCandidates:searchCandidates,
   search:search,
-  getAllCandidatesSkills:getAllCandidatesSkills
+  getAllCandidatesSkills:getAllCandidatesSkills,
+  getCandidatesSimilar:getCandidatesSimilar
 }

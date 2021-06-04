@@ -94,6 +94,7 @@ module.exports = {
   getImpressionCandidates,
   getStats,
   getUserSession,
+  addCard,
   createJob,
   updateJob,
   closeJob,
@@ -114,6 +115,7 @@ module.exports = {
   payJob,
   getJobInsights,
   getJobActivities,
+  getJobCandidatesSuggestion,
   searchApplications,
   getApplicationById,
   rejectApplication,
@@ -141,6 +143,7 @@ module.exports = {
   getCandidateEvaluations,
   getCandidateEvaluationsStats,
   getCandidateEvaluationById,
+  getCandidatesSimilar,
   getAllCandidatesSkills,
   addCandidateTag,
   removeCandidateTag,
@@ -635,6 +638,18 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 
 }
 
+
+async function addCard(companyId, currentUserId, card) {
+
+  if(!companyId || !currentUserId || !card){
+    return null;
+  }
+
+
+  let result;
+  return result;
+}
+
 async function createJob(companyId, currentUserId, job) {
 
   if(!companyId || !currentUserId || !job){
@@ -1126,6 +1141,39 @@ async function getJobInsights(currentUserId, companyId, jobId) {
 
 
 async function getJobActivities(companyId, currentUserId, jobId, filter) {
+  if(!companyId || !currentUserId || !jobId || !filter){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await activityService.findByJobId(jobId, filter);
+    let userIds = _.map(result.docs, 'causerId');
+    let users = await lookupUserIds(userIds);
+    result.docs.forEach(function(activity){
+      let found = _.find(users, {id: parseInt(activity.causerId)});
+      if(found){
+        activity.causer = convertToTalentUser(found);
+      }
+    });
+    return new Pagination(result);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
+async function getJobCandidatesSuggestion(companyId, currentUserId, jobId) {
   if(!companyId || !currentUserId || !jobId || !filter){
     return null;
   }
@@ -1922,7 +1970,7 @@ async function unsubscribeApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await memberService.unsubscribe(currentUserId, subjectType.APPLICATION, applicationId);
+    result = await memberService.unsubscribe(member._id, subjectType.APPLICATION, applicationId);
 
   } catch (error) {
     console.log(error);
@@ -2155,36 +2203,36 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
     {
       path: 'sources',
       model: 'Label'
-    },
-    {
-      path: 'evaluations',
-      model: 'Evaluation'
     }
   ]);
 
-  if(candidate.evaluations) {
-    let companyEvaluations = _.filter(candidate.evaluations, {companyId: company});
+  if(candidate) {
+    let evaluations = await evaluationService.getCandidateEvaluations(candidate.userId);
+    if (evaluations) {
+      let companyEvaluations = _.filter(evaluations, {companyId: company});
 
-    if(companyEvaluations) {
-      candidate.teamRating = Math.round(_.reduce(companyEvaluations, function (res, e) {
+      if (companyEvaluations) {
+        candidate.teamRating = Math.round(_.reduce(companyEvaluations, function (res, e) {
+          return res + e.rating;
+        }, 0) / companyEvaluations.length * 100) / 100;
+      }
+
+      candidate.overallRating = Math.round(_.reduce(evaluations, function (res, e) {
         return res + e.rating;
-      }, 0) / companyEvaluations.length * 10)/ 10;
+      }, 0) / evaluations.length * 100) / 100;
+
+    }
+    if (candidate) {
+      candidate.match = 78;
+      let partyLink = await getUserLinks(candidate.userId);
+      if (partyLink) {
+        candidate.links = partyLink.links;
+      }
+
+      result = convertToCandidate(candidate);
     }
 
-    candidate.overallRating = Math.round(_.reduce(candidate.evaluations, function (res, e) {
-      return res + e.rating;
-    }, 0) / candidate.evaluations.length * 10) / 10;
   }
-  if(candidate){
-    candidate.match = 78;
-    let partyLink = await getUserLinks(candidate.userId);
-    if(partyLink){
-      candidate.links = partyLink.links;
-    }
-
-    result = convertToCandidate(candidate);
-  }
-
   return result;
 
 }
@@ -2270,6 +2318,29 @@ async function getCandidateEvaluationById(companyId, currentUserId, evaluationId
   let result;
   try {
     result = await evaluationService.findById(evaluationId);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function getCandidatesSimilar(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await candidateService.getCandidatesSimilar(candidateId);
 
 
   } catch (error) {
@@ -3867,7 +3938,7 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
 
   let result;
   try {
-    result = await memberService.unsubscribe(member._id, jobId);
+    result = await memberService.unsubscribe(member._id, subjectType.JOB, ObjectID(jobId));
   } catch(e){
     console.log('unsubscribeJob: Error', e);
   }

@@ -236,14 +236,14 @@ async function subscribe(subscription) {
 }
 
 
-async function unsubscribe(userId, subjectType, subjectId) {
+async function unsubscribe(memberId, subjectType, subjectId) {
 
-  if(!userId || !subjectType || !subjectId){
+  if(!memberId || !subjectType || !subjectId){
     return;
   }
 
   let result;
-  let subscription = await MemberSubscribe.findOne({createdBy: userId, subjectType: subjectType, subjectId: ObjectID(subjectId)});
+  let subscription = await MemberSubscribe.findOne({memberId: memberId, subjectType: subjectType, subjectId: ObjectID(subjectId)});
 
   if(subscription){
     result = await subscription.delete();
