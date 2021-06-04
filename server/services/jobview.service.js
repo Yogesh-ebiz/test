@@ -37,8 +37,12 @@ function addJobViewByUserId(userId, company, jobId) {
 }
 
 
-async function findMostViewed() {
+async function findMostViewed(company) {
   let data = null;
+
+  if(!company){
+    return;
+  }
 
   let group = {
     _id: {
@@ -66,8 +70,8 @@ async function findMostViewed() {
   };
 
   data = await JobView.aggregate([
-    // { $lookup: {from: 'jobrequisitions', localField: 'jobId', foreignField: '_id', as: 'jobId' } },
-    {$lookup:{
+    { $match: {company: company} },
+    { $lookup:{
         from:"jobrequisitions",
         let:{jobId: '$jobId'},
         pipeline:[

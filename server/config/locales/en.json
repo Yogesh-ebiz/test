@@ -188,5 +188,6 @@
 	"email_added_successful": "email_added_successful",
 	"email_updated_successful": "email_updated_successful",
 	"email_deleted_successful": "email_deleted_successful",
-	"evaluationstats_retrieved_successful": "evaluationstats_retrieved_successful"
+	"evaluationstats_retrieved_successful": "evaluationstats_retrieved_successful",
+	"application_event_updated_successful": "application_event_updated_successful"
 }

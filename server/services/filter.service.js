@@ -1,5 +1,7 @@
 const _ = require('lodash');
+const {convertIndustry} = require('../utils/helper');
 
+const feedService = require('../services/api/feed.service.api');
 
 const ExperienceLevel = require('../models/experiencelevel.model');
 const JobFunction = require('../models/jobfunctions.model');
@@ -241,6 +243,35 @@ function getAllIndustries(filter, locale) {
 }
 
 
+
+async function getAllFeedIndustries(filter, locale) {
+  let localeStr = locale? locale.toLowerCase() : 'en';
+  let keyword= filter.query?filter.query:'';
+  let data = null;
+  let shortCode = filter.shortCode && filter.shortCode.length?filter.shortCode.split:[];
+  data = await feedService.findIndustry(keyword, shortCode, locale);
+
+  let groupJobIndustry = await JobRequisition.aggregate([
+    {$project: { _id: 0, industry: 1 } },
+    {$unwind: "$industry" },
+    {$group: { _id: "$industry", count: { $sum: 1 } }},
+  ]);
+
+  data.forEach(function(industry){
+    industry.noOfJobs = 0;
+    let found = _.find(groupJobIndustry, {_id: industry.shortCode});
+    if(found){
+      industry.noOfJobs = found.count;
+    }
+
+    industry = convertIndustry(industry);
+  });
+
+
+  return data;
+}
+
+
 // function getAllIndustries(locale) {
 //   let localeStr = locale? locale : 'en';
 //   let propLocale = '$name.'+localeStr;
@@ -325,6 +356,7 @@ module.exports = {
   getAllJobFunctions: getAllJobFunctions,
   getAllEmploymentTypes: getAllEmploymentTypes,
   getAllIndustries: getAllIndustries,
+  getAllFeedIndustries:getAllFeedIndustries,
   getAllSkillTypes: getAllSkillTypes,
   getAllJobLocations:getAllJobLocations,
   getAllFieldStudy:getAllFieldStudy,

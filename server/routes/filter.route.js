@@ -142,7 +142,7 @@ async function insert(req, res) {
 
 async function getAllIndustryies(req, res) {
   let query = req.query;
-  let data = await filterService.getAllIndustries(query, res.locale);
+  let data = await filterService.getAllFeedIndustries(query, res.locale);
   // let data = await industryCtl.getAllIndustries(req.query, req.locale);
   res.json(new Response(data, data?'Industries_retrieved_successful':'not_found', res));
 

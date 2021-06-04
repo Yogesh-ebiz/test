@@ -181,14 +181,13 @@ async function getLatestCandidates(company) {
 
   let jobs = await jobService.findJobsByCompanyId(company);
 
-
   var from = new Date();
   from.setDate(from.getDate()-1);
   from.setMinutes(0);
   from.setHours(0)
   let now = Date.now();
 
-  let result = await Application.find({$and: [ {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] }).populate('user').sort({createdDate: -1});
+  let result = await Application.find({$and: [ {company: company}, {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] }).populate('user').sort({createdDate: -1});
 
   return result;
 

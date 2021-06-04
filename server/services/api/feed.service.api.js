@@ -167,7 +167,8 @@ async function findIndustry(query, shortCodes, locale) {
   const options = {
     'Accept-Language': locale
   };
-  let response = await client.get(`/common/industry/search?query={query}&shortCodes=${shortCodes}`);
+  query = query?query:'';
+  let response = await client.get(`/common/industry/search?query=${query}&shortCodes=${shortCodes}`);
   return response.data.data;
 };
 

@@ -13,6 +13,8 @@ let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
+const taskType = require('../const/taskType');
+
 
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const {searchPeopleByIds, getUserLinks, lookupCompaniesIds, lookupPeopleIds, lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
@@ -138,6 +140,7 @@ module.exports = {
   getCandidateById,
   getCandidateEvaluations,
   getCandidateEvaluationsStats,
+  getCandidateEvaluationById,
   getAllCandidatesSkills,
   addCandidateTag,
   removeCandidateTag,
@@ -510,7 +513,7 @@ async function getStats(currentUserId, companyId) {
 
   });
 
-  let mostViewed = await jobViewService.findMostViewed();
+  let mostViewed = await jobViewService.findMostViewed(companyId);
   let jobIds = _.map(mostViewed, '_id');
 
   let subscribes = [];
@@ -1258,9 +1261,25 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
       application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
       hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
-      application.currentProgress.hasEvaluated = hasEvaluated;
-      application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
+      // application.currentProgress.hasEvaluated = hasEvaluated;
+      // application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
 
+      application.currentProgress.stage.tasks.forEach(function(task){
+        if(task.type===taskType.EMAIL){
+          task.isCompleted = application.currentProgress.emails.length?true:false;
+          task.required = (!application.currentProgress.emails.length && task.required)?true: false;
+        }
+
+        if(task.type===taskType.EVENT){
+          task.isCompleted = application.currentProgress.event?true:false;
+          task.required = (!application.currentProgress.event && task.required)?true: false;
+        }
+
+        if(task.type===taskType.EVALUATION){
+          task.isCompleted = hasEvaluated;
+          task.required = (!hasEvaluated && task.required)?true: false;
+        }
+      });
 
 
     } else {
@@ -1793,9 +1812,9 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 
 
 
-async function updateApplicationProgressEvent(companyId, currentUserId, applicationId, applicationProgressId, event) {
+async function updateApplicationProgressEvent(companyId, currentUserId, applicationId, applicationProgressId, form) {
 
-  if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !event){
+  if(!companyId || !currentUserId || !applicationId || !applicationProgressId || !form){
     return null;
   }
 
@@ -1806,7 +1825,7 @@ async function updateApplicationProgressEvent(companyId, currentUserId, applicat
 
   let result;
   try {
-    result = await applicationProgressService.remove(member._id, ObjectID(applicationId), ObjectID(applicationProgressId));
+    result = await applicationProgressService.updateApplicationProgressEvent(ObjectID(applicationProgressId), form);
   } catch (error) {
     console.log(error);
   }
@@ -2228,6 +2247,29 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
   let result;
   try {
     result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type, stages);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function getCandidateEvaluationById(companyId, currentUserId, evaluationId) {
+  if(!companyId || !currentUserId || !evaluationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await evaluationService.findById(evaluationId);
 
 
   } catch (error) {
@@ -3709,17 +3751,14 @@ async function removeProjectCandidates(company, projectId, candidateIds, current
   try {
     let project = await projectService.findProjectBy_Id(projectId);
     if (project && project.candidates) {
-      for(const [i, candidate] of project.candidates.entries()){
-        let exists = false;
-        candidateIds.forEach(function(item){
+      candidateIds.forEach(function(item){
+        for(const [i, candidate] of project.candidates.entries()){
           if(item==candidate){
-            exists = true;
+            project.candidates.splice(i, 1);
           }
-        });
-        if(exists){
-          project.candidates.splice(i, 1);
-        }
-      }
+        };
+
+      });
       await project.save();
       result = {success: true};
 

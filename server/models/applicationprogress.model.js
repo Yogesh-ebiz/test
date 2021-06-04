@@ -29,11 +29,6 @@ const ApplicationProgressSchema = new mongoose.Schema({
     required: false,
     default: ''
   },
-  requiredAction: {
-    type: Boolean,
-    required: false,
-    default: false
-  },
   event: {
     type: Object,
     required: false
@@ -46,15 +41,6 @@ const ApplicationProgressSchema = new mongoose.Schema({
   lastUpdatedDate: {
     type: Number,
     required: false
-  },
-  requireEvaluation: {
-    type: Boolean
-  },
-  hasEvaluated: {
-    type: Boolean
-  },
-  hasScheduled: {
-    type: Boolean
   },
   attachment: {
     type: Object,
@@ -75,7 +61,7 @@ const ApplicationProgressSchema = new mongoose.Schema({
   stage: { type: Schema.Types.ObjectId, ref: 'Stage' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],
-
+  emails: [{ type: Schema.Types.ObjectId, ref: 'Email' }],
 }, {
   versionKey: false
 });

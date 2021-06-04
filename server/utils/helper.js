@@ -130,7 +130,7 @@ const convertIndustry = (industry) => {
     icon: industry.icon,
     image: industry.image,
     cover: industry.cover,
-    noOfItems: industry.noOfItems
+    // noOfJobs: industry.noOfJobs?industry.noOfJobs:0
   };
 }
 

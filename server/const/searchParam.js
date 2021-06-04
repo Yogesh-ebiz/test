@@ -32,7 +32,7 @@ function SearchParam(filter) {
     this.query.tags =  { $in: filter.tags };
   }
 
-  if(filter.createdDate){
+  if(filter.postedDate){
     let start, end;
 
 
@@ -56,7 +56,7 @@ function SearchParam(filter) {
         break;
     }
 
-    this.query.createdDate =  { $gte: start.getTime()};
+    this.query.publishedDate =  { $gte: start.getTime()};
   }
 
 
@@ -83,6 +83,10 @@ function SearchParam(filter) {
   if (filter.company && filter.company!="") {
 
     this.query.company = { $in: filter.company };
+  }
+
+  if (filter.district && filter.district.length) {
+    this.query.district =  { $in: filter.district};
   }
 
   if (filter.city && filter.city.length) {

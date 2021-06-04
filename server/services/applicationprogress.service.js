@@ -83,18 +83,14 @@ function addApplicationProgressEvaluation(applicationProgress_Id, evaluationId) 
 }
 
 
-function updateApplicationProgressEvent(applicationProgress_Id, eventId) {
+function updateApplicationProgressEvent(applicationProgress_Id, form) {
   let data = null;
 
-  if(!applicationProgress_Id || !eventId){
+  if(!applicationProgress_Id || !form){
     return;
   }
 
-  return ApplicationProgress.updateOne({_id: ObjectID(applicationProgress_Id)}, { $push: {
-      evaluations: {
-        $each: [ObjectID(evaluationId)]
-      }
-    }});
+  return ApplicationProgress.updateOne({_id: ObjectID(applicationProgress_Id)}, { $set: {event:form.eventId} });
 }
 
 

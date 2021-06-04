@@ -609,9 +609,9 @@ async function updateApplicationProgressEvent(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = req.params.applicationId;
   let progressId = req.params.progressId;
-  let event = req.body;
+  let form = req.body;
 
-  let data = await talentCtrl.updateApplicationProgressEvent(companyId, currentUserId, applicationId, progressId, event);
+  let data = await talentCtrl.updateApplicationProgressEvent(companyId, currentUserId, applicationId, progressId, form);
 
   res.json(new Response(data, data?'application_event_updated_successful':'not_found', res));
 }
@@ -861,7 +861,7 @@ async function getCandidateEvaluations(req, res) {
 async function getCandidateEvaluationById(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let evaluationId = req.params.evaluationId;
+  let evaluationId = ObjectID(req.params.evaluationId);
 
 
   let data = await talentCtrl.getCandidateEvaluationById(company, currentUserId, evaluationId, res.locale);

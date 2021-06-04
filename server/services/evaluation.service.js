@@ -37,6 +37,14 @@ async function findById(evaluationId) {
     {
       path: 'assessment',
       model: 'Assessment'
+    },
+    {
+      path: 'evaluationForm',
+      model: 'Answer',
+      populate: {
+        path: 'question',
+        model: 'Question'
+      }
     }
   ]);
 
