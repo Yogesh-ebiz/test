@@ -27,7 +27,6 @@ function findJobViewByUserIdAndJobId(userId, jobId) {
 function addJobViewByUserId(userId, company, jobId) {
   let data = null;
 
-  console.log(userId, company, jobId)
   if(!userId || !company || !jobId){
     return;
   }
@@ -37,7 +36,96 @@ function addJobViewByUserId(userId, company, jobId) {
 }
 
 
-async function findMostViewed(company) {
+async function findMostViewed() {
+  let data = null;
+
+
+  let group = {
+    _id: {
+      _id: '$jobId._id',
+      jobId: '$jobId.jobId',
+      title: '$jobId.title',
+      department: '$jobId.department', city: '$jobId.city', state: '$jobId.state', country: '$jobId.country', company: '$jobId.company',
+      status: '$jobId.status', description: '$jobId.description',
+      minMonthExperience: '$jobId.minMonthExperience',
+      maxMonthExperience: '$jobId.maxMonthExperience',
+      expirationDate: '$jobId.expirationDate',
+      salaryRangeLow: '$jobId.salaryRangeLow',
+      salaryRangeHigh: '$jobId.salaryRangeHigh',
+      salaryFixed: '$jobId.salaryFixed',
+      jobFunction: '$jobId.jobFunction',
+      responsibilities:'$jobId.responsibilities',
+      qualifications: '$jobId.qualifications',
+      minimumQualifications: '$jobId.minimumQualifications',
+      skills: '$jobId.skills',
+      industry: '$jobId.industry',
+      createdDate: '$jobId.createdDate',
+      hasSaved: '$jobId.hasSaved'
+    },
+    count: {'$sum': 1}
+  };
+
+  data = await JobView.aggregate([
+    { $lookup:{
+        from:"jobrequisitions",
+        let:{jobId: '$jobId'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$jobId","$_id"]}}},
+          {
+            $lookup: {
+              from: 'departments',
+              localField: "department",
+              foreignField: "_id",
+              as: "department"
+            }
+          },
+          // { $unwind: '$department'}
+        ],
+        as: 'jobId'
+      }},
+    { $unwind: '$jobId'},
+    // { $lookup: {from: 'departments', localField: 'department', foreignField: '_id', as: 'department' } },
+    // { $unwind: '$department'},
+    { $group: group },
+
+    { $limit: 10 },
+    {
+      $project: {
+        _id: 0,
+        _id: '$_id._id',
+        jobId: '$_id.jobId',
+        title: '$_id.title',
+        department: '$_id.department',
+        city: '$_id.city',
+        state: '$_id.state',
+        country: '$_id.country',
+        company: '$_id.company',
+        noOfViews: '$count',
+        status: '$_id.status',
+        hasSaved: '$_id.hasSaved',
+        createdDate: '$_id.createdDate',
+        description: '',
+        minMonthExperience: '',
+        maxMonthExperience: '',
+        expirationDate: '',
+        salaryRangeLow: '',
+        salaryRangeHigh: '',
+        salaryFixed: '',
+        jobFunction: '',
+        responsibilities: '',
+        qualifications: [],
+        minimumQualifications: [],
+        skills: [],
+        industry: []
+      }
+    }
+  ]);
+
+  return _.orderBy(data, ['noOfViews'], ['desc']);
+}
+
+
+async function findMostViewedByCompany(company) {
   let data = null;
 
   if(!company){
@@ -330,6 +418,7 @@ module.exports = {
   findJobViewByUserIdAndJobId:findJobViewByUserIdAndJobId,
   addJobViewByUserId: addJobViewByUserId,
   findMostViewed:findMostViewed,
+  findMostViewedByCompany:findMostViewedByCompany,
   getCompanyInsight: getCompanyInsight,
   getJobInsight:getJobInsight,
   getInsightCandidates:getInsightCandidates

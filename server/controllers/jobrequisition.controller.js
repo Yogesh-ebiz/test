@@ -5,7 +5,7 @@ const ObjectID = require('mongodb').ObjectID;
 
 const {jobMinimal, convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
-const {getCandidateById, lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {findCandidateById, lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
 const partyEnum = require('../const/partyEnum');
@@ -581,8 +581,8 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
   let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
 
-  let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
-  let users = await lookupUserIds(userIds);
+  // let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
+  // let users = await lookupUserIds(userIds);
 
   let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
   let foundCompanies = await feedService.lookupCompaniesIds(listOfCompanyIds);
@@ -796,7 +796,7 @@ async function applyJobById(currentUserId, jobId, application ) {
   let savedApplication;
   try {
 
-    let currentParty = await getCandidateById(currentUserId);
+    let currentParty = await findCandidateById(currentUserId);
     //Security Check if user is part of meeting attendees that is ACTIVE.
     if (isPartyActive(currentParty)) {
 

@@ -131,20 +131,13 @@ function getListofCandidates(userIds, companyId) {
 }
 
 
-function searchCandidates(candidateIds, options) {
+function searchCandidates(company, query) {
 
 
-  if(!candidateIds || !options){
+  if(!company){
     return;
   }
-
-  const aggregate = Candidate.aggregate([{
-    $match: {_id: {$in: candidateIds}}
-  }
-  ]);
-
-
-  let result = Candidate.aggregatePaginate(aggregate, options);
+  let result = Candidate.find({company: company, $or: [{firstName: { $regex: query.toLowerCase(), $options: 'i' }}, {lastName: { $regex: query, $options: 'i' }}]});
 
   return result;
 }
@@ -277,7 +270,7 @@ async function getAllCandidatesSkills(company) {
 
   skills = _.reduce(skills, function(res, candidate){
     res = res.concat(candidate.skills);
-    return res;
+    return res;findById
   }, []);
   return skills
 }
@@ -290,20 +283,24 @@ async function getCandidatesSimilar(userId) {
   if(!userId){
     return;
   }
-  let candidates = await Candidate.find({userId: {$ne: userId}}).limit(10);
-  let candidateIds = _.map(candidates, 'userId');
-  let evaluations = await feed.getEvaluationsByCandidateList(candidateIds);
-  for(let [i, candidate] in candidates.entries()){
-    let found = _.find(evaluations, {_id: candidate.userId});
-    if(found){
-      candidate.overallRating = Math.round(_.reduce(found.evaluations, function (res, e) {
-        return res + e.rating;
-      }, 0) / found.evaluations.length * 100) / 100;
-      candidate = convertToCandidate(candidate);
-    }
-  };
+  // let candidates = await Candidate.find({userId: {$ne: userId}}).limit(10);
+  // let candidateIds = _.map(candidates, 'userId');
+  let filter = {
+    "jobTitles": ["Sr. Manager"],
+    "locations": ["US"],
+    "skills": [],
+    "companies": [""],
+    "schools": [],
+    "industries": [],
+    "employmentTypes": []
+  }
+  let result = await feedService.searchPeople(filter, {});
+  let people = _.reduce(result.content, function(res, p){
+    res.push(p);
+    return res;
+  }, []);
 
-  return candidates;
+  return people;
 }
 
 

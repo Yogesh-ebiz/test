@@ -45,7 +45,7 @@ const convertToTalentUser = (user) => {
 
 const convertToAvatar = (user) => {
   return {
-    id: user.id,
+    id: user.userId?user.userId:user.id,
     name: user.name,
     firstName: user.firstName,
     middleName: user.middleName,

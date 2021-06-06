@@ -17,7 +17,7 @@ const taskType = require('../const/taskType');
 
 
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
-const {searchPeopleByIds, getUserLinks, lookupCompaniesIds, lookupPeopleIds, lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {searchPeople, searchPeopleByIds, getUserLinks, lookupCompaniesIds, lookupPeopleIds, lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
 const applicationService = require('../services/application.service');
@@ -28,6 +28,8 @@ const {getDepartments, addDepartment} = require('../services/department.service'
 const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
 const {getPipelineByJobId, getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
 const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
+const pipelineTemplateService = require('../services/pipelineTemplate.service');
+
 const applicationProgressService = require('../services/applicationprogress.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
@@ -115,7 +117,7 @@ module.exports = {
   payJob,
   getJobInsights,
   getJobActivities,
-  getJobCandidatesSuggestion,
+  searchPeopleSuggestions,
   searchApplications,
   getApplicationById,
   rejectApplication,
@@ -208,7 +210,8 @@ module.exports = {
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
   updateCompanyEmailTemplate,
-  deleteCompanyEmailTemplate
+  deleteCompanyEmailTemplate,
+  searchContacts
 }
 
 
@@ -516,7 +519,7 @@ async function getStats(currentUserId, companyId) {
 
   });
 
-  let mostViewed = await jobViewService.findMostViewed(companyId);
+  let mostViewed = await jobViewService.findMostViewedByCompany(companyId);
   let jobIds = _.map(mostViewed, '_id');
 
   let subscribes = [];
@@ -603,6 +606,28 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   let aSort = { $sort: {createdDate: direction} };
 
   aList.push(aMatch);
+  aList.push(
+    {
+      $lookup: {
+        from: 'members',
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy"
+      }
+    },
+    { $unwind: '$createdBy'},
+    {
+      $lookup: {
+        from: 'departments',
+        localField: "department",
+        foreignField: "_id",
+        as: "department"
+      }
+    },
+    { $unwind: '$department'}
+
+  );
+
 
   if(sort && sort.sortBy=='mostView'){
     aSort = { $sort: { noOfViews: direction} };
@@ -612,24 +637,13 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   }
   const aggregate = JobRequisition.aggregate(aList);
 
-
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
-  let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
-  let users = await lookupUserIds(userIds);
-
-  let departmentIds = _.map(result.docs, 'department');
-  let departments = await departmentService.getDepartmentsByList(departmentIds);
 
   const loadPromises = result.docs.map(job => {
     job.isHot = false;
     job.isNew = false;
     job.company = convertToCompany(company);
     job.hasSaved = _.some(jobSubscribed, {subjectId: job._id});
-    job.department = _.find(departments, {_id: job.department});
-    let createdBy = _.find(users, {id: job.createdBy});
-    if(createdBy){
-      job.createdBy = convertToAvatar(createdBy);
-    }
     return job;
   });
   // result = await Promise.all(loadPromises);
@@ -1173,8 +1187,8 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
 }
 
 
-async function getJobCandidatesSuggestion(companyId, currentUserId, jobId) {
-  if(!companyId || !currentUserId || !jobId || !filter){
+async function searchPeopleSuggestions(companyId, currentUserId, jobId, filter, sort) {
+  if(!companyId || !currentUserId || !jobId || !filter || !sort){
     return null;
   }
 
@@ -1186,16 +1200,9 @@ async function getJobCandidatesSuggestion(companyId, currentUserId, jobId) {
   let result;
   try {
 
-    result = await activityService.findByJobId(jobId, filter);
-    let userIds = _.map(result.docs, 'causerId');
-    let users = await lookupUserIds(userIds);
-    result.docs.forEach(function(activity){
-      let found = _.find(users, {id: parseInt(activity.causerId)});
-      if(found){
-        activity.causer = convertToTalentUser(found);
-      }
-    });
-    return new Pagination(result);
+    filter.jobTitles = ["Sr. Manager"];
+    filter.location = ["US", "Vietnam"]
+    result = await searchPeople(filter, sort);
 
   } catch (error) {
     console.log(error);
@@ -1291,6 +1298,10 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
             model: 'Evaluation'
           }
         ]
+      },
+      {
+        path: 'user',
+        model: 'Candidate'
       }
     ]);
     if (application) {
@@ -2791,7 +2802,7 @@ async function addCompanyPipelineTemplate(companyId, currentUserId, form) {
 
   let result = null;
   try {
-    result = await addPipelineTemplate(form);
+    result = await pipelineTemplateService.add(form);
 
   } catch(e){
     console.log('addCompanyPipeline: Error', e);
@@ -2814,16 +2825,7 @@ async function updateCompanyPipelineTemplate(companyId, pipelineId, currentUserI
 
   let result = null;
   try {
-    let pipeline = await getPipelineTemplateById(pipelineId);
-    if(pipeline){
-      pipeline.name = form.name;
-      pipeline.updatedBy = currentUserId;
-      pipeline.stages=form.stages;
-      pipeline.category=form.category;
-      pipeline.department=form.department;
-      pipeline.type=form.type;
-      result = await pipeline.save();
-    }
+    result = await pipelineTemplateService.update(pipelineId, form);
 
 
   } catch(e){
@@ -2847,13 +2849,8 @@ async function deleteCompanyPipelineTemplate(companyId, pipelineId, currentUserI
   let result = null;
   try {
 
-    let pipeline = await getPipelineTemplateById(pipelineId);
-    if(pipeline){
-      result = await pipeline.delete();
-      if(result){
-        result = {deleted: 1};
-      }
-    }
+    result = await pipelineTemplateService.remove(pipelineId);
+
 
   } catch(e){
     console.log('deleteCompanyPipeline: Error', e);
@@ -2869,7 +2866,7 @@ async function getCompanyPipelineTemplate(companyId, pipelineId, currentUserId, 
     return null;
   }
 
-  let result = await getPipelineTemplateById(pipelineId);
+  let result = await pipelineTemplateService.findById(pipelineId);
 
   return result;
 
@@ -3273,6 +3270,7 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
   let result = null;
   try {
     result = await memberService.findJobSubscriptions(member._id, sort);
+    console.log(result)
     let company = await lookupCompaniesIds([companyId]);
     company = convertToCompany(company[0]);
     result.docs.forEach(function(sub){
@@ -4205,4 +4203,39 @@ async function deleteCompanyEmailTemplate(companyId, templateId, currentUserId) 
 
 
   return result
+}
+
+
+
+async function searchContacts(companyId, currentUserId, query) {
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result=[];
+  try {
+
+    let members = await memberService.searchMembers(companyId, query);
+    let candidates = await candidateService.searchCandidates(companyId, query);
+
+    result = _.reduce(members.concat(candidates), function (res, item) {
+      let exists = _.find(res, {id: item.userId});
+      if(!exists) {
+        res.push(convertToAvatar(item));
+      }
+      return res;
+    }, []);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
 }

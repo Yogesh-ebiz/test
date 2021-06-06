@@ -65,7 +65,7 @@ async function getMemberInvitations(company) {
 }
 
 
-async function getMembers(company, query) {
+async function getMembers(company) {
   let data = null;
 
   if(company==null){
@@ -74,6 +74,18 @@ async function getMembers(company, query) {
 
   let members = Member.find({company: company}).populate('role');
   return members
+}
+
+
+async function searchMembers(company, query) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  let result = Member.find({company: company, $or: [{firstName: { $regex: query.toLowerCase(), $options: 'i' }}, {lastName: { $regex: query, $options: 'i' }}]});
+  return result
 }
 
 async function findMemberBy_Id(memberId) {
@@ -498,6 +510,7 @@ module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   getMembers:getMembers,
+  searchMembers:searchMembers,
   findMemberBy_Id:findMemberBy_Id,
   findMemberByUserId:findMemberByUserId,
   findMemberByUserIdAndCompany:findMemberByUserIdAndCompany,

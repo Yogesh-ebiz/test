@@ -244,7 +244,7 @@ async function lookupPeopleIds(ids) {
 };
 
 
-async function findPeopleById(id) {
+async function findCandidateById(id) {
   console.log(id)
   let response = await client.get(`/people/candidates/${id}`, null, options);
   return response.data.data;
@@ -361,7 +361,7 @@ module.exports = {
   searchUsers: searchUsers,
   searchPeople:searchPeople,
   searchPeopleByIds:searchPeopleByIds,
-  findPeopleById:findPeopleById,
+  findCandidateById:findCandidateById,
   lookupUserIds:lookupUserIds,
   lookupPeopleIds:lookupPeopleIds,
   lookupCompaniesIds:lookupCompaniesIds,

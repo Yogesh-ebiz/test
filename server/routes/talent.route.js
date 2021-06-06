@@ -36,7 +36,7 @@ router.route('/company/:id/jobs/:jobId/comments/:commentId').put(asyncHandler(up
 
 router.route('/company/:id/jobs/:jobId/insights').get(asyncHandler(getJobInsights));
 router.route('/company/:id/jobs/:jobId/activities').get(asyncHandler(getJobActivities));
-router.route('/company/:id/jobs/:jobId/candidates/suggestions').post(asyncHandler(getJobCandidatesSuggestion));
+router.route('/company/:id/jobs/:jobId/candidates/suggestions').post(asyncHandler(searchPeopleSuggestions));
 router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchApplications));
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
@@ -171,6 +171,7 @@ router.route('/company/:id/emails/templates').post(asyncHandler(addCompanyEmailT
 router.route('/company/:id/emails/templates/:templateId').put(asyncHandler(updateCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(deleteCompanyEmailTemplate));
 
+router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 
 async function getInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -409,12 +410,13 @@ async function getJobActivities(req, res) {
 }
 
 
-async function getJobCandidatesSuggestion(req, res) {
-
+async function searchPeopleSuggestions(req, res) {
+  let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = req.params.jobId;
-  let data = await talentCtrl.getJobCandidatesSuggestion(currentUserId, jobId);
-
+  let sort = req.query;
+  let filter = req.body;
+  let data = await talentCtrl.searchPeopleSuggestions(companyId, currentUserId, jobId, filter, sort);
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
 
@@ -461,7 +463,6 @@ async function updateApplication(req, res) {
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
-
 
 
 
@@ -1053,7 +1054,7 @@ async function updateCompanyPipelineTemplate(req, res) {
 async function deleteCompanyPipelineTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let pipelineId = parseInt(req.params.pipelineId);
+  let pipelineId = ObjectID(req.params.pipelineId);
 
   let data = await talentCtrl.deleteCompanyPipelineTemplate(company, pipelineId, currentUserId);
   res.json(new Response(data, data?'pipeline_deleted_successful':'not_found', res));
@@ -1063,7 +1064,7 @@ async function deleteCompanyPipelineTemplate(req, res) {
 async function getCompanyPipelineTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let pipelineId = req.params.pipelineId;
+  let pipelineId = ObjectID(req.params.pipelineId);
 
   let data = await talentCtrl.getCompanyPipelineTemplate(company, pipelineId, currentUserId, res.locale);
   res.json(new Response(data, data?'pipeline_retrieved_successful':'not_found', res));
@@ -1594,5 +1595,15 @@ async function deleteCompanyEmailTemplate(req, res) {
 
   let data = await talentCtrl.deleteCompanyEmailTemplate(company, templateId, currentUserId);
   res.json(new Response(data, data?'email_deleted_successful':'not_found', res));
+}
+
+
+
+async function searchContacts(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query?req.query.query:'';
+  let data = await talentCtrl.searchContacts(company, currentUserId, query);
+  res.json(new Response(data, data?'contacts_retrieved_successful':'not_found', res));
 }
 

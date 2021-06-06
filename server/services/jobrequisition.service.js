@@ -27,7 +27,7 @@ let SearchParam = require('../const/searchParam');
 const jobSchema = Joi.object({
   company: Joi.number(),
   jobId: Joi.number().optional(),
-  createdBy: Joi.number(),
+  createdBy: Joi.object(),
   title: Joi.string().required(),
   description: Joi.string().required(),
   durationMonths: Joi.number().optional(),
@@ -83,7 +83,6 @@ async function addJob(companyId, currentUserId, form) {
 
 
   let result;
-  form.createdBy = currentUserId;
 
   if(form.department) {
     form.department = ObjectID(form.department);
@@ -92,7 +91,7 @@ async function addJob(companyId, currentUserId, form) {
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
   form.companyId = companyId
   form.members = [member._id];
-
+  form.createdBy = member._id;
   for (let tag of form.tags) {
     if(tag instanceof Object) {
       tag._id = new ObjectID();

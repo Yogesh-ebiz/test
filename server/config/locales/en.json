@@ -191,5 +191,6 @@
 	"evaluationstats_retrieved_successful": "evaluationstats_retrieved_successful",
 	"application_event_updated_successful": "application_event_updated_successful",
 	"job_unsubscribed_successful": "job_unsubscribed_successful",
-	"people_retrieved_successful": "people_retrieved_successful"
+	"people_retrieved_successful": "people_retrieved_successful",
+	"contacts_retrieved_successful": "contacts_retrieved_successful"
 }
