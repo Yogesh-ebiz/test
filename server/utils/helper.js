@@ -80,8 +80,19 @@ const convertToCandidate = (user) => {
   if(!user){
     return;
   }
+
+  let current = user.current?user.current:null;
+  if(current){
+    current.employer = convertToCompany(current.employer);
+  }
+
+  let past = user.current?user.current:null;
+  if(past){
+    past.employer = convertToCompany(past.employer);
+  }
+
   return {
-    id: user._id,
+    id: user.id?user.id:user._id,
     userId: user.userId,
     createdDate: user.createdDate,
     company: user.company,
@@ -92,6 +103,10 @@ const convertToCandidate = (user) => {
     avatar: user.avatar?user.avatar:'',
     email: user.email,
     phoneNumber: user.phoneNumber,
+    district: user.district?user.district:user.primaryAddress?user.primaryAddress.district:'',
+    city: user.city?user.city:user.primaryAddress?user.primaryAddress.city:'',
+    state: user.state?user.state:user.primaryAddress?user.primaryAddress.state:'',
+    country: user.country?user.country:user.primaryAddress?user.primaryAddress.country:'',
     isOnline: user.isOnline,
     partyType: user.partyType?user.partyType:'',
     jobTitle: user.jobTitle?user.jobTitle:'',
@@ -104,15 +119,15 @@ const convertToCandidate = (user) => {
     teamRating: user.teamRating?user.teamRating:0,
     hasApplied: user.hasApplied?user.hasApplied:false,
     hasImported: user.hasImported?user.hasImported:false,
-    past: user.past?user.past:null,
-    current: user.current?user.current:null,
+    past: past,
+    current: current,
     links: user.links?user.links:[],
     tags: user.tags?user.tags:[],
     sources: user.sources?user.sources:[],
     applications: user.applications?user.applications:[],
     evaluations: user.evaluations?user.evaluations:[],
-    experiences: user.experiences?user.experiences:[],
-    educations: user.educations?user.educations:[],
+    experiences: user.experiences?_.reduce(user.experiences, function(res, i){ i.employer = convertToCompany(i.company); res.push(i);  return res;}, []):[],
+    educations: user.educations?_.reduce(user.educations, function(res, i){ i.institute = convertToCompany(i.institute); res.push(i);  return res;}, []):[],
   };
 }
 

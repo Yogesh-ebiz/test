@@ -8,7 +8,7 @@ let JobSearchParam = require('../const/jobSearchParam');
 let SearchParam = require('../const/searchParam');
 
 let statusEnum = require('../const/statusEnum');
-
+const {convertToCandidate} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 
 module.exports = {
@@ -24,10 +24,10 @@ async function searchPeople(filter, sort, locale) {
   }
 
   result = await feedService.searchPeople(filter, sort);
-
-  for(let [i, people] in result.content.entries()){
-    console.log(people)
-  }
+  result.content = _.reduce(result.content, function(res, people){
+    res.push(convertToCandidate(people));
+    return res;
+  }, []);
 
   return result;
 }
