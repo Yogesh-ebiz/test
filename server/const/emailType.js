@@ -1,0 +1,4 @@
+module.exports = {
+  DEFAULT:'DEFAULT',
+  RECRUITER_INMAIL: "RECRUITER_INMAIL"
+};

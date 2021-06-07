@@ -284,6 +284,25 @@ async function createNotification(userId, notificationType, eventType, meta) {
 };
 
 
+
+async function createMessageThread(userId, type, name, members, contentType, contentTypeId, contentMeta) {
+  const options = {
+    headers: {'userId': userId}
+  };
+
+  let body = {
+    type:  type,
+    members: members,
+    contentType: contentType,
+    contentTypeId: contentTypeId,
+    contentMeta:contentMeta
+  };
+  let response = await client.post(`/v1/chat/users/${userId}/threads`, body, options);
+  return response.data.data;
+};
+
+
+
 async function getUserLast5Resumes(id) {
   let files = null;
   try {
@@ -339,9 +358,12 @@ async function updateResumeDefault(userId, id) {
   return data;
 };
 
+
+
 module.exports = {
   register:register,
   createNotification:createNotification,
+  createMessageThread:createMessageThread,
   findByUserId: findUserById,
 
   findCompanyById: findCompanyById,

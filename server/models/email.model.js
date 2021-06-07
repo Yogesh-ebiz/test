@@ -1,23 +1,37 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const statusEnum = require('../const/statusEnum');
+const emailType = require('../const/emailType');
+
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 
 
 const EmailSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true
+  status: {
+    type: String,
+    default: emailType.DEFAULT
   },
-  sender: {
+  type: {
+    type: String,
+    default: statusEnum.UNREAD
+  },
+  from: {
     type: Object
   },
-  recipients: {
-    type: Object
+  to: {
+    type: Array
+  },
+  cc: {
+    type: Array
+  },
+  bcc: {
+    type: Array
   },
   subject: {
     type: String,
     required: false
   },
-  bodyHtml: {
+  body: {
     type: String,
     required: true
   },
@@ -32,22 +46,22 @@ const EmailSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  hasRead: {
+    type: Boolean,
+    default: false
+  },
   createdDate: {
     type: Number,
     required: false,
     default: Date.now
   },
   createdBy:{ type: Schema.Types.ObjectId, ref: 'Member'},
-  updatedDate: {
-    type: Number,
-    required: false
-  },
-  updatedBy: {
-    type: Object
-  },
+  labels:[{ type: Schema.Types.ObjectId, ref: 'Label'}],
+  threads:[{ type: Schema.Types.ObjectId, ref: 'Email'}]
 }, {
   versionKey: false
 });
+EmailSchema.plugin(mongoosePaginate);
 
 
 module.exports = mongoose.model('Email', EmailSchema);

@@ -242,7 +242,7 @@ async function findJob_Id(jobId, locale) {
   if(jobId==null){
     return;
   }
-  data = await JobRequisition.findById(jobId).populate('department').populate('tags').populate('members');
+  data = await JobRequisition.findById(jobId).populate('department').populate('tags').populate('members').populate('createdBy');
   return data;
 
   // return JobRequisition.findOne({jobId: jobId});

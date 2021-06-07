@@ -17,7 +17,7 @@ const taskType = require('../const/taskType');
 
 
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
-const {searchPeople, searchPeopleByIds, getUserLinks, lookupCompaniesIds, lookupPeopleIds, lookupUserIds, createJobFeed, followCompany, findCategoryByShortCode, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const feedService = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
 const applicationService = require('../services/application.service');
@@ -40,11 +40,13 @@ const activityService = require('../services/activity.service');
 const commentService = require('../services/comment.service');
 const evaluationService = require('../services/evaluation.service');
 const evaluationTemplateService = require('../services/evaluationtemplate.service');
+const emailService = require('../services/email.service');
 const emailTemplateService = require('../services/emailtemplate.service');
 const candidateService = require('../services/candidate.service');
 const jobViewService = require('../services/jobview.service');
 const bookmarkService = require('../services/bookmark.service');
 const departmentService = require('../services/department.service');
+const cardService = require('../services/card.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -97,6 +99,8 @@ module.exports = {
   getStats,
   getUserSession,
   addCard,
+  getCards,
+  removeCard,
   createJob,
   updateJob,
   closeJob,
@@ -132,6 +136,7 @@ module.exports = {
   updateApplicationComment,
   getEvaluationById,
   getApplicationEvaluations,
+  searchApplicationEmails,
   addApplicationProgressEvaluation,
   removeApplicationProgressEvaluation,
   updateApplicationProgressEvent,
@@ -198,7 +203,6 @@ module.exports = {
   addProjectCandidates,
   removeProjectCandidate,
   removeProjectCandidates,
-  updateCandidateProject,
   subscribeJob,
   unsubscribeJob,
   getFiles,
@@ -207,6 +211,8 @@ module.exports = {
   getCompanyEvaluationTemplate,
   updateCompanyEvaluationTemplate,
   deleteCompanyEvaluationTemplate,
+  composeEmail,
+  getEmailById,
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
   updateCompanyEmailTemplate,
@@ -230,10 +236,10 @@ async function getUserSession(currentUserId, preferredCompany) {
 
 
   let result;
-  let user = await findByUserId(currentUserId);
+  let user = await feedService.findByUserId(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
 
-  let companies = await searchCompany('', _.map(allAccounts, 'company'), currentUserId);
+  let companies = await feedService.searchCompany('', _.map(allAccounts, 'company'), currentUserId);
 
 
   companies = _.reduce(companies.content, function(res, item){
@@ -453,7 +459,7 @@ async function getImpressionCandidates(company, currentUserId, type, timeframe, 
 
   if(result){
     let userIds = _.map(result.docs, 'partyId');
-    let users = await lookupPeopleIds(userIds);
+    let users = await feedService.lookupPeopleIds(userIds);
 
     for(i in result.docs){
 
@@ -506,7 +512,7 @@ async function getStats(currentUserId, companyId) {
 
   let newApplications = await applicationService.getLatestCandidates(companyId);
   // let userIds = _.reduce(newApplications, function(res, app){ res.push(app.user.userId); return res;}, []);
-  // let users = await lookupUserIds(userIds);
+  // let users = await feedService.lookupUserIds(userIds);
 
 
   newApplications.forEach(function(app){
@@ -528,7 +534,7 @@ async function getStats(currentUserId, companyId) {
   }
 
   if(mostViewed){
-    let company = await lookupCompaniesIds([companyId]);
+    let company = await feedService.lookupCompaniesIds([companyId]);
     mostViewed.forEach(function(job){
       job.company = convertToCompany(company[0]);
       job.department = job.department?job.department[0]:null;
@@ -548,7 +554,7 @@ async function getStats(currentUserId, companyId) {
 
   let jobEndingSoon = await jobService.getJobsEndingSoon(companyId);
   let userIds = _.map(jobEndingSoon, 'createdBy');
-  let users = await lookupUserIds(userIds);
+  let users = await feedService.lookupUserIds(userIds);
 
   jobEndingSoon.forEach(function(job){
     job.created = _.find(users, {id: job.createdBy});
@@ -599,7 +605,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
     page: parseInt(sort.page)+1
   };
 
-  let company = await findCompanyById(companyId, currentUserId);
+  let company = await feedService.findCompanyById(companyId, currentUserId);
 
   let aList = [];
   let aMatch = { $match: new SearchParam(filter)};
@@ -659,10 +665,33 @@ async function addCard(companyId, currentUserId, card) {
     return null;
   }
 
-
-  let result;
+  card.customer = companyId;
+  let result = await cardService.add(card);
   return result;
 }
+
+
+async function getCards(companyId, currentUserId) {
+
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let result = await cardService.findByCompany(companyId);
+  return result;
+}
+
+
+async function removeCard(companyId, currentUserId, cardId) {
+
+  if(!companyId || !currentUserId || !cardId){
+    return null;
+  }
+
+  let result = await cardService.remove(cardId);
+  return result;
+}
+
 
 async function createJob(companyId, currentUserId, job) {
 
@@ -672,7 +701,7 @@ async function createJob(companyId, currentUserId, job) {
 
 
   let result;
-  // let currentParty = await findByUserId(currentUserId);
+  // let currentParty = await feedService.findByUserId(currentUserId);
 
   // if (isPartyActive(currentParty)) {
   result = await jobService.addJob(companyId, currentUserId, job);
@@ -694,7 +723,7 @@ async function updateJob(companyId, currentUserId, jobId, form) {
   }
 
   let result;
-  let currentParty = await findByUserId(currentUserId);
+  let currentParty = await feedService.findByUserId(currentUserId);
 
   if (isPartyActive(currentParty)) {
     result = await jobService.updateJob(jobId, currentUserId, form);
@@ -791,7 +820,7 @@ async function getJobComments(currentUserId, jobId, filter) {
     result = await commentService.getComments(subjectType.JOB, jobId, filter);
 
     let userIds = _.map(result.docs, 'createdBy');
-    let users = await lookupUserIds(userIds);
+    let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(comment){
       let found = _.find(users, {id: comment.createdBy});
       if(found){
@@ -904,8 +933,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     let propLocale = '$name.'+localeStr;
     job = await jobService.findJob_Id(jobId, locale);
 
-    console.log(job.tags)
-    if(job && _.find(job.members, {_id: ObjectID(member._id)})) {
+    if(job) {
 
 
       let noApplied = await applicationService.findAppliedCountByJobId(job._id);
@@ -915,38 +943,38 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
       let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
       job.level = experienceLevel[0];
 
-      let industry = await findIndustry('', job.industry, locale);
+      let industry = await feedService.findIndustry('', job.industry, locale);
       job.industry = industry;
 
-      let jobFunction = await findJobfunction('', job.jobFunction, locale);
+      let jobFunction = await feedService.findJobfunction('', job.jobFunction, locale);
       if(jobFunction.length){
         job.jobFunction = jobFunction[0];
       }
 
       if(job.category){
-        let cateogry = await findCategoryByShortCode(job.category, locale);
+        let cateogry = await feedService.findCategoryByShortCode(job.category, locale);
         job.category = categoryMinimal(cateogry);
       }
 
       if(job.skills.length) {
-        let jobSkills = await findSkillsById(job.skills);
+        let jobSkills = await feedService.findSkillsById(job.skills);
         job.skills = jobSkills;
       }
 
 
-      let userIds = _.map(job.members, 'userId');
-      userIds.push(job.createdBy)
-      let users  = await lookupUserIds(userIds);
+      // let userIds = _.map(job.members, 'userId');
+      // userIds.push(job.createdBy)
+      // let users  = await lookupUserIds(userIds);
 
 
-      job.createdBy = _.find(users, {id: job.createdBy});
-      job.members.forEach(function(member){
-        let found = _.find(users, {id: member.userId});
-
-        if(found){
-          member.avatar = found.avatar?found.avatar:'';
-        }
-      });
+      // job.createdBy = _.find(users, {id: job.createdBy});
+      // job.members.forEach(function(member){
+      //   let found = _.find(users, {id: member.userId});
+      //
+      //   if(found){
+      //     member.avatar = found.avatar?found.avatar:'';
+      //   }
+      // });
 
       job.hasSaved = _.some(member.followedJobs, job._id);
 
@@ -1020,7 +1048,7 @@ async function updateJobMembers(jobId, currentUserId, members) {
   }
 
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
+  let currentParty = await feedService.findByUserId(currentUserId);
 
   try {
     if (isPartyActive(currentParty)) {
@@ -1041,7 +1069,7 @@ async function updateJobApplicationForm(jobId, currentUserId, form) {
   }
 
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
+  let currentParty = await feedService.findByUserId(currentUserId);
 
   try {
     if (isPartyActive(currentParty)) {
@@ -1169,7 +1197,7 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
 
     result = await activityService.findByJobId(jobId, filter);
     let userIds = _.map(result.docs, 'causerId');
-    let users = await lookupUserIds(userIds);
+    let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(activity){
       let found = _.find(users, {id: parseInt(activity.causerId)});
       if(found){
@@ -1202,7 +1230,7 @@ async function searchPeopleSuggestions(companyId, currentUserId, jobId, filter, 
 
     filter.jobTitles = ["Sr. Manager"];
     filter.location = ["US", "Vietnam"]
-    result = await searchPeople(filter, sort);
+    result = await feedService.searchPeople(filter, sort);
 
   } catch (error) {
     console.log(error);
@@ -1222,7 +1250,7 @@ async function searchApplications(currentUserId, jobId, filter, sort, locale) {
 
   let result = await applicationService.search(jobId, filter, sort);
     // let userIds = _.map(result.docs, 'user');
-    // let users = await lookupUserIds(userIds);
+    // let users = await feedService.lookupUserIds(userIds);
 
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
@@ -1250,7 +1278,7 @@ async function searchCompanyApplications(currentUserId, companyId, filter, local
   let results = await applicationService.findApplicationsByCompany(companyId, filter);
 
   let userIds = _.map(results.content, 'user');
-  let users = await lookupUserIds(userIds);
+  let users = await feedService.lookupUserIds(userIds);
 
   results.content.forEach(function(app){
     let user = _.find(users, {id: app.user});
@@ -1636,7 +1664,7 @@ async function getApplicationComments(currentUserId, applicationId, filter) {
     result = await commentService.getComments(subjectType.APPLICATION, applicationId, filter);
     if(result) {
       let userIds = _.map(result.docs, 'createdBy');
-      let users = await lookupUserIds(userIds);
+      let users = await feedService.lookupUserIds(userIds);
       result.docs.forEach(function (comment) {
         let found = _.find(users, {id: comment.createdBy});
         if (found) {
@@ -1769,7 +1797,7 @@ async function getApplicationEvaluations(companyId, currentUserId, candidateId, 
 
     result = await evaluationService.search(candidateId, companyId, applicationId, progressId, filter);
     let userIds = _.map(result.docs, 'createdBy');
-    let users = await lookupUserIds(userIds);
+    let users = await feedService.lookupUserIds(userIds);
 
     result.docs.forEach(function(evaluation){
       let found = _.find(users, {id: evaluation.createdBy});
@@ -1784,6 +1812,27 @@ async function getApplicationEvaluations(companyId, currentUserId, candidateId, 
 
   return new Pagination(result);
 }
+
+
+async function searchApplicationEmails(currentUserId, companyId, applicationId, sort, locale) {
+  if(!currentUserId || !companyId || !applicationId || !sort){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = await applicationService.searchEmails(applicationId, sort);
+
+  return new Pagination(result);
+
+}
+
+
 
 async function addApplicationProgressEvaluation(companyId, currentUserId, applicationId, applicationProgressId, form) {
 
@@ -2007,7 +2056,7 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
 
     result = await activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId, filter);
     let userIds = _.map(result.docs, 'causerId');
-    let users = await lookupUserIds(userIds);
+    let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(activity){
       let found = _.find(users, {id: parseInt(activity.causerId)});
       if(found){
@@ -2098,7 +2147,7 @@ async function getBoard(currentUserId, jobId, locale) {
 //
 //   result = await applicationService.findCandidatesByCompanyId(company, filter);
 //   let userIds = _.map(result.docs, 'id');
-//   let users = await lookupUserIds(userIds)
+//   let users = await feedService.lookupUserIds(userIds)
 //
 //   for(var i=0; i<result.docs.length; i++){
 //     let foundUser = _.find(users, {id: result.docs[i].id});
@@ -2235,7 +2284,7 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
     }
     if (candidate) {
       candidate.match = 78;
-      let partyLink = await getUserLinks(candidate.userId);
+      let partyLink = await feedService.getUserLinks(candidate.userId);
       if (partyLink) {
         candidate.links = partyLink.links;
       }
@@ -2274,7 +2323,7 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
     }
 
     let userIds = _.reduce(result.docs, function(res, item){res.push(item.createdBy.userId); return res;}, []);
-    let users = await lookupUserIds(userIds);
+    let users = await feedService.lookupUserIds(userIds);
 
     result.docs.forEach(function(evaluation){
       let found = _.find(users, {id: evaluation.createdBy.userId});
@@ -2376,7 +2425,7 @@ async function getAllCandidatesSkills(companyId, currentUserId, locale) {
   let result;
   try {
     let skills = await candidateService.getAllCandidatesSkills(companyId);
-    result = await findSkillsById(skills)
+    result = await feedService.findSkillsById(skills)
 
   } catch (error) {
     console.log(error);
@@ -2762,7 +2811,7 @@ async function deleteCompanyQuestionTemplate(companyId, questionId, currentUserI
   }
 
   let result = null;
-  let currentParty = await findByUserId(currentUserId);
+  let currentParty = await feedService.findByUserId(currentUserId);
 
 
   try {
@@ -3141,7 +3190,7 @@ async function getCompanyMembers(companyId, query, currentUserId, locale) {
 
   let result = await memberService.getMembers(companyId, query);
   let userIds = _.map(result, 'userId');
-  let users = await lookupUserIds(userIds);
+  let users = await feedService.lookupUserIds(userIds);
 
   result.forEach(function(member){
     let found = _.find(users, {id: member.userId});
@@ -3271,7 +3320,7 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
   try {
     result = await memberService.findJobSubscriptions(member._id, sort);
     console.log(result)
-    let company = await lookupCompaniesIds([companyId]);
+    let company = await feedService.lookupCompaniesIds([companyId]);
     company = convertToCompany(company[0]);
     result.docs.forEach(function(sub){
       sub.subject.hasSaved = true;
@@ -3414,7 +3463,7 @@ async function deleteCompanyPool(companyId, poolId, currentUserId) {
   return result
 }
 
-async function getPoolCandidates(companyId, currentUserId, poolId, sort) {
+async function getPoolCandidates(companyId, currentUserId, poolId, query, sort) {
   if(!companyId || !poolId || !currentUserId){
     return null;
   }
@@ -3443,12 +3492,13 @@ async function getPoolCandidates(companyId, currentUserId, poolId, sort) {
 
 
   try {
-    let pool = await poolService.findPoolBy_Id(poolId);
-    let candidateIds = pool.candidates;
-    result = await candidateService.searchCandidates(candidateIds, options);
-    for(i in result.docs){
-      result.docs[i] = convertToCandidate(result.docs[i]);
-    };
+    result = await poolService.getPoolCandidates(poolId);
+
+    // let candidateIds = pool.candidates;
+    // result = await candidateService.searchCandidates(candidateIds, query, options);
+    // for(i in result.docs){
+    //   result.docs[i] = convertToCandidate(result.docs[i]);
+    // };
   } catch(e){
     console.log('getPoolCandidates: Error', e);
   }
@@ -3457,8 +3507,8 @@ async function getPoolCandidates(companyId, currentUserId, poolId, sort) {
   return new Pagination(result);
 }
 
-async function addPoolCandidates(companyId, poolId, candidateIds, currentUserId) {
-  if(!companyId || !poolId || !candidateIds || !currentUserId){
+async function addPoolCandidates(companyId, currentUserId, poolId, candidateIds) {
+  if(!companyId || !currentUserId || !poolId || !candidateIds){
     return null;
   }
 
@@ -3472,20 +3522,31 @@ async function addPoolCandidates(companyId, poolId, candidateIds, currentUserId)
 
 
   try {
-    let pool = await poolService.findPoolBy_Id(poolId);
+    let pool = await poolService.findPoolBy_Id(poolId).populate('candidates');
     if (pool) {
-      candidateIds.forEach(function(candidate){
+      for(let [i, candidate] of candidateIds.entries()){
 
         let exists = false;
         pool.candidates.forEach(function(item){
-          if(item==candidate){
+          if(item.userId==candidate){
             exists = true;
           }
         });
         if (!exists) {
-          pool.candidates.push(ObjectID(candidate));
+
+          let found = await candidateService.findByUserIdAndCompanyId(candidate, companyId);
+          if(!found){
+            let user = await feedService.findCandidateById(candidate);
+            candidate = await candidateService.addCandidate({userId: currentUserId, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
+              jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
+              city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
+              skills: _.map(user.skills, 'id'), url: user.shareUrl
+            });
+            pool.candidates.push(candidate._id);
+          }
+
         }
-      })
+      }
       result = await pool.save();
 
     }
@@ -3704,7 +3765,7 @@ async function getProjectCandidates(companyId, projectId, currentUserId, sort) {
     let project = await projectService.findProjectBy_Id(projectId);
     let candidateIds = project.candidates;
 
-    result = await searchPeopleByIds(currentUserId, '', candidateIds, sort);
+    result = await feedService.searchPeopleByIds(currentUserId, '', candidateIds, sort);
     for(i in result.content){
       result.content[i].experiences.forEach(function(exp){
         exp.employer = convertToCompany(exp.employer)
@@ -4106,10 +4167,37 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
 
 
 
+/************************** EMAIL *****************************/
+
+async function composeEmail(companyId, currentUserId, form)  {
+
+  if(!companyId || !currentUserId ||  !form){
+    return null;
+  }
+
+  let result = await emailService.compose(form);
+
+  return result;
+
+}
+
+
+async function getEmailById(companyId, currentUserId, emailId)  {
+
+  if(!companyId || !currentUserId ||  !emailId){
+    return null;
+  }
+
+  let result = await emailService.findById(emailId);
+
+  return result;
+
+}
+
 
 /************************** EMAILTEMPLATES *****************************/
 
-async function getCompanyEmailTemplates(companyId, query, currentUserId, locale)  {
+async function getCompanyEmailTemplates(companyId, currentUserId, query, locale)  {
 
   if(!companyId || !currentUserId){
     return null;
@@ -4239,3 +4327,4 @@ async function searchContacts(companyId, currentUserId, query) {
   return result;
 
 }
+

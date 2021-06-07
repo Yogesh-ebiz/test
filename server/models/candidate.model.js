@@ -85,16 +85,38 @@ const CandidateSchema = new mongoose.Schema({
     required:false,
     default: 0
   },
+  past: {
+    type: Object
+  },
+  current: {
+    type: Object
+  },
   teamRating: {
     type: Number,
     required:false,
     default: 0
+  },
+  hasImported: {
+    type: Boolean,
+    default: false
+  },
+  hasApplied: {
+    type: Boolean,
+    default: false
   },
   links: {
     type: Array,
     required:false
   },
   skills: {
+    type: Array,
+    required:false
+  },
+  experiences: {
+    type: Array,
+    required:false
+  },
+  educations: {
     type: Array,
     required:false
   },

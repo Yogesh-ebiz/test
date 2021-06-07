@@ -107,6 +107,7 @@ const ApplicationSchema = new mongoose.Schema({
   allProgress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
   currentProgress: { type: Schema.Types.ObjectId, ref: 'ApplicationProgress' },
   files: [{ type: Schema.Types.ObjectId, ref: 'File' }],
+  emails:[{ type: Schema.Types.ObjectId, ref: 'Email'}]
 }, {
   versionKey: false
 });

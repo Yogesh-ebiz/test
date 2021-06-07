@@ -47,7 +47,7 @@ async function getPoolCandidates(poolId) {
   }
 
   const aggregate = Pool.aggregate([{
-    $match: {_id: ObjectID(poolId)}
+    $match: {_id: poolId, }
   },
     {
       $lookup: {
@@ -57,19 +57,41 @@ async function getPoolCandidates(poolId) {
         as: 'candidates',
       },
     },
-    {
-      $project: {
-        candidates: {
-          $slice: [{
-            "$filter": {
-              "input": "$candidates",
-              "as": "item",
-              "cond": { "$eq": [] }
-            }
-          }, (perPage * page), perPage]
+    { $unwind: '$candidates'},
+    { $project:
+        {
+          _id:'$candidates._id',
+          status: '$candidates.status',
+          rating: '$candidates.rating',
+          level: '$candidates.level',
+          overallRating: '$candidates.overallRating',
+          teamRating: '$candidates.teamRating',
+          links: '$candidates.links',
+          skills: '$candidates.skills',
+          experiences: '$candidates.experiences',
+          educations: '$candidates.educations',
+          tags: '$candidates.tags',
+          sources: '$candidates.sources',
+          applications:'$candidates.applications',
+          evaluations: '$candidates.evaluations',
+          userId: '$candidates.userId',
+          avatar: '$candidates.avatar',
+          company: '$candidates.firstName',
+          firstName: '$candidates.firstName',
+          middleName: '$candidates.middleName',
+          lastName: '$candidates.lastName',
+          jobTitle: '$candidates.jobTitle',
+          email: '$candidates._id',
+          phoneNumber: '$candidates.phoneNumber',
+          city: '$candidates.city',
+          state: '$candidates.state',
+          country: '$candidates.country',
+          createdDate: '$candidates.createdDate',
+          isImport: '$candidate.isImport',
+          hasApplied: '$candidate.hasApplied'
         }
-      }
     }
+
   ]);
 
 
@@ -97,7 +119,7 @@ async function updatePool(poolId, form) {
   if(!poolId || !form){
     return;
   }
-
+  getPoolCandidates
 
   form = await Joi.validate(form, poolSchema, {abortEarly: false});
   let pool = await findPoolBy_Id(poolId);

@@ -192,5 +192,8 @@
 	"application_event_updated_successful": "application_event_updated_successful",
 	"job_unsubscribed_successful": "job_unsubscribed_successful",
 	"people_retrieved_successful": "people_retrieved_successful",
-	"contacts_retrieved_successful": "contacts_retrieved_successful"
+	"contacts_retrieved_successful": "contacts_retrieved_successful",
+	"card_created_successful": "card_created_successful",
+	"cards_retrieved_successful": "cards_retrieved_successful",
+	"card_removeed_successful": "card_removeed_successful"
 }

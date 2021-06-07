@@ -18,6 +18,9 @@ router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHand
 router.route('/company/:id/stats').get(asyncHandler(getStats));
 
 router.route('/company/:id/payment/cards').post(asyncHandler(addCard));
+router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
+router.route('/company/:id/payment/cards/:cardId').delete(asyncHandler(removeCard));
+
 
 
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
@@ -57,6 +60,7 @@ router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApp
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
 router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
 router.route('/company/:id/applications/:applicationId/evaluations').get(asyncHandler(getApplicationEvaluations));
+router.route('/company/:id/applications/:applicationId/emails').get(asyncHandler(searchApplicationEmails));
 
 router.route('/company/:id/applications/:applicationId/labels').get(asyncHandler(getApplicationLabels));
 router.route('/company/:id/applications/:applicationId/labels').post(asyncHandler(addApplicationLabel));
@@ -157,6 +161,7 @@ router.route('/company/:id/projects/:projectId/candidates').delete(asyncHandler(
 
 router.route('/company/:id/people/:peopleId/projects').post(asyncHandler(updateCandidateProject));
 
+
 router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 
 router.route('/company/:id/evaluations/templates').get(asyncHandler(getCompanyEvaluationTemplates));
@@ -166,12 +171,17 @@ router.route('/company/:id/evaluations/templates/:templateId').put(asyncHandler(
 router.route('/company/:id/evaluations/templates/:templateId').delete(asyncHandler(deleteCompanyEvaluationTemplate));
 
 
+
 router.route('/company/:id/emails/templates').get(asyncHandler(getCompanyEmailTemplates));
 router.route('/company/:id/emails/templates').post(asyncHandler(addCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').put(asyncHandler(updateCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(deleteCompanyEmailTemplate));
 
+router.route('/company/:id/emails/compose').post(asyncHandler(composeEmail));
+router.route('/company/:id/emails/:emailId').get(asyncHandler(getEmailById));
+
 router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
+
 
 async function getInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -233,6 +243,21 @@ async function addCard(req, res) {
   let card = req.body;
   let data = await talentCtrl.addCard(companyId, currentUserId, card);
   res.json(new Response(data, data?'card_created_successful':'not_found', res));
+}
+
+async function getCards(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let data = await talentCtrl.getCards(companyId, currentUserId);
+  res.json(new Response(data, data?'cards_retrieved_successful':'not_found', res));
+}
+
+async function removeCard(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let cardId = req.params.cardId;
+  let data = await talentCtrl.removeCard(companyId, currentUserId, cardId);
+  res.json(new Response(data, data?'card_removed_successful':'not_found', res));
 }
 
 
@@ -605,6 +630,17 @@ async function getApplicationEvaluations(req, res) {
   res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
 }
 
+
+async function searchApplicationEmails(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+  let applicationId = ObjectID(req.query.applicationId);
+  let sort = req.query;
+
+
+  let data = await talentCtrl.searchApplicationEmails(currentUserId, companyId, applicationId, sort, res.locale);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
 
 async function addApplicationProgressEvaluation(req, res) {
   let companyId = parseInt(req.params.id);
@@ -1346,10 +1382,11 @@ async function deleteCompanyPool(req, res) {
 async function getPoolCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let poolId = req.params.poolId;
+  let poolId = ObjectID(req.params.poolId);
   let sort = req.query;
+  let query = req.query.query?req.query.query:'';
 
-  let data = await talentCtrl.getPoolCandidates(company, currentUserId, poolId, sort);
+  let data = await talentCtrl.getPoolCandidates(company, currentUserId, poolId, query, sort);
   res.json(new Response(data, data?'candidate_retrieved_successful':'not_found', res));
 }
 
@@ -1360,7 +1397,7 @@ async function addPoolCandidates(req, res) {
   let candidates = req.body.candidates;
 
   candidates.forEach(function(id){ id = parseInt(id); });
-  let data = await talentCtrl.addPoolCandidates(company, poolId, candidates, currentUserId);
+  let data = await talentCtrl.addPoolCandidates(company, currentUserId, poolId, candidates);
   res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
 }
 
@@ -1554,14 +1591,33 @@ async function deleteCompanyEvaluationTemplate(req, res) {
 }
 
 
+async function composeEmail(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let form = req.body;
+
+
+  let data = await talentCtrl.composeEmail(company, currentUserId, form);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
+
+
+async function getEmailById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let emailId = ObjectID(req.params.emailId);
+
+
+  let data = await talentCtrl.getEmailById(company, currentUserId, emailId);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
 
 async function getCompanyEmailTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let query = req.query.query;
 
-
-  let data = await talentCtrl.getCompanyEmailTemplates(company, query, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyEmailTemplates(company, currentUserId,  query, res.locale);
   res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
 }
 
@@ -1606,4 +1662,5 @@ async function searchContacts(req, res) {
   let data = await talentCtrl.searchContacts(company, currentUserId, query);
   res.json(new Response(data, data?'contacts_retrieved_successful':'not_found', res));
 }
+
 

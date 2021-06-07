@@ -808,8 +808,13 @@ async function applyJobById(currentUserId, jobId, application ) {
           candidate = await candidateService.addCandidate({userId: currentUserId, avatar: currentParty.avatar, company: job.company, firstName: currentParty.firstName, middleName: currentParty.middleName, lastName: currentParty.lastName,
             jobTitle: currentParty.jobTitle?currentParty.jobTitle:'', email: application.email, phoneNumber: application.phoneNumber,
             city: currentParty.primaryAddress.city, state: currentParty.primaryAddress.state, country: currentParty.primaryAddress.country,
-            skills: _.map(currentParty.skills, 'id'), url: currentParty.shareUrl
+            skills: _.map(currentParty.skills, 'id'), url: currentParty.shareUrl, hasApplied: true
           });
+        } else {
+          candidate.email = application.email;
+          candidate.phoneNumber = application.phoneNumber;
+          candidate.hasApplied = true;
+
         }
 
         application.user = candidate._id;
@@ -866,8 +871,6 @@ async function applyJobById(currentUserId, jobId, application ) {
                 }
               }
 
-
-              candidate.jobTitle = currentParty.jobTitle;
               candidate.applications.push(savedApplication._id);
               await candidate.save();
               await job.save();
@@ -875,12 +878,9 @@ async function applyJobById(currentUserId, jobId, application ) {
 
             }
 
-            // await addApplicationHistory({
-            //   applicationId: savedApplication.applicationId,
-            //   partyId: currentParty.id,
-            //   action: {type: applicationEnum.APPLIED}
-            // });
 
+
+            let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subjectId: ''+savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, jobId: job._id, jobTitle: job.title}});
 
 
 
@@ -893,15 +893,13 @@ async function applyJobById(currentUserId, jobId, application ) {
               applicantId: currentUserId,
               createdBy: job.createdBy
             };
-            await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+
+            // await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
             //TODO: Call Follow API
             if (application.follow) {
               await followCompany(job.company, currentUserId);
             }
-
-            let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subjectId: ''+savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, jobId: job._id, jobTitle: job.title}});
-
 
           }
 

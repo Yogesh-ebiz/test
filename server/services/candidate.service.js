@@ -23,10 +23,11 @@ const candidateSchema = Joi.object({
   country: Joi.string().allow('').optional(),
   skills: Joi.array().optional(),
   jobTitle: Joi.string().allow('').optional(),
-  phoneNumber: Joi.string().allow(''),
-  email: Joi.string(),
+  phoneNumber: Joi.string().allow('').optional(),
+  email: Joi.string().allow('').optional(),
   applications: Joi.array().optional(),
-  url: Joi.string().allow('').optional()
+  url: Joi.string().allow('').optional(),
+  hasApplied: Joi.boolean().optional()
 });
 
 

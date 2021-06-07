@@ -25,6 +25,10 @@ async function searchPeople(filter, sort, locale) {
 
   result = await feedService.searchPeople(filter, sort);
 
+  for(let [i, people] in result.content.entries()){
+    console.log(people)
+  }
+
   return result;
 }
 
@@ -46,7 +50,7 @@ async function getPeopleById(peopleId, locale) {
   if(!peopleId){
     return null;
   }
-  let result = await feedService.findPeopleById(peopleId);
+  let result = await feedService.findCandidateById(peopleId);
   return result;
 
 }

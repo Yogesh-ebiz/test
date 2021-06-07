@@ -14,6 +14,17 @@ const pipelineService = require('../services/pipeline.service');
 const feedService = require('../services/api/feed.service.api');
 
 
+
+function findById(applicationId) {
+  let data = null;
+
+  if(!applicationId){
+    return;
+  }
+  return Application.findById(applicationId);
+}
+
+
 function findApplicationById(applicationId) {
   let data = null;
 
@@ -916,7 +927,89 @@ async function search(jobId, filter, sort) {
 }
 
 
+async function searchEmails(applicationId, sort) {
+  let data = null;
+
+
+  if(applicationId==null || !sort){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+  let aSort = { $sort: {createdDate: direction} };
+
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = {};
+
+  aList.push({ $match: {_id: ObjectID('60ba0ecac14fc2a962078941')} });
+    aList.push(
+      {
+        $lookup: {
+          from: 'emails',
+          localField: 'emails',
+          foreignField: '_id',
+          as: 'emails',
+        },
+      },
+    );
+
+
+  aList.push(
+    {
+      $project: {
+        emails: '$emails'
+      }
+    }
+  );
+  aList.push(
+    {
+      $unwind: '$emails'
+    }
+  );
+  aList.push(
+    {
+      $project: {
+        _id: '$emails._id',
+        from: '$emails.from',
+        to: '$emails.to',
+        cc: '$emails.c',
+        attachments: '$emails.attachments',
+        subject: '$emails.subject',
+        // body: '$emails.body',
+        status: '$emails.status',
+        hasSent: '$emails.hasSent',
+        hasRead: '$emails.hasRend'
+      }
+    }
+  );
+  const aggregate = Application.aggregate(aList);
+
+  let result = await Application.aggregatePaginate(aggregate, options);
+  return result;
+
+}
+
+
+
+
+
+
 module.exports = {
+  findById: findById,
   findApplicationById: findApplicationById,
   findApplicationBy_Id:findApplicationBy_Id,
   findApplicationsByJobIds:findApplicationsByJobIds,
@@ -939,5 +1032,6 @@ module.exports = {
   applicationsEndingSoon:applicationsEndingSoon,
   getApplicationsStagesByJobId:getApplicationsStagesByJobId,
   search:search,
+  searchEmails:searchEmails
 
 }

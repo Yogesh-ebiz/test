@@ -11,6 +11,25 @@ const capitalizeLocale = ([ first, ...rest ], locale = navigator.language) => {
   return [ first.toLocaleUpperCase(locale), ...rest ].join('');
 }
 
+const cardTest = (card) => {
+  let brand;
+
+  if(card.match('^4[0-9]{6,}$')){
+    brand = 'VISA';
+  } else if(card.match('^5[1-5][0-9]{5,}|222[1-9][0-9]{3,}|22[3-9][0-9]{4,}|2[3-6][0-9]{5,}|27[01][0-9]{4,}|2720[0-9]{3,}$')){
+    brand = 'MASTERCARD';
+  } else if(card.match('^3[47][0-9]{5,}$')){
+    brand = 'AMX';
+  } else if(card.match('^3(?:0[0-5]|[68][0-9])[0-9]{4,}$')){
+    brand = 'DINER';
+  } else if(card.match('^6(?:011|5[0-9]{2})[0-9]{3,}$')){
+    brand = 'DISCOVER';
+  } else if(card.match('^(?:2131|1800|35[0-9]{3})[0-9]{3,}$')){
+    brand = 'JCB';
+  }
+
+  return brand;
+}
 
 
 const convertToTalentUser = (user) => {
@@ -83,11 +102,17 @@ const convertToCandidate = (user) => {
     rating: user.rating?user.rating:0,
     overallRating: user.overallRating?user.overallRating:0,
     teamRating: user.teamRating?user.teamRating:0,
+    hasApplied: user.hasApplied?user.hasApplied:false,
+    hasImported: user.hasImported?user.hasImported:false,
+    past: user.past?user.past:null,
+    current: user.current?user.current:null,
     links: user.links?user.links:[],
     tags: user.tags?user.tags:[],
     sources: user.sources?user.sources:[],
     applications: user.applications?user.applications:[],
-    evaluations: user.evaluations?user.evaluations:[]
+    evaluations: user.evaluations?user.evaluations:[],
+    experiences: user.experiences?user.experiences:[],
+    educations: user.educations?user.educations:[],
   };
 }
 
@@ -213,5 +238,6 @@ module.exports = {
   convertToTalentUser:convertToTalentUser,
   convertToCandidate:convertToCandidate,
   roleMinimal:roleMinimal,
-  jobMinimal:jobMinimal
+  jobMinimal:jobMinimal,
+  cardTest:cardTest
 };

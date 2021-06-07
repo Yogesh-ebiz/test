@@ -36,6 +36,7 @@ async function searchPeople(req, res) {
 
 
   data = await peopleCtrl.searchPeople(filter, sort, res.locale);
+
   res.json(new Response(data, data?'people_retrieved_successful':'not_found', res));
 }
 
