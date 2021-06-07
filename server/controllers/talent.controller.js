@@ -1202,7 +1202,7 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
     result.docs.forEach(function(activity){
       let found = _.find(users, {id: parseInt(activity.causerId)});
       if(found){
-        activity.causer = convertToTalentUser(found);
+        activity.causer = convertTstagsoTalentUser(found);
       }
     });
     return new Pagination(result);
@@ -1232,7 +1232,13 @@ async function searchPeopleSuggestions(companyId, currentUserId, jobId, filter, 
     filter.jobTitles = ["Sr. Manager"];
     filter.location = ["US", "Vietnam"]
     result = await feedService.searchPeople(filter, sort);
+    result.content = _.reduce(result.content, function(res, people){
 
+      people.employer = convertToCompany(people.employer);
+      people = convertToCandidate(people);
+      res.push(people);
+      return res;
+    }, []);
   } catch (error) {
     console.log(error);
   }

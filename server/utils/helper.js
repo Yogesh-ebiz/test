@@ -93,7 +93,7 @@ const convertToCandidate = (user) => {
 
   return {
     id: user.id?user.id:user._id,
-    userId: user.userId,
+    userId: user.userId?user.userId:user.id,
     createdDate: user.createdDate,
     company: user.company,
     name: user.name,
@@ -119,6 +119,9 @@ const convertToCandidate = (user) => {
     teamRating: user.teamRating?user.teamRating:0,
     hasApplied: user.hasApplied?user.hasApplied:false,
     hasImported: user.hasImported?user.hasImported:false,
+    hasFollowedCompany: user.hasFollowedCompany?user.hasFollowedCompany:false,
+    openToJob: user.openToJob?user.openToJob:false,
+    openToRelocate: user.openToRelocate?user.openToRelocate:false,
     past: past,
     current: current,
     links: user.links?user.links:[],

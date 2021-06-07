@@ -225,7 +225,7 @@ async function findJobId(jobId, locale) {
   // let propLocale = '$name.'+localeStr;
 
 
-  data = await JobRequisition.findOne({jobId: jobId}).populate('tags');
+  data = await JobRequisition.findOne({jobId: jobId}).populate('tags').populate('createdBy');
 
   // Promotion.populate(data, {path: "promotion"});
 

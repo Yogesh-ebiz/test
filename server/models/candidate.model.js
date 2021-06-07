@@ -104,6 +104,18 @@ const CandidateSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  hasFollowedCompany: {
+    type: Boolean,
+    default: false
+  },
+  openToJob: {
+    type: Boolean,
+    default: false
+  },
+  openToRelocation: {
+    type: Boolean,
+    default: false
+  },
   links: {
     type: Array,
     required:false

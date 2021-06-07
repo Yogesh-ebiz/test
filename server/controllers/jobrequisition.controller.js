@@ -135,34 +135,34 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     job = await findJobId(jobId, locale);
 
     if(job) {
-      if (currentUserId) {
 
-        let currentParty = await findByUserId(currentUserId);
+      let currentParty = await findByUserId(currentUserId);
 
-        if (isPartyActive(currentParty)) {
+      if (isPartyActive(currentParty)) {
 
-          let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
-          job.hasSaved = (hasSaved) ? true : false;
+        let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
+        job.hasSaved = (hasSaved) ? true : false;
 
-          let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
-          job.hasApplied = (hasApplied) ? true : false;
+        let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
+        job.hasApplied = (hasApplied) ? true : false;
 
-          partySkills = await findUserSkillsById(currentParty.id);
-          partySkills = _.map(partySkills, "id");
+        partySkills = await findUserSkillsById(currentParty.id);
+        partySkills = _.map(partySkills, "id");
 
-          await addJobViewByUserId(currentParty.id, job.company, job._id);
-          job.noOfViews++;
-          await job.save();
-        }
-
+        await addJobViewByUserId(currentParty.id, job.company, job._id);
+        job.noOfViews++;
+        await job.save();
       }
+
+
+
 
       let company = await findCompanyById(job.company, currentUserId);
       job.company = convertToCompany(company);
 
       if(!isMinimal) {
-
-        let hiringManager = await findByUserId(job.createdBy);
+        console.log(job.createdBy)
+        let hiringManager = await findByUserId(job.createdBy.userId);
         job.createdBy = convertToAvatar(hiringManager);
 
         let jobSkills = await findSkillsById(job.skills);
@@ -683,7 +683,11 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
     filter.employmentType=null;
 
 
-    result = await JobRequisition.aggregatePaginate({ $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } , options);
+    const aggregate = JobRequisition.aggregate([
+      { $match: { $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } }
+    ]);
+
+    result = await JobRequisition.aggregatePaginate(aggregate , options);
     let docs = [];
 
     let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
