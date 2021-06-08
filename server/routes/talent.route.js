@@ -55,7 +55,7 @@ router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncH
 
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
-// router.route('/company/:id/applications').get(asyncHandler(searchAllApplications));
+router.route('/company/:id/applications/endingsoon').get(asyncHandler(getAllApplicationsEndingSoon));
 router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
 router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
@@ -181,6 +181,7 @@ router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(de
 
 router.route('/company/:id/emails/compose').post(asyncHandler(composeEmail));
 router.route('/company/:id/emails/:emailId').get(asyncHandler(getEmailById));
+router.route('/company/:id/emails/:emailId/upload').post(asyncHandler(uploadEmailAttachmentById));
 
 router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 
@@ -492,6 +493,16 @@ async function updateApplication(req, res) {
 }
 
 
+
+async function getAllApplicationsEndingSoon(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let sort = req.query;
+
+  let data = await talentCtrl.getAllApplicationsEndingSoon(companyId, currentUserId, sort);
+
+  res.json(new Response(data, data?'applicagion_retrieved_successful':'not_found', res));
+}
 
 
 async function getApplicationById(req, res) {
@@ -1623,6 +1634,17 @@ async function getEmailById(req, res) {
 
 
   let data = await talentCtrl.getEmailById(company, currentUserId, emailId);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
+
+
+async function uploadEmailAttachmentById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let emailId = ObjectID(req.params.emailId);
+  let files = req.files;
+
+  let data = await talentCtrl.uploadEmailAttachmentById(company, currentUserId, emailId, files);
   res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
 }
 

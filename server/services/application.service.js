@@ -782,6 +782,77 @@ async function applicationsEndingSoon(company) {
 }
 
 
+async function getAllAapplicationsEndingSoon(company, sort) {
+  let result = null;
+
+  if(!company){
+    return;
+  }
+
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+
+  let aList = [];
+  let aMatch = { $match: {company: company} };
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+  aList.push(
+    { $lookup:{
+        from:"applicationprogresses",
+        let:{currentProgress: '$currentProgress'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$currentProgress","$_id"]}}},
+          {
+            $lookup: {
+              from: 'stages',
+              localField: "stage",
+              foreignField: "_id",
+              as: "stage"
+            }
+          },
+          { $unwind: '$stage' },
+          { $addFields:
+              {
+                timeLeft: {$round: [ {$divide : [{$subtract: [{ $add:[ {$toDate: "$createdDate"}, {$multiply: ['$stage.timeLimit', 1*24*60*60000] } ] }, "$$NOW"]}, 86400000]}, 0 ] }
+              }
+          },
+
+        ],
+        as: 'currentProgress'
+      }},
+    { $unwind: '$currentProgress'},
+    { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+    { $unwind: '$user' },
+    {
+      $match: {'currentProgress.timeLeft': {$lte: 1}}
+    }
+
+  );
+
+
+  aList.push(aSort);
+
+  let aggregate = Application.aggregate(aList)
+
+  let applications = await Application.aggregatePaginate(aggregate, options);
+
+  return applications;
+}
+
+
 async function getApplicationsStagesByJobId(jobId) {
   let result = null;
 
@@ -1030,6 +1101,7 @@ module.exports = {
   getInsightCandidates:getInsightCandidates,
   getCandidatesSourceByJobId:getCandidatesSourceByJobId,
   applicationsEndingSoon:applicationsEndingSoon,
+  getAllAapplicationsEndingSoon:getAllAapplicationsEndingSoon,
   getApplicationsStagesByJobId:getApplicationsStagesByJobId,
   search:search,
   searchEmails:searchEmails

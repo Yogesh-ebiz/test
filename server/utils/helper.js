@@ -72,7 +72,8 @@ const convertToAvatar = (user) => {
     avatar: user.avatar,
     isOnline: user.isOnline,
     partyType: user.partyType,
-    headline: user.headline
+    headline: user.headline,
+    isMember: user.isMember?user.isMember:false
   };
 }
 
@@ -111,17 +112,17 @@ const convertToCandidate = (user) => {
     partyType: user.partyType?user.partyType:'',
     jobTitle: user.jobTitle?user.jobTitle:'',
     headline: user.headline,
-    noOfMonthExperiences: user.noOfMonthExperiences?user.noOfMonthExperiences:6.5,
+    noOfMonthExperiences: user.noOfMonthExperiences?user.noOfMonthExperiences:35,
     level:user.level?user.level:'SENIOR',
-    match:user.match?user.match:0,
+    match:user.match?user.match:87,
     rating: user.rating?user.rating:0,
     overallRating: user.overallRating?user.overallRating:0,
     teamRating: user.teamRating?user.teamRating:0,
-    hasApplied: user.hasApplied?user.hasApplied:false,
-    hasImported: user.hasImported?user.hasImported:false,
-    hasFollowedCompany: user.hasFollowedCompany?user.hasFollowedCompany:false,
-    openToJob: user.openToJob?user.openToJob:false,
-    openToRelocate: user.openToRelocate?user.openToRelocate:false,
+    hasApplied: user.hasApplied?user.hasApplied:true,
+    hasImported: user.hasImported?user.hasImported:true,
+    hasFollowedCompany: user.hasFollowedCompany?user.hasFollowedCompany:true,
+    openToJob: user.openToJob?user.openToJob:true,
+    openToRelocate: user.openToRelocate?user.openToRelocate:true,
     past: past,
     current: current,
     links: user.links?user.links:[],

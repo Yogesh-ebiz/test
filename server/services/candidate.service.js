@@ -203,34 +203,6 @@ async function search(filter, sort) {
 
 
   if(filter.stages.length){
-    // filter.stages = _.reduce(filter.stages, function (res, stage) {
-    //   res.push(ObjectID(stage));
-    //   return res;
-    // }, []);
-
-
-    // aList.push(
-    //   {$lookup:{
-    //       from:"applications",
-    //       let:{user:"$_id"},
-    //       pipeline:[
-    //         {$match:{$expr:{$eq:["$user","$$user"]}}},
-    //         {$lookup:{
-    //             from:"applicationprogresses",
-    //             let:{currentProgress:"$currentProgress"},
-    //             pipeline:[
-    //               {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-    //             ],
-    //             as: 'currentProgress'
-    //           }},
-    //         { $unwind: '$currentProgress'},
-    //
-    //       ],
-    //       as: 'applications'
-    //     }},
-    //   { $match: {'applications.currentProgress.stage': {$in: filter.stages} } }
-    // );
-
     aList.push({ $match: {'applications.currentProgress.stage.type': {$in: filter.stages} } });
   }
 

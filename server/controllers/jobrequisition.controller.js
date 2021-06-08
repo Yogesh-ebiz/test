@@ -857,7 +857,6 @@ async function applyJobById(currentUserId, jobId, application ) {
 
           if (savedApplication) {
             let jobPipeline = await getPipelineById(job.pipeline);
-            console.log(jobPipeline)
             if (jobPipeline) {
               let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
 

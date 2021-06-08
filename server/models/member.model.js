@@ -56,6 +56,10 @@ const MemberSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  isMember: {
+    type: Boolean,
+    default: true
+  },
   preferTimeFormat: {
     type: String,
     required:false

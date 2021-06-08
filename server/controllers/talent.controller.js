@@ -15,7 +15,7 @@ const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const taskType = require('../const/taskType');
 
-
+const {upload} = require('../services/aws.service');
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
@@ -123,6 +123,7 @@ module.exports = {
   getJobActivities,
   searchPeopleSuggestions,
   searchApplications,
+  getAllApplicationsEndingSoon,
   getApplicationById,
   rejectApplication,
   updateApplicationProgress,
@@ -214,6 +215,7 @@ module.exports = {
   deleteCompanyEvaluationTemplate,
   composeEmail,
   getEmailById,
+  uploadEmailAttachmentById,
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
   updateCompanyEmailTemplate,
@@ -1298,6 +1300,25 @@ async function searchCompanyApplications(currentUserId, companyId, filter, local
 }
 
 
+async function getAllApplicationsEndingSoon(companyId, currentUserId, sort, locale) {
+
+  if(!companyId || !currentUserId || !sort){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result = await applicationService.getAllAapplicationsEndingSoon(companyId, sort);
+
+  return new Pagination(result);
+
+
+}
+
 
 async function getApplicationById(companyId, currentUserId, applicationId) {
 
@@ -2265,6 +2286,10 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
   }
 
   result = await candidateService.search(filter, sort);
+  result.docs = _.reduce(result.docs, function(res, item){
+    res.push(convertToCandidate(item));
+    return res;
+  }, []);
 
   return new Pagination(result);
 
@@ -4223,6 +4248,71 @@ async function getEmailById(companyId, currentUserId, emailId)  {
 }
 
 
+
+async function uploadEmailAttachmentById(companyId, currentUserId, emailId, files)  {
+  if(!companyId || !currentUserId ||  !emailId || !files){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'emails/';
+  try {
+    let email = await emailService.findById(emailId);
+    if (email && email.from.id === member.userId && (files && files.file.length)) {
+      let type;
+      //------------Upload CV----------------
+
+      for (let [i, file] of files.file.entries()) {
+        let fileName = file.originalFilename.split('.');
+        let fileExt = fileName[fileName.length - 1];
+        // let date = new Date();
+        let timestamp = Date.now();
+        let name = fileName[0] + '-' + timestamp + '.' + fileExt;
+        let path = basePath + email._id + '/files/' + name;
+        let response = await upload(path, file);
+        switch (fileExt.toLowerCase()) {
+          case 'pdf':
+            type = 'PDF';
+            break;
+          case 'doc':
+            type = 'WORD';
+            break;
+          case 'docx':
+            type = 'WORD';
+            break;
+          case 'png':
+            type = 'PNG';
+            break;
+          case 'jpg':
+            type = 'JPG';
+            break;
+          case 'jpeg':
+            type = 'JPG';
+            break;
+        }
+
+        email.attachments.push(name);
+
+      }
+
+
+      result = await email.save();
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
 /************************** EMAILTEMPLATES *****************************/
 
 async function getCompanyEmailTemplates(companyId, currentUserId, query, locale)  {
@@ -4337,10 +4427,13 @@ async function searchContacts(companyId, currentUserId, query) {
   try {
 
     let members = await memberService.searchMembers(companyId, query);
+
     let candidates = await candidateService.searchCandidates(companyId, query);
+
 
     result = _.reduce(members.concat(candidates), function (res, item) {
       let exists = _.find(res, {id: item.userId});
+      item.isMember = item.isMember?true:false;
       if(!exists) {
         res.push(convertToAvatar(item));
       }
