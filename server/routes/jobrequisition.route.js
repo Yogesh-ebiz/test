@@ -2,6 +2,8 @@ const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const querystring = require('querystring');
+const ObjectID = require('mongodb').ObjectID;
+
 const jobRequisitionCtl = require('../controllers/jobrequisition.controller');
 let Response = require('../const/response');
 
@@ -175,7 +177,7 @@ async function addBookmark(req, res) {
   // console.log('JobID: ', req.params.id)
   // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
-  let jobId = req.params.id;
+  let jobId = ObjectID(req.params.id);
   let data = await jobRequisitionCtl.addBookmark(currentUserId, jobId);
 
   res.json(new Response(data, data?'bookmark_saved_successful':'not_found', res));

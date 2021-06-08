@@ -54,7 +54,6 @@ router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
-  console.log('id', currentUserId)
   let data = await hr.getCompanyJobs(currentUserId, company);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }

@@ -350,12 +350,10 @@ async function getJobInsight(jobId) {
       }
     ]);
 
-    console.log(result)
     if (result.length) {
         date = new Date();
         for (var i = 0; i < maxDays; i++) {
           let item = {};
-          console.log(date.getDate(),date.getMonth()+1)
           let found = _.find(result, {_id: {day: date.getDate(), month: date.getMonth() + 1}});
           if (found) {
             item = {date: date.getDate() + '/' + (parseInt(date.getMonth()) + 1), data: {paid: 0, free: found.count}};
@@ -398,8 +396,6 @@ async function getInsightCandidates(from, to, companyId, jobId, options) {
     match.$and.push({jobId: jobId});
   }
 
-
-  console.log(match)
   const aggregate = JobView.aggregate([{
     $match: match
   },

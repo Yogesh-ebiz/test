@@ -280,7 +280,8 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
   let pipeline=null;
 
-  let job = await JobRequisition.findById(ObjectID(jobId)).populate(
+
+  let job = await JobRequisition.findById(jobId).populate(
     {
       path: 'pipeline',
       model: 'Pipeline',
@@ -306,11 +307,13 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
         await job.save();
       }
     } else {
+
       if(job.pipeline.pipelineTemplateId===form.pipelineTemplateId){
         for([i, stage] of job.pipeline.stages.entries()){
+
           let foundStage = _.find(form.stages, {_id: stage._id.toString()});
           if(foundStage){
-
+            stage.timeLimit = foundStage.timeLimit;
             if(foundStage.tasks.length){
               for([j, task] of stage.tasks.entries()){
                 let foundTask = _.find(foundStage.tasks, {type: task.type});
@@ -328,6 +331,20 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
         }
         pipeline = job.pipeline;
+      } else if(job.status == statusEnum.DRAFT) {
+        for(let [i, stages] in job.pipeline.stages.entries()){
+          await stages.delete();
+        }
+        job.pipeline.delete();
+
+        form.createdBy = currentUserId
+        form.jobId = job._id;
+        pipeline = await PipelineService.addPipeline(jobId, form);
+
+        if (pipeline) {
+          job.pipeline = pipeline._id;
+          await job.save();
+        }
       }
 
     }

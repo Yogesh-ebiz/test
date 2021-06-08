@@ -636,7 +636,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   );
 
 
-  if(sort && sort.sortBy=='mostView'){
+  if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
     aList.push(aSort);
   } else {
@@ -1006,7 +1006,6 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
   }
 
   let result = null;
-
   try {
       result = await jobService.updateJobPipeline(jobId, form, currentUserId);
 

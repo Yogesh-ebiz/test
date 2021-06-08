@@ -755,7 +755,7 @@ async function getApplicationActivities(req, res) {
 async function updateJobPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let jobId = req.params.jobId;
+  let jobId = ObjectID(req.params.jobId);
   let pipeline = req.body;
 
   let data = await talentCtrl.updateJobPipeline(companyId, jobId, currentUserId, pipeline);

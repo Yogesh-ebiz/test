@@ -1982,7 +1982,6 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
 
 async function getJobViewsByUserId(currentUserId, filter, locale) {
 
-  console.log(currentUserId)
   if(currentUserId==null || filter==null){
     return null;
   }
@@ -2012,7 +2011,14 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       filter.partyId=currentParty.id;
 
-      result = await JobView.aggregatePaginate(new SearchParam(filter), options);
+
+      const aggregate = JobView.aggregate([
+        { $match: {partyId: currentUserId}},
+        { $lookup: {from: 'jobrequisitions', localField: 'jobId', foreignField: '_id', as: 'job' } },
+        { $unwind: '$job'}
+      ]);
+
+      result = await JobView.aggregatePaginate(aggregate, options);
       let jobIds = _.map(result.docs, 'jobId');
 
       let hasSaves = await findBookByUserId(currentUserId);

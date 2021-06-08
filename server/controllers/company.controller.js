@@ -161,32 +161,41 @@ module.exports = {
 
 }
 
-async function getCompanyJobs(currentUserId, filter, pagination, locale) {
+async function getCompanyJobs(currentUserId, filter, sort, locale) {
 
-  console.log(filter, pagination)
-  if(!filter || !pagination){
+  if(!filter || !sort){
     return null;
   }
 
   let foundJob = null;
-  let select = '-description -qualifications -responsibilities';
-  let limit = (pagination.size && pagination.size>0) ? pagination.size:20;
-  let page = (pagination.page && pagination.page==0) ? pagination.page:1;
-  let sortBy = {};
-  pagination.sortBy = (pagination.sortyBy) ? pagination.sortyBy : 'createdDate';
-  pagination.direction = (pagination.direction && pagination.direction=="ASC") ? "ASC" : 'DESC';
-  sortBy[pagination.sortBy] = (pagination.direction == "DESC") ? -1 : 1;
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
 
   let options = {
     select:   select,
-    sort:     sortBy,
+    sort:     null,
     lean:     true,
     limit:    limit,
-    page: parseInt(pagination.page)+1
+    page: parseInt(sort.page)+1
   };
 
+  filter.status = [statusEnum.ACTIVE];
 
-  let result = await JobRequisition.aggregatePaginate(new SearchParam(filter), options);
+  let aList = [];
+  let aMatch = { $match: new SearchParam(filter)};
+  let aSort = { $sort: {createdDate: direction} };
+  aList.push(aMatch);
+  if(sort && sort.sortBy=='popular'){
+    aSort = { $sort: { noOfViews: direction} };
+    aList.push(aSort);
+  } else {
+    aList.push(aSort);
+  }
+  
+  const aggregate = JobRequisition.aggregate(aList);
+  let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let docs = [];
 
   // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));

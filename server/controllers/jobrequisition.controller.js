@@ -524,22 +524,19 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   }
 
   let foundJob = null;
-  let select = '-description -qualifications -responsibilities';
+
+  let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page:1;
-  let sortBy = {};
-  sort.sortBy = (sort.sortyBy) ? sort.sortyBy : 'createdDate';
-  sort.direction = (sort.direction && sort.direction=="ASC") ? "ASC" : 'DESC';
-  sortBy[sort.sortBy] = (sort.direction == "DESC") ? -1 : 1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
 
   let options = {
     select:   select,
-    sort:     sortBy,
+    sort:     null,
     lean:     true,
     limit:    limit,
     page: parseInt(sort.page)+1
   };
-
 
 
   let history = await  saveSearch(currentUserId, filter.query);
@@ -567,10 +564,20 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   }
 
   filter.status = [statusEnum.ACTIVE];
-  const aggregate = JobRequisition.aggregate([{
-    $match: new SearchParam(filter)
+
+  let aList = [];
+  let aMatch = { $match: new SearchParam(filter)};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+  if(sort && sort.sortBy=='popular'){
+    aSort = { $sort: { noOfViews: direction} };
+    aList.push(aSort);
+  } else {
+    aList.push(aSort);
   }
-  ]);
+
+  const aggregate = JobRequisition.aggregate(aList);
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let docs = [];
 
@@ -595,7 +602,7 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
 
 
   _.forEach(result.docs, function(job){
-    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+    job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
     job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
@@ -850,6 +857,7 @@ async function applyJobById(currentUserId, jobId, application ) {
 
           if (savedApplication) {
             let jobPipeline = await getPipelineById(job.pipeline);
+            console.log(jobPipeline)
             if (jobPipeline) {
               let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
 
@@ -929,7 +937,8 @@ async function addBookmark(currentUserId, jobId) {
 
   let result;
   try {
-    let job = await JobRequisition.findOne({_id: ObjectID(jobId), status: statusEnum.ACTIVE });
+    console.log(jobId)
+    let job = await JobRequisition.findById(jobId);
     if(job) {
       result = await bookmarkService.findBookById(currentUserId, ObjectID(jobId));
 
