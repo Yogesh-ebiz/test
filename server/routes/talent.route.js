@@ -44,6 +44,7 @@ router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchAp
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
 router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
+router.route('/company/:id/jobs/:jobId/members').get(asyncHandler(getJobMembers));
 router.route('/company/:id/jobs/:jobId/members').post(asyncHandler(updateJobMembers));
 
 router.route('/company/:id/jobs/:jobId/subscribe').post(asyncHandler(subscribeJob));
@@ -80,6 +81,8 @@ router.route('/company/:id/applications/:applicationId/progress/:progressId/even
 
 router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHandler(disqualifyApplication));
 router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
+router.route('/company/:id/applications/:applicationId').delete(asyncHandler(deleteApplication));
+
 
 router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHandler(subscribeApplication));
 router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
@@ -178,10 +181,6 @@ router.route('/company/:id/emails/templates').get(asyncHandler(getCompanyEmailTe
 router.route('/company/:id/emails/templates').post(asyncHandler(addCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').put(asyncHandler(updateCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(deleteCompanyEmailTemplate));
-
-router.route('/company/:id/emails/compose').post(asyncHandler(composeEmail));
-router.route('/company/:id/emails/:emailId').get(asyncHandler(getEmailById));
-router.route('/company/:id/emails/:emailId/upload').post(asyncHandler(uploadEmailAttachmentById));
 
 router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 
@@ -647,7 +646,7 @@ async function getApplicationEvaluations(req, res) {
 async function searchApplicationEmails(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let applicationId = ObjectID(req.query.applicationId);
+  let applicationId = ObjectID(req.params.applicationId);
   let sort = req.query;
 
 
@@ -707,7 +706,7 @@ async function removeApplicationProgressEvent(req, res) {
 async function disqualifyApplication(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = req.params.applicationId;
+  let applicationId = ObjectID(req.params.applicationId);
   let disqualification = req.body;
 
   let data = await talentCtrl.disqualifyApplication(companyId, currentUserId, applicationId, disqualification);
@@ -719,11 +718,22 @@ async function disqualifyApplication(req, res) {
 async function revertApplication(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = req.params.applicationId;
+  let applicationId = ObjectID(req.params.applicationId);
 
   let data = await talentCtrl.revertApplication(companyId, currentUserId, applicationId);
 
   res.json(new Response(data, data?'application_reverted_successful':'not_found', res));
+}
+
+
+async function deleteApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = ObjectID(req.params.applicationId);
+
+  let data = await talentCtrl.deleteApplication(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_deleted_successful':'not_found', res));
 }
 
 
@@ -777,13 +787,19 @@ async function updateJobPipeline(req, res) {
 async function getJobPipeline(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let jobId = req.params.jobId;
+  let jobId = ObjectID(req.params.jobId);
 
   let data = await talentCtrl.getJobPipeline(companyId, jobId, currentUserId);
   res.json(new Response(data, data?'job_pipeline_retreived_successful':'not_found', res));
 }
 
 
+async function getJobMembers(req, res) {
+  let jobId = ObjectID(req.params.jobId);
+
+  let data = await talentCtrl.getJobMembers(jobId);
+  res.json(new Response(data, data?'job_member_retrieved_successful':'not_found', res));
+}
 
 async function updateJobMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -1615,38 +1631,6 @@ async function deleteCompanyEvaluationTemplate(req, res) {
   res.json(new Response(data, data?'evlaluation_deleted_successful':'not_found', res));
 }
 
-
-async function composeEmail(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
-  let form = req.body;
-
-
-  let data = await talentCtrl.composeEmail(company, currentUserId, form);
-  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
-}
-
-
-async function getEmailById(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
-  let emailId = ObjectID(req.params.emailId);
-
-
-  let data = await talentCtrl.getEmailById(company, currentUserId, emailId);
-  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
-}
-
-
-async function uploadEmailAttachmentById(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
-  let emailId = ObjectID(req.params.emailId);
-  let files = req.files;
-
-  let data = await talentCtrl.uploadEmailAttachmentById(company, currentUserId, emailId, files);
-  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
-}
 
 async function getCompanyEmailTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

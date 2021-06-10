@@ -28,12 +28,13 @@ async function compose(form) {
     return;
   }
 
+  form.threadId = form.threadId?ObjectID(form.threadId):'';
   form = await Joi.validate(form, emailSchema, { abortEarly: false });
 
   let email = await new Email(form).save();
 
   if(email) {
-    if (form.meta.applicationId) {
+    if (form.meta && form.meta.applicationId) {
       let application = await applicationService.findById(ObjectID(form.meta.applicationId));
       if (application) {
         application.emails.push(email._id);

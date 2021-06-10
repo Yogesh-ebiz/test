@@ -60,6 +60,10 @@ app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
 app.use(multipart());
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  limit: '250mb',
+  extended: true
+}));
 
 
 // secure apps by setting various HTTP headers

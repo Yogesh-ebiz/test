@@ -891,7 +891,7 @@ async function applyJobById(currentUserId, jobId, application ) {
 
 
 
-            let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subjectId: ''+savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, jobId: job._id, jobTitle: job.title}});
+            let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subjectId: ''+savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, candidate: savedApplication.user, jobId: job._id, jobTitle: job.title}});
 
 
 

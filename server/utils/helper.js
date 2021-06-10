@@ -73,6 +73,7 @@ const convertToAvatar = (user) => {
     isOnline: user.isOnline,
     partyType: user.partyType,
     headline: user.headline,
+    email: user.email,
     isMember: user.isMember?user.isMember:false
   };
 }
@@ -118,8 +119,8 @@ const convertToCandidate = (user) => {
     rating: user.rating?user.rating:0,
     overallRating: user.overallRating?user.overallRating:0,
     teamRating: user.teamRating?user.teamRating:0,
-    hasApplied: user.hasApplied?user.hasApplied:true,
-    hasImported: user.hasImported?user.hasImported:true,
+    hasApplied: user.hasApplied?user.hasApplied:false,
+    hasImported: user.hasImported?user.hasImported:false,
     hasFollowedCompany: user.hasFollowedCompany?user.hasFollowedCompany:true,
     openToJob: user.openToJob?user.openToJob:true,
     openToRelocate: user.openToRelocate?user.openToRelocate:true,

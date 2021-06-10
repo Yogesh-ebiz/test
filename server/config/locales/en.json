@@ -195,5 +195,6 @@
 	"contacts_retrieved_successful": "contacts_retrieved_successful",
 	"card_created_successful": "card_created_successful",
 	"cards_retrieved_successful": "cards_retrieved_successful",
-	"card_removeed_successful": "card_removeed_successful"
+	"card_removeed_successful": "card_removeed_successful",
+	"job_member_retrieved_successful": "job_member_retrieved_successful"
 }

@@ -436,23 +436,46 @@ async function getJobMembers(jobId) {
     return;
   }
 
-  let job = await JobRequisition.findById(jobId);
-  if(job){
-    data = await Pipeline.findById(job.pipeline).populate({
-      path: 'stages',
-      populate:[{
-        path: 'members',
-        model: 'Member'
-      }, {
-        path: 'tasks',
-        model: 'Task'
-      }]
-    });
+  let job = await JobRequisition.findById(jobId).populate([
+    {
+      path: 'createdBy',
+      model: 'Member'
+    },
+    {
+      path: 'members',
+      model: 'Member'
+    },
+    {
+      path: 'pipeline',
+      model: 'Pipeline',
+      populate: {
+        path: 'stages',
+        model: 'Stage',
+        populate: {
+          path: 'members',
+          model: 'Member'
+        }
+      }
+    }
+    ]);
 
-  }
+  let members = _.reduce(job.pipeline.stages, function(res, stage){
+    res = res.concat(stage.members);
+    return res;
+  }, []);
 
+  members = members.concat(job.members);
+  members.push(job.createdBy);
 
-  return data;
+  let reduceMembers = [];
+  members.forEach(function(member){
+    if(!_.find(reduceMembers, {userId: member.userId})){
+      reduceMembers.push(member);
+    }
+
+  });
+
+  return reduceMembers;
 }
 
 async function updateJobApplicationForm(jobId, form, currentUserId, locale) {

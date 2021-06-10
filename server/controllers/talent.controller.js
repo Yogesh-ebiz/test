@@ -115,6 +115,7 @@ module.exports = {
   getJobById,
   updateJobPipeline,
   getJobPipeline,
+  getJobMembers,
   updateJobMembers,
   updateJobApplicationForm,
   getBoard,
@@ -144,6 +145,7 @@ module.exports = {
   removeApplicationProgressEvent,
   disqualifyApplication,
   revertApplication,
+  deleteApplication,
   subscribeApplication,
   unsubscribeApplication,
   getApplicationActivities,
@@ -213,9 +215,6 @@ module.exports = {
   getCompanyEvaluationTemplate,
   updateCompanyEvaluationTemplate,
   deleteCompanyEvaluationTemplate,
-  composeEmail,
-  getEmailById,
-  uploadEmailAttachmentById,
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
   updateCompanyEmailTemplate,
@@ -625,15 +624,15 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
       }
     },
     { $unwind: '$createdBy'},
-    {
-      $lookup: {
-        from: 'departments',
-        localField: "department",
-        foreignField: "_id",
-        as: "department"
-      }
-    },
-    { $unwind: '$department'}
+    // {
+    //   $lookup: {
+    //     from: 'departments',
+    //     localField: "department",
+    //     foreignField: "_id",
+    //     as: "department"
+    //   }
+    // },
+    // { $unwind: '$department'}
 
   );
 
@@ -648,11 +647,11 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
 
-  const loadPromises = result.docs.map(job => {
-    job.isHot = false;
-    job.isNew = false;
-    job.company = convertToCompany(company);
-    job.hasSaved = _.some(jobSubscribed, {subjectId: job._id});
+  let departmentIds = _.map(result.docs, 'department');
+  let departments = await departmentService.findDepartmentsByCompany(companyId);
+
+  result.docs.map(job => {
+    job.department = _.find(departments, {_id: job.department});
     return job;
   });
   // result = await Promise.all(loadPromises);
@@ -1044,18 +1043,35 @@ async function getJobPipeline(companyId, jobId, currentUserId) {
   return result
 }
 
+
+async function getJobMembers(jobId) {
+  let result;
+  try {
+    result = await jobService.getJobMembers(jobId);
+
+  } catch(e){
+    console.log('updateJobMember: Error', e);
+  }
+
+
+  return result
+}
+
 async function updateJobMembers(jobId, currentUserId, members) {
   if(!jobId || !currentUserId || !members){
     return null;
   }
 
   let result = null;
-  let currentParty = await feedService.findByUserId(currentUserId);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
 
   try {
-    if (isPartyActive(currentParty)) {
-      result = await jobService.updateJobMembers(jobId, members, currentUserId);
-    }
+    result = await jobService.updateJobMembers(jobId, members, currentUserId);
+
   } catch(e){
     console.log('updateJobMember: Error', e);
   }
@@ -1528,7 +1544,7 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
 
 
       let job = await jobService.findJob_Id(application.jobId);
-      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: foundStage.name}});
+      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: foundStage.name}});
     }
 
   } catch (error) {
@@ -1703,7 +1719,7 @@ async function getApplicationComments(currentUserId, applicationId, filter) {
     console.log(error);
   }
 
-  return result;
+  return new Pagination(result);
 }
 
 async function addApplicationComment(currentUserId, applicationId, comment) {
@@ -1913,7 +1929,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
         await application.currentProgress.save();
         await application.user.save();
         let job = await jobService.findJob_Id(application.jobId);
-        let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {name: application.currentProgress.stage.name, jobId: job._id}});
+        let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {candidate: application.user._id, name: application.currentProgress.stage.name, jobId: job._id}});
       }
     }
 
@@ -2030,6 +2046,31 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
   try {
 
     result = await applicationService.revertApplication(applicationId, member);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function deleteApplication(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await applicationService.deleteApplication(applicationId, member);
 
   } catch (error) {
     console.log(error);
@@ -2319,6 +2360,8 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
     }
   ]);
 
+
+
   if(candidate) {
     let evaluations = await evaluationService.getCandidateEvaluations(candidate.userId);
     if (evaluations) {
@@ -2335,17 +2378,24 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
       }, 0) / evaluations.length * 100) / 100;
 
     }
-    if (candidate) {
-      candidate.match = 78;
-      let partyLink = await feedService.getUserLinks(candidate.userId);
-      if (partyLink) {
-        candidate.links = partyLink.links;
-      }
-
-      result = convertToCandidate(candidate);
+    candidate.match = 78;
+    let partyLink = await feedService.getUserLinks(candidate.userId);
+    if (partyLink) {
+      candidate.links = partyLink.links;
     }
+    result = convertToCandidate(candidate);
+  } else {
+    let people = await feedService.findCandidateById(candidateId);
+
+    people.match = 78;
+
+    result = convertToCandidate(people);
+
 
   }
+
+
+
   return result;
 
 }
@@ -4220,97 +4270,6 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
 
 
 
-/************************** EMAIL *****************************/
-
-async function composeEmail(companyId, currentUserId, form)  {
-
-  if(!companyId || !currentUserId ||  !form){
-    return null;
-  }
-
-  let result = await emailService.compose(form);
-
-  return result;
-
-}
-
-
-async function getEmailById(companyId, currentUserId, emailId)  {
-
-  if(!companyId || !currentUserId ||  !emailId){
-    return null;
-  }
-
-  let result = await emailService.findById(emailId);
-
-  return result;
-
-}
-
-
-
-async function uploadEmailAttachmentById(companyId, currentUserId, emailId, files)  {
-  if(!companyId || !currentUserId ||  !emailId || !files){
-    return null;
-  }
-
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
-    return null;
-  }
-
-  let result = null;
-  let basePath = 'emails/';
-  try {
-    let email = await emailService.findById(emailId);
-    if (email && email.from.id === member.userId && (files && files.file.length)) {
-      let type;
-      //------------Upload CV----------------
-
-      for (let [i, file] of files.file.entries()) {
-        let fileName = file.originalFilename.split('.');
-        let fileExt = fileName[fileName.length - 1];
-        // let date = new Date();
-        let timestamp = Date.now();
-        let name = fileName[0] + '-' + timestamp + '.' + fileExt;
-        let path = basePath + email._id + '/files/' + name;
-        let response = await upload(path, file);
-        switch (fileExt.toLowerCase()) {
-          case 'pdf':
-            type = 'PDF';
-            break;
-          case 'doc':
-            type = 'WORD';
-            break;
-          case 'docx':
-            type = 'WORD';
-            break;
-          case 'png':
-            type = 'PNG';
-            break;
-          case 'jpg':
-            type = 'JPG';
-            break;
-          case 'jpeg':
-            type = 'JPG';
-            break;
-        }
-
-        email.attachments.push(name);
-
-      }
-
-
-      result = await email.save();
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  return result;
-
-}
 
 
 /************************** EMAILTEMPLATES *****************************/

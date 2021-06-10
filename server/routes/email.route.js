@@ -1,0 +1,48 @@
+const express = require('express');
+const passport = require('passport');
+const asyncHandler = require('express-async-handler');
+const ObjectID = require('mongodb').ObjectID;
+
+const emailCtl = require('../controllers/email.controller');
+let Response = require('../const/response');
+
+const router = express.Router();
+module.exports = router;
+
+router.route('/compose').post(asyncHandler(composeEmail));
+router.route('/:emailId').get(asyncHandler(getEmailById));
+router.route('/:emailId/upload').post(asyncHandler(uploadEmailAttachmentById));
+
+
+async function composeEmail(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let form = req.body;
+
+
+  let data = await emailCtl.composeEmail(currentUserId, form);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
+
+
+async function getEmailById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let emailId = ObjectID(req.params.emailId);
+
+
+  let data = await emailCtl.getEmailById(currentUserId, emailId);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
+
+
+async function uploadEmailAttachmentById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let emailId = ObjectID(req.params.emailId);
+  let files = req.files;
+
+  let data = await emailCtl.uploadEmailAttachmentById(currentUserId, emailId, files);
+  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+}
+
+
+
+

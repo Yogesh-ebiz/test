@@ -73,11 +73,11 @@ async function addComment(comment) {
 
   comment = await new Comment(comment).save();
 
-  let job;
+  let job, application;
   if(comment.subjectType==subjectType.JOB){
     job = await jobService.findJob_Id(ObjectID(comment.subjectId));
   } else if(comment.subjectType==subjectType.APPLICATION) {
-    let application = await applicationService.findApplicationBy_Id(ObjectID(comment.subjectId));
+    application = await applicationService.findApplicationBy_Id(ObjectID(comment.subjectId));
     if(application){
       job = await jobService.findJob_Id(ObjectID(application.jobId));
     }
@@ -85,7 +85,7 @@ async function addComment(comment) {
   }
 
   let user = await feedService.lookupUserIds([comment.createdBy]);
-  await activityService.addActivity({causerId: ''+comment.createdBy, causerType: subjectType.MEMBER, subjectType: comment.subjectType, subjectId: ''+comment.subjectId, action: actionEnum.COMMENTED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: job.title, jobId: job._id}});
+  await activityService.addActivity({causerId: ''+comment.createdBy, causerType: subjectType.MEMBER, subjectType: comment.subjectType, subjectId: ''+comment.subjectId, action: actionEnum.COMMENTED, meta: {name: user[0].firstName + ' ' + user[0].lastName, candidate: application.user, jobTitlte: job.title, jobId: job._id}});
 
 
   return comment;

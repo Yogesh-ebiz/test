@@ -13,7 +13,7 @@ const activityService = require('../services/activity.service');
 const pipelineService = require('../services/pipeline.service');
 const feedService = require('../services/api/feed.service.api');
 
-
+const {convertToAvatar} = require('../utils/helper');
 
 function findById(applicationId) {
   let data = null;
@@ -301,7 +301,7 @@ async function disqualifyApplication(applicationId, reason, member) {
 
       let job = await jobService.findJob_Id(ObjectID(application.jobId));
       //Add activity
-      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, jobTitle: job.title, jobId: job._id, reason: reason}});
+      await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id, reason: reason}});
     }
   }
   return result;
@@ -324,8 +324,27 @@ async function revertApplication(applicationId, member) {
       result = {status: statusEnum.ACTIVE};
 
       let job = await jobService.findJob_Id(ObjectID(application.jobId));
-      let activity = await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.REVERTED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, jobTitle: job.title, jobId: job._id}});
+      await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.REVERTED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
     }
+  }
+  return result;
+}
+
+
+
+async function deleteApplication(applicationId, member) {
+  let result = null;
+
+  if(!applicationId || !member){
+    return;
+  }
+
+  let application = await Application.findById(applicationId).populate('user');
+  if(application){
+    application.status = statusEnum.DELETED;
+    application = await application.save();
+    let job = await jobService.findJob_Id(ObjectID(application.jobId));
+    await activityService.addActivity({causerId: ''+member.userId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.DELETED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
   }
   return result;
 }
@@ -1006,6 +1025,7 @@ async function searchEmails(applicationId, sort) {
     return;
   }
 
+  let result;
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page:1;
@@ -1026,17 +1046,17 @@ async function searchEmails(applicationId, sort) {
   let aLookup = [];
   let aMatch = {};
 
-  aList.push({ $match: {_id: ObjectID('60ba0ecac14fc2a962078941')} });
-    aList.push(
-      {
-        $lookup: {
-          from: 'emails',
-          localField: 'emails',
-          foreignField: '_id',
-          as: 'emails',
-        },
+  aList.push({ $match: {_id: applicationId} });
+  aList.push(
+    {
+      $lookup: {
+        from: 'emails',
+        localField: 'emails',
+        foreignField: '_id',
+        as: 'emails',
       },
-    );
+    },
+  );
 
 
   aList.push(
@@ -1069,7 +1089,22 @@ async function searchEmails(applicationId, sort) {
   );
   const aggregate = Application.aggregate(aList);
 
-  let result = await Application.aggregatePaginate(aggregate, options);
+  result = await Application.aggregatePaginate(aggregate, options);
+  let userIds = _.reduce(result.docs, function (res, email) {
+    if(email.from && email.from.id) {
+      res.push(email.from.id);
+    }
+    return res;
+  }, []);
+
+  let users = await feedService.lookupPeopleIds(userIds);
+  result.docs = _.reduce(result.docs, function(res, email){
+    email.hasRead = email.hasRead?email.hasRead:false;
+    email.from = convertToAvatar(_.find(users, {id: email.from.id}));
+    res.push(email);
+    return res;
+  }, []);
+
   return result;
 
 }
@@ -1093,6 +1128,7 @@ module.exports = {
   getLatestCandidates:getLatestCandidates,
   disqualifyApplication:disqualifyApplication,
   revertApplication:revertApplication,
+  deleteApplication:deleteApplication,
   getApplicationActivities:getApplicationActivities,
   applyJob: applyJob,
   getCompanyInsight: getCompanyInsight,
