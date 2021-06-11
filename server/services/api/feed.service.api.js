@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:90/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:90/api');
 
 async function createJobFeed(jobId, partyId, text, userId){
 
@@ -28,6 +28,17 @@ async function register(user){
   return response.data
 };
 
+
+
+async function registerCompany(company){
+  if(!company){
+    return null;
+  }
+
+  let response = await client.post(`/company/register`, company, null);
+  return response.data.data;
+};
+
 async function findUserById(id) {
   let user = null;
   try {
@@ -35,6 +46,22 @@ async function findUserById(id) {
     user = response.data.data;
   } catch(error) {
     console.log("findUserById: error", error);
+  }
+  return user;
+};
+
+async function findUserByIdFull(id) {
+  let user = null;
+
+  const options = {
+    headers: {'userId': id}
+  };
+
+  try {
+    let response = await client.get(`/user/${id}/update`, options);
+    user = response.data.data;
+  } catch(error) {
+    console.log("findUserByIdFull: error", error);
   }
   return user;
 };
@@ -362,10 +389,11 @@ async function updateResumeDefault(userId, id) {
 
 module.exports = {
   register:register,
+  registerCompany:registerCompany,
   createNotification:createNotification,
   createMessageThread:createMessageThread,
   findByUserId: findUserById,
-
+  findUserByIdFull:findUserByIdFull,
   findCompanyById: findCompanyById,
 
   followCompany: followCompany,

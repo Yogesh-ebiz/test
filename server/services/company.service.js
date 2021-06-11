@@ -1,4 +1,8 @@
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
+const Joi = require('joi');
+
+const Company = require('../models/company.model');
 const CompanySalary = require('../models/companysalary.model');
 const CompanySalaryHistory = require('../models/companysalaryhistory.model');
 
@@ -7,6 +11,62 @@ const CompanyReviewHistory = require('../models/companyreviewhistory.model');
 const CompanyReviewReport = require('../models/companyreviewreport.model');
 const CompanyReviewReaction = require('../models/companyreviewreaction.model');
 const JobFunction = require('../models/jobfunctions.model');
+
+const feedService = require('../services/api/feed.service.api');
+const memberService = require('../services/member.service');
+const roleService = require('../services/role.service');
+
+
+
+const companySchema = Joi.object({
+  name: Joi.string(),
+  about: Joi.string().allow(''),
+  size: Joi.number(),
+  industry: Joi.array(),
+  website: Joi.string().allow(''),
+  yearFounded: Joi.number(),
+  primaryAddress: Joi.object()
+});
+
+
+
+async function register(currentParty, form) {
+
+  if(!currentParty || !form){
+    return;
+  }
+
+  form = await Joi.validate(form, companySchema, {abortEarly: false});
+  let company = await feedService.registerCompany(form);
+  console.log(company)
+  if(company){
+    company = await new Company({
+      name: company.name,
+      companyId: company.id
+    }).save();
+
+    let role = await roleService.getRoleByRole('ADMIN');
+    let member = {
+      createdBy: currentParty.id,
+      company: company.companyId,
+      firstName: currentParty.firstName,
+      middleName: currentParty.middleName,
+      lastName: currentParty.lastName,
+      phone: currentParty.primaryPhone?currentParty.primaryPhone.value:'',
+      email: currentParty.primaryEmail?currentParty.primaryEmail.value:'',
+      timezone: currentParty.timezone?currentParty.timezone:'',
+      preferTimeFormat: '',
+      userId: currentParty.id,
+      role: role._id
+    }
+
+    await memberService.addMember(member);
+
+  }
+
+  return company;
+
+}
 
 
 
@@ -562,6 +622,7 @@ function addCompanyReviewReport(report) {
 
 
 module.exports = {
+  register:register,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,
   findSalariesByCompanyId: findSalariesByCompanyId,

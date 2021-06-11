@@ -9,7 +9,7 @@ let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
 const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
-const {getUserExperienceById, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
+const {getUserExperienceById, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findUserByIdFull, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findListOfPartyEmploymentTitle} = require('../services/partyemployment.service');
 const {findCompanyReviewReactionByPartyId, addCompanyReviewReaction} = require('../services/companyreviewreaction.service');
@@ -20,6 +20,7 @@ const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
 const {getPipelines, addPipeline} = require('../services/pipeline.service');
+const companyService = require('../services/company.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 
@@ -27,6 +28,8 @@ const labelService = require('../services/label.service');
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
+const memberService = require('../services/member.service');
+
 
 const JobRequisition = require('../models/jobrequisition.model');
 const CompanyReview = require('../models/companyreview.model');
@@ -127,6 +130,7 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
+  register,
   getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
@@ -158,6 +162,29 @@ module.exports = {
   updateCompanyLabel,
   deleteCompanyLabel,
 
+
+}
+
+
+async function register(currentUserId, form) {
+
+  if(!currentUserId || !form){
+    return null;
+  }
+
+  let currentParty = await findUserByIdFull(currentUserId);
+
+  let company;
+  try {
+    if (isPartyActive(currentParty)) {
+      company = await companyService.register(currentParty, form);
+    }
+  } catch(e){
+    console.log('addNewSalary: Error', e);
+  }
+
+
+  return company;
 
 }
 
@@ -193,7 +220,7 @@ async function getCompanyJobs(currentUserId, filter, sort, locale) {
   } else {
     aList.push(aSort);
   }
-  
+
   const aggregate = JobRequisition.aggregate(aList);
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let docs = [];

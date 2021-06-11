@@ -161,7 +161,6 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
       job.company = convertToCompany(company);
 
       if(!isMinimal) {
-        console.log(job.createdBy)
         let hiringManager = await findByUserId(job.createdBy.userId);
         job.createdBy = convertToAvatar(hiringManager);
 

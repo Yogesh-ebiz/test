@@ -10,6 +10,8 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
+router.route('/register').post(asyncHandler(register));
+
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
@@ -50,6 +52,15 @@ router.route('/:id/labels').post(asyncHandler(addCompanyLabel));
 router.route('/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
 router.route('/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
+
+
+async function register(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = req.body;
+  let data = await companyCtl.register(currentUserId, company);
+  res.json(new Response(data, data?'company_registered_successful':'not_found', res));
+}
+
 
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));

@@ -14,6 +14,8 @@ module.exports = router;
 router.route('/session').get(asyncHandler(getUserSession));
 router.route('/company').get(asyncHandler(getCompanies));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
+router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
+
 router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 router.route('/company/:id/stats').get(asyncHandler(getStats));
 
@@ -191,6 +193,16 @@ async function getInsights(req, res) {
   let timeframe = req.query.timeframe
 
   let data = await talentCtrl.getCompanyInsights(currentUserId, companyId, timeframe);
+  res.json(new Response(data, data?'get_insights_successful':'not_found', res));
+}
+
+
+async function getInmailCredits(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+  let timeframe = req.query.timeframe
+
+  let data = await talentCtrl.getInmailCredits(currentUserId, companyId, timeframe);
   res.json(new Response(data, data?'get_insights_successful':'not_found', res));
 }
 
@@ -406,11 +418,11 @@ async function getJobById(req, res) {
 
 async function payJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-
+  let companyId = parseInt(req.params.id);
   let jobId = req.params.jobId;
   let payment = req.body;
 
-  let data = await talentCtrl.payJob(currentUserId, jobId, payment);
+  let data = await talentCtrl.payJob(companyId, currentUserId, jobId, payment);
   res.json(new Response(data, data?'job_paid_successful':'not_found', res));
 }
 
@@ -803,10 +815,11 @@ async function getJobMembers(req, res) {
 
 async function updateJobMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
   let jobId = req.params.jobId;
   let members = req.body.members;
 
-  let data = await talentCtrl.updateJobMembers(jobId, currentUserId, members);
+  let data = await talentCtrl.updateJobMembers(companyId, currentUserId, jobId, members);
   res.json(new Response(data, data?'job_member_updated_successful':'not_found', res));
 }
 
@@ -842,7 +855,7 @@ async function updateJobApplicationForm(req, res) {
   let jobId = req.params.jobId;
   let form = req.body;
 
-  let data = await talentCtrl.updateJobApplicationForm(jobId, currentUserId, form);
+  let data = await talentCtrl.updateJobApplicationForm(companyId, currentUserId, jobId, form);
   res.json(new Response(data, data?'job_applicationform_updated_successful':'not_found', res));
 }
 

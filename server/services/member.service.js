@@ -15,13 +15,14 @@ const memberSchema = Joi.object({
   firstName: Joi.string().required(),
   middleName: Joi.string().allow('').optional(),
   lastName: Joi.string().required(),
-  phone: Joi.number().required(),
-  email: Joi.string().required(),
+  phone: Joi.string().allow('').required(),
+  email: Joi.string().allow('').required(),
   status: Joi.string().optional(),
   language: Joi.string().allow('').optional(),
   timezone: Joi.string().allow('').optional(),
   preferTimeFormat: Joi.string().allow('').optional(),
-  userId: Joi.number()
+  userId: Joi.number(),
+  role: Joi.object().optional()
 });
 
 const subscriptionSchema = Joi.object({
@@ -123,7 +124,23 @@ async function findMemberByUserIdAndCompany(userId, company) {
 }
 
 
-async function addMember(member, role, invitationId) {
+async function addMember(member) {
+  if(!member){
+    return;
+  }
+
+
+  let result;
+  console.log(member)
+  member = await Joi.validate(member, memberSchema, {abortEarly: false});
+
+  result = new Member(member).save();
+  return result;
+
+}
+
+
+async function addMemberFromInvitation(member, role, invitationId) {
   if(!member || !role || !invitationId){
     return;
   }
@@ -515,6 +532,7 @@ module.exports = {
   findMemberByUserId:findMemberByUserId,
   findMemberByUserIdAndCompany:findMemberByUserIdAndCompany,
   addMember:addMember,
+  addMemberFromInvitation:addMemberFromInvitation,
   updateMember:updateMember,
   updateMemberRole:updateMemberRole,
   followJob: followJob,

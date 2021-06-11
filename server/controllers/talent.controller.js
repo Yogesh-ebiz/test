@@ -95,6 +95,7 @@ const labelSchema = Joi.object({
 
 module.exports = {
   getCompanyInsights,
+  getInmailCredits,
   getImpressionCandidates,
   getStats,
   getUserSession,
@@ -256,6 +257,27 @@ async function getUserSession(currentUserId, preferredCompany) {
   user = convertToTalentUser(user);
   user.company = companies;
   user.currentCompanyId = preferredCompany? _.some(companies, {id: preferredCompany})?preferredCompany:companies.length?companies[0].id:null:companies.length?companies[0].id:null;
+
+
+
+  return user;
+
+}
+
+
+async function getInmailCredits(company, currentUserId, preferredCompany) {
+
+  if(!currentUserId){
+    return null;
+  }
+
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
 
 
 
@@ -651,6 +673,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   let departments = await departmentService.findDepartmentsByCompany(companyId);
 
   result.docs.map(job => {
+    job.company = company;
     job.department = _.find(departments, {_id: job.department});
     return job;
   });
@@ -1057,8 +1080,8 @@ async function getJobMembers(jobId) {
   return result
 }
 
-async function updateJobMembers(jobId, currentUserId, members) {
-  if(!jobId || !currentUserId || !members){
+async function updateJobMembers(companyId, currentUserId, jobId, members) {
+  if(!companyId || !currentUserId  || !jobId || !members){
     return null;
   }
 
@@ -1081,18 +1104,21 @@ async function updateJobMembers(jobId, currentUserId, members) {
 }
 
 
-async function updateJobApplicationForm(jobId, currentUserId, form) {
-  if(!jobId || !currentUserId || !form){
+async function updateJobApplicationForm(companyId, currentUserId, jobId, form) {
+  if(!companyId || !currentUserId || !jobId || !form){
     return null;
   }
 
   let result = null;
-  let currentParty = await feedService.findByUserId(currentUserId);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
 
   try {
-    if (isPartyActive(currentParty)) {
-      result = await jobService.updateJobApplicationForm(jobId, form, currentUserId);
-    }
+    result = await jobService.updateJobApplicationForm(jobId, form, currentUserId);
+
   } catch(e){
     console.log('updateJobApplicationForm: Error', e);
   }
@@ -1103,9 +1129,15 @@ async function updateJobApplicationForm(jobId, currentUserId, form) {
 
 
 
-async function payJob(currentUserId, jobId, payment) {
+async function payJob(companyId, currentUserId, jobId, payment) {
 
-  if(!currentUserId || !jobId || !payment){
+  if(!companyId  || !currentUserId || !jobId || !payment){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -3325,7 +3357,7 @@ async function addCompanyMember(companyId, form, invitationId) {
       let role = form.role;
       delete form.role
 
-      result = await memberService.addMember(form, role, invitationId);
+      result = await memberService.addMemberFromInvitation(form, role, invitationId);
 
   } catch(e){
     console.log('addCompanyMember: Error', e);
