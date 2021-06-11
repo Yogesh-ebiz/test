@@ -19,7 +19,8 @@ module.exports = {
   searchPeople,
   getPeopleSuggestions,
   getPeopleById,
-  addPeopleToBlacklist
+  addPeopleToBlacklist,
+  removePeopleFromBlacklist
 }
 
 async function searchPeople(filter, sort, locale) {
@@ -87,11 +88,41 @@ async function addPeopleToBlacklist(currentUserId, flag) {
       }
     }
 
-    let result = await flagService.add(flag);
-    console.log(result)
+    result = await flagService.add(flag);
     candidate.flag = result._id;
     await candidate.save();
 
+  } catch(e){
+    console.log('addPeopleToBlacklist: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
+  if(!currentUserId || !companyId || !userId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId).populate('flag');
+    if(candidate && candidate.flag) {
+      await candidate.flag.delete();
+      candidate.flag = null;
+      await candidate.save();
+
+      result = {success: true}
+    }
   } catch(e){
     console.log('addPeopleToBlacklist: Error', e);
   }

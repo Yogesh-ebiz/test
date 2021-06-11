@@ -11,7 +11,8 @@ const flagSchema = Joi.object({
   createdBy: Joi.number(),
   companyId: Joi.number(),
   userId: Joi.number(),
-  type: Joi.string()
+  type: Joi.string(),
+  comment: Joi.string().allow('')
 });
 
 
@@ -39,7 +40,7 @@ async function remove(company, userId) {
   if(candidate){
 
     await candidate.flag.delete();
-    candidate.flag=null;
+    delete candidate.flag;
     await candidate.save();
   }
 

@@ -21,6 +21,9 @@ const FlagSchema = new mongoose.Schema({
   companyId: {
     type: Number,
     required: true
+  },
+  comment: {
+    type: String
   }
 }, {
   versionKey: false

@@ -12,6 +12,8 @@ module.exports = router;
 
 router.route('/:id').get(asyncHandler(getPeopleById));
 router.route('/:id/flag').post(asyncHandler(addPeopleToBlacklist));
+router.route('/:id/flag').delete(asyncHandler(removePeopleFromBlacklist));
+
 
 router.route('/search').post(asyncHandler(searchPeople));
 router.route('/suggestions').post(asyncHandler(getPeopleSuggestions));
@@ -63,6 +65,18 @@ async function addPeopleToBlacklist(req, res) {
   flag.userId = peopleId;
   flag.createdBy = currentUserId;
   let data = await peopleCtrl.addPeopleToBlacklist(currentUserId, flag);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
+
+
+async function removePeopleFromBlacklist(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let peopleId = parseInt(req.params.id);
+  let flag = req.body;
+  let companyId = req.query.companyId;
+  let data = await peopleCtrl.removePeopleFromBlacklist(currentUserId, companyId, peopleId);
 
   res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
