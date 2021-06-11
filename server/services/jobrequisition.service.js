@@ -92,6 +92,8 @@ async function addJob(companyId, currentUserId, form) {
   form.companyId = companyId
   form.members = [member._id];
   form.createdBy = member._id;
+
+
   for (let tag of form.tags) {
     if(tag instanceof Object) {
       tag._id = new ObjectID();

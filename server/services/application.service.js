@@ -980,6 +980,21 @@ async function search(jobId, filter, sort) {
                 as: 'sources',
             },
           },
+          {
+            $lookup: {
+              from: 'evaluations',
+              localField: 'evaluations',
+              foreignField: '_id',
+              as: 'evaluations',
+            },
+          },
+          { $addFields:
+              {
+                rating: {$avg: "$evaluations.rating"},
+                evaluations: [],
+                applications: []
+              }
+          },
         ],
         as: 'user'
       }},

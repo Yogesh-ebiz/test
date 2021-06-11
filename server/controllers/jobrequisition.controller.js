@@ -854,6 +854,7 @@ async function applyJobById(currentUserId, jobId, application ) {
 
           savedApplication = await applyJob(application);
 
+
           if (savedApplication) {
             let jobPipeline = await getPipelineById(job.pipeline);
             if (jobPipeline) {
@@ -866,6 +867,11 @@ async function applyJobById(currentUserId, jobId, application ) {
 
               job.noOfApplied+=1;
               // progress.stage = applyStage._id;
+
+              if(jobPipeline.autoRejectBlackList && candidate.flag){
+                savedApplication.status = applicationEnum.REJECTED;
+              }
+
               savedApplication.progress.push(progress._id);
               savedApplication.allProgress.push(progress._id)
               savedApplication.currentProgress = progress._id;
@@ -884,8 +890,7 @@ async function applyJobById(currentUserId, jobId, application ) {
               candidate.applications.push(savedApplication._id);
               await candidate.save();
               await job.save();
-              await savedApplication.save();
-
+              savedApplication = await savedApplication.save();
             }
 
 

@@ -83,11 +83,6 @@ const CandidateSchema = new mongoose.Schema({
     required:false,
     default: ''
   },
-  overallRating: {
-    type: Number,
-    required:false,
-    default: 0
-  },
   past: {
     type: Object
   },

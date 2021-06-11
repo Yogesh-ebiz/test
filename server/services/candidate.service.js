@@ -194,11 +194,21 @@ async function search(filter, sort) {
                 { $unwind: '$stage'}
               ],
               as: 'currentProgress'
-            }},
+            }
+          },
           { $unwind: '$currentProgress'}
         ],
         as: 'applications'
-      }}
+      },
+    },
+    {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
+    { $addFields:
+        {
+          rating: {$avg: "$evaluations.rating"},
+          evaluations: [],
+          applications: []
+        }
+    },
   );
 
 

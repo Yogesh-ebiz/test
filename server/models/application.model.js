@@ -38,7 +38,8 @@ const ApplicationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: false
+    required: false,
+    default: statusEnum.ACTIVE
   },
   type: {
     type: String,
@@ -87,7 +88,7 @@ const ApplicationSchema = new mongoose.Schema({
   currency: {
     type: String
   },
-  overallRating: {
+  rating: {
     type: Number
   },
   noOfEvaluations: {

@@ -75,7 +75,8 @@ const departmentSchema = Joi.object({
 
 const pipelineSchema = Joi.object({
   pipelineTemplateId: Joi.string().required(),
-  stages: Joi.array().required()
+  stages: Joi.array().required(),
+  autoRejectBlackList: Joi.boolean().optional()
 });
 
 const roleSchema = Joi.object({
@@ -95,11 +96,12 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
+  getUserSession,
+  getMarketSalary,
   getCompanyInsights,
   getInmailCredits,
   getImpressionCandidates,
   getStats,
-  getUserSession,
   addCard,
   getCards,
   removeCard,
@@ -263,6 +265,18 @@ async function getUserSession(currentUserId, preferredCompany) {
 
 
   return user;
+
+}
+
+
+async function getMarketSalary(jobTitle) {
+
+  if(!jobTitle){
+    return null;
+  }
+
+  let result = {min: 15500, max: 25000, currency: 'USD'};
+  return result;
 
 }
 
@@ -1421,7 +1435,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         }
       }
       application.noOfEvaluations = noOfEvaluations;
-      application.overallRating = Math.round(rating / noOfEvaluations * 10) /10;
+      application.rating = Math.round(rating / noOfEvaluations * 10) /10;
 
       application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
       hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
@@ -2216,9 +2230,48 @@ async function getBoard(currentUserId, jobId, locale) {
 
     let applicationsGroupByStage = await Application.aggregate([
       {$match: {jobId: job._id}},
-      {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
+      // {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
+      {$lookup:{
+          from:"applicationprogresses",
+          let:{currentProgress:"$currentProgress"},
+          pipeline:[
+            {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+
+          ],
+          as: 'currentProgress'
+        }},
       {$unwind: '$currentProgress'},
-      {$lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+      {$lookup:{
+          from:"candidates",
+          let:{user:"$user"},
+          pipeline:[
+            {$match:{$expr:{$eq:["$_id","$$user"]}}},
+            {
+              $lookup: {
+                from: 'labels',
+                localField: 'sources',
+                foreignField: '_id',
+                as: 'sources',
+              },
+            },
+            {
+              $lookup: {
+                from: 'evaluations',
+                localField: 'evaluations',
+                foreignField: '_id',
+                as: 'evaluations',
+              },
+            },
+            { $addFields:
+                {
+                  rating: {$avg: "$evaluations.rating"},
+                  evaluations: [],
+                  applications: []
+                }
+            },
+          ],
+          as: 'user'
+        }},
       {$unwind: '$user'},
       {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, hasFollowed: 1, sources: 1, note: 1, user: 1, jobTitle: 1, currentProgress: 1 }},
       {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
@@ -2407,7 +2460,7 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
         }, 0) / companyEvaluations.length * 100) / 100;
       }
 
-      candidate.overallRating = Math.round(_.reduce(evaluations, function (res, e) {
+      candidate.rating = Math.round(_.reduce(evaluations, function (res, e) {
         return res + e.rating;
       }, 0) / evaluations.length * 100) / 100;
 

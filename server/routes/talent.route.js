@@ -12,6 +12,8 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('/session').get(asyncHandler(getUserSession));
+router.route('/market/salary').get(asyncHandler(getMarketSalary));
+
 router.route('/company').get(asyncHandler(getCompanies));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
@@ -188,6 +190,26 @@ router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(de
 router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 
 
+
+
+async function getUserSession(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let preferredCompany = req.query.company?req.query.company:null;
+
+  let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
+  res.json(new Response(data, data?'get_session_successful':'not_found', res));
+}
+
+
+async function getMarketSalary(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobTitle = req.query.jobTitle?req.query.jobTitle:'';
+
+  let data = await talentCtrl.getMarketSalary(jobTitle);
+  res.json(new Response(data, data?'get_salary_successful':'not_found', res));
+}
+
+
 async function getInsights(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
@@ -231,16 +253,6 @@ async function getStats(req, res) {
 
   let data = await talentCtrl.getStats(currentUserId, companyId);
   res.json(new Response(data, data?'get_stats_successful':'not_found', res));
-}
-
-
-
-async function getUserSession(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let preferredCompany = req.query.company?req.query.company:null;
-
-  let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
-  res.json(new Response(data, data?'get_session_successful':'not_found', res));
 }
 
 async function getCompanies(req, res) {

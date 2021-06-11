@@ -64,7 +64,7 @@ async function getPoolCandidates(poolId) {
           status: '$candidates.status',
           rating: '$candidates.rating',
           level: '$candidates.level',
-          overallRating: '$candidates.overallRating',
+          rating: '$candidates.rating',
           teamRating: '$candidates.teamRating',
           links: '$candidates.links',
           skills: '$candidates.skills',

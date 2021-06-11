@@ -34,6 +34,10 @@ const PipelineSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  autoRejectBlackList: {
+    type: Boolean,
+    default: false
+  },
   default: {
     type: Boolean,
     default: false
