@@ -48,7 +48,7 @@ async function addStage(stage) {
 }
 
 
-async function createTasksForStage(stage, jobTitle) {
+async function createTasksForStage(stage, jobTitle, meta) {
   let data = null;
 
   if(!stage){
@@ -59,10 +59,9 @@ async function createTasksForStage(stage, jobTitle) {
     for(let member of task.members){
       let newTask = {};
       newTask.member = ObjectID(member);
-      newTask.name = '['+task.type+'] ' + jobTitle;
       newTask.required = task.required;
       newTask.type = task.type;
-
+      newTask.meta = meta;
       let startDate = new Date();
       let endDate = new Date();
       startDate.setDate(startDate.getDate()+stage.timeLimit);
@@ -72,6 +71,19 @@ async function createTasksForStage(stage, jobTitle) {
       endDate.setHours(0)
       newTask.startDate = startDate.getTime();
       newTask.endDate = endDate.getTime();
+
+      switch(task.type){
+        case 'EMAIL':
+          newTask.name = '['+stage.name+'] ' + 'Send Email';
+          break;
+        case 'EVALUATION':
+          newTask.name = '['+stage.name+'] ' + 'Give Evaluation';
+          break;
+        case 'EVENT':
+          newTask.name = '['+stage.name+'] ' + 'Set-up Event';
+          break;
+      }
+
       await addTask(newTask)
     }
     // task = await addTask(task)

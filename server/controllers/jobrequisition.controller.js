@@ -888,10 +888,12 @@ async function applyJobById(currentUserId, jobId, application ) {
                 }
               }
 
+              let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
+
               candidate.applications.push(savedApplication._id);
               await candidate.save();
               await job.save();
-              await stageService.createTasksForStage(applyStage, job.title);
+              await stageService.createTasksForStage(applyStage, job.title, taskMeta);
               savedApplication = await savedApplication.save();
             }
 

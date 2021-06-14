@@ -1055,7 +1055,7 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
 
   let result = null;
   try {
-      result = await jobService.updateJobPipeline(jobId, form, currentUserId);
+    result = await jobService.updateJobPipeline(jobId, form, currentUserId);
 
   } catch(e){
     console.log('updateJobPipeline: Error', e);
@@ -1589,7 +1589,8 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
               stage: foundStage._id
             });
 
-            await stageService.createTasksForStage(foundStage);
+            let taskMeta = {applicationId: application._id, applicationProgressId: application.currentProgress._id};
+            await stageService.createTasksForStage(foundStage, '', taskMeta);
 
             application.currentProgress = progress;
             application.progress.push(progress);

@@ -289,17 +289,14 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
       model: 'Pipeline',
       populate: {
         path: 'stages',
-        model: 'Stage',
-        populate: {
-          path: 'tasks',
-          model: 'Task'
-        }
+        model: 'Stage'
       }
     }
   );
 
   if(job) {
     if(!job.pipeline) {
+      console.log('helllooo')
       form.createdBy = currentUserId
       form.jobId = job._id;
       pipeline = await PipelineService.addPipeline(jobId, form);

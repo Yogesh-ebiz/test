@@ -16,7 +16,8 @@ const taskSchema = Joi.object({
   name: Joi.string().required(),
   member: Joi.object().required(),
   startDate: Joi.number(),
-  endDate: Joi.number()
+  endDate: Joi.number(),
+  meta: Joi.object()
 });
 
 function findById(id) {
@@ -37,7 +38,6 @@ async function addTask(task) {
     return;
   }
 
-  console.log(task)
   task = await Joi.validate(task, taskSchema, { abortEarly: false });
 
   task = await new Task(task).save();

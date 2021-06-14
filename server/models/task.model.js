@@ -21,17 +21,11 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  options: {
-    type: Object,
-    required: false
-  },
-  template: {
-    type: Object,
-    required: false
-  },
   data: {
-    type: Object,
-    required: false
+    type: Object
+  },
+  meta: {
+    type: Object
   },
   createdDate: {
     type: Number,
