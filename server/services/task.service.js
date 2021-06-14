@@ -10,14 +10,13 @@ const applicationService = require('../services/application.service');
 
 
 const taskSchema = Joi.object({
-  _id: Joi.object(),
   required: Joi.boolean().required(),
   type: Joi.string().required(),
   name: Joi.string().required(),
   member: Joi.object().required(),
   startDate: Joi.number(),
   endDate: Joi.number(),
-  meta: Joi.object()
+  meta: Joi.object().optional()
 });
 
 function findById(id) {
@@ -31,7 +30,7 @@ function findById(id) {
 }
 
 
-async function addTask(task) {
+async function add(task) {
   let data = null;
 
   if(!task){
@@ -67,101 +66,72 @@ async function markComplete(id, memberId) {
     return;
   }
 
-
-  console.log(id, memberId)
-  let task = await Task.updateOne({_id: id, member: memberId}, { $set: {hasCompleted:true} });
+  let task = await Task.updateOne({_id: id, member: memberId}, { $set: {status: statusEnum.COMPLETED, hasCompleted:true} });
   return task;
 
 }
 
 
 
-async function getTasksDueSoon(company, member) {
+async function getTasksDueSoon(member) {
   let result = null;
 
-  if(!company || !member){
+  if(!member){
+    return;
+  }
+
+  let tasks = await Task.aggregate([
+    {$match: {member: member._id} },
+    {$sort: {endDate: 1}},
+    {$limit: 5}
+  ]);
+
+  return tasks;
+}
+
+
+async function search(memberId, filter, sort, query) {
+  let result = null;
+  if(!memberId || !filter || !sort){
     return;
   }
 
 
-  let applications = await Application.aggregate([
-    { $match: {company: company} },
-    { $lookup:{
-        from:"applicationprogresses",
-        let:{currentProgress: '$currentProgress'},
-        pipeline:[
-          {$match:{$expr:{$eq:["$$currentProgress","$_id"]}}},
-          {
-            $lookup: {
-              from: "stages",
-              let: {stage: '$stage'},
-              pipeline: [
-                {$match: {$expr: {$eq: ["$$stage", "$_id"]}}},
-                // {
-                //   $lookup: {
-                //     from: "tasks",
-                //     let: {tasks: '$tasks'},
-                //     pipeline: [
-                //       {$match: {$expr: {$eq: ["$$tasks", "$_id"]}}}
-                //     ],
-                //     as: 'tasks'
-                //   }
-                // }
-                {
-                  $lookup: {
-                    from: 'members',
-                    localField: "members",
-                    foreignField: "_id",
-                    as: "members"
-                  }
-                },
-                {
-                  $lookup: {
-                    from: 'tasks',
-                    localField: "tasks",
-                    foreignField: "_id",
-                    as: "tasks"
-                  }
-                },
-              ],
-              as: 'stage'
-            }
-          },
-          // {
-          //   $lookup: {
-          //     from: 'stages',
-          //     localField: "stage",
-          //     foreignField: "_id",
-          //     as: "stage"
-          //   }
-          // },
-          { $unwind: '$stage' },
-          { $addFields:
-              {
-                timeLeft: {$round: [ {$divide : [{$subtract: [{ $add:[ {$toDate: "$createdDate"}, {$multiply: ['$stage.timeLimit', 1*24*60*60000] } ] }, "$$NOW"]}, 86400000]}, 0 ] }
-              }
-          },
-        ],
-        as: 'currentProgress'
-      }},
-    { $unwind: '$currentProgress'},
-    {
-      $match: {'currentProgress.timeLeft': {$lte: 1}, 'currentProgress.stage.members': { $elemMatch: { _id: member._id }} }
-    }
-  ]);
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
 
-  let tasks = _.reduce(applications, function(res, app){
-    let tasks = _.reduce(app.currentProgress.stage.tasks, function(res2, task){
-      task.name = app.jobTitle;
-      task.timeLeft = app.currentProgress.timeLeft
-      res2.push(task);
-      return res2;
-    }, []);
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
 
-    res = res.concat(tasks);
-    return tasks
-  }, []);
 
+  let aList = [];
+  let $match = {member: memberId, status: filter.status};
+  if(query){
+    $match.name = {$regex: query, $options: 'i'};
+  }
+
+  if(filter.application) {
+    $match['meta.applicationId'] = ObjectID(filter.applicationId);
+  }
+
+  let aMatch = { $match:  $match};
+  let aSort = { $sort: {createdDate: direction} };
+
+  console.log(aMatch)
+
+
+  aList.push(aMatch);
+  aList.push(aSort);
+
+  let aggregate = Task.aggregate(aList);
+  let tasks = await Task.aggregatePaginate(aggregate, options);
 
   return tasks;
 }
@@ -169,8 +139,9 @@ async function getTasksDueSoon(company, member) {
 
 module.exports = {
   findById:findById,
-  addTask:addTask,
+  add:add,
   remove:remove,
   markComplete:markComplete,
-  getTasksDueSoon:getTasksDueSoon
+  getTasksDueSoon:getTasksDueSoon,
+  search: search
 }

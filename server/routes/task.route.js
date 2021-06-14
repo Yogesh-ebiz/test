@@ -10,11 +10,21 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
-
+router.route('').post(asyncHandler(addTask));
 router.route('/:id').get(asyncHandler(getTask));
 router.route('/:id/complete').post(asyncHandler(markComplete));
 router.route('/:id').delete(asyncHandler(removeTask));
 
+
+
+async function addTask(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.query.companyId);
+  let task = req.body;
+
+  let data = await taskCtl.addTask(companyId, currentUserId, task, res.locale);
+  res.json(new Response(data, data?'task_added_successful':'not_found', res));
+}
 
 async function getTask(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

@@ -362,42 +362,22 @@ async function getJobPipeline(jobId) {
     path: 'pipeline',
     populate:[{
       path: 'stages',
-      populate:[{
-        path: 'members',
-        model: 'Member'
-      }, {
-        path: 'tasks',
-        model: 'Task'
-      }]
+      populate:[
+        {
+          path: 'members',
+          model: 'Member'
+        },
+        {
+          path: 'tasks.members',
+          model: 'Member'
+        }
+      ]
     }]
   });
 
 
 
   if(job){
-    if(job.pipeline.stages) {
-      let userIds = _.reduce(job.pipeline.stages, function (res, stage) {
-        if (stage) {
-          res = _.union(res, _.map(stage.members, 'userId'));
-          return res;
-        }
-        return res;
-      }, []);
-
-      let users = await feedService.lookupUserIds(userIds);
-      job.pipeline.stages.forEach(function(stage){
-        stage.members.forEach(function(member){
-          let found = _.find(users, {id: member.userId});
-          if(found){
-            member.avatar = found.avatar;
-            member.firstName = found.firstName;
-            member.middleName = found.middleName;
-            member.lastName = found.lastName;
-          }
-        });
-      });
-
-    }
     data = job.pipeline;
 
   }

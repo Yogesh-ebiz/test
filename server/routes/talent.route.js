@@ -151,6 +151,7 @@ router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompany
 
 router.route('/company/:id/members/:memberId/jobs/subscribes').get(asyncHandler(getJobsSubscribed));
 router.route('/company/:id/members/:memberId/applications/subscribes').get(asyncHandler(getApplicationsSubscribed));
+router.route('/company/:id/members/:memberId/tasks').post(asyncHandler(searchTasks));
 
 router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
 router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
@@ -1410,6 +1411,17 @@ async function getApplicationsSubscribed(req, res) {
   let company = parseInt(req.params.id);
   let sort = req.query;
   let data = await talentCtrl.getApplicationsSubscribed(company, currentUserId, sort);
+  res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
+}
+
+
+async function searchTasks(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let filter = req.body;
+  let sort = req.query;
+  let query = req.query.query;
+  let data = await talentCtrl.searchTasks(company, currentUserId, filter, sort, query);
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
 

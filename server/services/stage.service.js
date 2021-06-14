@@ -3,7 +3,7 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const Stage = require('../models/stage.model');
-const {addTask} = require('../services/task.service');
+const {add} = require('../services/task.service');
 
 
 
@@ -54,7 +54,6 @@ async function createTasksForStage(stage, jobTitle, meta) {
   if(!stage){
     return;
   }
-  console.log(stage)
   for (let task of stage.tasks) {
     for(let member of task.members){
       let newTask = {};
@@ -84,9 +83,9 @@ async function createTasksForStage(stage, jobTitle, meta) {
           break;
       }
 
-      await addTask(newTask)
+      await add(newTask)
     }
-    // task = await addTask(task)
+    // task = await add(task)
   }
 
   stage = new Stage(stage).save();

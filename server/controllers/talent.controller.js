@@ -200,6 +200,7 @@ module.exports = {
   deleteCompanyMember,
   getJobsSubscribed,
   getApplicationsSubscribed,
+  searchTasks,
   getCompanyPools,
   addCompanyPool,
   updateCompanyPool,
@@ -559,16 +560,8 @@ async function getStats(currentUserId, companyId) {
   let data = [];
 
   let newApplications = await applicationService.getLatestCandidates(companyId);
-  // let userIds = _.reduce(newApplications, function(res, app){ res.push(app.user.userId); return res;}, []);
-  // let users = await feedService.lookupUserIds(userIds);
-
 
   newApplications.forEach(function(app){
-    // let found = _.find(users, {id: app.user});
-    // if(found){
-    //   app.user = convertToCandidate(found);
-    // }
-
     app.progress=[];
 
   });
@@ -598,7 +591,7 @@ async function getStats(currentUserId, companyId) {
     app.user.tags = [];
   });
 
-  let taskDueSoon = await taskService.getTasksDueSoon(companyId, member)
+  let taskDueSoon = await taskService.getTasksDueSoon(member)
   let jobEndingSoon = await jobService.getJobsEndingSoon(companyId);
   let userIds = _.map(jobEndingSoon, 'createdBy');
   let users = await feedService.lookupUserIds(userIds);
@@ -3669,6 +3662,31 @@ async function getApplicationsSubscribed(companyId, currentUserId, sort) {
     result.docs.forEach(function(sub){
       sub.subject.user = convertToCandidate(sub.subject.user);
     });
+
+  } catch(e){
+    console.log('getApplicationsSubscribed: Error', e);
+  }
+
+
+  return new Pagination(result);
+}
+
+
+
+
+async function searchTasks(companyId, currentUserId, filter, sort, query) {
+  if(!companyId || !currentUserId || !filter || !sort){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  try {
+    result = await taskService.search(member._id, filter, sort, query);
 
   } catch(e){
     console.log('getApplicationsSubscribed: Error', e);

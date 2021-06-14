@@ -1,13 +1,19 @@
 const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const Schema = mongoose.Schema;
+const statusEnum = require('../const/statusEnum');
+
 
 const TaskSchema = new mongoose.Schema({
   required: {
     type: Boolean,
     required: true,
     default: false
+  },
+  status: {
+    type: String,
+    default: statusEnum.ACTIVE
   },
   name: {
     type: String,
