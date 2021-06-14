@@ -197,5 +197,8 @@
 	"cards_retrieved_successful": "cards_retrieved_successful",
 	"card_removeed_successful": "card_removeed_successful",
 	"job_member_retrieved_successful": "job_member_retrieved_successful",
-	"company_registered_successful": "company_registered_successful"
+	"company_registered_successful": "company_registered_successful",
+	"task_retrieved_successful": "task_retrieved_successful",
+	"people_added_successful": "people_added_successful",
+	"blacklist_retrieved_successful": "blacklist_retrieved_successful"
 }

@@ -18,6 +18,7 @@ const adminRoutes = require('./admin.route');
 const productRoutes = require('./product.route');
 const peopleRoutes = require('./people.route');
 const emailRoutes = require('./email.route');
+const taskRoutes = require('./task.route');
 
 const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
@@ -54,6 +55,7 @@ router.use('/policies', policyRoutes);
 router.use('/products', productRoutes);
 router.use('/people', peopleRoutes);
 router.use('/emails', emailRoutes);
+router.use('/tasks', taskRoutes);
 
 
 module.exports = router;

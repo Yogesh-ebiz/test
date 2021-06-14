@@ -140,6 +140,8 @@ router.route('/company/:id/labels').get(asyncHandler(getCompanyLabels));
 
 router.route('/company/:id/members/invites').post(asyncHandler(inviteMembers));
 router.route('/company/:id/members/invites').get(asyncHandler(getCompanyMemberInvitations));
+router.route('/company/:id/members/invites/:invitationId').delete(asyncHandler(cancelMemberInvitation));
+
 
 router.route('/company/:id/members').get(asyncHandler(getCompanyMembers));
 router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
@@ -170,6 +172,7 @@ router.route('/company/:id/projects/:projectId/candidates').delete(asyncHandler(
 
 router.route('/company/:id/people/:peopleId/projects').post(asyncHandler(updateCandidateProject));
 router.route('/company/:id/people/:peopleId/pools').post(asyncHandler(updatePeoplePool));
+router.route('/company/:id/people/flagged').get(asyncHandler(getPeopleFlagged));
 
 
 router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
@@ -1324,7 +1327,17 @@ async function getCompanyMemberInvitations(req, res) {
   let company = parseInt(req.params.id);
   let query = req.query.query;
 
-  let data = await talentCtrl.getCompanyMemberInvitations(company, query, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyMemberInvitations(company, currentUserId, query, res.locale);
+  res.json(new Response(data, data?'members_retrieved_successful':'not_found', res));
+}
+
+
+async function cancelMemberInvitation(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let invitationId = ObjectID(req.params.invitationId);
+
+  let data = await talentCtrl.cancelMemberInvitation(company, currentUserId, invitationId);
   res.json(new Response(data, data?'members_retrieved_successful':'not_found', res));
 }
 
@@ -1405,9 +1418,10 @@ async function getCompanyPools(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let query = req.query.query;
-  let candidateId = req.query.candidateId;
+  let candidateId = req.query.candidateId?ObjectID(req.query.candidateId):null;
+  let id = req.query.id?parseInt(req.query.id):null;
 
-  let data = await talentCtrl.getCompanyPools(company, currentUserId, query, candidateId, res.locale);
+  let data = await talentCtrl.getCompanyPools(company, currentUserId, query, candidateId, id, res.locale);
   res.json(new Response(data, data?'pools_retrieved_successful':'not_found', res));
 }
 
@@ -1601,6 +1615,14 @@ async function updatePeoplePool(req, res) {
 
 
 
+async function getPeopleFlagged(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let sort = req.query;
+  let data = await talentCtrl.getPeopleFlagged(companyId, currentUserId, sort);
+
+  res.json(new Response(data, data?'blacklist_retrieved_successful':'not_found', res));
+}
 
 async function getFiles(req, res) {
   let companyId = parseInt(req.params.id);

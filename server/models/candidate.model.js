@@ -106,6 +106,10 @@ const CandidateSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  hasSaved: {
+    type: Boolean,
+    default: false
+  },
   openToJob: {
     type: Boolean,
     default: false

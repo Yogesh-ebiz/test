@@ -121,6 +121,7 @@ const convertToCandidate = (user) => {
     hasApplied: user.hasApplied?user.hasApplied:false,
     hasImported: user.hasImported?user.hasImported:false,
     hasFollowedCompany: user.hasFollowedCompany?user.hasFollowedCompany:true,
+    hasSaved: user.hasSaved,
     openToJob: user.openToJob?user.openToJob:true,
     openToRelocate: user.openToRelocate?user.openToRelocate:true,
     past: past,

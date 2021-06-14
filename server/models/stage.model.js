@@ -49,8 +49,10 @@ const StageSchema = new mongoose.Schema({
     type: Array,
     required: false
   },
-  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
-  tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
+  // tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
+  tasks: {
+    type: Array
+  },
   evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],
 }, {
   versionKey: false

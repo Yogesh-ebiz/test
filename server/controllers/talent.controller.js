@@ -48,6 +48,8 @@ const bookmarkService = require('../services/bookmark.service');
 const departmentService = require('../services/department.service');
 const cardService = require('../services/card.service');
 const flagService = require('../services/flag.service');
+const taskService = require('../services/task.service');
+const stageService = require('../services/stage.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -166,6 +168,7 @@ module.exports = {
   removeCandidateSource,
   updateCandidatePool,
   updatePeoplePool,
+  getPeopleFlagged,
   addCompanyDepartment,
   updateCompanyDepartment,
   deleteCompanyDepartment,
@@ -189,6 +192,7 @@ module.exports = {
   deleteCompanyLabel,
   inviteMembers,
   getCompanyMemberInvitations,
+  cancelMemberInvitation,
   getCompanyMembers,
   addCompanyMember,
   updateCompanyMember,
@@ -547,6 +551,10 @@ async function getStats(currentUserId, companyId) {
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
 
   let data = [];
 
@@ -588,10 +596,9 @@ async function getStats(currentUserId, companyId) {
     app.user.evaluations = [];
     app.user.sources = [];
     app.user.tags = [];
-
-
   });
 
+  let taskDueSoon = await taskService.getTasksDueSoon(companyId, member)
   let jobEndingSoon = await jobService.getJobsEndingSoon(companyId);
   let userIds = _.map(jobEndingSoon, 'createdBy');
   let users = await feedService.lookupUserIds(userIds);
@@ -607,6 +614,7 @@ async function getStats(currentUserId, companyId) {
   });
 
   let result = {
+    taskDueSoon: taskDueSoon,
     newApplications: newApplications,
     mostViewedJobs: mostViewed,
     applicationsEndingSoon: applicationEndingSoon,
@@ -1580,6 +1588,8 @@ async function updateApplicationProgress(currentUserId, applicationId, newStage)
               applicationId: application.applicationId,
               stage: foundStage._id
             });
+
+            await stageService.createTasksForStage(foundStage);
 
             application.currentProgress = progress;
             application.progress.push(progress);
@@ -2910,6 +2920,30 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
 
 
 
+async function getPeopleFlagged(companyId, currentUserId, sort) {
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  let result;
+  if(!member){
+    return null;
+  }
+
+  try {
+    result = await candidateService.getCompanyBlacklisted(companyId, sort);
+  } catch(e){
+    console.log('getPeopleFlagged: Error', e);
+  }
+
+
+  return new Pagination(result);
+}
+
+
+
 
 /************************** DEPARTMENTS *****************************/
 async function addCompanyDepartment(companyId, currentUserId, form) {
@@ -3416,7 +3450,7 @@ async function inviteMembers(companyId, currentUserId, form) {
 }
 
 
-async function getCompanyMemberInvitations(companyId, currentUserId) {
+async function getCompanyMemberInvitations(companyId, currentUserId, query) {
 
   if(!companyId || !currentUserId){
     return null;
@@ -3427,10 +3461,31 @@ async function getCompanyMemberInvitations(companyId, currentUserId) {
     return null;
   }
 
-  let result = await memberService.getMemberInvitations(companyId);
+  let result = await memberService.getMemberInvitations(companyId, query);
   result.forEach(function(member){
     member.role = roleMinimal(member.role);
   });
+  return result;
+
+}
+
+
+
+async function cancelMemberInvitation(companyId, currentUserId, invitationId) {
+
+  if(!companyId || !currentUserId || !invitationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await memberService.cancelMemberInvitation(companyId, invitationId);
+  if(result){
+    result = {success: true}
+  }
   return result;
 
 }
@@ -3626,15 +3681,22 @@ async function getApplicationsSubscribed(companyId, currentUserId, sort) {
 
 /************************** POOOL *****************************/
 
-async function getCompanyPools(company, currentUserId, query, candidateId, locale) {
+async function getCompanyPools(company, currentUserId, query, candidateId, userId, locale) {
 
   if(!company || !currentUserId){
     return null;
   }
 
+  if(userId){
+    let candidate = await candidateService.findByUserIdAndCompanyId(userId, company);
+      if(candidate){
+      candidateId = candidate._id;
+    }
+  }
+
   let result = await poolService.findByCompany(company, query);
   result.forEach(function(pool){
-    pool.isIn = _.some(pool.candidates, ObjectID(candidateId))
+    pool.isIn = _.some(pool.candidates, candidateId)
   });
 
   return result;

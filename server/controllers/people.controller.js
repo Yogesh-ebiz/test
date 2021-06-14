@@ -13,6 +13,7 @@ const feedService = require('../services/api/feed.service.api');
 const memberService = require('../services/member.service');
 const candidateService = require('../services/candidate.service');
 const flagService = require('../services/flag.service');
+const poolService = require('../services/pool.service');
 
 
 module.exports = {
@@ -23,14 +24,33 @@ module.exports = {
   removePeopleFromBlacklist
 }
 
-async function searchPeople(filter, sort, locale) {
-
-  if(!filter || !sort){
+async function searchPeople(companyId, filter, sort, locale) {
+  if(!companyId || !filter || !sort){
     return null;
   }
 
   result = await feedService.searchPeople(filter, sort);
+  let pools = await poolService.findByCompany(companyId)
+  let candidates = await candidateService.getListofCandidates(_.map(result.content, 'id'), companyId)
   result.content = _.reduce(result.content, function(res, people){
+    let hasSaved = false;
+    for(let candidate of candidates){
+      if(candidate.userId==people.id) {
+        for (let pool of pools) {
+          let found = _.includes(pool.candidates, candidate._id);
+          for (let c of pool.candidates) {
+            if(candidate._id.equals(c)){
+              hasSaved=true;
+            }
+          }
+          if (found) {
+            hasSaved = true;
+          }
+        }
+      }
+    }
+
+    people.hasSaved=hasSaved;
     res.push(convertToCandidate(people));
     return res;
   }, []);
@@ -130,3 +150,5 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
 
   return result
 }
+
+

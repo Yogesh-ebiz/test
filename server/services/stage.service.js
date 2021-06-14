@@ -14,8 +14,7 @@ const stageSchema = Joi.object({
   name: Joi.string().required(),
   type: Joi.string().required(),
   timeLimit: Joi.number().required(),
-  tasks: Joi.array().optional(),
-  members: Joi.array().optional()
+  tasks: Joi.array().optional()
 });
 
 function getStage(id) {
@@ -38,9 +37,44 @@ async function addStage(stage) {
 
   stage = await Joi.validate(stage, stageSchema, { abortEarly: false });
 
+  // for (let task of stage.tasks) {
+  //   task._id = new ObjectID();
+  //   task = await addTask(task)
+  // }
+
+  stage = new Stage(stage).save();
+  return stage;
+
+}
+
+
+async function createTasksForStage(stage, jobTitle) {
+  let data = null;
+
+  if(!stage){
+    return;
+  }
+  console.log(stage)
   for (let task of stage.tasks) {
-    task._id = new ObjectID();
-    task = await addTask(task)
+    for(let member of task.members){
+      let newTask = {};
+      newTask.member = ObjectID(member);
+      newTask.name = '['+task.type+'] ' + jobTitle;
+      newTask.required = task.required;
+      newTask.type = task.type;
+
+      let startDate = new Date();
+      let endDate = new Date();
+      startDate.setDate(startDate.getDate()+stage.timeLimit);
+      startDate.setMinutes(0);
+      startDate.setHours(0)
+      endDate.setMinutes(0);
+      endDate.setHours(0)
+      newTask.startDate = startDate.getTime();
+      newTask.endDate = endDate.getTime();
+      await addTask(newTask)
+    }
+    // task = await addTask(task)
   }
 
   stage = new Stage(stage).save();
@@ -52,5 +86,6 @@ async function addStage(stage) {
 
 module.exports = {
   getStage:getStage,
-  addStage:addStage
+  addStage:addStage,
+  createTasksForStage:createTasksForStage
 }

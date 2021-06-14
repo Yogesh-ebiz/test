@@ -801,7 +801,7 @@ async function applicationsEndingSoon(company) {
 }
 
 
-async function getAllAapplicationsEndingSoon(company, sort) {
+async function getAllApplicationsEndingSoon(company, sort) {
   let result = null;
 
   if(!company){
@@ -1152,7 +1152,7 @@ module.exports = {
   getInsightCandidates:getInsightCandidates,
   getCandidatesSourceByJobId:getCandidatesSourceByJobId,
   applicationsEndingSoon:applicationsEndingSoon,
-  getAllAapplicationsEndingSoon:getAllAapplicationsEndingSoon,
+  getAllApplicationsEndingSoon:getAllApplicationsEndingSoon,
   getApplicationsStagesByJobId:getApplicationsStagesByJobId,
   search:search,
   searchEmails:searchEmails

@@ -40,6 +40,7 @@ const {getTopIndustry} = require('../services/industry.service');
 const filterService = require('../services/filter.service');
 const bookmarkService = require('../services/bookmark.service');
 const questionSubmissionService = require('../services/questionsubmission.service');
+const stageService = require('../services/stage.service');
 
 
 const JobRequisition = require('../models/jobrequisition.model');
@@ -890,6 +891,7 @@ async function applyJobById(currentUserId, jobId, application ) {
               candidate.applications.push(savedApplication._id);
               await candidate.save();
               await job.save();
+              await stageService.createTasksForStage(applyStage, job.title);
               savedApplication = await savedApplication.save();
             }
 

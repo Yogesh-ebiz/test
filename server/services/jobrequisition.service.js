@@ -317,15 +317,14 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
           if(foundStage){
             stage.timeLimit = foundStage.timeLimit;
             if(foundStage.tasks.length){
-              for([j, task] of stage.tasks.entries()){
-                let foundTask = _.find(foundStage.tasks, {type: task.type});
-                if(foundTask){
-                  task.members = foundTask.members;
-                  task.options = foundTask.options;
-                  await task.save();
-                }
-              }
-              stage.members = foundStage.members;
+              // for([j, task] of stage.tasks.entries()){
+              //   let foundTask = _.find(foundStage.tasks, {type: task.type});
+              //   if(foundTask){
+              //     task.members = foundTask.members;
+              //     task.options = foundTask.options;
+              //     await task.save();
+              //   }
+              // }
               await stage.save();
             }
 

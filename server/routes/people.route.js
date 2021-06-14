@@ -32,13 +32,14 @@ async function getPeopleById(req, res) {
 
 async function searchPeople(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.query.companyId);
   let data;
   let filter = req.body;
   let sort = req.query;
   filter.query = req.query.query;
 
 
-  data = await peopleCtrl.searchPeople(filter, sort, res.locale);
+  data = await peopleCtrl.searchPeople(companyId, filter, sort, res.locale);
 
   res.json(new Response(data, data?'people_retrieved_successful':'not_found', res));
 }
@@ -66,7 +67,7 @@ async function addPeopleToBlacklist(req, res) {
   flag.createdBy = currentUserId;
   let data = await peopleCtrl.addPeopleToBlacklist(currentUserId, flag);
 
-  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+  res.json(new Response(data, data?'people_added_successful':'not_found', res));
 }
 
 
@@ -78,6 +79,7 @@ async function removePeopleFromBlacklist(req, res) {
   let companyId = req.query.companyId;
   let data = await peopleCtrl.removePeopleFromBlacklist(currentUserId, companyId, peopleId);
 
-  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+  res.json(new Response(data, data?'people _removed_successful':'not_found', res));
 }
+
 

@@ -54,14 +54,34 @@ async function inviteMembers(company, currentUserId, emails, role) {
   return invitations;
 }
 
-async function getMemberInvitations(company) {
+async function getMemberInvitations(company, query) {
   let data = null;
 
   if(!company){
     return;
   }
 
-  let invitations = await MemberInvitation.find({company: company}).populate('role');
+  let match = {company: company};
+
+  if(query){
+    match.email = { $regex: query, $options: 'i'};
+  }
+
+  let invitations = await MemberInvitation.find(match).populate('role');
+  return invitations
+}
+
+
+
+async function cancelMemberInvitation(company, invitationId) {
+  let data = null;
+
+  if(!company || !invitationId){
+    return;
+  }
+
+
+  let invitations = await MemberInvitation.deleteOne({_id: invitationId});
   return invitations
 }
 
@@ -526,6 +546,7 @@ async function findApplicationSubscriptions(memberId, sort) {
 module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
+  cancelMemberInvitation:cancelMemberInvitation,
   getMembers:getMembers,
   searchMembers:searchMembers,
   findMemberBy_Id:findMemberBy_Id,

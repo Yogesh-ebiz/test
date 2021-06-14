@@ -9,10 +9,9 @@ const TaskSchema = new mongoose.Schema({
     required: true,
     default: false
   },
-  allowChange: {
-    type: Boolean,
-    required: true,
-    default: false
+  name: {
+    type: String,
+    required: true
   },
   isCompleted: {
     type: Boolean,
@@ -34,7 +33,7 @@ const TaskSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  createdAt: {
+  createdDate: {
     type: Number,
     default: Date.now
   },
@@ -42,13 +41,24 @@ const TaskSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  updatedAt: {
+  updatedDate: {
     type: Number,
     default: Date.now
   },
   updatedBy: {
     type: Number
   },
+  startDate: {
+    type: Number
+  },
+  endDate: {
+    type: Number
+  },
+  hasCompleted: {
+    type: Boolean,
+    default: false
+  },
+  member: { type: Schema.Types.ObjectId, ref: 'Member' }
 }, {
   versionKey: false
 });

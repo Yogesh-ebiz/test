@@ -288,6 +288,49 @@ async function getCandidatesSimilar(userId) {
 
 
 
+async function getCompanyBlacklisted(company, sort) {
+
+  if(!company){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+  let aList = [];
+  let aMatch = { $match: {company: company, flag: {$exists: true}}};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+  aList.push(
+    {
+      $lookup: {
+        from: 'flags',
+        localField: "flag",
+        foreignField: "_id",
+        as: "flag"
+      }
+    },
+    { $unwind: '$flag'}
+  );
+
+
+  aList.push(aSort);
+
+  const aggregate = Candidate.aggregate(aList);
+  let candidates = await Candidate.aggregatePaginate(aggregate, options);
+  return candidates;
+}
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
@@ -298,5 +341,6 @@ module.exports = {
   searchCandidates:searchCandidates,
   search:search,
   getAllCandidatesSkills:getAllCandidatesSkills,
-  getCandidatesSimilar:getCandidatesSimilar
+  getCandidatesSimilar:getCandidatesSimilar,
+  getCompanyBlacklisted:getCompanyBlacklisted
 }
