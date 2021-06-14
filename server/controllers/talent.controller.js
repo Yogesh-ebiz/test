@@ -1407,11 +1407,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         populate: [
           {
             path: 'stage',
-            model: 'Stage',
-            populate: {
-              path: 'tasks',
-              model: 'Task'
-            }
+            model: 'Stage'
           },
           {
             path: 'evaluations',
