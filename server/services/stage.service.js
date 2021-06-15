@@ -57,7 +57,7 @@ async function createTasksForStage(stage, jobTitle, meta) {
   for (let task of stage.tasks) {
     for(let member of task.members){
       let newTask = {};
-      newTask.member = ObjectID(member);
+      newTask.members = [ObjectID(member)];
       newTask.required = task.required;
       newTask.type = task.type;
       newTask.meta = meta;
@@ -70,6 +70,7 @@ async function createTasksForStage(stage, jobTitle, meta) {
       endDate.setHours(0)
       newTask.startDate = startDate.getTime();
       newTask.endDate = endDate.getTime();
+      newTask.reminders = ['D1'];
 
       switch(task.type){
         case 'EMAIL':

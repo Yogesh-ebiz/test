@@ -19,9 +19,14 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String
+  },
+  reminders: {
+    type: Array
+  },
   isCompleted: {
-    type: Boolean,
-    required: false
+    type: Boolean
   },
   type: {
     type: String,
@@ -58,7 +63,8 @@ const TaskSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  member: { type: Schema.Types.ObjectId, ref: 'Member' }
+  owner: { type: Schema.Types.ObjectId, ref: 'Member' },
+  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }]
 }, {
   versionKey: false
 });

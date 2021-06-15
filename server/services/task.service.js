@@ -13,10 +13,13 @@ const taskSchema = Joi.object({
   required: Joi.boolean().required(),
   type: Joi.string().required(),
   name: Joi.string().required(),
-  member: Joi.object().required(),
+  description: Joi.string().allow('').optional(),
+  members: Joi.array().required(),
+  owner: Joi.object().optional(),
   startDate: Joi.number(),
   endDate: Joi.number(),
-  meta: Joi.object().optional()
+  meta: Joi.object().optional(),
+  reminders: Joi.array().optional()
 });
 
 function findById(id) {
@@ -26,7 +29,7 @@ function findById(id) {
     return;
   }
 
-  return Task.findById(id);
+  return Task.findById(id).populate('members').populate('owner');
 }
 
 
@@ -41,6 +44,35 @@ async function add(task) {
 
   task = await new Task(task).save();
   return task;
+
+}
+
+
+async function update(id, memberId, form) {
+  if(!id || !memberId || !form){
+    return;
+  }
+
+
+  form = await Joi.validate(form, taskSchema, { abortEarly: false });
+  let task = await findById(id);
+  let result = null;
+
+  if(!task || !task.owner.equals(memberId)){
+    return;
+  }
+
+  task.name = form.name;
+  task.description = form.description;
+  task.members = form.members;
+  task.type = form.type;
+  task.startDate = form.startDate;
+  task.endDate = form.endDate;
+  task.meta = form.meta;
+  result = await task.save();
+
+
+  return result;
 
 }
 
@@ -112,19 +144,17 @@ async function search(memberId, filter, sort, query) {
 
 
   let aList = [];
-  let $match = {member: memberId, status: filter.status};
+  let $match = {members: [memberId], status: filter.status};
   if(query){
     $match.name = {$regex: query, $options: 'i'};
   }
 
-  if(filter.application) {
+  if(filter.applicationId) {
     $match['meta.applicationId'] = ObjectID(filter.applicationId);
   }
 
   let aMatch = { $match:  $match};
   let aSort = { $sort: {createdDate: direction} };
-
-  console.log(aMatch)
 
 
   aList.push(aMatch);
@@ -140,6 +170,7 @@ async function search(memberId, filter, sort, query) {
 module.exports = {
   findById:findById,
   add:add,
+  update:update,
   remove:remove,
   markComplete:markComplete,
   getTasksDueSoon:getTasksDueSoon,

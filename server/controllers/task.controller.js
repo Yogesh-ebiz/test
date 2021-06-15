@@ -19,6 +19,7 @@ const memberService = require('../services/member.service');
 module.exports = {
   addTask,
   getTask,
+  updateTask,
   markComplete,
   removeTask
 }
@@ -36,7 +37,7 @@ async function addTask(companyId, currentUserId, task) {
     return null;
   }
 
-  task.member = member._id;
+  task.owner = member._id;
   let result = await taskService.add(task);
   return result;
 
@@ -61,6 +62,22 @@ async function getTask(companyId, currentUserId, taskId) {
 }
 
 
+async function updateTask(companyId, currentUserId, taskId, task) {
+
+  if(!companyId || !currentUserId || !task){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await taskService.update(taskId, member._id, task);
+  return result;
+
+}
+
 
 async function markComplete(companyId, currentUserId, taskId) {
   if(!companyId || !currentUserId || !taskId){
@@ -73,7 +90,6 @@ async function markComplete(companyId, currentUserId, taskId) {
     return null;
   }
 
-  console.log(member)
   let task = await taskService.markComplete(taskId, member._id);
   if(task){
     result = {success: true}

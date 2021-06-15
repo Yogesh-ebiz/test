@@ -205,8 +205,7 @@ async function search(filter, sort) {
     { $addFields:
         {
           rating: {$avg: "$evaluations.rating"},
-          evaluations: [],
-          applications: []
+          evaluations: []
         }
     },
   );

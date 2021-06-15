@@ -2444,6 +2444,10 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
     {
       path: 'sources',
       model: 'Label'
+    },
+    {
+      path: 'flag',
+      model: 'Flag'
     }
   ]);
 
@@ -2475,10 +2479,7 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
     let people = await feedService.findCandidateById(candidateId);
 
     people.match = 78;
-
     result = convertToCandidate(people);
-
-
   }
 
 

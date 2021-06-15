@@ -503,14 +503,29 @@ async function findApplicationSubscriptions(memberId, sort) {
         let:{subjectId: '$subjectId'},
         pipeline:[
           {$match:{$expr:{$eq:["$$subjectId","$_id"]}}},
-          {
-            $lookup: {
-              from: 'candidates',
-              localField: "user",
-              foreignField: "_id",
-              as: "user"
-            }
-          },
+          {$lookup:{
+              from:"candidates",
+              let:{user:"$user"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$user"]}}},
+                {
+                  $lookup: {
+                    from: 'evaluations',
+                    localField: 'evaluations',
+                    foreignField: '_id',
+                    as: 'evaluations',
+                  },
+                },
+                { $addFields:
+                    {
+                      rating: {$avg: "$evaluations.rating"},
+                      evaluations: [],
+                      applications: []
+                    }
+                },
+              ],
+              as: 'user'
+            }},
           { $unwind: '$user'},
           {$lookup:{
               from:"applicationprogresses",

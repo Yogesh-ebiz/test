@@ -201,5 +201,6 @@
 	"task_retrieved_successful": "task_retrieved_successful",
 	"people_added_successful": "people_added_successful",
 	"blacklist_retrieved_successful": "blacklist_retrieved_successful",
-	"task_added_successful": "task_added_successful"
+	"task_added_successful": "task_added_successful",
+	"task_updated_successful": "task_updated_successful"
 }
