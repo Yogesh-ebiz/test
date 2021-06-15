@@ -133,6 +133,8 @@ const convertToCandidate = (user) => {
     evaluations: user.evaluations?user.evaluations:[],
     experiences: user.experiences?_.reduce(user.experiences, function(res, i){ i.employer = convertToCompany(i.company); res.push(i);  return res;}, []):[],
     educations: user.educations?_.reduce(user.educations, function(res, i){ i.institute = convertToCompany(i.institute); res.push(i);  return res;}, []):[],
+    url: user.url,
+    flag: user.flag
   };
 }
 
