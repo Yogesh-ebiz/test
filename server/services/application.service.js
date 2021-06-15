@@ -953,7 +953,7 @@ async function search(jobId, filter, sort) {
   let aMatch = {};
 
 
-  aList.push({ $match: {jobId: jobId} });
+  aList.push({ $match: {jobId: jobId, status: filter.status} });
   aList.push(
     {
       $lookup: {

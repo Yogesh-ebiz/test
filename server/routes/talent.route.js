@@ -1617,7 +1617,7 @@ async function updateCandidateProject(req, res) {
 async function updatePeoplePool(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let peopleId = parseInt(req.params.userId);
+  let peopleId = parseInt(req.params.peopleId);
   let poolIds = req.body.pools;
 
   let data = await talentCtrl.updatePeoplePool(companyId, currentUserId, peopleId, poolIds);

@@ -18,6 +18,8 @@ const taskType = require('../const/taskType');
 const {upload} = require('../services/aws.service');
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
+const paymentService = require('../services/api/payment.service.api');
+
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
 const applicationService = require('../services/application.service');
@@ -50,6 +52,7 @@ const cardService = require('../services/card.service');
 const flagService = require('../services/flag.service');
 const taskService = require('../services/task.service');
 const stageService = require('../services/stage.service');
+const receiptService = require('../services/receipt.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -1158,12 +1161,41 @@ async function payJob(companyId, currentUserId, jobId, payment) {
     return null;
   }
 
-  let job = await jobService.findJob_Id(jobId);
+  let job;
+  let checkout = await paymentService.charge(currentUserId, payment);
+  console.log(checkout);
+  if(checkout){
+    let receipt = {
+      amount: checkout.amount,
+      currency: checkout.currency,
+      description: checkout.description,
+      chargeId: checkout.id,
+      metadata: checkout.meta,
+      type: 'PROMOTEJOB',
+      isPaid: checkout.paid,
+      receiptUrl: checkout.receipt_url,
+      userId: currentUserId,
+      member: member._id
+    };
 
-  if(job){
-    job.status = statusEnum.ACTIVE;
-    job.publishedDate = Date.now();
-    await job.save();
+    receipt = await receiptService.add(receipt);
+
+    if(checkout.card){
+      receipt.paymentMethod = 'CARD';
+      receipt.payment = {
+        last4: checkout.card.last4,
+        brand: checkout.card.brand
+      }
+    }
+
+    job = await jobService.findJob_Id(jobId);
+
+    if(job){
+      job.status = statusEnum.ACTIVE;
+      job.publishedDate = Date.now();
+      job = await job.save();
+    }
+
   }
 
   return job;
@@ -2229,7 +2261,7 @@ async function getBoard(currentUserId, jobId, locale) {
 
 
     let applicationsGroupByStage = await Application.aggregate([
-      {$match: {jobId: job._id}},
+      {$match: {jobId: job._id, status:'ACTIVE'}},
       // {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
       {$lookup:{
           from:"applicationprogresses",
@@ -2782,6 +2814,7 @@ async function removeCandidateSource(companyId, currentUserId, candidateId, sour
 
 
 async function updateCandidatePool(companyId, currentUserId, candidateId, poolIds) {
+  console.log(companyId, currentUserId, candidateId, poolIds)
   if(!companyId || !currentUserId || !candidateId || !poolIds){
     return null;
   }
@@ -2796,6 +2829,7 @@ async function updateCandidatePool(companyId, currentUserId, candidateId, poolId
 
 
   try {
+
     let pools = await poolService.findByCompany(companyId);
     if (pools) {
       for([i, pool] of pools.entries()){
@@ -2850,7 +2884,8 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
     return null;
   }
 
-  let result = null;
+
+  let result;
   let candidateId;
   let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
   if(!candidate){
@@ -2896,6 +2931,8 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
 
 
       }
+
+      result = {success: true};
 
     }
 
@@ -3624,7 +3661,6 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
   let result = null;
   try {
     result = await memberService.findJobSubscriptions(member._id, sort);
-    console.log(result)
     let company = await feedService.lookupCompaniesIds([companyId]);
     company = convertToCompany(company[0]);
     result.docs.forEach(function(sub){

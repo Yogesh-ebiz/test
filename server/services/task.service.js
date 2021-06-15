@@ -144,7 +144,7 @@ async function search(memberId, filter, sort, query) {
 
 
   let aList = [];
-  let $match = {members: [memberId], status: filter.status};
+  let $match = {$or: [{members: [memberId]}, {owner: memberId}], status: filter.status};
   if(query){
     $match.name = {$regex: query, $options: 'i'};
   }
@@ -155,8 +155,7 @@ async function search(memberId, filter, sort, query) {
 
   let aMatch = { $match:  $match};
   let aSort = { $sort: {createdDate: direction} };
-
-
+  
   aList.push(aMatch);
   aList.push(aSort);
 

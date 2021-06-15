@@ -13,8 +13,8 @@ module.exports = router;
 router.route('').post(asyncHandler(addTask));
 router.route('/:id').get(asyncHandler(getTask));
 router.route('/:id').put(asyncHandler(updateTask));
-router.route('/:id/complete').post(asyncHandler(markComplete));
 router.route('/:id').delete(asyncHandler(removeTask));
+router.route('/:id/complete').post(asyncHandler(markComplete));
 
 
 
@@ -52,7 +52,6 @@ async function markComplete(req, res) {
   let data = await taskCtl.markComplete(companyId, currentUserId, taskId, res.locale);
   res.json(new Response(data, data?'task_retrieved_successful':'not_found', res));
 }
-
 
 
 async function removeTask(req, res) {

@@ -296,7 +296,6 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
   if(job) {
     if(!job.pipeline) {
-      console.log('helllooo')
       form.createdBy = currentUserId
       form.jobId = job._id;
       pipeline = await PipelineService.addPipeline(jobId, form);
@@ -328,7 +327,9 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
           }
 
         }
-        pipeline = job.pipeline;
+        job.pipeline.autoRejectBlackList = form.autoRejectBlackList;
+        pipeline = job.pipeline.save();
+
       } else if(job.status == statusEnum.DRAFT) {
         for(let [i, stages] in job.pipeline.stages.entries()){
           await stages.delete();
