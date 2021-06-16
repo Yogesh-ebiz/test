@@ -87,7 +87,12 @@ async function findByCompany(company) {
   if(!company){
     return;
   }
-  return await Card.find({customer: ''+company});
+  // return await Card.find({customer: ''+company});
+  return [
+    {brand: 'Visa', last4: 4543, isDefault: false},
+    {brand: 'MasterCard', last4: 7544, isDefault: true},
+    {brand: 'Discover', last4: 6434, isDefault: false}
+  ];
 }
 
 

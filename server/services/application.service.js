@@ -953,7 +953,7 @@ async function search(jobId, filter, sort) {
   let aMatch = {};
 
 
-  aList.push({ $match: {jobId: jobId, status: filter.status} });
+  aList.push({ $match: {jobId: jobId, status: {$in: filter.status} } });
   aList.push(
     {
       $lookup: {
@@ -966,40 +966,40 @@ async function search(jobId, filter, sort) {
     {$unwind: '$currentProgress'}
   );
 
-  aList.push(
-    {$lookup:{
-        from:"candidates",
-        let:{user:"$user"},
-        pipeline:[
-          {$match:{$expr:{$eq:["$_id","$$user"]}}},
-          {
-            $lookup: {
-                from: 'labels',
-                localField: 'sources',
-                foreignField: '_id',
-                as: 'sources',
-            },
-          },
-          {
-            $lookup: {
-              from: 'evaluations',
-              localField: 'evaluations',
-              foreignField: '_id',
-              as: 'evaluations',
-            },
-          },
-          { $addFields:
-              {
-                rating: {$avg: "$evaluations.rating"},
-                evaluations: [],
-                applications: []
-              }
-          },
-        ],
-        as: 'user'
-      }},
-    {$unwind: '$user'}
-  );
+  // aList.push(
+  //   {$lookup:{
+  //       from:"candidates",
+  //       let:{user:"$user"},
+  //       pipeline:[
+  //         {$match:{$expr:{$eq:["$_id","$$user"]}}},
+  //         {
+  //           $lookup: {
+  //               from: 'labels',
+  //               localField: 'sources',
+  //               foreignField: '_id',
+  //               as: 'sources',
+  //           },
+  //         },
+  //         {
+  //           $lookup: {
+  //             from: 'evaluations',
+  //             localField: 'evaluations',
+  //             foreignField: '_id',
+  //             as: 'evaluations',
+  //           },
+  //         },
+  //         { $addFields:
+  //             {
+  //               rating: {$avg: "$evaluations.rating"},
+  //               evaluations: [],
+  //               applications: []
+  //             }
+  //         },
+  //       ],
+  //       as: 'user'
+  //     }},
+  //   {$unwind: '$user'}
+  // );
 
 
   let params = new ApplicationSearchParam(filter);

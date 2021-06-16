@@ -12,7 +12,8 @@ const emailCampaignSchema = Joi.object({
   jobId: Joi.object(),
   user: Joi.object().optional(),
   userId: Joi.number(),
-  email: Joi.string(),
+  email: Joi.object(),
+  emailAddress: Joi.string(),
   meta: Joi.object().optional(),
 });
 
@@ -26,7 +27,7 @@ async function add(emailCampaign) {
 
   emailCampaign = await Joi.validate(emailCampaign, emailCampaignSchema, {abortEarly: false});
   emailCampaign = new EmailCampaign(emailCampaign).save();
-  return activity;
+  return emailCampaign;
 
 }
 
@@ -36,7 +37,9 @@ async function findByEmailAndJobId(email, jobId) {
     return;
   }
 
-  return EmailCampaign.findOne({email: email, jobId: jobId}).populate('stages');
+  return EmailCampaign.aggregate([
+    {$match: {emailAddress: email, jobId: jobId} }
+  ])
 }
 
 

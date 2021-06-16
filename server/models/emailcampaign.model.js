@@ -32,6 +32,9 @@ const EmailCampaignSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  emailAddress: {
+    type: String
+  },
   email: { type: Schema.Types.ObjectId, ref: 'Email' },
   user: { type: Schema.Types.ObjectId, ref: 'Candidate' },
   jobId: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },

@@ -25,6 +25,7 @@ router.route('/company/:id/stats').get(asyncHandler(getStats));
 router.route('/company/:id/payment/cards').post(asyncHandler(addCard));
 router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
 router.route('/company/:id/payment/cards/:cardId').delete(asyncHandler(removeCard));
+router.route('/company/:id/payment/cards/verify').post(asyncHandler(verifyCard));
 
 
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
@@ -153,6 +154,7 @@ router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompany
 router.route('/company/:id/members/:memberId/jobs/subscribes').get(asyncHandler(getJobsSubscribed));
 router.route('/company/:id/members/:memberId/applications/subscribes').get(asyncHandler(getApplicationsSubscribed));
 router.route('/company/:id/members/:memberId/tasks').post(asyncHandler(searchTasks));
+
 
 router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
 router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
@@ -298,6 +300,16 @@ async function removeCard(req, res) {
   let cardId = req.params.cardId;
   let data = await talentCtrl.removeCard(companyId, currentUserId, cardId);
   res.json(new Response(data, data?'card_removed_successful':'not_found', res));
+}
+
+
+async function verifyCard(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let jobId = ObjectID(req.query.id);
+  let verification = req.body;
+  let data = await talentCtrl.verifyCard(companyId, currentUserId, jobId, verification);
+  res.json(new Response(data, data?'card_verified_successful':'not_found', res));
 }
 
 
@@ -1444,6 +1456,7 @@ async function searchTasks(req, res) {
   let data = await talentCtrl.searchTasks(company, currentUserId, filter, sort, query);
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
+
 
 
 async function getCompanyPools(req, res) {

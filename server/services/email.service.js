@@ -10,15 +10,16 @@ const emailCampaignService = require('../services/emailcampaign.service');
 
 
 const emailSchema = Joi.object({
+  type: Joi.string(),
   subject: Joi.string().allow('').optional(),
   body: Joi.string().required(),
   to: Joi.array(),
   cc: Joi.array().optional(),
   bcc: Joi.array().optional(),
   from: Joi.object(),
+  attachments: Joi.array().optional(),
   threadId: Joi.object().allow('').optional(),
   whenToSend: Joi.string(),
-  type: Joi.string(),
   meta: Joi.object().optional()
 });
 
@@ -27,15 +28,14 @@ const emailSchema = Joi.object({
 async function compose(form) {
   let data = null;
 
-  if(form==null){
+  if(!form){
     return;
   }
 
   form.threadId = form.threadId?ObjectID(form.threadId):'';
-
+  form = await Joi.validate(form, emailSchema, {abortEarly: false});
   if(form.type===emailType.DEFAULT) {
-    form = await Joi.validate(form, emailSchema, {abortEarly: false});
-    let email = await new Email(form).save();
+    email = await new Email(form).save();
 
     if(email) {
       if (form.meta && form.meta.applicationId) {
@@ -47,37 +47,39 @@ async function compose(form) {
       }
     }
   } else if(form.type===emailType.JOB_INVITE) {
-    console.log('INVITE')
-    for(let [i, contact] of form.to.entries()){
-      let email = form;
-      email.to = [contact];
-
-      email = await Joi.validate(email, emailSchema, {abortEarly: false});
-
-      let jobLink = _.find(email.attachments, {type: 'JOBLINK'});
-      if(jobLink){
 
 
-        email = await new Email(email).save();
-        if(emai){
-          let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(email.meta.jobId));
-          let hasInvitation = campaing?_.find(campaign.stages, {type: 'INVITED'}):false;
-          let token = new ObjectID();
+    let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
+    if(jobLink) {
+      for (let [i, contact] of form.to.entries()) {
+        let nMail = form;
+        nMail.to = [contact];
+
+        let token = new ObjectID();
+        let link = `${jobLink.url}?tracking=${token}`;
+        nMail.attachments[0].url = link;
+        nMail = await new Email(nMail).save();
+        if (nMail) {
+          let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(form.meta.jobId));
+          let hasInvitation = campaign ? _.find(campaign.stages, {type: 'INVITED'}) : false;
+
           console.log(hasInvitation);
           console.log(campaign);
-          if(!hasInvitation){
+          if (!hasInvitation) {
             await emailCampaignService.add({
-              token: token,
-              createdBy: email.createdBy,
-              jobId: email.meta.jobId,
+              token: token.toString(),
+              createdBy: form.createdBy,
+              jobId: ObjectID(form.meta.jobId),
               // user: Joi.object().optional(),
-              userId: Joi.number(),
-              email: email._id,
-              meta: email.meta,
+              userId: contact.id ? contact.id : null,
+              emailAddress: contact.email,
+              email: nMail._id,
+              meta: form.meta,
             });
           }
 
         }
+
       }
     }
   }

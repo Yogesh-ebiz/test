@@ -111,6 +111,7 @@ module.exports = {
   addCard,
   getCards,
   removeCard,
+  verifyCard,
   createJob,
   updateJob,
   closeJob,
@@ -759,6 +760,30 @@ async function removeCard(companyId, currentUserId, cardId) {
 }
 
 
+async function verifyCard(companyId, currentUserId, jobId, form) {
+
+  if(!companyId || !currentUserId  || !jobId || !form){
+    return null;
+  }
+
+  let result;
+  let oneOrZero = (Math.random()>=0.5)? 1 : 0;
+
+  if(oneOrZero) {
+    let job = await jobService.findJob_Id(jobId);
+    if (job) {
+      job.status = statusEnum.ACTIVE;
+      await job.save();
+    }
+
+    result = {success: true};
+  } else {
+    result = {success: false};
+  }
+  return result;
+}
+
+
 async function createJob(companyId, currentUserId, job) {
 
   if(!companyId || !currentUserId || !job){
@@ -1212,33 +1237,40 @@ async function payJob(companyId, currentUserId, jobId, payment) {
     return null;
   }
 
-  let job;
-  let checkout = await paymentService.charge(currentUserId, payment);
-  if(checkout){
-    let receipt = {
-      amount: checkout.amount,
-      currency: checkout.currency,
-      description: checkout.description,
-      chargeId: checkout.id,
-      meta: checkout.metadata,
-      type: 'PROMOTEJOB',
-      isPaid: checkout.paid,
-      receiptUrl: checkout.receipt_url,
-      userId: currentUserId,
-      member: member._id
-    };
+  let result;
+  let checkout;
+  // checkout = await paymentService.charge(currentUserId, payment);
 
-    receipt = await receiptService.add(receipt);
+  let oneOrZero = (Math.random()>=0.5)? 1 : 0;
+  // if(checkout){
+  if(oneOrZero){
+    if(checkout) {
+      let receipt = {
+        amount: checkout.amount,
+        currency: checkout.currency,
+        description: checkout.description,
+        chargeId: checkout.id,
+        meta: checkout.metadata,
+        type: 'PROMOTEJOB',
+        isPaid: checkout.paid,
+        receiptUrl: checkout.receipt_url,
+        userId: currentUserId,
+        member: member._id
+      };
 
-    if(checkout.card){
-      receipt.paymentMethod = 'CARD';
-      receipt.payment = {
-        last4: checkout.card.last4,
-        brand: checkout.card.brand
+      receipt = await receiptService.add(receipt);
+
+      if (checkout.card) {
+        receipt.paymentMethod = 'CARD';
+        receipt.payment = {
+          last4: checkout.card.last4,
+          brand: checkout.card.brand
+        }
       }
+
     }
 
-    job = await jobService.findJob_Id(jobId);
+    let job = await jobService.findJob_Id(jobId);
 
     if(job){
       job.status = statusEnum.ACTIVE;
@@ -1246,11 +1278,12 @@ async function payJob(companyId, currentUserId, jobId, payment) {
       job = await job.save();
     }
 
+    result = { success: true, verification: false };
+  } else {
+    result = { success: false, verification: true };
   }
 
-  return job;
-
-
+  return result;
 }
 
 
@@ -3780,6 +3813,7 @@ async function searchTasks(companyId, currentUserId, filter, sort, query) {
 
   return new Pagination(result);
 }
+
 
 
 
