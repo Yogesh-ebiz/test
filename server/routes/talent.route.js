@@ -26,7 +26,6 @@ router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
 router.route('/company/:id/payment/cards/:cardId').delete(asyncHandler(removeCard));
 
 
-
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
 router.route('/company/:id/jobs/search').post(asyncHandler(searchJob));
 router.route('/company/:id/jobs/:jobId').get(asyncHandler(getJobById));
@@ -58,6 +57,7 @@ router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
 
+router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
 router.route('/company/:id/applications/endingsoon').get(asyncHandler(getAllApplicationsEndingSoon));
@@ -430,6 +430,17 @@ async function getJobById(req, res) {
   let data = await talentCtrl.getJobById(currentUserId, companyId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+async function publishJob(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+  let jobId = req.params.jobId;
+  let type = req.body.type;
+
+  let data = await talentCtrl.publishJob(companyId, currentUserId, jobId, type);
+  res.json(new Response(data, data?'job_paid_successful':'not_found', res));
 }
 
 

@@ -12,8 +12,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: Date.now
   },
   createdBy: {
-    type: Object,
-    required: true
+    type: Object
   },
   updatedDate: {
     type: Number,
@@ -23,200 +22,18 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  publishedDate: {
-    type: Number
-  },
-  jobId: {
-    type: Number,
-    required: true
-  },
-  title: {
-    type: String,
-    required: true
-  },
   status: {
     type: String,
-    default: statusEnum.DRAFT
+    default: statusEnum.ACTIVE
   },
-  description: {
-    type: String,
-    required: false,
-    default: ""
+  userId: {
+    type: String
   },
-  currency: {
-    type: String,
-    required: true
+  email: {
+    type: String
   },
-  durationMonths: {
-    type: Number,
-    required: false,
-    default: null
-  },
-  minMonthExperience: {
-    type: Number,
-    required: false,
-    default: null
-  },
-  maxMonthExperience: {
-    type: Number,
-    required: false,
-    default: null
-  },
-  noOfResources: {
-    type: Number,
-    required: false,
-    default: 1
-  },
-  noOfViews: {
-    type: Number,
-    required: false,
-    default: 0
-  },
-  noOfApplied: {
-    type: Number,
-    required: false,
-    default: 0
-  },
-  type: {
-    type: String,
-    required: false
-  },
-  expirationDate: {
-    type: Number,
-    required: false
-  },
-  requiredOnDate: {
-    type: Number,
-    required: false
-  },
-  salaryRangeLow: {
-    type: Number,
-    required: false
-  },
-  salaryRangeHigh: {
-    type: Number,
-    required: false
-  },
-  salaryFixed: {
-    type: Number,
-    required: false
-  },
-  isNegotiable: {
-    type: String,
-    required: false,
-    default: false
-  },
-  hasApplied: {
-    type: Boolean,
-    default: false
-  },
-  appliedDate: {
-    type: Number,
-    required: false
-  },
-  level: {
-    type: Object,
-    required: false
-  },
-  jobFunction: {
-    type: Object,
-    required: false
-  },
-  responsibilities: {
-    type: Array,
-    required: false
-  },
-  qualifications: {
-    type: Array,
-    required: false
-  },
-  minimumQualifications: {
-    type: Array,
-    required: false
-  },
-  skills: {
-    type: Array,
-    required: false
-  },
-  employmentType: {
-    type: Object,
-    required: true
-  },
-  industry: {
-    type: Array,
-    required: true,
-    default: []
-  },
-  education: {
-    type: Object,
-    required: false
-  },
-  category: {
-    type: Object,
-    required: false
-  },
-  promotion: {
-    type: Object,
-    required: false
-  },
-  hasSaved: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
-  allowRemote: {
-    type: Boolean,
-    default: false
-  },
-  company: {
-    type: Object,
-    required: true
-  },
-  connection: {
-    type: Object,
-    required: false
-  },
-  hiringManager: {
-    type: Object,
-    required: false
-  },
-  district: {
-    type: String,
-    required: false
-  },
-  city: {
-    type: String,
-    required: false
-  },
-  state: {
-    type: String,
-    required: false
-  },
-  country: {
-    type: String,
-    required: true
-  },
-  postalCode: {
-    type: String,
-    required: false
-  },
-  internalCode: {
-    type: String,
-    required: false
-  },
-  isExternal: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
-  externalUrl: {
-    type: String,
-    required: false
-  },
-  shareUrl: {
-    type: String,
-    required: false,
-    default: 'http://www.anymay.com/jobs/'
+  user: {
+    type: Object
   },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
   department: { type: Schema.Types.ObjectId, ref: 'Department'},

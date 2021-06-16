@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const _ = require('lodash');
 const asyncHandler = require('express-async-handler');
 const companyCtrl = require('../controllers/company.controller');
 const peopleCtrl = require('../controllers/people.controller');
@@ -13,8 +14,7 @@ module.exports = router;
 router.route('/:id').get(asyncHandler(getPeopleById));
 router.route('/:id/flag').post(asyncHandler(addPeopleToBlacklist));
 router.route('/:id/flag').delete(asyncHandler(removePeopleFromBlacklist));
-
-
+router.route('/:id/jobs/assign').post(asyncHandler(assignPeopleJobs));
 router.route('/search').post(asyncHandler(searchPeople));
 router.route('/suggestions').post(asyncHandler(getPeopleSuggestions));
 
@@ -81,5 +81,19 @@ async function removePeopleFromBlacklist(req, res) {
 
   res.json(new Response(data, data?'people _removed_successful':'not_found', res));
 }
+
+
+
+async function assignPeopleJobs(req, res) {
+  let companyId = parseInt(req.query.companyId);
+  let currentUserId = parseInt(req.header('UserId'));
+  let peopleId = parseInt(req.params.id);
+  let jobs = req.body.jobs;
+  jobs = _.reduce(jobs, function(res, id){res.push(ObjectID(id)); return res;}, []);
+  let data = await peopleCtrl.assignPeopleJobs(companyId, currentUserId, peopleId, jobs);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
 
 

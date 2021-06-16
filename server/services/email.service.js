@@ -2,8 +2,11 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const emailType = require('../const/emailType');
+
 const Email = require('../models/email.model');
 const applicationService = require('../services/application.service');
+const emailCampaignService = require('../services/emailcampaign.service');
 
 
 const emailSchema = Joi.object({
@@ -29,20 +32,48 @@ async function compose(form) {
   }
 
   form.threadId = form.threadId?ObjectID(form.threadId):'';
-  form = await Joi.validate(form, emailSchema, { abortEarly: false });
 
-  let email = await new Email(form).save();
+  if(form.type===emailType.DEFAULT) {
+    form = await Joi.validate(form, emailSchema, {abortEarly: false});
+    let email = await new Email(form).save();
 
-  if(email) {
-    if (form.meta && form.meta.applicationId) {
-      let application = await applicationService.findById(ObjectID(form.meta.applicationId));
-      if (application) {
-        application.emails.push(email._id);
-        await application.save();
+    if(email) {
+      if (form.meta && form.meta.applicationId) {
+        let application = await applicationService.findById(ObjectID(form.meta.applicationId));
+        if (application) {
+          application.emails.push(email._id);
+          await application.save();
+        }
+      }
+    }
+  } else if(form.type===emailType.JOB_INVITE) {
+    console.log('INVITE')
+    for(let [i, contact] of form.to.entries()){
+      let email = form;
+      email.to = [contact];
+
+      email = await Joi.validate(email, emailSchema, {abortEarly: false});
+
+      let jobLink = _.find(email.attachments, {type: 'JOBLINK'});
+      if(jobLink){
+        let token = new ObjectID();
+
+        email = await new Email(email).save();
+        if(emai){
+          let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(email.meta.jobId));
+          let hasInvitation = campaing?_.find(campaign.stages, {type: 'INVITED'}):false;
+          if(!hasInvitation){
+
+          }
+          console.log(campaign);
+          console.log(hasInvitation)
+        }
       }
     }
   }
-  return email;
+
+
+  return {success:true};
 
 }
 

@@ -21,7 +21,7 @@ module.exports = {
   getTask,
   updateTask,
   markComplete,
-  removeTask
+  removeTask,
 }
 
 

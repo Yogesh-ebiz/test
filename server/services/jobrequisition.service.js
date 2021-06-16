@@ -66,7 +66,8 @@ const jobSchema = Joi.object({
   applicationPreferences: Joi.object(),
   profileField: Joi.object(),
   autoConfirmationEmail: Joi.object(),
-  pipeline: Joi.object()
+  pipeline: Joi.object(),
+  type: Joi.string()
 });
 
 

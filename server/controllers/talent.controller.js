@@ -128,6 +128,7 @@ module.exports = {
   updateJobMembers,
   updateJobApplicationForm,
   getBoard,
+  publishJob,
   payJob,
   getJobInsights,
   getJobActivities,
@@ -1001,7 +1002,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
         job.category = categoryMinimal(cateogry);
       }
 
-      if(job.skills.length) {
+      if(job.skills && job.skills.length) {
         let jobSkills = await feedService.findSkillsById(job.skills);
         job.skills = jobSkills;
       }
@@ -1148,6 +1149,31 @@ async function updateJobApplicationForm(companyId, currentUserId, jobId, form) {
 }
 
 
+async function publishJob(companyId, currentUserId, jobId, type) {
+
+  if(!companyId  || !currentUserId || !jobId || !type){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let job = await jobService.findJob_Id(jobId);
+
+  if(job){
+    job.type = type;
+    job.status = statusEnum.ACTIVE;
+    job.publishedDate = Date.now();
+    job = await job.save();
+  }
+
+  return job;
+
+
+}
 
 async function payJob(companyId, currentUserId, jobId, payment) {
 
@@ -1163,14 +1189,13 @@ async function payJob(companyId, currentUserId, jobId, payment) {
 
   let job;
   let checkout = await paymentService.charge(currentUserId, payment);
-  console.log(checkout);
   if(checkout){
     let receipt = {
       amount: checkout.amount,
       currency: checkout.currency,
       description: checkout.description,
       chargeId: checkout.id,
-      metadata: checkout.meta,
+      meta: checkout.metadata,
       type: 'PROMOTEJOB',
       isPaid: checkout.paid,
       receiptUrl: checkout.receipt_url,
@@ -2268,7 +2293,12 @@ async function getBoard(currentUserId, jobId, locale) {
           let:{currentProgress:"$currentProgress"},
           pipeline:[
             {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-
+            { $addFields:
+                {
+                  noOfEvaluations: {$size: "$evaluations"},
+                  noOfEmails: {size: 'emails'}
+                }
+            },
           ],
           as: 'currentProgress'
         }},
@@ -2891,11 +2921,7 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
   if(!candidate){
     let user = await feedService.findCandidateById(userId);
     if(user){
-        candidate = await candidateService.addCandidate({userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
-          jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
-          city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
-          skills: _.map(user.skills, 'id'), url: user.shareUrl
-        });
+        candidate = await candidateService.addCandidate(companyId, user);
         candidateId = candidate._id;
     }
   } else {
@@ -2906,14 +2932,15 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
     let pools = await poolService.findByCompany(companyId);
     if (pools) {
       for([i, pool] of pools.entries()){
+
         let existPool = _.find(poolIds, function(item){return ObjectID(item).equals(pool._id); });
         if(!existPool){
           for(const [i, candidate] of pool.candidates.entries()){
-            if(candidate==candidateId){
+            console.log(candidate, candidateId)
+            if(candidate.equals(candidateId)){
               pool.candidates.splice(i, 1);
             }
           }
-
           await pool.save();
         } else {
           let existCandidate= false;
@@ -3915,11 +3942,7 @@ async function addPoolCandidates(companyId, currentUserId, poolId, candidateIds)
           let found = await candidateService.findByUserIdAndCompanyId(candidate, companyId);
           if(!found){
             let user = await feedService.findCandidateById(candidate);
-            candidate = await candidateService.addCandidate({userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
-              jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
-              city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
-              skills: _.map(user.skills, 'id'), url: user.shareUrl
-            });
+            candidate = await candidateService.addCandidate(companyId, user);
             pool.candidates.push(candidate._id);
           }
 
@@ -4661,13 +4684,21 @@ async function searchContacts(companyId, currentUserId, query) {
   try {
 
     let members = await memberService.searchMembers(companyId, query);
+    members = _.reduce(members, function(res, m){
+      m.isMember = true;
+      res.push(m);
+      return res;
+    }, []);
 
     let candidates = await candidateService.searchCandidates(companyId, query);
-
+    candidates = _.reduce(candidates, function(res, c){
+      c.isMember = false;
+      res.push(c);
+      return res;
+    }, []);
 
     result = _.reduce(members.concat(candidates), function (res, item) {
       let exists = _.find(res, {id: item.userId});
-      item.isMember = item.isMember?true:false;
       if(!exists) {
         res.push(convertToAvatar(item));
       }

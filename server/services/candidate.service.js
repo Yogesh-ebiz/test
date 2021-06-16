@@ -31,12 +31,16 @@ const candidateSchema = Joi.object({
 });
 
 
-async function addCandidate(candidate) {
+async function addCandidate(user) {
 
-  if(!candidate){
+  if(!user){
     return;
   }
-
+  let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
+    jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
+    city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
+    skills: _.map(user.skills, 'id'), url: user.shareUrl
+  }
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
   candidate = new Candidate(candidate).save();
 

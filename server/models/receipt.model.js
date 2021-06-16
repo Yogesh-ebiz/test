@@ -20,7 +20,7 @@ const ReceiptSchema = new mongoose.Schema({
   chargeId: {
     type: String
   },
-  metadata: {
+  meta: {
     type: Object
   },
   type: {   //SUBSCRIPTION || PURCHASE

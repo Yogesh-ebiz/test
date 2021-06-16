@@ -12,8 +12,7 @@ const EmailSchema = new mongoose.Schema({
     default: emailType.DEFAULT
   },
   type: {
-    type: String,
-    default: statusEnum.UNREAD
+    type: String
   },
   from: {
     type: Object
@@ -57,9 +56,6 @@ const EmailSchema = new mongoose.Schema({
   },
   meta: {
     type: Object
-  },
-  attachLinks: {
-    type: Array
   },
   createdBy:{ type: Schema.Types.ObjectId, ref: 'Member'},
   labels:[{ type: Schema.Types.ObjectId, ref: 'Label'}],

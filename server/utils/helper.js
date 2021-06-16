@@ -63,7 +63,7 @@ const convertToTalentUser = (user) => {
 
 
 const convertToAvatar = (user) => {
-  return {
+  let data = {
     id: user.userId?user.userId:user.id,
     name: user.name,
     firstName: user.firstName,
@@ -76,6 +76,12 @@ const convertToAvatar = (user) => {
     email: user.email,
     isMember: user.isMember?user.isMember:false
   };
+  
+  if(user._id){
+    data._id = user._id;
+  }
+  
+  return data;
 }
 
 const convertToCandidate = (user) => {

@@ -21,7 +21,8 @@ module.exports = {
   getPeopleSuggestions,
   getPeopleById,
   addPeopleToBlacklist,
-  removePeopleFromBlacklist
+  removePeopleFromBlacklist,
+  assignPeopleJobs
 }
 
 async function searchPeople(companyId, filter, sort, locale) {
@@ -100,11 +101,7 @@ async function addPeopleToBlacklist(currentUserId, flag) {
     if(!candidate){
       let user = await feedService.findCandidateById(flag.userId);
       if(user){
-        candidate = await candidateService.addCandidate({userId: user.id, avatar: user.avatar, company: flag.companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
-          jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
-          city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
-          skills: _.map(user.skills, 'id'), url: user.shareUrl
-        });
+        candidate = await candidateService.addCandidate(flag.companyId, user);
       }
     }
 
@@ -151,4 +148,40 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
   return result
 }
 
+
+
+
+
+async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
+  if(!companyId || !currentUserId || !userId || !jobIds){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result;
+  let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
+  if(!candidate){
+    let user = await feedService.findCandidateById(userId);
+    if(user){
+      candidate = await candidateService.addCandidate(companyId, user);
+    }
+  }
+
+  try {
+
+    candidate.assignedJobs = jobIds;
+    candidate = await candidate.save();
+    result = {success: true};
+  } catch(e){
+    console.log('assignPeopleJobs: Error', e);
+  }
+
+
+  return result
+}
 

@@ -63,11 +63,9 @@ async function createTasksForStage(stage, jobTitle, meta) {
       newTask.meta = meta;
       let startDate = new Date();
       let endDate = new Date();
-      startDate.setDate(startDate.getDate()+stage.timeLimit);
-      startDate.setMinutes(0);
-      startDate.setHours(0)
-      endDate.setMinutes(0);
-      endDate.setHours(0)
+      endDate.setDate(endDate.getDate()+stage.timeLimit);
+      endDate.setMinutes(59);
+      endDate.setHours(23)
       newTask.startDate = startDate.getTime();
       newTask.endDate = endDate.getTime();
       newTask.reminders = ['D1'];

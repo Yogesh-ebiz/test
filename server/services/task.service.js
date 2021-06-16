@@ -69,6 +69,7 @@ async function update(id, memberId, form) {
   task.startDate = form.startDate;
   task.endDate = form.endDate;
   task.meta = form.meta;
+  task.reminders = form.reminders;
   result = await task.save();
 
 
@@ -98,7 +99,7 @@ async function markComplete(id, memberId) {
     return;
   }
 
-  let task = await Task.updateOne({_id: id, member: memberId}, { $set: {status: statusEnum.COMPLETED, hasCompleted:true} });
+  let task = await Task.updateOne({_id: id, $or: [{members: memberId}, {owner: memberId}]}, { $set: {status: statusEnum.COMPLETED, hasCompleted:true} });
   return task;
 
 }
@@ -113,7 +114,7 @@ async function getTasksDueSoon(member) {
   }
 
   let tasks = await Task.aggregate([
-    {$match: {member: member._id} },
+    {$match: {members: member._id} },
     {$sort: {endDate: 1}},
     {$limit: 5}
   ]);
@@ -149,13 +150,13 @@ async function search(memberId, filter, sort, query) {
     $match.name = {$regex: query, $options: 'i'};
   }
 
-  if(filter.applicationId) {
-    $match['meta.applicationId'] = ObjectID(filter.applicationId);
+  if(filter.application) {
+    $match['meta.application'] = {$exists: true};
   }
 
   let aMatch = { $match:  $match};
   let aSort = { $sort: {createdDate: direction} };
-  
+
   aList.push(aMatch);
   aList.push(aSort);
 
