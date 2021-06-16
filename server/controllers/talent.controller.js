@@ -105,6 +105,7 @@ module.exports = {
   getMarketSalary,
   getCompanyInsights,
   getInmailCredits,
+  getTaxAndFee,
   getImpressionCandidates,
   getStats,
   addCard,
@@ -290,9 +291,9 @@ async function getMarketSalary(jobTitle) {
 }
 
 
-async function getInmailCredits(company, currentUserId, preferredCompany) {
+async function getInmailCredits(companyId, currentUserId) {
 
-  if(!currentUserId){
+  if(!companyId || !currentUserId){
     return null;
   }
 
@@ -306,7 +307,26 @@ async function getInmailCredits(company, currentUserId, preferredCompany) {
 
 
 
-  return user;
+  return 25;
+
+}
+
+
+async function getTaxAndFee(companyId, currentUserId) {
+
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+
+  // let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  //
+  // if(!member){
+  //   return null;
+  // }
+
+
+  return {taxRate: 9.5, fee: 25};
 
 }
 
@@ -745,12 +765,17 @@ async function createJob(companyId, currentUserId, job) {
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return;
+  }
+
 
   let result;
   // let currentParty = await feedService.findByUserId(currentUserId);
 
   // if (isPartyActive(currentParty)) {
-  result = await jobService.addJob(companyId, currentUserId, job);
+  result = await jobService.addJob(companyId, member, job);
 
   // }
 

@@ -56,17 +56,27 @@ async function compose(form) {
 
       let jobLink = _.find(email.attachments, {type: 'JOBLINK'});
       if(jobLink){
-        let token = new ObjectID();
+
 
         email = await new Email(email).save();
         if(emai){
           let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(email.meta.jobId));
           let hasInvitation = campaing?_.find(campaign.stages, {type: 'INVITED'}):false;
-          if(!hasInvitation){
-
-          }
+          let token = new ObjectID();
+          console.log(hasInvitation);
           console.log(campaign);
-          console.log(hasInvitation)
+          if(!hasInvitation){
+            await emailCampaignService.add({
+              token: token,
+              createdBy: email.createdBy,
+              jobId: email.meta.jobId,
+              // user: Joi.object().optional(),
+              userId: Joi.number(),
+              email: email._id,
+              meta: email.meta,
+            });
+          }
+
         }
       }
     }

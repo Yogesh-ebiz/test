@@ -17,6 +17,7 @@ router.route('/market/salary').get(asyncHandler(getMarketSalary));
 router.route('/company').get(asyncHandler(getCompanies));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
+router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
 
 router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 router.route('/company/:id/stats').get(asyncHandler(getStats));
@@ -227,12 +228,20 @@ async function getInsights(req, res) {
 async function getInmailCredits(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let timeframe = req.query.timeframe
 
-  let data = await talentCtrl.getInmailCredits(currentUserId, companyId, timeframe);
-  res.json(new Response(data, data?'get_insights_successful':'not_found', res));
+  let data = await talentCtrl.getInmailCredits(companyId, currentUserId);
+  res.json(new Response(data, data?'credits_retrieved_successful':'not_found', res));
 }
 
+
+
+async function getTaxAndFee(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+
+  let data = await talentCtrl.getTaxAndFee(currentUserId, companyId);
+  res.json(new Response(data, data?'taxandfees_retrieved_successful':'not_found', res));
+}
 
 
 async function getImpressionCandidates(req, res) {

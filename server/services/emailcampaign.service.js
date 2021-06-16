@@ -7,13 +7,15 @@ const Joi = require('joi');
 
 
 const emailCampaignSchema = Joi.object({
-  causerType: Joi.string(),
-  causerId: Joi.string(),
-  action: Joi.string().required(),
-  subjectType: Joi.string(),
-  subjectId: Joi.string(),
+  token: Joi.string(),
+  createdBy: Joi.object(),
+  jobId: Joi.object(),
+  user: Joi.object().optional(),
+  userId: Joi.number(),
+  email: Joi.string(),
   meta: Joi.object().optional(),
 });
+
 
 
 async function add(emailCampaign) {

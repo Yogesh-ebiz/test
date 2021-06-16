@@ -72,15 +72,11 @@ const jobSchema = Joi.object({
 
 
 
-async function addJob(companyId, currentUserId, form) {
-  if(!companyId || !currentUserId || !form){
+async function addJob(companyId, member, form) {
+  if(!companyId || !member || !form){
     return;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
-    return;
-  }
 
 
   let result;
@@ -109,7 +105,7 @@ async function addJob(companyId, currentUserId, form) {
 
   result = await new JobRequisition(form).save();
 
-  let subscription = {memberId: member._id, createdBy: currentUserId, subjectType: subjectType.JOB, subjectId: result._id};
+  let subscription = {memberId: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subjectId: result._id};
   await memberService.subscribe(subscription);
 
   return result;

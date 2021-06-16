@@ -12,27 +12,13 @@ const EmailCampaignSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  jobId: {
-    type: Object,
-    required: true
-  },
-  user: {
-    type: Object
-  },
   userId: {
     type: Number,
-    required: true
-  },
-  email: {
-    type: String,
     required: true
   },
   status: {
     type: String,
     default: statusEnum.ACTIVE
-  },
-  createdBy: {
-    type: Number
   },
   createdDate: {
     type: Number,
@@ -46,6 +32,10 @@ const EmailCampaignSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  email: { type: Schema.Types.ObjectId, ref: 'Email' },
+  user: { type: Schema.Types.ObjectId, ref: 'Candidate' },
+  jobId: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   stages: [{ type: Schema.Types.ObjectId, ref: 'EmailCampaignStage' }],

@@ -31,9 +31,9 @@ const candidateSchema = Joi.object({
 });
 
 
-async function addCandidate(user) {
+async function addCandidate(companyId, user) {
 
-  if(!user){
+  if(!companyId || !user){
     return;
   }
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,

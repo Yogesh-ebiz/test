@@ -26,6 +26,5 @@ const EmailCampaignStageSchema = new mongoose.Schema({
 
 EmailCampaignProgressSchema.plugin(mongoosePaginate);
 
-
 module.exports = mongoose.model('EmailCampaignStage', EmailCampaignStageSchema);
 
