@@ -39,8 +39,11 @@ async function compose(form) {
 
     if(email) {
       if (form.meta && form.meta.applicationId) {
-        let application = await applicationService.findById(ObjectID(form.meta.applicationId));
+        let application = await applicationService.findById(ObjectID(form.meta.applicationId)).populate('currentProgress');
         if (application) {
+          application.currentProgress.emails.push(email._id);
+          await application.currentProgress.save();
+
           application.emails.push(email._id);
           await application.save();
         }

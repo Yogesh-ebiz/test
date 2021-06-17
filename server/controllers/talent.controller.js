@@ -2354,7 +2354,7 @@ async function getBoard(currentUserId, jobId, locale) {
             { $addFields:
                 {
                   noOfEvaluations: {$size: "$evaluations"},
-                  noOfEmails: {size: 'emails'}
+                  noOfEmails: {$size: '$emails'}
                 }
             },
           ],
