@@ -18,13 +18,15 @@ const cardSchema = Joi.object({
   name: Joi.string().optional(),
   address_line1: Joi.string(),
   address_line2: Joi.string().allow('').optional(),
+  address_district: Joi.string().allow('').optional(),
   address_city: Joi.string().allow('').optional(),
   address_country: Joi.string(),
   address_state: Joi.string().allow('').optional(),
   address_zip: Joi.string().allow('').optional(),
   currency: Joi.string().allow('').optional(),
   meta: Joi.object().optional(),
-  customer: Joi.number()
+  companyId: Joi.number(),
+  userId: Joi.number()
 });
 
 
@@ -37,8 +39,10 @@ async function add(card) {
   card = await Joi.validate(card, cardSchema, {abortEarly: false});
   card.last4 = card.number.substring(card.number.length-4, card.number.length);
   card.brand = cardTest(card.number)
-  console.log(card.brand)
+  card.isDefault = true;
   card = new Card(card).save();
+
+  await Card.update({last4: {$ne: card.last4}}, {$set: {isDefault: false}});
 
   return card;
 
@@ -72,14 +76,6 @@ async function findById(id) {
   return await Card.findById(id);
 }
 
-async function findByUserId(userId) {
-
-  if(!userId){
-    return;
-  }
-
-  return await Card.findOne({userId: userId});
-}
 
 
 async function findByCompany(company) {
@@ -87,7 +83,7 @@ async function findByCompany(company) {
   if(!company){
     return;
   }
-  // return await Card.find({customer: ''+company});
+  return await Card.find({customer: ''+company});
   return [
     {brand: 'Visa', last4: 4543, isDefault: false},
     {brand: 'MasterCard', last4: 7544, isDefault: true},
@@ -97,10 +93,24 @@ async function findByCompany(company) {
 
 
 
+async function findByUserId(userId) {
+
+  if(!userId){
+    return;
+  }
+  return await Card.find({userId: userId}).limit(5);
+  // return [
+  //   {brand: 'Visa', last4: 4543, isDefault: false},
+  //   {brand: 'MasterCard', last4: 7544, isDefault: true},
+  //   {brand: 'Discover', last4: 6434, isDefault: false}
+  // ];
+}
+
+
 module.exports = {
   add:add,
   remove:remove,
   findById:findById,
   findByUserId:findByUserId,
-  findByCompany:findByCompany
+  findByCompany:findByCompany,
 }

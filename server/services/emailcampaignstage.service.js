@@ -3,11 +3,11 @@ const ObjectID = require('mongodb').ObjectID;
 let SearchParam = require('../const/searchParam');
 
 const statusEnum = require('../const/statusEnum');
-const EmailCampaign = require('../models/emailcampaign.model');
+const EmailCampaignStage = require('../models/emailcampaignstage.model');
 const Joi = require('joi');
 
 
-const emailCampaignSchema = Joi.object({
+const emailCampaignStageSchema = Joi.object({
   token: Joi.string(),
   createdBy: Joi.object(),
   jobId: Joi.object(),
@@ -20,15 +20,15 @@ const emailCampaignSchema = Joi.object({
 
 
 
-async function add(emailCampaign) {
+async function add(emailCampaignStage) {
 
-  if(!emailCampaign){
+  if(!emailCampaignStage){
     return;
   }
 
-  emailCampaign = await Joi.validate(emailCampaign, emailCampaignSchema, {abortEarly: false});
-  emailCampaign = new EmailCampaign(emailCampaign).save();
-  return emailCampaign;
+  emailCampaignStage = await Joi.validate(emailCampaignStage, emailCampaignStageSchema, {abortEarly: false});
+  emailCampaignStage = new EmailCampaignStage(emailCampaignStage).save();
+  return emailCampaignStage;
 
 }
 

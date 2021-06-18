@@ -48,8 +48,8 @@ async function add(task) {
 }
 
 
-async function update(id, memberId, form) {
-  if(!id || !memberId || !form){
+async function update(id, form) {
+  if(!id || !form){
     return;
   }
 
@@ -58,7 +58,7 @@ async function update(id, memberId, form) {
   let task = await findById(id);
   let result = null;
 
-  if(!task || !task.owner.equals(memberId)){
+  if(!task || !task.owner.equals(form.updatedBy)){
     return;
   }
 

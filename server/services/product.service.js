@@ -1,8 +1,12 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const productType = require('../const/productType');
+
 const Product = require('../models/product.model');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
+
+const paymentService = require('../services/api/payment.service.api');
 
 
 const productSchema = Joi.object({
@@ -10,9 +14,55 @@ const productSchema = Joi.object({
   description: Joi.string().allow(''),
   type: Joi.string().allow(''),
   category: Joi.string().allow(''),
-  listPrice: Joi.number(),
-  isRecommended: Joi.boolean()
+  currency: Joi.string(),
+  price: Joi.object(),
+  isRecommended: Joi.boolean(),
+  recurring: Joi.object().optional()
 });
+
+
+async function add(currentUserId, form) {
+  if(!currentUserId || !form){
+    return;
+  }
+
+
+  let result;
+  form = await Joi.validate(form, productSchema, {abortEarly: false});
+  form.createdBy = currentUserId
+
+  let product = await paymentService.addProduct(currentUserId, form);
+  if(product){
+    form.productId = product.id;
+    result = new Product(form).save();
+  }
+
+
+
+  return result;
+
+}
+
+async function update(id, form) {
+  if(!id || !form){
+    return;
+  }
+
+  form = await Joi.validate(form, productSchema, {abortEarly: false});
+
+  let product = await findById(id);
+
+  if(product){
+    product.lastUpdatedDate = Date.now();
+    product.name = form.name;
+    product.description = form.description;
+    product.listPrice = form.listPrice;
+
+    result = await product.save();
+  }
+  return result;
+
+}
 
 
 async function getProducts(filter, sort) {
@@ -56,46 +106,12 @@ function findById(productId) {
   return product
 }
 
-async function addProduct(currentUserId, form) {
-  if(!currentUserId || !form){
-    return;
-  }
-
-
-  let result;
-  form = await Joi.validate(form, productSchema, {abortEarly: false});
-  form.createdBy = currentUserId
-  result = new Product(form).save();
-
-  return result;
-
-}
-
-async function updateProduct(productId, form) {
-  if(!productId || !form){
-    return;
-  }
-
-  form = await Joi.validate(form, productSchema, {abortEarly: false});
-
-  let product = await findById(productId);
-
-  if(product){
-    product.lastUpdatedDate = Date.now();
-    product.name = form.name;
-    product.description = form.description;
-    product.listPrice = form.listPrice;
-    result = await product.save();
-  }
-  return result;
-
-}
-
 
 module.exports = {
+  add:add,
+  update:update,
   getProducts:getProducts,
   getAvailableProducts:getAvailableProducts,
-  addProduct:addProduct,
-  findById:findById,
-  updateProduct:updateProduct
+  findById:findById
+
 }

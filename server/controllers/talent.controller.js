@@ -52,7 +52,9 @@ const cardService = require('../services/card.service');
 const flagService = require('../services/flag.service');
 const taskService = require('../services/task.service');
 const stageService = require('../services/stage.service');
-const receiptService = require('../services/receipt.service');
+const emailCampaignService = require('../services/emailcampaign.service');
+
+const checkoutService = require('../services/checkout.service');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -136,6 +138,7 @@ module.exports = {
   getJobActivities,
   searchPeopleSuggestions,
   searchApplications,
+  searchCampaigns,
   getAllApplicationsEndingSoon,
   getApplicationById,
   rejectApplication,
@@ -731,8 +734,8 @@ async function addCard(companyId, currentUserId, card) {
   if(!companyId || !currentUserId || !card){
     return null;
   }
-
-  card.customer = companyId;
+  card.userId = currentUserId;
+  card.companyId = companyId;
   let result = await cardService.add(card);
   return result;
 }
@@ -744,7 +747,11 @@ async function getCards(companyId, currentUserId) {
     return null;
   }
 
-  let result = await cardService.findByCompany(companyId);
+  let result = await cardService.findByUserId(currentUserId);
+  result = _.reduce(result, function(res, c){
+    res.push({brand: c.brand, last4: c.last4, isDefault: c.isDefault});
+    return res;
+  }, []);
   return result;
 }
 
@@ -1225,9 +1232,9 @@ async function publishJob(companyId, currentUserId, jobId, type) {
 
 }
 
-async function payJob(companyId, currentUserId, jobId, payment) {
+async function payJob(companyId, currentUserId, jobId, form) {
 
-  if(!companyId  || !currentUserId || !jobId || !payment){
+  if(!companyId  || !currentUserId || !jobId || !form){
     return null;
   }
 
@@ -1238,38 +1245,11 @@ async function payJob(companyId, currentUserId, jobId, payment) {
   }
 
   let result;
-  let checkout;
-  // checkout = await paymentService.charge(currentUserId, payment);
+  let checkout = await checkoutService.pay(member, form);
 
   let oneOrZero = (Math.random()>=0.5)? 1 : 0;
   // if(checkout){
   if(oneOrZero){
-    if(checkout) {
-      let receipt = {
-        amount: checkout.amount,
-        currency: checkout.currency,
-        description: checkout.description,
-        chargeId: checkout.id,
-        meta: checkout.metadata,
-        type: 'PROMOTEJOB',
-        isPaid: checkout.paid,
-        receiptUrl: checkout.receipt_url,
-        userId: currentUserId,
-        member: member._id
-      };
-
-      receipt = await receiptService.add(receipt);
-
-      if (checkout.card) {
-        receipt.paymentMethod = 'CARD';
-        receipt.payment = {
-          last4: checkout.card.last4,
-          brand: checkout.card.brand
-        }
-      }
-
-    }
-
     let job = await jobService.findJob_Id(jobId);
 
     if(job){
@@ -1450,6 +1430,30 @@ async function searchApplications(currentUserId, jobId, filter, sort, locale) {
       app.hasFollowed = true;
     }
   })
+
+  return new Pagination(result);
+
+
+}
+
+
+async function searchCampaigns(companyId, currentUserId, jobId, filter, sort, locale) {
+
+  if(!companyId || !currentUserId || !jobId || !filter || !sort){
+    return null;
+  }
+
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await emailCampaignService.search(jobId, filter, sort);
+  // let userIds = _.map(result.docs, 'user');
+  // let users = await feedService.lookupUserIds(userIds);
+
+
 
   return new Pagination(result);
 

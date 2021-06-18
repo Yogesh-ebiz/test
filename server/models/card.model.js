@@ -39,9 +39,6 @@ const CardSchema = new mongoose.Schema({
   country: {
     type: String
   },
-  customer: {
-    type: String
-  },
   cvc: {
     type: Number
   },
@@ -71,9 +68,14 @@ const CardSchema = new mongoose.Schema({
   metadata: {
     type: String
   },
-  name: {
-    type: String,
-    required: true
+  userId: {
+    type: Number
+  },
+  companyId: {
+    type: Number
+  },
+  isDefault: {
+    type: Boolean
   }
 }, {
   versionKey: false

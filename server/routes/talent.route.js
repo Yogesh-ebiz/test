@@ -59,6 +59,8 @@ router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
 
+router.route('/company/:id/jobs/:jobId/campaigns').post(asyncHandler(searchCampaigns));
+
 router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
@@ -551,6 +553,21 @@ async function updateApplication(req, res) {
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
+
+async function searchCampaigns(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let jobId = ObjectID(req.params.jobId);
+
+  let filter = req.body;
+  let sort = req.query;
+  filter.query = req.query.query;
+
+
+  let data = await talentCtrl.searchCampaigns(company, currentUserId, jobId, filter, sort, res.locale);
+  res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
+}
+
 
 
 

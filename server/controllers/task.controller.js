@@ -73,7 +73,8 @@ async function updateTask(companyId, currentUserId, taskId, task) {
     return null;
   }
 
-  let result = await taskService.update(taskId, member._id, task);
+  task.updateBy = member._id
+  let result = await taskService.update(taskId, task);
   return result;
 
 }

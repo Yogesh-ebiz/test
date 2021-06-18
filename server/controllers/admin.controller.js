@@ -154,7 +154,7 @@ async function addProduct(currentUserId, form) {
 
   let result;
   try {
-    result = await productService.addProduct(currentUserId, form);
+    result = await productService.add(currentUserId, form);
 
   } catch (error) {
     console.log(error);

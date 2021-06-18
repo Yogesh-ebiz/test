@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const statusEnum = require('../const/statusEnum');
+const Schema = mongoose.Schema;
 
 
-const ProductSchema = new mongoose.Schema({
+const PaymentSchema = new mongoose.Schema({
   createdBy: {
     type: Number
   },
@@ -18,42 +19,34 @@ const ProductSchema = new mongoose.Schema({
   status: {
     type: String
   },
-  name: {
+  paymentType: {
+    type: String
+  },
+  paymentMethod: {
+    type: Object
+  },
+  amount: {
+    type: Number
+  },
+  currency: {
     type: String
   },
   description: {
     type: String
   },
-  price: {
-    type: Object
-  },
-  type: {
+  chargeId: {
     type: String
   },
-  category: {
-    type: String
-  },
-  image_url: {
-    type: String
-  },
-  isRecommended: {
-    type: Boolean
-  },
-  hasPurchased: {
-    type: Boolean
-  },
-  recurring: {
-    type: Object
-  },
-  productId: {
-    type: String
-  }
+  refund: { type: Schema.Types.ObjectId, ref: 'Refund' },
+  product: { type: Schema.Types.ObjectId, ref: 'Product' },
+  comments:[{ type: Schema.Types.ObjectId, ref: 'Comment'}],
+  tags:[{ type: Schema.Types.ObjectId, ref: 'Label'}]
 }, {
   versionKey: false
 });
 
-ProductSchema.plugin(mongoosePaginate);
+PaymentSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('Product', ProductSchema);
+module.exports = mongoose.model('Payment', PaymentSchema);
 

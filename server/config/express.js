@@ -14,6 +14,8 @@ const routes = require('../routes/index.route');
 const config = require('./config');
 const passport = require('./passport');
 const multipart = require('connect-multiparty');
+const handleErrors = require('../middleware/handleErrors');
+const { BadRequest } = require('../middleware/baseError');
 
 const i18n = require('./i18n');
 let Response = require('../const/response');
@@ -97,6 +99,9 @@ app.use((req, res, next) => {
 });
 
 // error handler, send stacktrace only during development
+app.use(handleErrors);
+
+
 app.use((err, req, res, next) => {
 
   // customize Joi validation errors
@@ -106,11 +111,11 @@ app.use((err, req, res, next) => {
 
   }
 
-  res.status(err.status || 500).json({
-    data: null,
-    message: err.message,
-    status: err.status
-  });
+    res.status(err.status ||  500).json({
+      data: null,
+      message: err.message,
+      status: err.status
+    });
   next(err);
 });
 
