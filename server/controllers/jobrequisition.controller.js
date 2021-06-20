@@ -165,7 +165,10 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         let hiringManager = await findByUserId(job.createdBy.userId);
         job.createdBy = convertToAvatar(hiringManager);
 
-        let jobSkills = await findSkillsById(job.skills);
+        let jobSkills = [];
+        if(job.skills.length){
+          jobSkills = await findSkillsById(job.skills);
+        }
         // console.log('jobSkils', jobSkills)
 
 
@@ -899,7 +902,7 @@ async function applyJobById(currentUserId, jobId, application ) {
 
 
 
-            let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subjectId: ''+savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, candidate: savedApplication.user, jobId: job._id, jobTitle: job.title}});
+            let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, candidate: candidate._id, jobId: job._id, jobTitle: job.title}});
 
 
 

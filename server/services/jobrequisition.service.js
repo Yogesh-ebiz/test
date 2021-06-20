@@ -113,8 +113,8 @@ async function addJob(companyId, member, form) {
 }
 
 
-async function updateJob(jobId, currentUserId, form) {
-  if(!jobId || !currentUserId || !form){
+async function updateJob(jobId, member, form) {
+  if(!jobId || !member || !form){
     return;
   }
 
@@ -187,12 +187,12 @@ async function updateJob(jobId, currentUserId, form) {
       job.department =  ObjectID(form.department);
     }
 
-    job.updatedBy = currentUserId;
+    job.updatedBy = member;
     job.updatedDate = Date.now();
 
     result = await job.save();
 
-    let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+job._id, action: actionEnum.UPDATED, meta: {jobId: job._id, jobTitle: job.title}});
+    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.UPDATED, meta: {jobId: job._id, jobTitle: job.title}});
 
   }
 
@@ -490,27 +490,26 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
 }
 
 
-async function closeJob(jobId, currentUserId) {
-  if(!jobId || !currentUserId){
+async function closeJob(jobId, member) {
+  if(!jobId || !member){
     return;
   }
 
   let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: currentUserId, updatedDate: Date.now()}});
   let user = await feedService.lookupUserIds([currentUserId]);
-  await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.CLOSED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
+  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.CLOSED, meta: {name: member.firstName + ' ' + member.lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
   return result;
 
 }
 
 
-async function archiveJob(jobId, currentUserId) {
-  if(!jobId || !currentUserId){
+async function archiveJob(jobId, member) {
+  if(!jobId || !member){
     return;
   }
 
   let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: currentUserId, updatedDate: Date.now()}});
-  let user = await feedService.lookupUserIds([currentUserId]);
-  await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.ARCHIVED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
+  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.ARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
 
   return result;
 
@@ -518,14 +517,13 @@ async function archiveJob(jobId, currentUserId) {
 
 
 
-async function unarchiveJob(jobId, currentUserId) {
-  if(!jobId || !currentUserId){
+async function unarchiveJob(jobId, member) {
+  if(!jobId || !member){
     return;
   }
 
   let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: currentUserId, updatedDate: Date.now()}});
-  let user = await feedService.lookupUserIds([currentUserId]);
-  await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subjectId: ''+result._id, action: actionEnum.UNARCHIVED, meta: {name: user[0].firstName + ' ' + user[0].lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
+  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.UNARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitlte: result.title, jobId: ObjectID(jobId)}});
 
   return result;
 

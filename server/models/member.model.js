@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
+
 const statusEnum = require('../const/statusEnum');
 
 
@@ -74,6 +76,8 @@ const MemberSchema = new mongoose.Schema({
 }, {
   versionKey: false
 });
+MemberSchema.plugin(mongoosePaginate);
+
 
 
 module.exports = mongoose.model('Member', MemberSchema);

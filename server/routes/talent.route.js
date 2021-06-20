@@ -111,6 +111,7 @@ router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandl
 router.route('/company/:id/candidates/:candidateId/evaluations/stats').get(asyncHandler(getCandidateEvaluationsStats));
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
+router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 
 router.route('/company/:id/filter/skills').get(asyncHandler(getAllCandidatesSkills));
 
@@ -439,7 +440,7 @@ async function searchJob(req, res) {
   let filter = req.body;
   let pagination = req.query;
   filter.company = [companyId];
-
+  filter.title = req.query.query;
 
   let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, sort, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
@@ -492,7 +493,7 @@ async function getJobInsights(req, res) {
 async function getJobActivities(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let jobId = req.params.jobId;
+  let jobId = ObjectID(req.params.jobId);
   let filter = req.query;
   let data = await talentCtrl.getJobActivities(companyId, currentUserId, jobId, filter);
 
@@ -532,11 +533,11 @@ async function searchApplications(req, res) {
 
 
 async function rejectApplication(req, res) {
-
   let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
   let jobId = req.params.jobId;
   let applicationId = parseInt(req.params.applicationId);
-  let data = await talentCtrl.getJobById(currentUserId, jobId, res.locale);
+  let data = await talentCtrl.getJobById(companyId, currentUserId, jobId, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
@@ -544,12 +545,12 @@ async function rejectApplication(req, res) {
 
 
 async function updateApplication(req, res) {
-
   let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
   let jobId = req.params.jobId;
   let applicationId = parseInt(req.params.applicationId);
   let requestBody = req.query.status;
-  let data = await talentCtrl.updateApplication(currentUserId, jobId, applicationId, requestBody);
+  let data = await talentCtrl.updateApplication(companyId, currentUserId, jobId, applicationId, requestBody);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
@@ -596,10 +597,11 @@ async function getApplicationById(req, res) {
 async function updateApplicationProgress(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let applicationId = req.params.applicationId;
   let newStage = req.body.newStage;
 
-  let data = await talentCtrl.updateApplicationProgress(currentUserId, applicationId, newStage);
+  let data = await talentCtrl.updateApplicationProgress(companyId, currentUserId, applicationId, newStage);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
@@ -609,7 +611,6 @@ async function updateApplicationProgress(req, res) {
 async function getApplicationQuestions(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-
   let applicationId = req.params.applicationId;
 
   let data = await talentCtrl.getApplicationQuestions(companyId, currentUserId, applicationId);
@@ -623,8 +624,8 @@ async function getApplicationLabels(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = req.params.applicationId;
-
-  let data = await talentCtrl.getApplicationLabels(currentUserId, applicationId);
+  let companyId = parseInt(req.params.id);
+  let data = await talentCtrl.getApplicationLabels(companyId, currentUserId, applicationId);
 
   res.json(new Response(data, data?'label_retrieved_successful':'not_found', res));
 }
@@ -633,10 +634,11 @@ async function getApplicationLabels(req, res) {
 async function addApplicationLabel(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let applicationId = req.params.applicationId;
   let label = req.body;
 
-  let data = await talentCtrl.addApplicationLabel(currentUserId, applicationId, label);
+  let data = await talentCtrl.addApplicationLabel(companyId, currentUserId, applicationId, label);
 
   res.json(new Response(data, data?'label_added_successful':'not_found', res));
 }
@@ -646,10 +648,11 @@ async function addApplicationLabel(req, res) {
 async function deleteApplicationLabel(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let applicationId = req.params.applicationId;
   let labelId = req.params.labelId;
 
-  let data = await talentCtrl.deleteApplicationLabel(currentUserId, applicationId, labelId);
+  let data = await talentCtrl.deleteApplicationLabel(companyId, currentUserId, applicationId, labelId);
 
   res.json(new Response(data, data?'label_deleted_successful':'not_found', res));
 }
@@ -659,9 +662,10 @@ async function deleteApplicationLabel(req, res) {
 async function getApplicationComments(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let applicationId = req.params.applicationId;
   let filter = req.query;
-  let data = await talentCtrl.getApplicationComments(currentUserId, applicationId, filter);
+  let data = await talentCtrl.getApplicationComments(companyId, currentUserId, applicationId, filter);
 
   res.json(new Response(data, data?'comment_retrieved_successful':'not_found', res));
 }
@@ -670,10 +674,11 @@ async function getApplicationComments(req, res) {
 async function addApplicationComment(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let applicationId = req.params.applicationId;
   let comment = req.body;
 
-  let data = await talentCtrl.addApplicationComment(currentUserId, applicationId, comment);
+  let data = await talentCtrl.addApplicationComment(companyId, currentUserId, applicationId, comment);
 
   res.json(new Response(data, data?'comment_added_successful':'not_found', res));
 }
@@ -683,10 +688,11 @@ async function addApplicationComment(req, res) {
 async function deleteApplicationComment(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
   let applicationId = req.params.applicationId;
   let commentId = req.params.commentId;
 
-  let data = await talentCtrl.deleteApplicationComment(currentUserId, applicationId, commentId);
+  let data = await talentCtrl.deleteApplicationComment(companyId, currentUserId, applicationId, commentId);
 
   res.json(new Response(data, data?'comment_deleted_successful':'not_found', res));
 }
@@ -842,11 +848,11 @@ async function unsubscribeApplication(req, res) {
 async function getApplicationActivities(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = req.params.applicationId;
-  let filter = req.query;
-  let data = await talentCtrl.getApplicationActivities(companyId, currentUserId, applicationId, filter);
+  let applicationId = ObjectID(req.params.applicationId);
+  let sort = req.query;
+  let data = await talentCtrl.getApplicationActivities(companyId, currentUserId, applicationId, sort);
 
-  res.json(new Response(data, data?'application_reverted_successful':'not_found', res));
+  res.json(new Response(data, data?'activities_retrieved_successful':'not_found', res));
 }
 
 
@@ -1060,6 +1066,16 @@ async function getCandidatesSimilar(req, res) {
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 
+async function getCandidateActivities(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = req.params.candidateId;
+
+
+  let data = await talentCtrl.getCandidateActivities(company, currentUserId, candidateId, res.locale);
+  res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
+}
+
 
 async function getCandidateEvaluationsStats(req, res) {
   let companyId = parseInt(req.params.id);
@@ -1197,7 +1213,7 @@ async function addCompanyPipelineTemplate(req, res) {
 async function updateCompanyPipelineTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let pipelineId = parseInt(req.params.pipelineId);
+  let pipelineId = ObjectID(req.params.pipelineId);
   let pipeline = req.body;
   pipeline.company = company;
   pipeline.createdBy = currentUserId;

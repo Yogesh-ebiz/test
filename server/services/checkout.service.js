@@ -13,15 +13,7 @@ async function pay(member, form) {
   if(!member || !form){
     return;
   }
-
-
-  let oneOrZero = (Math.random()>=0.5)? 1 : 0;
-  let payment;
-  if(oneOrZero) {
-    payment = await paymentService.charge(member, form);
-  }
-
-
+  let payment = await paymentService.charge(member, form);
 
   return payment;
 

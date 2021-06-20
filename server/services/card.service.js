@@ -42,8 +42,10 @@ async function add(card) {
   card.isDefault = true;
   card = new Card(card).save();
 
-  await Card.update({last4: {$ne: card.last4}}, {$set: {isDefault: false}});
-
+  if(card.isDefault) {
+    await Card.update({}, {$set: {isDefault: false}});
+    await Card.update({last4: {$ne: card.last4}}, {$set: {isDefault: true}});
+  }
   return card;
 
 }

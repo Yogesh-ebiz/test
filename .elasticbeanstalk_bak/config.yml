@@ -1,0 +1,20 @@
+branch-defaults:
+  develop:
+    environment: Accessed-Job-Service
+environment-defaults:
+  Accessed-Job-Service:
+    branch: null
+    repository: null
+global:
+  application_name: Accessed
+  default_ec2_keyname: accessed-developer
+  default_platform: arn:aws:elasticbeanstalk:us-west-2::platform/Node.js running on
+    64bit Amazon Linux/4.12.0
+  default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: null
+  sc: git
+  workspace_type: Application

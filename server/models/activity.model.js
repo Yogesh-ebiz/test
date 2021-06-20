@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const mongoosePaginate = require('mongoose-paginate-v2');
+let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const ActivitySchema = new mongoose.Schema({
@@ -17,11 +17,14 @@ const ActivitySchema = new mongoose.Schema({
     required: true
   },
   causerId: {
-    type: String,
-    required: true
+    type: Object
   },
   action: {
     type: String,
+    required: true
+  },
+  subject: {
+    type: Object,
     required: true
   },
   subjectType: {
@@ -29,8 +32,7 @@ const ActivitySchema = new mongoose.Schema({
     required: true
   },
   subjectId: {
-    type: String,
-    required: true
+    type: String
   },
   meta: {
     type: Object

@@ -170,6 +170,7 @@ module.exports = {
   getCandidateEvaluationsStats,
   getCandidateEvaluationById,
   getCandidatesSimilar,
+  getCandidateActivities,
   getAllCandidatesSkills,
   addCandidateTag,
   removeCandidateTag,
@@ -677,7 +678,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   let company = await feedService.findCompanyById(companyId, currentUserId);
 
   let aList = [];
-  let aMatch = { $match: new SearchParam(filter)};
+  let aMatch = { $match: new JobSearchParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
 
   aList.push(aMatch);
@@ -749,7 +750,7 @@ async function getCards(companyId, currentUserId) {
 
   let result = await cardService.findByUserId(currentUserId);
   result = _.reduce(result, function(res, c){
-    res.push({brand: c.brand, last4: c.last4, isDefault: c.isDefault});
+    res.push({id: c._id, brand: c.brand, last4: c.last4, isDefault: c.isDefault});
     return res;
   }, []);
   return result;
@@ -829,7 +830,7 @@ async function updateJob(companyId, currentUserId, jobId, form) {
   let currentParty = await feedService.findByUserId(currentUserId);
 
   if (isPartyActive(currentParty)) {
-    result = await jobService.updateJob(jobId, currentUserId, form);
+    result = await jobService.updateJob(jobId, member, form);
   }
 
   return result;
@@ -865,7 +866,7 @@ async function archiveJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let result = await jobService.archiveJob(jobId, currentUserId);
+  let result = await jobService.archiveJob(jobId, member);
 
   return result;
 }
@@ -944,6 +945,11 @@ async function addJobComment(currentUserId, jobId, comment) {
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
   let result;
   try {
 
@@ -953,9 +959,9 @@ async function addJobComment(currentUserId, jobId, comment) {
 
     if(job) {
       comment.subjectType = subjectType.JOB;
-      comment.subjectId = job._id;
-      comment.createdBy = currentUserId;
-      result = await commentService.addComment(comment);
+      comment.subject = job._id;
+      comment.createdBy = member._id;
+      result = await commentService.addComment(comment, member);
 
     }
 
@@ -970,6 +976,11 @@ async function addJobComment(currentUserId, jobId, comment) {
 async function deleteJobComment(currentUserId, jobId, commentId) {
 
   if(!currentUserId || !jobId || !commentId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -993,6 +1004,11 @@ async function deleteJobComment(currentUserId, jobId, commentId) {
 async function updateJobComment(currentUserId, jobId, commentId, comment) {
 
   if(!currentUserId || !jobId || !commentId || !comment){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -1245,7 +1261,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
   }
 
   let result;
-  let checkout = await checkoutService.pay(member, form);
+  // let checkout = await checkoutService.pay(member, form);
 
   let oneOrZero = (Math.random()>=0.5)? 1 : 0;
   // if(checkout){
@@ -1357,15 +1373,15 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
   let result;
   try {
 
-    result = await activityService.findByJobId(jobId, filter);
-    let userIds = _.map(result.docs, 'causerId');
-    let users = await feedService.lookupUserIds(userIds);
-    result.docs.forEach(function(activity){
-      let found = _.find(users, {id: parseInt(activity.causerId)});
-      if(found){
-        activity.causer = convertTstagsoTalentUser(found);
-      }
-    });
+    result = await activityService.findByJobId(companyId, jobId, filter);
+    // let userIds = _.map(result.docs, 'causerId');
+    // let users = await feedService.lookupUserIds(userIds);
+    // result.docs.forEach(function(activity){
+    //   let found = _.find(users, {id: parseInt(activity.causerId)});
+    //   if(found){
+    //     activity.causer = convertTstagsoTalentUser(found);
+    //   }
+    // });
     return new Pagination(result);
 
   } catch (error) {
@@ -1589,9 +1605,15 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 }
 
 
-async function rejectApplication(currentUserId, jobId, applicationId, locale) {
+async function rejectApplication(companyId, currentUserId, jobId, applicationId, locale) {
 
   if(!jobId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -1616,9 +1638,15 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
 }
 
 
-async function updateApplication(currentUserId, jobId, applicationId, newStatus) {
+async function updateApplication(companyId, currentUserId, jobId, applicationId, newStatus) {
 
-  if(!jobId || !applicationId || !currentUserId || !newStatus){
+  if(!companyId || !jobId || !applicationId || !currentUserId || !newStatus){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -1642,12 +1670,17 @@ async function updateApplication(currentUserId, jobId, applicationId, newStatus)
   return application;
 }
 
-async function updateApplicationProgress(currentUserId, applicationId, newStage) {
+async function updateApplicationProgress(companyId, currentUserId, applicationId, newStage) {
 
-  if(!currentUserId || !applicationId || !newStage){
+  if(!companyId || !currentUserId || !applicationId || !newStage){
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
 
   let progress;
   try {
@@ -1771,9 +1804,15 @@ async function getApplicationQuestions(companyId, currentUserId, applicationId) 
 
 
 
-async function getApplicationLabels(currentUserId, applicationId) {
+async function getApplicationLabels(companyId, currentUserId, applicationId) {
 
-  if(!currentUserId || !applicationId){
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -1798,12 +1837,18 @@ async function getApplicationLabels(currentUserId, applicationId) {
   return result;
 }
 
-async function addApplicationLabel(currentUserId, applicationId, label) {
+async function addApplicationLabel(companyId, currentUserId, applicationId, label) {
 
-  if(!currentUserId || !applicationId || !label){
+  if(!companyId || !currentUserId || !applicationId || !label){
     return null;
   }
 
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
   let result;
   try {
 
@@ -1833,9 +1878,15 @@ async function addApplicationLabel(currentUserId, applicationId, label) {
 }
 
 
-async function deleteApplicationLabel(currentUserId, applicationId, labelId) {
+async function deleteApplicationLabel(companyId, currentUserId, applicationId, labelId) {
 
-  if(!currentUserId || !applicationId || !labelId){
+  if(!companyId || !currentUserId || !applicationId || !labelId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -1861,9 +1912,15 @@ async function deleteApplicationLabel(currentUserId, applicationId, labelId) {
 
 
 
-async function getApplicationComments(currentUserId, applicationId, filter) {
+async function getApplicationComments(companyId, currentUserId, applicationId, filter) {
 
-  if(!currentUserId || !applicationId || !filter){
+  if(!companyId || !currentUserId || !applicationId || !filter){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -1889,9 +1946,15 @@ async function getApplicationComments(currentUserId, applicationId, filter) {
   return new Pagination(result);
 }
 
-async function addApplicationComment(currentUserId, applicationId, comment) {
+async function addApplicationComment(companyId, currentUserId, applicationId, comment) {
 
-  if(!currentUserId || !applicationId || !comment){
+  if(!companyId || !currentUserId || !applicationId || !comment){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -1904,8 +1967,8 @@ async function addApplicationComment(currentUserId, applicationId, comment) {
     if(application) {
       comment.subjectType = subjectType.APPLICATION;
       comment.subjectId = application._id;
-      comment.createdBy = currentUserId;
-      result = await commentService.addComment(comment);
+      comment.createdBy = member._id;
+      result = await commentService.addComment(comment, member);
 
       // await application.comments.push(result._id);
     }
@@ -1918,9 +1981,15 @@ async function addApplicationComment(currentUserId, applicationId, comment) {
 }
 
 
-async function deleteApplicationComment(currentUserId, applicationId, commentId) {
+async function deleteApplicationComment(companyId, currentUserId, applicationId, commentId) {
 
-  if(!currentUserId || !applicationId || !commentId){
+  if(!companyId || !currentUserId || !applicationId || !commentId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -2298,8 +2367,8 @@ async function unsubscribeApplication(companyId, currentUserId, applicationId) {
 
 
 
-async function getApplicationActivities(companyId, currentUserId, applicationId, filter) {
-  if(!companyId || !currentUserId || !applicationId || !filter){
+async function getApplicationActivities(companyId, currentUserId, applicationId, sort) {
+  if(!companyId || !currentUserId || !applicationId || !sort){
     return null;
   }
 
@@ -2311,14 +2380,14 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
   let result;
   try {
 
-    result = await activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId, filter);
+    result = await activityService.findBySubjectTypeAndSubject(companyId, subjectType.APPLICATION, applicationId, sort);
     let userIds = _.map(result.docs, 'causerId');
     let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(activity){
-      let found = _.find(users, {id: parseInt(activity.causerId)});
-      if(found){
-        activity.causer = convertToTalentUser(found);
-      }
+      // let found = _.find(users, {id: parseInt(activity.causerId)});
+      // if(found){
+      //   activity.causer = convertToTalentUser(found);
+      // }
     });
     return new Pagination(result);
 
@@ -2716,6 +2785,30 @@ async function getCandidatesSimilar(companyId, currentUserId, candidateId) {
   let result;
   try {
     result = await candidateService.getCandidatesSimilar(candidateId);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function getCandidateActivities(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await candidateService.getCandidateActivities(candidateId);
 
 
   } catch (error) {
@@ -3276,7 +3369,6 @@ async function addCompanyPipelineTemplate(companyId, currentUserId, form) {
 }
 
 async function updateCompanyPipelineTemplate(companyId, pipelineId, currentUserId, form) {
-  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
   if(!companyId || !currentUserId || !pipelineId || !form){
     return null;
   }

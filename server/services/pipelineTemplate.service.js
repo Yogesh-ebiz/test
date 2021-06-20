@@ -12,7 +12,8 @@ const pipelineSchema = Joi.object({
   category: Joi.string().required(),
   company: Joi.number().required(),
   stages: Joi.array().required(),
-  createdBy: Joi.number()
+  createdBy: Joi.number(),
+  updatedBy: Joi.number()
 });
 
 function findById(id) {
@@ -22,7 +23,6 @@ function findById(id) {
     return;
   }
 
-  console.log(id)
   return PipelineTemplate.findById(id);
 }
 
@@ -66,16 +66,14 @@ async function update(id, form) {
 
   let result = null;
 
-  form = await Joi.validate(newPipeline, pipelineSchema, { abortEarly: false });
+  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
 
   let pipeline = await findById(id);
   if(pipeline){
     pipeline.name = form.name;
-    pipeline.updatedBy = currentUserId;
     pipeline.stages=form.stages;
     pipeline.category=form.category;
     pipeline.department=form.department;
-    pipeline.type=form.type;
     result = await pipeline.save();
   }
 
@@ -104,9 +102,11 @@ async function remove(id) {
 
 
 
+
 module.exports = {
   findById:findById,
   getPipelineTemplates:getPipelineTemplates,
   add:add,
-  remove:remove
+  remove:remove,
+  update:update
 }

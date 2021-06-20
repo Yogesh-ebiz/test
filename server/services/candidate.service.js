@@ -2,7 +2,7 @@ const _ = require('lodash');
 const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
 
-let SearchParam = require('../const/searchParam');
+let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
 const evaluationService = require('../services/evaluation.service');
@@ -156,21 +156,22 @@ async function search(filter, sort) {
   }
 
   let select = '';
-  let limit = (sort.size && sort.size>0) ? sort.size:20;
-  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let limit = (sort.size && sort.size>0) ? parseInt(sort.size):20;
+  let page = (sort.page && sort.page==0) ? 1:parseInt(sort.page)+1;
   let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
 
-  let options = {
-    select:   select,
-    sort:     null,
-    lean:     true,
-    limit:    limit,
-    page: parseInt(filter.page)+1
+
+
+  const options = {
+    page: page,
+    limit: limit,
   };
+
+  console.log(options)
 
   let aList = [];
   let aLookup = [];
-  let aMatch = { $match: new SearchParam(filter)};
+  let aMatch = { $match: new CandidateParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
 
   aList.push(aMatch);
@@ -334,6 +335,35 @@ async function getCompanyBlacklisted(company, sort) {
   return candidates;
 }
 
+
+
+
+async function getCandidateActivities(id) {
+
+
+  if(!id){
+    return;
+  }
+  // let candidates = await Candidate.find({userId: {$ne: userId}}).limit(10);
+  // let candidateIds = _.map(candidates, 'userId');
+  let filter = {
+    "jobTitles": ["Sr. Manager"],
+    "locations": ["US"],
+    "skills": [],
+    "companies": [""],
+    "schools": [],
+    "industries": [],
+    "employmentTypes": []
+  }
+  let result = await feedService.searchPeople(filter, {});
+  let people = _.reduce(result.content, function(res, p){
+    res.push(p);
+    return res;
+  }, []);
+
+  return people;
+}
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
@@ -345,5 +375,6 @@ module.exports = {
   search:search,
   getAllCandidatesSkills:getAllCandidatesSkills,
   getCandidatesSimilar:getCandidatesSimilar,
-  getCompanyBlacklisted:getCompanyBlacklisted
+  getCompanyBlacklisted:getCompanyBlacklisted,
+  getCandidateActivities:getCandidateActivities
 }

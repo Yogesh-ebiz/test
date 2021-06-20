@@ -14,9 +14,9 @@ const applicationService = require('../services/application.service');
 
 
 const commentSchema = Joi.object({
+  subject: Joi.object(),
   subjectType: Joi.string().required(),
-  subjectId: Joi.object().required(),
-  createdBy: Joi.number().required(),
+  createdBy: Joi.object().required(),
   message: Joi.string().required()
 });
 
@@ -62,10 +62,10 @@ async function getComments(subjectType, subjectId, filter) {
 }
 
 
-async function addComment(comment) {
+async function addComment(comment, member) {
   let data = null;
 
-  if(comment==null){
+  if(!comment || !member){
     return;
   }
 
@@ -75,17 +75,16 @@ async function addComment(comment) {
 
   let job, application;
   if(comment.subjectType==subjectType.JOB){
-    job = await jobService.findJob_Id(ObjectID(comment.subjectId));
+    job = await jobService.findJob_Id(comment.subject);
   } else if(comment.subjectType==subjectType.APPLICATION) {
-    application = await applicationService.findApplicationBy_Id(ObjectID(comment.subjectId));
+    application = await applicationService.findApplicationBy_Id(comment.subject);
     if(application){
-      job = await jobService.findJob_Id(ObjectID(application.jobId));
+      job = await jobService.findJob_Id(application.jobId);
     }
 
   }
 
-  let user = await feedService.lookupUserIds([comment.createdBy]);
-  await activityService.addActivity({causerId: ''+comment.createdBy, causerType: subjectType.MEMBER, subjectType: comment.subjectType, subjectId: ''+comment.subjectId, action: actionEnum.COMMENTED, meta: {name: user[0].firstName + ' ' + user[0].lastName, candidate: application.user, jobTitlte: job.title, jobId: job._id}});
+  await activityService.addActivity({causer: comment.createdBy, causerType: subjectType.MEMBER, subjectType: comment.subjectType, subject: comment.subjectId, action: actionEnum.COMMENTED, meta: {name: member.firstName + ' ' + member.lastName, candidate: application.user, jobTitlte: job.title, jobId: job._id}});
 
 
   return comment;

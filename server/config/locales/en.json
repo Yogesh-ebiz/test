@@ -205,5 +205,6 @@
 	"task_updated_successful": "task_updated_successful",
 	"taxandfees_retrieved_successful": "taxandfees_retrieved_successful",
 	"credits_retrieved_successful": "credits_retrieved_successful",
-	"card_verified_successful": "card_verified_successful"
+	"card_verified_successful": "card_verified_successful",
+	"activities_retrieved_successful": "activities_retrieved_successful"
 }
