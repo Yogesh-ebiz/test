@@ -9,10 +9,6 @@ const EvaluationSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  createdBy: {
-    type: Object,
-    required: true
-  },
   applicationId: {
     type: Object,
     required: true
@@ -41,6 +37,7 @@ const EvaluationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'Member'},
   assessment: { type: Schema.Types.ObjectId, ref: 'Assessment'},
   evaluationForm: [{ type: Schema.Types.ObjectId, ref: 'Answer'}]
 }, {

@@ -115,7 +115,6 @@ async function uploadCV(currentUserId, applicationId, files, name) {
   let basePath = 'user/';
   try {
     let currentParty = await findByUserId(currentUserId);
-    console.log(currentParty)
     if (isPartyActive(currentParty)) {
 
       let application = await findApplicationById(applicationId).populate('user');
@@ -125,7 +124,6 @@ async function uploadCV(currentUserId, applicationId, files, name) {
         let progress = application.currentProress;
         //------------Upload CV----------------
 
-        console.log(files)
         if(files.file) {
 
           let cv = files.file;

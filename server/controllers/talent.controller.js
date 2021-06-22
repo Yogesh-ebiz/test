@@ -2432,7 +2432,6 @@ async function getBoard(currentUserId, jobId, locale) {
   let pipeline = await getPipelineByJobId(job._id);
   if(pipeline.stages) {
 
-
     let pipelineStages = pipeline.stages;
     let applicationsGroupByStage = await Application.aggregate([
       {$match: {jobId: job._id, status:'ACTIVE'}},
@@ -2448,6 +2447,15 @@ async function getBoard(currentUserId, jobId, locale) {
                   noOfEmails: {$size: '$emails'}
                 }
             },
+            {
+              $lookup: {
+                from: 'evaluations',
+                localField: 'evaluations',
+                foreignField: '_id',
+                as: 'evaluations',
+              },
+            },
+
           ],
           as: 'currentProgress'
         }},
@@ -2488,7 +2496,6 @@ async function getBoard(currentUserId, jobId, locale) {
       {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
     ]);
 
-
     let sources = await sourceService.findByJobId(jobId).populate('candidate');
 
     applicationsGroupByStage.forEach(function(stage){
@@ -2502,7 +2509,6 @@ async function getBoard(currentUserId, jobId, locale) {
         application.application.user = null;
         res.push(application);
         return res;
-
       }, [])
     }, []);
 
@@ -2512,15 +2518,39 @@ async function getBoard(currentUserId, jobId, locale) {
         item.applications = found.applications;
       }
 
-      let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, applications: item.applications}
+      let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: item.applications}
+
+      for (const [i, task] of stage.tasks.entries()){
+        if(task.type===taskType.EVALUATION && task.required){
+
+          for(let [j, item] of stage.applications.entries()){
+            if(item.application.currentProgress) {
+              let noOfCompletedEvaluation = 0;
+              for(let [k, member] of task.members.entries()){
+                for(let [l, evaluation] of item.application.currentProgress.evaluations.entries()){
+                  if(member.equals(evaluation.createdBy)){
+                    noOfCompletedEvaluation++;
+                  }
+                }
+              }
+
+              if(noOfCompletedEvaluation==task.members.length){
+                item.application.isCompleted=true;
+              }
+            }
+          }
+        }
+      }
+
 
       if(stage.type===stageType.SOURCED && sources.length){
         stage.applications = _.reduce(sources, function(res, source){
           let application = {application: null, user: source.candidate};
           res.push(application);
           return res;
-        }, [])
+        }, []);
       }
+
 
       boardStages.push(stage);
 
