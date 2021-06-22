@@ -14,6 +14,7 @@ const memberService = require('../services/member.service');
 const candidateService = require('../services/candidate.service');
 const flagService = require('../services/flag.service');
 const poolService = require('../services/pool.service');
+const sourceService = require('../services/source.service');
 
 
 module.exports = {
@@ -149,9 +150,6 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
 }
 
 
-
-
-
 async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
   if(!companyId || !currentUserId || !userId || !jobIds){
     return null;
@@ -174,9 +172,32 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
 
   try {
 
-    candidate.assignedJobs = jobIds;
-    candidate = await candidate.save();
-    result = {success: true};
+    let sources = await sourceService.findByCandidateId(candidate._id);
+    if (sources) {
+      let sourcesRemoving = _.reduce(sources, function(res, source){
+        let exist = _.includes(jobIds, source.jobId);
+        if(!exist){
+          res.push(source.jobId);
+        }
+        return res;
+      }, []);
+
+      await sourceService.removeMany(sourcesRemoving)
+
+      let sourcesAdding = _.reduce(jobIds, function(res, id){
+        let exist = _.find(sources, {jobId: id});
+        if(!exist){
+          res.push({jobId: id, candidate: candidate._id, createdBy: member._id})
+        }
+        return res;
+      }, []);
+
+      await sourceService.addSources(sourcesAdding);
+
+    }
+
+
+
   } catch(e){
     console.log('assignPeopleJobs: Error', e);
   }

@@ -206,5 +206,7 @@
 	"taxandfees_retrieved_successful": "taxandfees_retrieved_successful",
 	"credits_retrieved_successful": "credits_retrieved_successful",
 	"card_verified_successful": "card_verified_successful",
-	"activities_retrieved_successful": "activities_retrieved_successful"
+	"activities_retrieved_successful": "activities_retrieved_successful",
+	"sources_retrieved_successful": "sources_retrieved_successful",
+	"email_composed_successful": "email_composed_successful"
 }

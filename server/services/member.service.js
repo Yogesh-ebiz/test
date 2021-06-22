@@ -397,7 +397,6 @@ async function findJobSubscriptions(memberId, sort) {
   }
 
 
-  console.log(sort)
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page+1:1;
@@ -412,6 +411,7 @@ async function findJobSubscriptions(memberId, sort) {
     page: page
   };
 
+  console.log(memberId, subjectType.JOB)
   const aggregate = MemberSubscribe.aggregate([{
     $match: {
       memberId: memberId,
@@ -432,20 +432,20 @@ async function findJobSubscriptions(memberId, sort) {
         let:{subjectId: '$subjectId'},
         pipeline:[
           {$match:{$expr:{$eq:["$$subjectId","$_id"]}}},
-          {
-            $lookup: {
-              from: 'departments',
-              localField: "department",
-              foreignField: "_id",
-              as: "department"
-            }
-          },
+          // {
+          //   $lookup: {
+          //     from: 'departments',
+          //     localField: "department",
+          //     foreignField: "_id",
+          //     as: "department"
+          //   }
+          // },
           { $unwind: '$department'},
           {
             $lookup: {
               from: 'members',
               localField: "createdBy",
-              foreignField: "userId",
+              foreignField: "_id",
               as: "createdBy"
             }
           },

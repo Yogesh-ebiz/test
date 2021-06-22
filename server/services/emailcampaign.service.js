@@ -12,7 +12,7 @@ const emailCampaignSchema = Joi.object({
   createdBy: Joi.object(),
   jobId: Joi.object(),
   user: Joi.object().optional(),
-  userId: Joi.number(),
+  userId: Joi.number().optional(),
   email: Joi.object(),
   emailAddress: Joi.string(),
   meta: Joi.object().optional(),

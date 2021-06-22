@@ -58,7 +58,8 @@ exports.upload = function(path, file){
 
   var params = {
     Key: path,
-    Body: data
+    Body: data,
+    ACL:'public-read'
   };
   return s3bucket.upload(params, function (err, data) {
 

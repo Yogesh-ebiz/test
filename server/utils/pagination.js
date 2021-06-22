@@ -8,7 +8,7 @@ const defaultPagination = {
       sort: true,
       empty: false
     },
-    pageSize: 1,
+    pageSize: 10,
     pageNumber: 0,
     offset: 0,
     paged: false,

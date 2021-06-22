@@ -1,12 +1,10 @@
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
-
+const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const Activity = require('../models/activity.model');
-const Member = require('../models/member.model');
 
-const Joi = require('joi');
-
+const candidateService = require('../services/candidate.service');
 
 const activitySchema = Joi.object({
   causer: Joi.object(),
@@ -27,7 +25,7 @@ async function addActivity(activity) {
   }
 
   activity = await Joi.validate(activity, activitySchema, {abortEarly: false});
-  activity = new Activity(activity).save();
+  activity = await new Activity(activity).save();
 
   return activity;
 
@@ -173,7 +171,7 @@ async function findBySubjectTypeAndSubject(companyId, subjectType, subject, sort
 }
 
 async function findByJobId(companyId, jobId, sort) {
-  if(!jobId || !sort){
+  if(!companyId || !jobId || !sort){
     return;
   }
 
@@ -220,8 +218,60 @@ async function findByJobId(companyId, jobId, sort) {
 
   const aggregate = Activity.aggregate(aList);
 
-  return Activity.aggregatePaginate(aList, options);
-  // return Activity.find({subjectType: subjectType, subjectId: subjectId});
+  return Activity.aggregatePaginate(aggregate, options);
+
+}
+
+
+async function findByCandidateId(companyId, candidateId, sort) {
+  if(!companyId || !candidateId || !sort){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size > 0) ? parseInt(sort.size) : 20;
+  let page = (sort.page && sort.page == 0) ? 1 : parseInt(sort.page) + 1;
+  let direction = (sort.direction && sort.direction == "DESC") ? -1 : 1;
+
+  const options = {
+    page: page,
+    limit: limit,
+  };
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = {$match: {'meta.candidate': candidateId}};
+  let aSort = {$sort: {createdDate: direction}};
+
+  aList.push(aMatch);
+  aList.push(
+    {
+      $lookup: {
+        let: {causer: '$causer'},
+        from: "candidates",
+        pipeline: [
+          {$match: {company: companyId}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+          {
+            $unionWith: {
+              coll: "members",
+              pipeline: [
+                {$match: {company: companyId}}
+              ]
+            }
+          },
+          {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+        ],
+        as: "causer"
+      }
+    },
+    {$unwind: '$causer'}
+  );
+
+  const aggregate = Activity.aggregate(aList);
+
+  return Activity.aggregatePaginate(aggregate, options);
 
 }
 
@@ -230,5 +280,7 @@ module.exports = {
   addActivity:addActivity,
   findBySubjectTypeAndSubjectId:findBySubjectTypeAndSubjectId,
   findBySubjectTypeAndSubject:findBySubjectTypeAndSubject,
-  findByJobId:findByJobId
+  findByJobId:findByJobId,
+  findByCandidateId:findByCandidateId
+
 }

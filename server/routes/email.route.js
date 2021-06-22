@@ -20,7 +20,7 @@ async function composeEmail(req, res) {
 
 
   let data = await emailCtl.composeEmail(currentUserId, form);
-  res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'email_composed_successful':'not_found', res));
 }
 
 
@@ -39,7 +39,7 @@ async function uploadEmailAttachmentById(req, res) {
   let emailId = ObjectID(req.params.emailId);
   let files = req.files;
 
-  let data = await emailCtl.uploadEmailAttachmentById(currentUserId, emailId, files);
+  let data = await emailCtl.uploadEmailAttachmentById(currentUserId, emailId, files.file);
   res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
 }
 

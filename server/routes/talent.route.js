@@ -58,6 +58,7 @@ router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updat
 router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
+router.route('/company/:id/jobs/:jobId/sources').post(asyncHandler(searchSources));
 
 router.route('/company/:id/jobs/:jobId/campaigns').post(asyncHandler(searchCampaigns));
 
@@ -112,6 +113,7 @@ router.route('/company/:id/candidates/:candidateId/evaluations/stats').get(async
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
+router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 
 router.route('/company/:id/filter/skills').get(asyncHandler(getAllCandidatesSkills));
 
@@ -141,7 +143,7 @@ router.route('/company/:id/roles').get(asyncHandler(getCompanyRoles));
 router.route('/company/:id/labels').post(asyncHandler(addCompanyLabel));
 router.route('/company/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
 router.route('/company/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
-router.route('/company/:id/labels').get(asyncHandler(getCompanyLabels));
+router.route('/company/:id/labels').get(asyncHandler(getLabels));
 
 router.route('/company/:id/members/invites').post(asyncHandler(inviteMembers));
 router.route('/company/:id/members/invites').get(asyncHandler(getCompanyMemberInvitations));
@@ -494,8 +496,8 @@ async function getJobActivities(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = ObjectID(req.params.jobId);
-  let filter = req.query;
-  let data = await talentCtrl.getJobActivities(companyId, currentUserId, jobId, filter);
+  let sort = req.query;
+  let data = await talentCtrl.getJobActivities(companyId, currentUserId, jobId, sort);
 
   res.json(new Response(data, data?'application_reverted_successful':'not_found', res));
 }
@@ -554,6 +556,23 @@ async function updateApplication(req, res) {
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
+
+
+
+async function searchSources(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+  let company = parseInt(req.params.id);
+  let filter = req.body;
+  let sort = req.query;
+  filter.query = req.query.query;
+
+
+  data = await talentCtrl.searchSources(currentUserId, company, filter, sort, res.locale);
+  res.json(new Response(data, data?'sources_retrieved_successful':'not_found', res));
+}
+
+
 
 async function searchCampaigns(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -675,7 +694,7 @@ async function addApplicationComment(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
-  let applicationId = req.params.applicationId;
+  let applicationId = ObjectID(req.params.applicationId);
   let comment = req.body;
 
   let data = await talentCtrl.addApplicationComment(companyId, currentUserId, applicationId, comment);
@@ -938,7 +957,7 @@ async function getBoard(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
 
   let filter = req.query;
-  let jobId = req.params.id;
+  let jobId = ObjectID(req.params.id);
   let data = await talentCtrl.getBoard(currentUserId, jobId, filter, res.locale);
   res.json(new Response(data, data?'board_retrieved_successful':'not_found', res));
 }
@@ -1021,6 +1040,8 @@ async function removeCandidateSource(req, res) {
   res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }
 
+
+
 async function updateCandidatePool(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -1069,11 +1090,11 @@ async function getCandidatesSimilar(req, res) {
 async function getCandidateActivities(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let candidateId = req.params.candidateId;
+  let candidateId = parseInt(req.params.candidateId);
+  let sort = req.query;
 
-
-  let data = await talentCtrl.getCandidateActivities(company, currentUserId, candidateId, res.locale);
-  res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
+  let data = await talentCtrl.getCandidateActivities(company, currentUserId, candidateId, sort);
+  res.json(new Response(data, data?'activities_retrieved_successful':'not_found', res));
 }
 
 
@@ -1367,13 +1388,13 @@ async function deleteCompanyLabel(req, res) {
   res.json(new Response(data, data?'label_deleted_successful':'not_found', res));
 }
 
-async function getCompanyLabels(req, res) {
+async function getLabels(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let query = req.query.query;
   let type = req.query.type;
 
-  let data = await talentCtrl.getCompanyLabels(company, query, type, currentUserId, res.locale);
+  let data = await talentCtrl.getLabels(query, type, res.locale);
   res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
 }
 
@@ -1381,9 +1402,10 @@ async function getCompanyLabels(req, res) {
 
 async function inviteMembers(req, res) {
   let company = parseInt(req.params.id);
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let form = req.body;
 
-  let data = await talentCtrl.inviteMembers(company, form);
+  let data = await talentCtrl.inviteMembers(company, currentUserId, form);
   res.json(new Response(data, data?'members_invited_successful':'not_found', res));
 }
 

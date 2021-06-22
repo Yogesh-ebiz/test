@@ -182,37 +182,37 @@ async function search(filter, sort) {
         let:{user:"$_id"},
         pipeline:[
           {$match:{$expr:{$eq:["$user","$$user"]}}},
-          {$lookup:{
-              from:"applicationprogresses",
-              let:{currentProgress:"$currentProgress"},
-              pipeline:[
-                {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-                {$lookup:{
-                    from:"stages",
-                    let:{stage:"$stage"},
-                    pipeline:[
-                      {$match:{$expr:{$eq:["$_id","$$stage"]}}},
-
-                    ],
-                    as: 'stage'
-                  }},
-                { $unwind: '$stage'}
-              ],
-              as: 'currentProgress'
-            }
-          },
-          { $unwind: '$currentProgress'}
+          // {$lookup:{
+          //     from:"applicationprogresses",
+          //     let:{currentProgress:"$currentProgress"},
+          //     pipeline:[
+          //       {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+          //       {$lookup:{
+          //           from:"stages",
+          //           let:{stage:"$stage"},
+          //           pipeline:[
+          //             {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+          //
+          //           ],
+          //           as: 'stage'
+          //         }},
+          //       { $unwind: '$stage'}
+          //     ],
+          //     as: 'currentProgress'
+          //   }
+          // },
+          // { $unwind: '$currentProgress'}
         ],
         as: 'applications'
       },
     },
-    {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
-    { $addFields:
-        {
-          rating: {$avg: "$evaluations.rating"},
-          evaluations: []
-        }
-    },
+    // {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
+    // { $addFields:
+    //     {
+    //       rating: {$avg: "$evaluations.rating"},
+    //       evaluations: []
+    //     }
+    // },
   );
 
 
@@ -338,32 +338,6 @@ async function getCompanyBlacklisted(company, sort) {
 
 
 
-async function getCandidateActivities(id) {
-
-
-  if(!id){
-    return;
-  }
-  // let candidates = await Candidate.find({userId: {$ne: userId}}).limit(10);
-  // let candidateIds = _.map(candidates, 'userId');
-  let filter = {
-    "jobTitles": ["Sr. Manager"],
-    "locations": ["US"],
-    "skills": [],
-    "companies": [""],
-    "schools": [],
-    "industries": [],
-    "employmentTypes": []
-  }
-  let result = await feedService.searchPeople(filter, {});
-  let people = _.reduce(result.content, function(res, p){
-    res.push(p);
-    return res;
-  }, []);
-
-  return people;
-}
-
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
@@ -375,6 +349,5 @@ module.exports = {
   search:search,
   getAllCandidatesSkills:getAllCandidatesSkills,
   getCandidatesSimilar:getCandidatesSimilar,
-  getCompanyBlacklisted:getCompanyBlacklisted,
-  getCandidateActivities:getCandidateActivities
+  getCompanyBlacklisted:getCompanyBlacklisted
 }

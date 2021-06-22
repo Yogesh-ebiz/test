@@ -14,6 +14,7 @@ let employmentTypeEnum = require('../const/employmentTypeEnum');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const taskType = require('../const/taskType');
+const stageType = require('../const/stageType');
 
 const {upload} = require('../services/aws.service');
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
@@ -53,6 +54,7 @@ const flagService = require('../services/flag.service');
 const taskService = require('../services/task.service');
 const stageService = require('../services/stage.service');
 const emailCampaignService = require('../services/emailcampaign.service');
+const sourceService = require('../services/source.service');
 
 const checkoutService = require('../services/checkout.service');
 
@@ -138,6 +140,7 @@ module.exports = {
   getJobActivities,
   searchPeopleSuggestions,
   searchApplications,
+  searchSources,
   searchCampaigns,
   getAllApplicationsEndingSoon,
   getApplicationById,
@@ -197,7 +200,7 @@ module.exports = {
   updateCompanyRole,
   deleteCompanyRole,
   addCompanyLabel,
-  getCompanyLabels,
+  getLabels,
   updateCompanyLabel,
   deleteCompanyLabel,
   inviteMembers,
@@ -310,9 +313,7 @@ async function getInmailCredits(companyId, currentUserId) {
   }
 
 
-
-
-  return 25;
+  return {credit: 25};
 
 }
 
@@ -1244,9 +1245,8 @@ async function publishJob(companyId, currentUserId, jobId, type) {
   }
 
   return job;
-
-
 }
+
 
 async function payJob(companyId, currentUserId, jobId, form) {
 
@@ -1261,11 +1261,10 @@ async function payJob(companyId, currentUserId, jobId, form) {
   }
 
   let result;
-  // let checkout = await checkoutService.pay(member, form);
+  let checkout = await checkoutService.pay(member, form);
 
-  let oneOrZero = (Math.random()>=0.5)? 1 : 0;
   // if(checkout){
-  if(oneOrZero){
+  if(checkout){
     let job = await jobService.findJob_Id(jobId);
 
     if(job){
@@ -1446,6 +1445,34 @@ async function searchApplications(currentUserId, jobId, filter, sort, locale) {
       app.hasFollowed = true;
     }
   })
+
+  return new Pagination(result);
+
+
+}
+
+
+
+async function searchSources(currentUserId, jobId, filter, sort, locale) {
+
+  if(!currentUserId || !jobId || !filter){
+    return null;
+  }
+
+  let result = await sourceService.search(jobId, filter, sort);
+  // let userIds = _.map(result.docs, 'user');
+  // let users = await feedService.lookupUserIds(userIds);
+
+  let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
+
+  // result.docs.forEach(function(app){
+  //   app.labels = [];
+  //   app.note = [];
+  //   app.comments = [];
+  //   if(_.some(subscriptions, {subjectId: ObjectID(app._id)})){
+  //     app.hasFollowed = true;
+  //   }
+  // })
 
   return new Pagination(result);
 
@@ -1961,17 +1988,10 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
   let result;
   try {
 
-
-    let application = await applicationService.findApplicationBy_Id(applicationId);
-
-    if(application) {
-      comment.subjectType = subjectType.APPLICATION;
-      comment.subjectId = application._id;
-      comment.createdBy = member._id;
-      result = await commentService.addComment(comment, member);
-
-      // await application.comments.push(result._id);
-    }
+  comment.subjectType = subjectType.APPLICATION;
+  comment.subject = applicationId;
+  comment.createdBy = member._id;
+  result = await commentService.addComment(comment, member);
 
   } catch (error) {
     console.log(error);
@@ -2414,8 +2434,6 @@ async function getBoard(currentUserId, jobId, locale) {
 
 
     let pipelineStages = pipeline.stages;
-
-
     let applicationsGroupByStage = await Application.aggregate([
       {$match: {jobId: job._id, status:'ACTIVE'}},
       // {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
@@ -2471,21 +2489,39 @@ async function getBoard(currentUserId, jobId, locale) {
     ]);
 
 
+    let sources = await sourceService.findByJobId(jobId).populate('candidate');
+
     applicationsGroupByStage.forEach(function(stage){
-      stage.applications.forEach(function(app){
-        app.user = convertToCandidate(app.user);
-      })
-    });
+
+      stage.applications = _.reduce(stage.applications, function(res, app){
+        let application = {
+          application: app,
+          user: convertToCandidate(app.user)
+        };
+
+        application.application.user = null;
+        res.push(application);
+        return res;
+
+      }, [])
+    }, []);
 
     pipelineStages.forEach(function(item){
       let found = _.find(applicationsGroupByStage, {'_id': item._id});
       if(found){
-
-
         item.applications = found.applications;
       }
 
       let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, applications: item.applications}
+
+      if(stage.type===stageType.SOURCED && sources.length){
+        stage.applications = _.reduce(sources, function(res, source){
+          let application = {application: null, user: source.candidate};
+          res.push(application);
+          return res;
+        }, [])
+      }
+
       boardStages.push(stage);
 
 
@@ -2796,8 +2832,8 @@ async function getCandidatesSimilar(companyId, currentUserId, candidateId) {
 
 
 
-async function getCandidateActivities(companyId, currentUserId, candidateId) {
-  if(!companyId || !currentUserId || !candidateId){
+async function getCandidateActivities(companyId, currentUserId, userId, sort) {
+  if(!companyId || !currentUserId || !userId || !sort){
     return null;
   }
 
@@ -2808,14 +2844,16 @@ async function getCandidateActivities(companyId, currentUserId, candidateId) {
 
   let result;
   try {
-    result = await candidateService.getCandidateActivities(candidateId);
-
+    let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
+    if(candidate) {
+      result = await activityService.findByCandidateId(companyId, candidate._id, sort);
+    }
 
   } catch (error) {
     console.log(error);
   }
 
-  return result;
+  return new Pagination(result);
 }
 
 
@@ -3630,13 +3668,10 @@ async function deleteCompanyLabel(companyId, labelId, currentUserId) {
   return result
 }
 
-async function getCompanyLabels(companyId, query, type, currentUserId, locale) {
+async function getLabels(query, type, locale) {
 
-  if(!companyId || !currentUserId){
-    return null;
-  }
 
-  let result = await labelService.getLabels(companyId, query, type);
+  let result = await labelService.getLabels(query, type);
 
   return result;
 
@@ -3646,7 +3681,7 @@ async function getCompanyLabels(companyId, query, type, currentUserId, locale) {
 
 async function inviteMembers(companyId, currentUserId, form) {
 
-  if(!companyId || !form){
+  if(!companyId || !currentUserId || !form){
     return null;
   }
 
@@ -3903,7 +3938,7 @@ async function searchTasks(companyId, currentUserId, filter, sort, query) {
     result = await taskService.search(member._id, filter, sort, query);
 
   } catch(e){
-    console.log('getApplicationsSubscribed: Error', e);
+    console.log('searchTasks: Error', e);
   }
 
 

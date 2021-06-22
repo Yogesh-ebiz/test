@@ -32,10 +32,15 @@ async function compose(form) {
     return;
   }
 
+  let email;
   form.threadId = form.threadId?ObjectID(form.threadId):'';
   form = await Joi.validate(form, emailSchema, {abortEarly: false});
+
+  let threadId = new ObjectID;
+  form.threadId = threadId;
   if(form.type===emailType.DEFAULT) {
     email = await new Email(form).save();
+
 
     if(email) {
       if (form.meta && form.meta.applicationId) {
@@ -50,45 +55,48 @@ async function compose(form) {
       }
     }
   } else if(form.type===emailType.JOB_INVITE) {
-
-
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
-    if(jobLink) {
-      for (let [i, contact] of form.to.entries()) {
-        let nMail = form;
-        nMail.to = [contact];
 
-        let token = new ObjectID();
+    for (let [i, contact] of form.to.entries()) {
+      let nMail = _.clone(form);
+      nMail.to = [contact];
+      console.log(contact)
+      let token;
+      if(jobLink) {
+        token = new ObjectID;
         let link = `${jobLink.url}?tracking=${token}`;
         nMail.attachments[0].url = link;
+
         nMail = await new Email(nMail).save();
         if (nMail) {
           let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(form.meta.jobId));
           let hasInvitation = campaign ? _.find(campaign.stages, {type: 'INVITED'}) : false;
 
-          console.log(hasInvitation);
-          console.log(campaign);
           if (!hasInvitation) {
-            await emailCampaignService.add({
+            let campaign = {
               token: token.toString(),
               createdBy: form.createdBy,
               jobId: ObjectID(form.meta.jobId),
-              // user: Joi.object().optional(),
-              userId: contact.id ? contact.id : null,
               emailAddress: contact.email,
               email: nMail._id,
               meta: form.meta,
-            });
+            };
+
+            if(contact.id){
+              campaign.userId = contact.id;
+            }
+
+            await emailCampaignService.add(campaign);
           }
 
         }
-
       }
     }
+
   }
 
 
-  return {success:true};
+  return {threadId: threadId};
 
 }
 
@@ -100,6 +108,16 @@ function findById(id) {
   }
 
   return Email.findById(id);
+}
+
+function findByThreadId(threadId) {
+  let data = null;
+
+  if(threadId==null){
+    return;
+  }
+
+  return Email.findOne({threadId: threadId});
 }
 
 
@@ -136,5 +154,6 @@ module.exports = {
   compose:compose,
   archive:archive,
   search: search,
-  findById:findById
+  findById:findById,
+  findByThreadId:findByThreadId
 }

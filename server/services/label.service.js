@@ -17,14 +17,17 @@ function findById(labelId) {
 }
 
 
-async function getLabels(company, query, type) {
+async function getLabels(query, type) {
   let data = null;
 
-  if(company==null){
-    return;
+
+  let match = {name: { $regex: query, $options: "si" }};
+
+  if(type){
+    match.type = type;
   }
 
-  return Label.find({company: company, name: { $regex: query, $options: "si" },type: type});
+  return Label.find(match);
 }
 
 

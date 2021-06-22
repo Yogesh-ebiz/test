@@ -13,8 +13,7 @@ const EmailCampaignSchema = new mongoose.Schema({
     required: true
   },
   userId: {
-    type: Number,
-    required: true
+    type: Number
   },
   status: {
     type: String,

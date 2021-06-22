@@ -13,7 +13,9 @@ const swaggerDocument = require('./swagger.json');
 const routes = require('../routes/index.route');
 const config = require('./config');
 const passport = require('./passport');
-const multipart = require('connect-multiparty');
+// const multipart = require('connect-multiparty');
+const multer = require('multer');
+
 const handleErrors = require('../middleware/handleErrors');
 const { BadRequest } = require('../middleware/baseError');
 
@@ -24,6 +26,20 @@ let Response = require('../const/response');
 const locale = require("locale")
   , supported = ["en", "en_US", "ja"]
   , defaultLocale = "en";
+
+
+// SET STORAGE
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '/tmp/uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+var upload = multer({ storage: storage })
+
 
 const app = express();
 // app.set('case sensitive routing', true);
@@ -61,7 +77,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
-app.use(multipart());
+// app.use(multipart());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   limit: '250mb',
   extended: true
@@ -86,8 +102,10 @@ var options = {
 app.use('/docApi', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 
+
+var cpUpload = upload.fields([{ name: 'file', maxCount: 20 }, { name: 'photo', maxCount: 20 }])
 // API router
-app.use('/api/', routes);
+app.use('/api/', cpUpload, routes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -99,7 +117,7 @@ app.use((req, res, next) => {
 });
 
 // error handler, send stacktrace only during development
-app.use(handleErrors);
+// app.use(handleErrors);
 
 
 app.use((err, req, res, next) => {
@@ -111,11 +129,11 @@ app.use((err, req, res, next) => {
 
   }
 
-    res.status(err.status ||  500).json({
-      data: null,
-      message: err.message,
-      status: err.status
-    });
+  res.status(err.status ||  500).json({
+    data: null,
+    message: err.message,
+    status: err.status
+  });
   next(err);
 });
 

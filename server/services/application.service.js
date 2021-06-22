@@ -301,7 +301,7 @@ async function disqualifyApplication(applicationId, reason, member) {
 
       let job = await jobService.findJob_Id(ObjectID(application.jobId));
       //Add activity
-      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id, reason: reason}});
+      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id, reason: reason}});
     }
   }
   return result;
@@ -324,7 +324,7 @@ async function revertApplication(applicationId, member) {
       result = {status: statusEnum.ACTIVE};
 
       let job = await jobService.findJob_Id(ObjectID(application.jobId));
-      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REVERTED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
+      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REVERTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
     }
   }
   return result;
@@ -339,12 +339,13 @@ async function deleteApplication(applicationId, member) {
     return;
   }
 
+
   let application = await Application.findById(applicationId).populate('user');
   if(application){
     application.status = statusEnum.DELETED;
     application = await application.save();
     let job = await jobService.findJob_Id(ObjectID(application.jobId));
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DELETED, meta: {candidate: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DELETED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
   }
   return result;
 }

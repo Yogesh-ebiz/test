@@ -3,6 +3,8 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 
 const statusEnum = require('../const/statusEnum');
+const TaskSearchParam = require('../const/taskSearchParam');
+
 const Task = require('../models/task.model');
 const Application = require('../models/application.model');
 
@@ -10,6 +12,7 @@ const applicationService = require('../services/application.service');
 
 
 const taskSchema = Joi.object({
+  updatedBy: Joi.object().optional(),
   required: Joi.boolean().required(),
   type: Joi.string().required(),
   name: Joi.string().required(),
@@ -58,7 +61,7 @@ async function update(id, form) {
   let task = await findById(id);
   let result = null;
 
-  if(!task || !task.owner.equals(form.updatedBy)){
+  if(!task || (task.owner && !task.owner.equals(form.updatedBy))){
     return;
   }
 
@@ -143,9 +146,10 @@ async function search(memberId, filter, sort, query) {
     page: parseInt(sort.page)+1
   };
 
-
+  filter.member = memberId;
   let aList = [];
-  let $match = {$or: [{members: [memberId]}, {owner: memberId}], status: filter.status};
+  // let $match = {$or: [{members: [memberId]}, {owner: memberId}], status: filter.status};
+  let $match = new TaskSearchParam(filter)
   if(query){
     $match.name = {$regex: query, $options: 'i'};
   }

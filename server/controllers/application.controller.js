@@ -106,6 +106,7 @@ async function getApplicationById(currentUserId, applicationId) {
 }
 
 async function uploadCV(currentUserId, applicationId, files, name) {
+  console.log(currentUserId, applicationId, files, name)
   if(currentUserId==null || applicationId==null || files==null){
     return null;
   }
@@ -114,6 +115,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
   let basePath = 'user/';
   try {
     let currentParty = await findByUserId(currentUserId);
+    console.log(currentParty)
     if (isPartyActive(currentParty)) {
 
       let application = await findApplicationById(applicationId).populate('user');
@@ -122,6 +124,8 @@ async function uploadCV(currentUserId, applicationId, files, name) {
         let type;
         let progress = application.currentProress;
         //------------Upload CV----------------
+
+        console.log(files)
         if(files.file) {
 
           let cv = files.file;

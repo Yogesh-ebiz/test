@@ -51,7 +51,7 @@ const TaskSchema = new mongoose.Schema({
     default: Date.now
   },
   updatedBy: {
-    type: Number
+    type: Object
   },
   startDate: {
     type: Number

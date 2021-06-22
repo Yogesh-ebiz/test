@@ -31,6 +31,7 @@ async function getApplicationById(req, res) {
 async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = parseInt(req.params.id);
+  console.log(req.files)
   let data = await applicationCtl.uploadCV(currentUserId, applicationId, req.files, req.body.name);
   res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
 }
