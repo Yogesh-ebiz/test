@@ -329,7 +329,7 @@ async function getJobInsight(jobId) {
     let maxDays = 30;
     let date = new Date();
     // To calculate the time difference of two dates
-    var Difference_In_Time = date.getTime() - job.publishedDate;
+    var Difference_In_Time = date.getTime() - job.originalPublishedDate;
 
     // To calculate the no. of days between two dates
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)

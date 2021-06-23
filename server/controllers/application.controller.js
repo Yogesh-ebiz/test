@@ -106,7 +106,6 @@ async function getApplicationById(currentUserId, applicationId) {
 }
 
 async function uploadCV(currentUserId, applicationId, files, name) {
-  console.log(currentUserId, applicationId, files, name)
   if(currentUserId==null || applicationId==null || files==null){
     return null;
   }
@@ -126,15 +125,14 @@ async function uploadCV(currentUserId, applicationId, files, name) {
 
         if(files.file) {
 
-          let cv = files.file;
-          let fileName = name ? name.split('.') : cv.originalFilename.split('.');
+          let cv = files.file[0];
+          let fileName = name ? name.split('.') : cv.originalname.split('.');
           let fileExt = fileName[fileName.length - 1];
           // let date = new Date();
           let timestamp = Date.now();
-          name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
+          name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
           let path = basePath + currentUserId + '/_resumes/' + name;
           let response = await upload(path, cv);
-          console.log(response)
           switch (fileExt) {
             case 'pdf':
               type = 'PDF';
@@ -158,8 +156,8 @@ async function uploadCV(currentUserId, applicationId, files, name) {
         applicationBasePath = 'applications/';
 
         if(files.photo) {
-          let photo = files.photo;
-          fileName = photo.originalFilename.split('.');
+          let photo = files.photo[0];
+          fileName = photo.originalname.split('.');
           fileExt = fileName[fileName.length - 1];
           timestamp = Date.now();
           name = currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '_' + applicationId + '-' + timestamp + '.' + fileExt;

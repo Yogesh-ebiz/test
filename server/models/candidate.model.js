@@ -94,6 +94,9 @@ const CandidateSchema = new mongoose.Schema({
     required:false,
     default: 0
   },
+  isCandidate: {
+    type: Boolean
+  },
   hasImported: {
     type: Boolean,
     default: false

@@ -4,6 +4,7 @@ const asyncHandler = require('express-async-handler');
 const companyCtrl = require('../controllers/company.controller');
 const talentCtrl = require('../controllers/talent.controller');
 const ObjectID = require('mongodb').ObjectID;
+const _ = require('lodash');
 
 let Response = require('../const/response');
 
@@ -1573,9 +1574,8 @@ async function addPoolCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let poolId = req.params.poolId;
-  let candidates = req.body.candidates;
+  let candidates = _.reduce(req.body.candidates, function(res, item){res.push(ObjectID(item)); return res;}, []);
 
-  candidates.forEach(function(id){ id = parseInt(id); });
   let data = await talentCtrl.addPoolCandidates(company, currentUserId, poolId, candidates);
   res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
 }

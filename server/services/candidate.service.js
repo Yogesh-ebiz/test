@@ -31,13 +31,16 @@ const candidateSchema = Joi.object({
 });
 
 
-async function addCandidate(companyId, user) {
+async function addCandidate(companyId, user, email, phone) {
 
   if(!companyId || !user){
     return;
   }
+
+  email = email?email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
+  phone = phone?phone:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
-    jobTitle: user.jobTitle?user.jobTitle:'', email: '', phoneNumber: '',
+    jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
     city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
     skills: _.map(user.skills, 'id'), url: user.shareUrl
   }
@@ -182,37 +185,37 @@ async function search(filter, sort) {
         let:{user:"$_id"},
         pipeline:[
           {$match:{$expr:{$eq:["$user","$$user"]}}},
-          // {$lookup:{
-          //     from:"applicationprogresses",
-          //     let:{currentProgress:"$currentProgress"},
-          //     pipeline:[
-          //       {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-          //       {$lookup:{
-          //           from:"stages",
-          //           let:{stage:"$stage"},
-          //           pipeline:[
-          //             {$match:{$expr:{$eq:["$_id","$$stage"]}}},
-          //
-          //           ],
-          //           as: 'stage'
-          //         }},
-          //       { $unwind: '$stage'}
-          //     ],
-          //     as: 'currentProgress'
-          //   }
-          // },
-          // { $unwind: '$currentProgress'}
+          {$lookup:{
+              from:"applicationprogresses",
+              let:{currentProgress:"$currentProgress"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+                {$lookup:{
+                    from:"stages",
+                    let:{stage:"$stage"},
+                    pipeline:[
+                      {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+
+                    ],
+                    as: 'stage'
+                  }},
+                { $unwind: '$stage'}
+              ],
+              as: 'currentProgress'
+            }
+          },
+          { $unwind: '$currentProgress'}
         ],
         as: 'applications'
       },
     },
-    // {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
-    // { $addFields:
-    //     {
-    //       rating: {$avg: "$evaluations.rating"},
-    //       evaluations: []
-    //     }
-    // },
+    {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
+    { $addFields:
+        {
+          rating: {$avg: "$evaluations.rating"},
+          evaluations: []
+        }
+    },
   );
 
 
@@ -239,6 +242,7 @@ async function search(filter, sort) {
     aList.push(aSort);
   }
 
+  console.log(aSort)
 
   const aggregate = Candidate.aggregate(aList);
 

@@ -89,6 +89,10 @@ function SearchParam(filter) {
     this.query.district =  { $in: filter.district};
   }
 
+  if (filter.types && filter.types.length) {
+    this.query.type =  { $in: filter.types};
+  }
+
   if (filter.city && filter.city.length) {
     this.query.city =  { $in: filter.city};
   }
@@ -146,6 +150,7 @@ function SearchParam(filter) {
 
 
 
+  console.log(this.query)
   return this.query;
 }
 

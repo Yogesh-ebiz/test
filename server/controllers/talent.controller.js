@@ -1240,7 +1240,10 @@ async function publishJob(companyId, currentUserId, jobId, type) {
   if(job){
     job.type = type;
     job.status = statusEnum.ACTIVE;
-    job.publishedDate = Date.now();
+
+    let publishedDate = Date.now();
+    job.originalPublishedDate = !job.originalPublishedDate?publishedDate:job.originalPublishedDate;
+    job.publishedDate = publishedDate;
     job = await job.save();
   }
 
@@ -1262,8 +1265,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
 
   let result;
   let checkout = await checkoutService.pay(member, form);
-
-  // if(checkout){
+  console.log(checkout)
   if(checkout){
     let job = await jobService.findJob_Id(jobId);
 
@@ -1739,14 +1741,16 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
     if(application) {
       let previousProgress = application.currentProgress;
       _.forEach(application.progress, function(item){
-        if(item.stage._id==ObjectID(newStage)){
+        if(item.stage._id.equals(ObjectID(newStage))){
           progress = item;
         }
       });
 
       if(progress){
         application.currentProgress = progress;
+        newStage = progress.stage;
         await application.save();
+
       } else {
         let pipeline = await getPipelineByJobId(application.jobId);
         if(pipeline) {
@@ -1754,9 +1758,10 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
           if(foundStage) {
             progress = await  applicationProgressService.addApplicationProgress({
               applicationId: application.applicationId,
-              stage: foundStage._id
+              stage: foundStage
             });
 
+            newStage = foundStage;
             let taskMeta = {applicationId: application._id, applicationProgressId: application.currentProgress._id};
             await stageService.createTasksForStage(foundStage, '', taskMeta);
 
@@ -1769,9 +1774,8 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
         }
       }
 
-
       let job = await jobService.findJob_Id(application.jobId);
-      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subjectId: ''+application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: foundStage.name}});
+      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
     }
 
   } catch (error) {
@@ -2520,27 +2524,42 @@ async function getBoard(currentUserId, jobId, locale) {
 
       let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: item.applications}
 
-      for (const [i, task] of stage.tasks.entries()){
-        if(task.type===taskType.EVALUATION && task.required){
 
-          for(let [j, item] of stage.applications.entries()){
-            if(item.application.currentProgress) {
+
+      for(let [i, item] of stage.applications.entries()){
+        if(item.application.currentProgress) {
+          let completed = _.reduce(stage.tasks, function(res, item){res.push(false); return res;}, []);
+          for (const [j, task] of stage.tasks.entries()) {
+            if (task.type === taskType.EVALUATION && task.required) {
               let noOfCompletedEvaluation = 0;
-              for(let [k, member] of task.members.entries()){
-                for(let [l, evaluation] of item.application.currentProgress.evaluations.entries()){
-                  if(member.equals(evaluation.createdBy)){
-                    noOfCompletedEvaluation++;
-                  }
-                }
+              if (task.members.length) {
+                // for (let [k, member] of task.members.entries()) {
+                //   for (let [l, evaluation] of item.application.currentProgress.evaluations.entries()) {
+                //     if (ObjectID(member).equals(evaluation.createdBy)) {
+                //       noOfCompletedEvaluation++;
+                //     }
+                //   }
+                // }
+                let createdBy = _.sortedUniq(_.reduce(item.application.currentProgress.evaluations, function(res, item){res.push(item.createdBy.toString()); return res;}, []));
+                let members = _.sortedUniq(_.reduce(task.members, function(res, item){res.push(item.toString()); return res;}, []));
+                console.log(createdBy, members, createdBy===members, _.difference(createdBy, members))
+                completed[j]=(!_.difference(createdBy, members).length)? true:false;
+              } else{
+                completed[j]=true;
               }
-
-              if(noOfCompletedEvaluation==task.members.length){
-                item.application.isCompleted=true;
-              }
+            } else if (task.type === taskType.EMAIL) {
+              completed[j]=(task.required && item.application.currentProgress.emails.length)? true: false;
+            } else if (task.type === taskType.EVENT) {
+              completed[j]=(task.required && item.application.currentProgress.event)? true: false;
             }
+
           }
+
+          item.isCompleted = (!_.includes(completed, false)) ? true : false;
         }
       }
+
+
 
 
       if(stage.type===stageType.SOURCED && sources.length){
@@ -3189,7 +3208,7 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
 
 
   } catch(e){
-    console.log('addPoolCandidate: Error', e);
+    console.log('updatePeoplePool: Error', e);
   }
 
 
@@ -3908,11 +3927,16 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
   try {
     result = await memberService.findJobSubscriptions(member._id, sort);
     let company = await feedService.lookupCompaniesIds([companyId]);
+    let departments = await departmentService.findDepartmentsByCompany(companyId);
+    console.log(departments)
     company = convertToCompany(company[0]);
     result.docs.forEach(function(sub){
       sub.subject.hasSaved = true;
       sub.subject.company = company;
       sub.subject = jobMinimal(sub.subject)
+
+
+      sub.subject.department = _.find(departments, function(o){ return o._id.equals(ObjectID(sub.subject.department))});
     });
 
   } catch(e){
@@ -3965,7 +3989,8 @@ async function searchTasks(companyId, currentUserId, filter, sort, query) {
 
   let result = null;
   try {
-    result = await taskService.search(member._id, filter, sort, query);
+    filter.members = [member._id];
+    result = await taskService.search(filter, sort, query);
 
   } catch(e){
     console.log('searchTasks: Error', e);
@@ -4149,25 +4174,7 @@ async function addPoolCandidates(companyId, currentUserId, poolId, candidateIds)
   try {
     let pool = await poolService.findPoolBy_Id(poolId).populate('candidates');
     if (pool) {
-      for(let [i, candidate] of candidateIds.entries()){
-
-        let exists = false;
-        pool.candidates.forEach(function(item){
-          if(item.userId==candidate){
-            exists = true;
-          }
-        });
-        if (!exists) {
-
-          let found = await candidateService.findByUserIdAndCompanyId(candidate, companyId);
-          if(!found){
-            let user = await feedService.findCandidateById(candidate);
-            candidate = await candidateService.addCandidate(companyId, user);
-            pool.candidates.push(candidate._id);
-          }
-
-        }
-      }
+      pool.candidates = candidateIds;
       result = await pool.save();
 
     }
@@ -4878,17 +4885,11 @@ async function deleteCompanyEmailTemplate(companyId, templateId, currentUserId) 
       }
 
     }
-
-
   } catch(e){
     console.log('deleteCompanyEmailTemplate: Error', e);
   }
-
-
   return result
 }
-
-
 
 async function searchContacts(companyId, currentUserId, query) {
   if(!companyId || !currentUserId){
@@ -4906,6 +4907,7 @@ async function searchContacts(companyId, currentUserId, query) {
     let members = await memberService.searchMembers(companyId, query);
     members = _.reduce(members, function(res, m){
       m.isMember = true;
+      m.isCandidate = false;
       res.push(m);
       return res;
     }, []);
@@ -4913,6 +4915,7 @@ async function searchContacts(companyId, currentUserId, query) {
     let candidates = await candidateService.searchCandidates(companyId, query);
     candidates = _.reduce(candidates, function(res, c){
       c.isMember = false;
+      c.isCandidate = (c.hasApplied || c.hasImported)?true: false
       res.push(c);
       return res;
     }, []);

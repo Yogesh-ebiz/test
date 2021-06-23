@@ -74,13 +74,14 @@ const convertToAvatar = (user) => {
     partyType: user.partyType,
     headline: user.headline,
     email: user.email,
-    isMember: user.isMember?user.isMember:false
+    isMember: user.isMember?user.isMember:false,
+    isCandidate: user.isCandidate?user.isCandidate:false
   };
-  
+
   if(user._id){
     data._id = user._id;
   }
-  
+
   return data;
 }
 
@@ -122,7 +123,7 @@ const convertToCandidate = (user) => {
     noOfMonthExperiences: user.noOfMonthExperiences?user.noOfMonthExperiences:35,
     level:user.level?user.level:'SENIOR',
     match:user.match?user.match:87,
-    rating: user.rating?user.rating:4.3,
+    rating: Math.round(user.rating * 10) /10,
     teamRating: user.teamRating?user.teamRating:0,
     hasApplied: user.hasApplied?user.hasApplied:false,
     hasImported: user.hasImported?user.hasImported:false,
@@ -224,6 +225,7 @@ const jobMinimal = (job) => {
     _id: job._id,
     jobId: job.jobId,
     title: job.title,
+    type: job.type,
     hasSaved: job.hasSaved,
     level: job.level,
     employmentType: job.employmentType,
@@ -232,7 +234,12 @@ const jobMinimal = (job) => {
     country: job.country,
     company: job.company,
     createdBy: job.createdBy,
-    department: job.department
+    department: job.department,
+    createdDate: job.createdDate,
+    publishedDate: job.publishedDate,
+    originalPublishedDate:job.originalPublishedDate,
+    noOfApplied:job.noOfApplied
+
   };
 }
 

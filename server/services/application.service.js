@@ -38,7 +38,7 @@ function findApplicationById(applicationId) {
 function findApplicationBy_Id(applicationId) {
   let data = null;
 
-  if(applicationId==null){
+  if(!applicationId){
     return;
   }
 
@@ -555,7 +555,7 @@ async function getJobInsight(jobId) {
     let maxDays = 30;
     let date = new Date();
     // To calculate the time difference of two dates
-    var Difference_In_Time = date.getTime() - job.createdDate;
+    var Difference_In_Time = date.getTime() - job.originalPublishedDate;
 
     // To calculate the no. of days between two dates
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)

@@ -45,16 +45,38 @@ async function getEmailById(currentUserId, emailId)  {
 
   let email = await emailService.findById(emailId);
   if(email){
+
+    let userIds = _.map(email.to, 'id').concat(_.map(email.cc, 'id'));
+    userIds.push(email.from.id);
+
+    let users = await feedService.lookupPeopleIds(userIds)
     if(email.from.id){
-      let user = await feedService.lookupPeopleIds([email.from.id]);
-      if(user.length){
-        email.from = convertToAvatar(user[0]);
+      if(users.length){
+        email.to = _.reduce(email.to, function(res, contact){
+          let found = _.find(users, {id: contact.id});
+          if(found){
+            contact = found;
+          }
+          res.push(convertToAvatar(contact));
+          return res;
+        }, []);
+
+        email.cc = _.reduce(email.cc, function(res, contact){
+          let found = _.find(users, {id: contact.id});
+          if(found){
+            contact = found;
+          }
+
+          res.push(convertToAvatar(contact));
+          return res;
+        }, []);
+
+        email.from = convertToAvatar(_.find(users, {id: email.from.id}));
       }
 
     }
 
     email.attachments = _.reduce(email.attachments, function(res, file){
-      console.log(file)
       if(file.type==='JOBLINK'){
         file.url = `${file.url.toString()}`;
       } else {

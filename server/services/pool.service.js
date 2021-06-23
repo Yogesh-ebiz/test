@@ -64,7 +64,6 @@ async function getPoolCandidates(poolId) {
           status: '$candidates.status',
           rating: '$candidates.rating',
           level: '$candidates.level',
-          rating: '$candidates.rating',
           teamRating: '$candidates.teamRating',
           links: '$candidates.links',
           skills: '$candidates.skills',
@@ -87,7 +86,7 @@ async function getPoolCandidates(poolId) {
           state: '$candidates.state',
           country: '$candidates.country',
           createdDate: '$candidates.createdDate',
-          isImport: '$candidate.isImport',
+          hasImported: '$candidate.hasImported',
           hasApplied: '$candidate.hasApplied'
         }
     }

@@ -13,6 +13,8 @@ const applicationEnum = require('../const/applicationEnum');
 const notificationType = require('../const/notificationType');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
+const jobType = require('../const/jobType');
+
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const feedService = require('../services/api/feed.service.api');
@@ -567,6 +569,7 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   }
 
   filter.status = [statusEnum.ACTIVE];
+  filter.types = [jobType.FREE, jobType.PROMOTE];
 
   let aList = [];
   let aMatch = { $match: new SearchParam(filter)};
@@ -819,7 +822,7 @@ async function applyJobById(currentUserId, jobId, application ) {
       if(job) {
         let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
         if(!candidate){
-          candidate = await candidateService.addCandidate(job.company, currentParty);
+          candidate = await candidateService.addCandidate(job.company, currentParty, application.email, application.phoneNumber);
         } else {
           candidate.email = application.email;
           candidate.phoneNumber = application.phoneNumber;

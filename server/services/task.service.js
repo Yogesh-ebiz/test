@@ -126,9 +126,9 @@ async function getTasksDueSoon(member) {
 }
 
 
-async function search(memberId, filter, sort, query) {
+async function search(filter, sort, query) {
   let result = null;
-  if(!memberId || !filter || !sort){
+  if(!filter || !sort){
     return;
   }
 
@@ -146,7 +146,6 @@ async function search(memberId, filter, sort, query) {
     page: parseInt(sort.page)+1
   };
 
-  filter.member = memberId;
   let aList = [];
   // let $match = {$or: [{members: [memberId]}, {owner: memberId}], status: filter.status};
   let $match = new TaskSearchParam(filter)

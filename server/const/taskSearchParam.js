@@ -10,9 +10,9 @@ function TaskSearchParam(filter) {
   if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };
   }
-
-  if(filter.member){
-    this.query.$or =  [{members: [filter.member]}, {owner: filter.member}];
+  
+  if (filter.members && filter.members.length) {
+    this.query.$or =  [{members: { $in: filter.members} }, {owner: { $in: filter.members}}];
   }
 
   if(filter.application){
@@ -46,9 +46,7 @@ function TaskSearchParam(filter) {
     this.query.company = { $in: filter.company };
   }
 
-  if (filter.members && filter.members.length) {
-    this.query.members =  { $in: filter.members};
-  }
+
 
   if (filter.createdBy && filter.createdBy.length) {
     this.query.createdBy =  { $in: filter.createdBy};
