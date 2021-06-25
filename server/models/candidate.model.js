@@ -37,6 +37,9 @@ const CandidateSchema = new mongoose.Schema({
   url: {
     type: String
   },
+  district: {
+    type: String
+  },
   city: {
     type: String,
     required:false
@@ -64,6 +67,15 @@ const CandidateSchema = new mongoose.Schema({
   jobTitle: {
     type: String,
     required:false
+  },
+  dob: {
+    type: String
+  },
+  gender: {
+    type: String
+  },
+  maritalStatus: {
+    type: String
   },
   match: {
     type: Number,

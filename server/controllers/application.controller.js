@@ -160,7 +160,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           fileName = photo.originalname.split('.');
           fileExt = fileName[fileName.length - 1];
           timestamp = Date.now();
-          name = currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '_' + applicationId + '-' + timestamp + '.' + fileExt;
+          name = currentParty.firstName + '_' + currentParty.lastName + '_' + application.user._id + '_' + applicationId + '-' + timestamp + '.' + fileExt;
           path = applicationBasePath + applicationId + '/photos/' + name;
           response = await upload(path, photo);
           switch (fileExt) {

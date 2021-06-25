@@ -23,25 +23,22 @@ function findBookByUserId(userId, size) {
     return;
   }
 
-  console.log(userId)
   return size?BookMark.find({partyId: userId}).sort({createdDate: -1}).limit(size):BookMark.find({partyId: userId}).sort({createdDate: -1});
 }
 
-function addBook(userId, company, jobId) {
+function addBook(bookmark) {
   let data = null;
 
-  if(userId==null || !company || jobId==null){
+  if(!bookmark){
     return;
   }
 
-  let bookmark = {partyId: userId, company: company, jobId: jobId};
   return new BookMark(bookmark).save();
 }
 
 
 function removeBookById(userId, jobId) {
   let data = null;
-  console.log(userId, jobId)
   if(!userId || !jobId){
     return;
   }

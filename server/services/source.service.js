@@ -2,13 +2,13 @@ const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
-let CandidateParam = require('../const/candidateParam');
+let SourceParam = require('../const/sourceParam');
 
 const Source = require('../models/source.model');
 const candidateService = require('../services/candidate.service');
 
 const sourceSchema = Joi.object({
-  jobId: Joi.object(),
+  job: Joi.object(),
   candidate: Joi.object(),
   createdBy: Joi.object()
 });
@@ -43,23 +43,15 @@ async function addSources(sources) {
 }
 
 
-async function remove(id) {
-  if(!id){
-    return;
-  }
-
-  return Source.findById(id);
-}
-
-async function removeMany(ids) {
+async function remove(ids) {
   if(!ids){
     return;
   }
 
-  return Source.remove({jobId: {$in: ids}});
+  await Source.deleteMany({_id: {$in: ids}});
 }
 
-async function findById(id) {
+function findById(id) {
   if(!id){
     return;
   }
@@ -82,14 +74,14 @@ function findByJobId(jobId) {
     return;
   }
 
-  return Source.find({jobId: jobId});
+  return Source.find({job: jobId});
 
 }
 
 
-async function search(jobId, filter, sort) {
+async function search(filter, sort) {
 
-  if(!jobId || !filter || !sort){
+  if(!filter || !sort){
     return;
   }
 
@@ -108,24 +100,49 @@ async function search(jobId, filter, sort) {
 
   let aList = [];
   let aLookup = [];
-  let aMatch = { $match: new CandidateParam(filter)};
+  let aMatch = { $match: new SourceParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
-
-  aList.push(aMatch);
 
   aList.push(
     {$lookup:{
-        from:"members",
-        let:{user:"$createdBy"},
+        from:"candidates",
+        let:{candidate:"$candidate"},
         pipeline:[
-          {$match:{$expr:{$eq:["$_","$$user"]}}}
+          {$match:{$expr:{$eq:["$_id","$$candidate"]}}},
+          {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
+          { $addFields:
+              {
+                rating: {$avg: "$evaluations.rating"},
+                evaluations: []
+              }
+          },
         ],
-        as: 'createdBy'
+        as: 'candidate'
       },
     },
-    {$unwind: '$createdBy'},
-
+    {$unwind: '$candidate'},
+    // {$lookup: {from: 'emailcampaigns', localField: 'campaign', foreignField: '_id', as: 'campaign' } },
+    {$lookup:{
+        from:"emailcampaigns",
+        let:{campaign:"$campaign"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$campaign"]}}},
+          {$lookup: {from: 'emailcampaignstages', localField: 'currentStage', foreignField: '_id', as: 'currentStage' } },
+          {$unwind: '$currentStage'}
+        ],
+        as: 'campaign'
+      },
+    },
+    // {$unwind: '$campaign'}
+    {$unwind: {
+        path: "$campaign",
+        preserveNullAndEmptyArrays: true
+      }
+    }
   );
+
+  aList.push(aMatch);
+
 
 
   if(sort && sort.sortBy=='rating'){
@@ -147,7 +164,6 @@ module.exports = {
   add:add,
   addSources:addSources,
   remove:remove,
-  removeMany:removeMany,
   findById:findById,
   findByCandidateId:findByCandidateId,
   findByJobId:findByJobId,

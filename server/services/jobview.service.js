@@ -24,14 +24,13 @@ function findJobViewByUserIdAndJobId(userId, jobId) {
   return JobView.findOne({partyId: userId, jobId: jobId});
 }
 
-function addJobViewByUserId(userId, company, jobId) {
+function addJobViewByUserId(jobView) {
   let data = null;
 
-  if(!userId || !company || !jobId){
+  if(!jobView){
     return;
   }
 
-  let jobView = {partyId: userId, company: company, jobId: jobId}
   return new JobView(jobView).save();
 }
 
@@ -60,7 +59,7 @@ async function findMostViewed() {
       skills: '$jobId.skills',
       industry: '$jobId.industry',
       createdDate: '$jobId.createdDate',
-      hasSaved: '$jobId.hasSaved'
+      hasSaved: '$jobId.hasSaved',
     },
     count: {'$sum': 1}
   };

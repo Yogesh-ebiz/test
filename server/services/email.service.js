@@ -7,6 +7,7 @@ const emailType = require('../const/emailType');
 const Email = require('../models/email.model');
 const applicationService = require('../services/application.service');
 const emailCampaignService = require('../services/emailcampaign.service');
+const sourceService = require('../services/source.service');
 
 
 const emailSchema = Joi.object({
@@ -40,8 +41,6 @@ async function compose(form) {
   form.threadId = threadId;
   if(form.type===emailType.DEFAULT) {
     email = await new Email(form).save();
-
-
     if(email) {
       if (form.meta && form.meta.applicationId) {
         let application = await applicationService.findById(ObjectID(form.meta.applicationId)).populate('currentProgress');
@@ -60,7 +59,6 @@ async function compose(form) {
     for (let [i, contact] of form.to.entries()) {
       let nMail = _.clone(form);
       nMail.to = [contact];
-      console.log(contact)
       let token;
       if(jobLink) {
         token = new ObjectID;
@@ -86,7 +84,13 @@ async function compose(form) {
               campaign.userId = contact.id;
             }
 
-            await emailCampaignService.add(campaign);
+            campaign = await emailCampaignService.add(campaign);
+
+            if(contact.sourceId){
+              let source = await sourceService.findById(ObjectID(contact.sourceId));
+              source.campaign = campaign;
+              await source.save();
+            }
           }
 
         }

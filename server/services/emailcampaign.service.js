@@ -1,10 +1,15 @@
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
-let SearchParam = require('../const/searchParam');
-
-const statusEnum = require('../const/statusEnum');
-const EmailCampaign = require('../models/emailcampaign.model');
 const Joi = require('joi');
+
+let SearchParam = require('../const/searchParam');
+const statusEnum = require('../const/statusEnum');
+const emailCampaignStageType = require('../const/emailCampaignStageType');
+
+const EmailCampaign = require('../models/emailcampaign.model');
+const emailCampaignStageService = require('../services/emailcampaignstage.service');
+
+
 
 
 const emailCampaignSchema = Joi.object({
@@ -19,7 +24,6 @@ const emailCampaignSchema = Joi.object({
 });
 
 
-
 async function add(emailCampaign) {
 
   if(!emailCampaign){
@@ -27,7 +31,15 @@ async function add(emailCampaign) {
   }
 
   emailCampaign = await Joi.validate(emailCampaign, emailCampaignSchema, {abortEarly: false});
-  emailCampaign = new EmailCampaign(emailCampaign).save();
+  emailCampaign = await new EmailCampaign(emailCampaign).save();
+
+  let stage = await emailCampaignStageService.add({type: emailCampaignStageType.INVITED});
+  console.log(emailCampaign)
+  emailCampaign.stages.push(stage);
+  emailCampaign.currentStage = stage;
+
+  emailCampaign = await emailCampaign.save();
+
   return emailCampaign;
 
 }
@@ -38,9 +50,7 @@ async function findByEmailAndJobId(email, jobId) {
     return;
   }
 
-  return EmailCampaign.aggregate([
-    {$match: {emailAddress: email, jobId: jobId} }
-  ])
+  return EmailCampaign.findOne({emailAddress: email, jobId: jobId}).populate('stages').populate('currentStage');
 }
 
 
@@ -63,8 +73,28 @@ async function findByJobId(jobId, filter) {
     limit:    limit,
     page: parseInt(filter.page)+1
   };
-  return Activity.paginate({'meta.jobId': ObjectID(jobId)}, options);
+  return EmailCampaign.paginate({'meta.jobId': ObjectID(jobId)}, options);
   // return Activity.find({subjectType: subjectType, subjectId: subjectId});
+
+}
+
+
+
+async function findCampaignsByJobId(jobId) {
+  if(!jobId){
+    return;
+  }
+
+  return EmailCampaign.find({jobId: jobId});
+}
+
+
+async function findByToken(token) {
+  if(!token){
+    return;
+  }
+
+  return EmailCampaign.findOne({token: token}).populate('stages');
 
 }
 
@@ -179,5 +209,7 @@ module.exports = {
   add:add,
   findByEmailAndJobId:findByEmailAndJobId,
   findByJobId:findByJobId,
+  findCampaignsByJobId:findCampaignsByJobId,
+  findByToken:findByToken,
   search:search
 }

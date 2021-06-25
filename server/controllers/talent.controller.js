@@ -55,6 +55,7 @@ const taskService = require('../services/task.service');
 const stageService = require('../services/stage.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const sourceService = require('../services/source.service');
+const fileService = require('../services/file.service');
 
 const checkoutService = require('../services/checkout.service');
 
@@ -141,9 +142,13 @@ module.exports = {
   searchPeopleSuggestions,
   searchApplications,
   searchSources,
+  removeSources,
+  addSourceApplication,
   searchCampaigns,
+  addApplication,
   getAllApplicationsEndingSoon,
   getApplicationById,
+  acceptApplication,
   rejectApplication,
   updateApplicationProgress,
   getApplicationQuestions,
@@ -164,11 +169,13 @@ module.exports = {
   disqualifyApplication,
   revertApplication,
   deleteApplication,
+  rejectApplication,
   subscribeApplication,
   unsubscribeApplication,
   getApplicationActivities,
   searchCandidates,
   getCandidateById,
+  updateCandidateById,
   getCandidateEvaluations,
   getCandidateEvaluationsStats,
   getCandidateEvaluationById,
@@ -208,6 +215,7 @@ module.exports = {
   cancelMemberInvitation,
   getCompanyMembers,
   addCompanyMember,
+  getCompanyMember,
   updateCompanyMember,
   updateCompanyMemberRole,
   deleteCompanyMember,
@@ -232,12 +240,14 @@ module.exports = {
   removeProjectCandidates,
   subscribeJob,
   unsubscribeJob,
+  uploadApplication,
   getFiles,
   getCompanyEvaluationTemplates,
   addCompanyEvaluationTemplate,
   getCompanyEvaluationTemplate,
   updateCompanyEvaluationTemplate,
   deleteCompanyEvaluationTemplate,
+  getEvaluationFilters,
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
   updateCompanyEmailTemplate,
@@ -657,7 +667,6 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   }
 
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-  let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.JOB);
 
   if(!member){
     return null;
@@ -675,8 +684,6 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
     limit:    limit,
     page: parseInt(sort.page)+1
   };
-
-  let company = await feedService.findCompanyById(companyId, currentUserId);
 
   let aList = [];
   let aMatch = { $match: new JobSearchParam(filter)};
@@ -716,16 +723,21 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
 
-  let departmentIds = _.map(result.docs, 'department');
-  let departments = await departmentService.findDepartmentsByCompany(companyId);
+  if(result) {
+    let departmentIds = _.map(result.docs, 'department');
+    let departments = await departmentService.findDepartmentsByCompany(companyId);
 
-  result.docs.map(job => {
-    job.company = company;
-    job.department = _.find(departments, {_id: job.department});
-    return job;
-  });
-  // result = await Promise.all(loadPromises);
+    let company = await feedService.findCompanyById(companyId, currentUserId);
+    let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.JOB);
 
+    result.docs.map(job => {
+      job.company = company;
+      job.department = _.find(departments, {_id: job.department});
+      job.hasSaved = _.find(jobSubscribed, {subject: job._id})?true:false;
+      return job;
+    });
+
+  }
   return new Pagination(result);
 
 }
@@ -1265,8 +1277,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
 
   let result;
   let checkout = await checkoutService.pay(member, form);
-  console.log(checkout)
-  if(checkout){
+  // if(checkout){
     let job = await jobService.findJob_Id(jobId);
 
     if(job){
@@ -1276,9 +1287,9 @@ async function payJob(companyId, currentUserId, jobId, form) {
     }
 
     result = { success: true, verification: false };
-  } else {
-    result = { success: false, verification: true };
-  }
+  // } else {
+  //   result = { success: false, verification: true };
+  // }
 
   return result;
 }
@@ -1455,31 +1466,93 @@ async function searchApplications(currentUserId, jobId, filter, sort, locale) {
 
 
 
-async function searchSources(currentUserId, jobId, filter, sort, locale) {
+async function searchSources(companyId, currentUserId, filter, sort, locale) {
 
-  if(!currentUserId || !jobId || !filter){
+  if(!companyId || !currentUserId || !filter){
     return null;
   }
 
-  let result = await sourceService.search(jobId, filter, sort);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await sourceService.search(filter, sort);
   // let userIds = _.map(result.docs, 'user');
   // let users = await feedService.lookupUserIds(userIds);
 
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
-  // result.docs.forEach(function(app){
-  //   app.labels = [];
-  //   app.note = [];
-  //   app.comments = [];
-  //   if(_.some(subscriptions, {subjectId: ObjectID(app._id)})){
-  //     app.hasFollowed = true;
-  //   }
-  // })
+  result.docs.forEach(function(source){
+    source.candidate = convertToCandidate(source.candidate);
+  })
 
   return new Pagination(result);
 
 
 }
+
+
+
+
+async function removeSources(companyId, currentUserId, sourceIds) {
+
+  if(!companyId || !currentUserId || !sourceIds){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await sourceService.remove(sourceIds);
+
+  return {success: true};
+
+
+}
+
+
+
+
+
+async function addSourceApplication(companyId, currentUserId, jobId, sourceId, application) {
+
+  if(!companyId || !currentUserId || !jobId || !sourceId || !application){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let progress;
+  try {
+
+    let source = await sourceService.findById(sourceId).populate('candidate').populate('job');
+
+    if(source) {
+      let stage = application.stage;
+      delete application.stage;
+      application.user = source.candidate._id;
+      application.partyId= source.candidate.userId;
+      application.jobId =source.job._id;
+      application.jobTitle = source.job.jobTitle;
+      application.company= source.job.company;
+
+      application = await applicationService.apply(application);
+
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
+}
+
 
 
 async function searchCampaigns(companyId, currentUserId, jobId, filter, sort, locale) {
@@ -1498,11 +1571,7 @@ async function searchCampaigns(companyId, currentUserId, jobId, filter, sort, lo
   // let userIds = _.map(result.docs, 'user');
   // let users = await feedService.lookupUserIds(userIds);
 
-
-
   return new Pagination(result);
-
-
 }
 
 
@@ -1526,6 +1595,56 @@ async function searchCompanyApplications(currentUserId, companyId, filter, local
 
   return results;
 
+}
+
+
+
+async function addApplication(companyId, currentUserId, application ) {
+
+  if(!companyId || !currentUserId || !application){
+    return null;
+  }
+
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let savedApplication;
+  try {
+    let foundApplication = await applicationService.findApplicationByCandidateIdAndJobId(application.user, application.jobId);
+    if(!foundApplication) {
+      let candidate = await candidateService.findById(application.user);
+      let job = await jobService.findById(application.jobId).populate('createdBy');
+      if (job && candidate) {
+        candidate.email = application.email;
+        candidate.phoneNumber = application.phoneNumber;
+        candidate.firstName = application.firstName;
+        candidate.lastName = application.lastName;
+        candidate.hasApplied = true;
+
+
+
+        application.jobTitle = job.title;
+        application.partyId = candidate.userId;
+        application.jobId = job;
+        application.user = candidate;
+        application.company = job.company
+
+
+        savedApplication = await applicationService.apply(application);
+        await candidate.save();
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+    return savedApplication;
+  }
+
+  return savedApplication;
 }
 
 
@@ -2281,7 +2400,7 @@ async function disqualifyApplication(companyId, currentUserId, applicationId, di
   let result;
   try {
 
-    result = await applicationService.disqualifyApplication(applicationId, disqualification.reason, member);
+    result = await applicationService.disqualify(applicationId, disqualification.reason, member);
 
   } catch (error) {
     console.log(error);
@@ -2305,7 +2424,7 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
   let result;
   try {
 
-    result = await applicationService.revertApplication(applicationId, member);
+    result = await applicationService.revert(applicationId, member);
 
   } catch (error) {
     console.log(error);
@@ -2330,7 +2449,56 @@ async function deleteApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await applicationService.deleteApplication(applicationId, member);
+    result = await applicationService.remove(applicationId, member);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function acceptApplication(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await applicationService.accept(applicationId, member);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function rejectApplication(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await applicationService.reject(applicationId, member);
 
   } catch (error) {
     console.log(error);
@@ -2354,7 +2522,7 @@ async function subscribeApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    let subscription = {createdBy: currentUserId, memberId: member._id, subjectType: subjectType.APPLICATION, subjectId: ObjectID(applicationId)};
+    let subscription = {createdBy: currentUserId, member: member._id, subjectType: subjectType.APPLICATION, subject: ObjectID(applicationId)};
     result = await memberService.subscribe(subscription);
 
   } catch (error) {
@@ -2525,7 +2693,6 @@ async function getBoard(currentUserId, jobId, locale) {
       let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: item.applications}
 
 
-
       for(let [i, item] of stage.applications.entries()){
         if(item.application.currentProgress) {
           let completed = _.reduce(stage.tasks, function(res, item){res.push(false); return res;}, []);
@@ -2560,19 +2727,18 @@ async function getBoard(currentUserId, jobId, locale) {
       }
 
 
+      //Temporary not returning SOURCED
+      // if(stage.type===stageType.SOURCED && sources.length){
+      //   stage.applications = _.reduce(sources, function(res, source){
+      //     let application = {application: null, user: source.candidate};
+      //     res.push(application);
+      //     return res;
+      //   }, []);
+      // }
 
-
-      if(stage.type===stageType.SOURCED && sources.length){
-        stage.applications = _.reduce(sources, function(res, source){
-          let application = {application: null, user: source.candidate};
-          res.push(application);
-          return res;
-        }, []);
+      if(stage.type!==stageType.SOURCED) {
+        boardStages.push(stage);
       }
-
-
-      boardStages.push(stage);
-
 
     });
   }
@@ -2702,15 +2868,21 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
 }
 
 
-async function getCandidateById(currentUserId, company, candidateId, locale) {
+async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
-  if(!currentUserId || !company || !candidateId){
+  if(!currentUserId || !companyId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
   let result;
 
-  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, company).populate([
+  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId).populate([
     {
       path: 'applications',
       model: 'Application'
@@ -2734,7 +2906,7 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
   if(candidate) {
     let evaluations = await evaluationService.getCandidateEvaluations(candidate.userId);
     if (evaluations) {
-      let companyEvaluations = _.filter(evaluations, {companyId: company});
+      let companyEvaluations = _.filter(evaluations, {companyId: companyId});
 
       if (companyEvaluations) {
         candidate.teamRating = Math.round(_.reduce(companyEvaluations, function (res, e) {
@@ -2761,6 +2933,47 @@ async function getCandidateById(currentUserId, company, candidateId, locale) {
   }
 
 
+
+  return result;
+
+}
+
+
+async function updateCandidateById(currentUserId, companyId, candidateId, form) {
+
+  if(!currentUserId || !companyId || !candidateId || !form){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result;
+
+  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+
+  if(candidate) {
+    candidate.firstName = form.firstName;
+    candidate.lastName = form.lastName;
+    candidate.email = form.email;
+    candidate.phoneNumber = form.phoneNumber;
+    candidate.address1 = form.address1;
+    candidate.district = form.district;
+    candidate.city = form.city;
+    candidate.state = form.state;
+    candidate.country = form.country;
+    candidate.postalCode = form.postalCode;
+    candidate.about = form.about;
+    candidate.gender = form.gender;
+    candidate.maritalStatus = form.maritalStatus;
+    candidate.dob = form.dob;
+    candidate.links = form.links;
+
+    result = await candidate.save();
+  }
 
   return result;
 
@@ -2811,7 +3024,7 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
 }
 
 
-async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages) {
+async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages, applicationId) {
   if(!companyId || !currentUserId || !candidateId || !type || !stages){
     return null;
   }
@@ -2823,7 +3036,7 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
 
   let result;
   try {
-    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type, stages);
+    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type, stages, applicationId);
 
 
   } catch (error) {
@@ -3839,6 +4052,29 @@ async function addCompanyMember(companyId, form, invitationId) {
   return result
 }
 
+
+async function getCompanyMember(companyId, memberId, currentUserId) {
+  if(!companyId || !currentUserId || !memberId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  try {
+    result = await memberService.findById(memberId);
+
+  } catch(e){
+    console.log('updateCompanyMember: Error', e);
+  }
+
+
+  return result
+}
+
 async function updateCompanyMember(companyId, memberId, currentUserId, form) {
   if(!companyId || !currentUserId || !memberId || !form){
     return null;
@@ -3928,7 +4164,6 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
     result = await memberService.findJobSubscriptions(member._id, sort);
     let company = await feedService.lookupCompaniesIds([companyId]);
     let departments = await departmentService.findDepartmentsByCompany(companyId);
-    console.log(departments)
     company = convertToCompany(company[0]);
     result.docs.forEach(function(sub){
       sub.subject.hasSaved = true;
@@ -4603,7 +4838,7 @@ async function subscribeJob(currentUserId, companyId, jobId) {
 
   let result;
   try {
-    let subscription = {createdBy: currentUserId, memberId: member._id, subjectType: subjectType.JOB, subjectId: ObjectID(jobId)};
+    let subscription = {createdBy: currentUserId, member: member._id, subjectType: subjectType.JOB, subject: ObjectID(jobId)};
     result = await memberService.subscribe(subscription);
   } catch(e){
     console.log('subscribeJob: Error', e);
@@ -4634,6 +4869,100 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
 }
 
 
+
+async function uploadApplication(companyId, currentUserId, applicationId, files) {
+  if(!companyId || !currentUserId || !applicationId || !files){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'applications/';
+  try {
+
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate('user');
+
+    if (application) {
+      let type, name;
+      let progress = application.currentProress;
+      //------------Upload CV----------------
+
+      if(files.file) {
+
+        let cv = files.file[0];
+        let fileName = cv.originalname.split('.');
+        let fileExt = fileName[fileName.length - 1];
+        // let date = new Date();
+        let timestamp = Date.now();
+        name = application.user.firstName + '_' + application.user.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt;
+        let path = basePath + application.applicationId + '/' + name;
+        let response = await upload(path, cv);
+        switch (fileExt) {
+          case 'pdf':
+            type = 'PDF';
+            break;
+          case 'doc':
+            type = 'WORD';
+            break;
+          case 'docx':
+            type = 'WORD';
+            break;
+
+        }
+
+        application.resume = {filename: name, type: type};
+        let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+        if(file){
+          application.files.push(file._id);
+        }
+
+      }
+
+
+      if(files.photo) {
+        let photo = files.photo[0];
+        fileName = photo.originalname.split('.');
+        fileExt = fileName[fileName.length - 1];
+        timestamp = Date.now();
+        name = application.user.firstName + '_' + application.user.lastName + '_' + application.user._id + '_' + application.applicationId + '-' + timestamp + '.' + fileExt;
+        path = basePath + application.applicationId + '/photos/' + name;
+        response = await upload(path, photo);
+        switch (fileExt) {
+          case 'png':
+            type = 'PNG';
+            break;
+          case 'jpeg':
+            type = 'JPG';
+            break;
+          case 'jpg':
+            type = 'JPG';
+            break;
+
+        }
+        application.photo = {filename: path, type: type};
+        let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+        if(file){
+          application.files.push(file._id);
+        }
+      }
+
+      result = await application.save();
+
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
 
 
 async function getFiles(companyId, currentUserId, applicationId) {
@@ -4784,6 +5113,33 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
 
     }
 
+
+  } catch(e){
+    console.log('deleteCompanyEvaluationTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+
+
+async function getEvaluationFilters(companyId, currentUserId) {
+  if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+
+  try {
+    result = await evaluationService.getFilters(companyId);
 
   } catch(e){
     console.log('deleteCompanyEvaluationTemplate: Error', e);

@@ -36,6 +36,9 @@ const BookmarkSchema = new mongoose.Schema({
     type: String,
     required: false,
     default: statusEnum.NONE
+  },
+  token: {
+    type: String
   }
 }, {
   versionKey: false

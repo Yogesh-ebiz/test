@@ -1,19 +1,67 @@
 const _ = require('lodash');
+const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
+
 let ApplicationSearchParam = require('../const/applicationSearchParam');
 const applicationEnum = require('../const/applicationEnum');
 const statusEnum = require('../const/statusEnum');
 const actionEnum = require('../const/actionEnum');
 const subjectType = require('../const/subjectType');
+const notificationType = require('../const/notificationType');
+const emailCampaignStageType = require('../const/emailCampaignStageType');
+
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
 const Pagination = require('../utils/job.pagination');
 const jobService = require('../services/jobrequisition.service');
+const applicationProgressService = require('../services/applicationprogress.service');
+const questionSubmissionService = require('../services/questionsubmission.service');
+const stageService = require('../services/stage.service');
 const activityService = require('../services/activity.service');
 const pipelineService = require('../services/pipeline.service');
+const emailCampaignService = require('../services/emailcampaign.service');
+const emailCampaignStageService = require('../services/emailcampaignstage.service');
+
 const feedService = require('../services/api/feed.service.api');
 
 const {convertToAvatar} = require('../utils/helper');
+
+
+
+const applicationSchema = Joi.object({
+  jobTitle: Joi.string().allow(''),
+  jobId: Joi.object().required(),
+  user: Joi.object().required(),
+  partyId: Joi.number().required(),
+  phoneNumber: Joi.string(),
+  email: Joi.string().required(),
+  availableDate: Joi.number(),
+  attachment: Joi.string().allow('').optional(),
+  follow: Joi.boolean().optional(),
+  resumeId: Joi.any().optional(),
+  questionAnswers: Joi.array(),
+  coverLetter: Joi.string().allow('').optional(),
+  source: Joi.string().allow('').optional(),
+  desiredSalary: Joi.number().optional(),
+  currency: Joi.string().optional(),
+  applicationQuestions: Joi.object().optional(),
+  firstName: Joi.string().allow('').optional(),
+  lastName: Joi.string().allow('').optional(),
+  company: Joi.number(),
+  token: Joi.string().allow('').optional()
+});
+
+
+function add(application) {
+  let data = null;
+
+  if(!application){
+    return;
+  }
+  return new Application(application).save();
+}
+
+
 
 function findById(applicationId) {
   let data = null;
@@ -249,6 +297,26 @@ function findApplicationByIdAndUserId(applicationId, userId) {
 }
 
 
+async function findApplicationByCandidateIdAndJobId(candidateId, jobId) {
+  let data = null;
+
+  if(candidateId==null || jobId==null){
+    return;
+  }
+
+  let application = await Application.aggregate([
+    { $match: {user: candidateId, jobId: jobId} },
+    { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+    { $unwind: '$user '},
+    { $limit: 1 }
+  ]);
+
+
+  data = application.length?application[0]:null;
+
+  return data;
+}
+
 async function findApplicationByUserIdAndJobId(userId, jobId) {
   let data = null;
 
@@ -283,7 +351,7 @@ function findAppliedCountByUserIdAndJobId(userId, jobId) {
 
 
 
-async function disqualifyApplication(applicationId, reason, member) {
+async function disqualify(applicationId, reason, member) {
   let result = null;
 
   if(!applicationId || !reason || !member){
@@ -308,7 +376,7 @@ async function disqualifyApplication(applicationId, reason, member) {
 }
 
 
-async function revertApplication(applicationId, member) {
+async function revert(applicationId, member) {
   let result = null;
 
   if(!applicationId || !member){
@@ -332,7 +400,7 @@ async function revertApplication(applicationId, member) {
 
 
 
-async function deleteApplication(applicationId, member) {
+async function remove(applicationId, member) {
   let result = null;
 
   if(!applicationId || !member){
@@ -346,6 +414,45 @@ async function deleteApplication(applicationId, member) {
     application = await application.save();
     let job = await jobService.findJob_Id(ObjectID(application.jobId));
     await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DELETED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
+    result = {status: statusEnum.DELETED};
+  }
+  return result;
+}
+
+
+
+async function accept(applicationId, member) {
+  let result = null;
+
+  if(!applicationId || !member){
+    return;
+  }
+
+
+  let application = await Application.findById(applicationId).populate('user');
+  if(application){
+    application.status = statusEnum.ACTIVE;
+    application = await application.save();
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.ACCEPTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, jobId: application.jobId}});
+    result = {status: statusEnum.ACTIVE};
+  }
+  return result;
+}
+
+
+async function reject(applicationId, member) {
+  let result = null;
+
+  if(!applicationId || !member){
+    return;
+  }
+
+  let application = await Application.findById(applicationId).populate('user');
+  if(application){
+    application.status = statusEnum.REJECTED;
+    application = await application.save();
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REJECTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, jobId: application.jobId}});
+    result = {status: statusEnum.REJECTED};
   }
   return result;
 }
@@ -396,48 +503,101 @@ async function getApplicationActivities(applicationId) {
 
 
 
-function applyJob(application) {
+async function apply(application) {
   let data = null;
 
-  if(application==null){
+  if(!application){
     return;
   }
 
-  application.attachment = '';
-  application.status = applicationEnum.ACTIVE;
-
-  // return new Application(application).save();
-
-  // let saveApplication = new Application(application).save(function (err) {
-  //   if (err) return handleError(err);
-  //
-  //   console.log('saved', this._id);
-  //   const applicationProgress = new ApplicationProgress({
-  //     status: applicationEnum.APPLIED,
-  //     application: this._id
-  //   });
-  //
-  //   applicationProgress.save(function (err) {
-  //     if (err) return handleError(err);
-  //   });
-  //
-  //
-  // });
-  // return saveApplication;
-
-  // return new Application(application).save();
-
-  application = new Application(application).save();
-
-  // const applicationProgress = await new ApplicationProgress({
-  //   status: applicationEnum.APPLIED,
-  //   application: application._id
-  // });
-
-  // console.log('progress', applicationProgress)
+  application = await Joi.validate(application, applicationSchema, {abortEarly: false});
 
 
-  return application;
+
+  let savedApplication = await new Application(application).save();
+  if (savedApplication) {
+    let jobPipeline = await pipelineService.getPipelineById(application.jobId.pipeline);
+    if (jobPipeline) {
+      let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
+
+      let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
+
+      application.jobId.noOfApplied+=1;
+      // progress.stage = applyStage._id;
+
+      if(jobPipeline.autoRejectBlackList && candidate.flag){
+        savedApplication.status = applicationEnum.REJECTED;
+      }
+
+      savedApplication.progress.push(progress._id);
+      savedApplication.allProgress.push(progress._id)
+      savedApplication.currentProgress = progress._id;
+
+
+      if(application.applicationQuestions) {
+        application.applicationQuestions.createdBy = application.user.userId;
+        let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
+
+        if (questionSubmission) {
+          savedApplication.questionSubmission = questionSubmission._id;
+          savedApplication.hasSubmittedQuestion = true;
+        }
+      }
+
+      let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
+
+      application.user.applications.push(savedApplication._id);
+      await application.user.save();
+      await application.jobId.save();
+      await stageService.createTasksForStage(applyStage, application.jobId.title, taskMeta);
+
+      let campaign;
+      if(application.token){
+        campaign = await emailCampaignService.findByToken(application.token);
+      } else {
+        campaign = await emailCampaignService.findByEmailAndJobId(application.email, application.jobId._id);
+      }
+
+      savedApplication = await savedApplication.save();
+
+      if(campaign) {
+        let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
+        if (!exists) {
+          let organic = campaign.token===application.token?true:false;
+          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: organic});
+          campaign.stages.push(campaign);
+          campaign.currentStage = stage;
+          campaign.application = savedApplication;
+          await campaign.save();
+        }
+      }
+
+    }
+
+
+    let activity = await activityService.addActivity({causer: application.user._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobId: application.jobId._id, jobTitle: application.jobId.title}});
+
+
+    //Create Notification
+    let meta = {
+      companyId: application.jobId.company,
+      jobId: application.jobId._id,
+      jobTitle: application.jobId.title,
+      applicationId: savedApplication.applicationId,
+      applicantId: application.user.userId,
+      createdBy: application.jobId.createdBy.userId
+    };
+
+    await await feedService.createNotification(application.jobId.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+
+    if (application.follow) {
+      await feedService.followCompany(application.jobId.company, application.user.userId);
+    }
+
+  }
+
+
+  return savedApplication;
 
 }
 
@@ -1131,22 +1291,26 @@ async function searchEmails(applicationId, sort) {
 
 
 module.exports = {
+  add:add,
   findById: findById,
   findApplicationById: findApplicationById,
   findApplicationBy_Id:findApplicationBy_Id,
   findApplicationsByJobIds:findApplicationsByJobIds,
   findApplicationByUserId: findApplicationByUserId,
+  findApplicationByCandidateIdAndJobId: findApplicationByCandidateIdAndJobId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
   findAppliedCountByJobId: findAppliedCountByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
   findApplicationsByUserId:findApplicationsByUserId,
   getLatestCandidates:getLatestCandidates,
-  disqualifyApplication:disqualifyApplication,
-  revertApplication:revertApplication,
-  deleteApplication:deleteApplication,
+  disqualify:disqualify,
+  revert:revert,
+  remove:remove,
+  accept:accept,
+  reject:reject,
   getApplicationActivities:getApplicationActivities,
-  applyJob: applyJob,
+  apply: apply,
   getCompanyInsight: getCompanyInsight,
   getJobInsight:getJobInsight,
   getCandidatesSourceByCompanyId:getCandidatesSourceByCompanyId,

@@ -11,6 +11,7 @@ module.exports = {
   INACTIVE: "INACTIVE",
   READ: 'READ',
   REPORTED: 'REPORTED',
+  REJECTED: 'REJECTED',
   SUSPENDED: 'SUSPENDED',     //SUSPENDED by reported User or Admin
   UNREAD: 'UNREAD'
 };

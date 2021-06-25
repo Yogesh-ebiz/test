@@ -182,17 +182,18 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
         return res;
       }, []);
 
-      await sourceService.removeMany(sourcesRemoving)
+      await sourceService.remove(sourcesRemoving)
 
       let sourcesAdding = _.reduce(jobIds, function(res, id){
         let exist = _.find(sources, {jobId: id});
         if(!exist){
-          res.push({jobId: id, candidate: candidate._id, createdBy: member._id})
+          res.push({job: id, candidate: candidate._id, createdBy: member._id})
         }
         return res;
       }, []);
 
-      await sourceService.addSources(sourcesAdding);
+      console.log(sourcesAdding)
+      result = await sourceService.addSources(sourcesAdding);
 
     }
 
@@ -203,6 +204,6 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
   }
 
 
-  return result
+  return {success: true}
 }
 

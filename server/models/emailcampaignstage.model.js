@@ -14,6 +14,9 @@ const EmailCampaignStageSchema = new mongoose.Schema({
   type: {
     type: String
   },
+  organic: {
+    type: Boolean
+  },
   createdDate: {
     type: Number,
     required: false,
@@ -24,7 +27,7 @@ const EmailCampaignStageSchema = new mongoose.Schema({
   versionKey: false
 });
 
-EmailCampaignProgressSchema.plugin(mongoosePaginate);
+EmailCampaignStageSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('EmailCampaignStage', EmailCampaignStageSchema);
 

@@ -21,10 +21,10 @@ const SourceSchema = new mongoose.Schema({
     type: Date,
     required: false
   },
-  jobId: {
-    type: Object,
-    required: true
+  hasApplied: {
+    type: Boolean
   },
+  job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
   updatedBy: { type: Schema.Types.ObjectId, ref: 'Candidate' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'Candidate' },
   candidate: { type: Schema.Types.ObjectId, ref: 'Candidate' },

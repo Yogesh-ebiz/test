@@ -9,8 +9,7 @@ const statusEnum = require('../const/statusEnum');
 
 const ApplicationSchema = new mongoose.Schema({
   applicationId: {
-    type: Number,
-    required: true
+    type: Number
   },
   jobId: {
     type: Object,
@@ -108,6 +107,9 @@ const ApplicationSchema = new mongoose.Schema({
   },
   sources: {
     type: Array
+  },
+  token: {
+    type: String
   },
   questionSubmission: { type: Schema.Types.ObjectId, ref: 'QuestionSubmission' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],

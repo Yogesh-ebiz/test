@@ -27,11 +27,22 @@ const memberSchema = Joi.object({
 
 const subscriptionSchema = Joi.object({
   createdBy: Joi.number().required(),
-  memberId: Joi.object().required(),
+  member: Joi.object().required(),
   subjectType: Joi.string().required(),
-  subjectId: Joi.object().required()
+  subject: Joi.object().required()
 });
 
+
+
+async function findById(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  return Member.findById(id).populate('role');
+}
 
 async function inviteMembers(company, currentUserId, emails, role) {
   let data = null;
@@ -559,6 +570,7 @@ async function findApplicationSubscriptions(memberId, sort) {
 
 
 module.exports = {
+  findById:findById,
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   cancelMemberInvitation:cancelMemberInvitation,

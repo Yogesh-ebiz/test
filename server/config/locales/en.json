@@ -208,5 +208,11 @@
 	"card_verified_successful": "card_verified_successful",
 	"activities_retrieved_successful": "activities_retrieved_successful",
 	"sources_retrieved_successful": "sources_retrieved_successful",
-	"email_composed_successful": "email_composed_successful"
+	"email_composed_successful": "email_composed_successful",
+	"filters_retrieved_successful": "filters_retrieved_successful",
+	"application_rejected_successful": "application_rejected_successful",
+	"member_retrieved_successful": "member_retrieved_successful",
+	"source_removed_successful": "source_removed_successful",
+	"source_added_successful": "source_added_successful",
+	"sources_removed_successful": "sources_removed_successful"
 }

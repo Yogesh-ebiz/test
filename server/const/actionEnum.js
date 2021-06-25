@@ -1,4 +1,5 @@
 module.exports = {
+  ACCEPTED: 'ACCEPTED',
   ADDED: 'ADDED',
   APPLIED: 'APPLIED',
   SENT: "SENT",

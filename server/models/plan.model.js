@@ -13,18 +13,39 @@ const PlanSchema = new mongoose.Schema({
     default: Date.now
   },
   lastUpdatedDate: {
-    type: Number,
-    required: false
+    type: Number
   },
   status: {
-    type: String,
-    required: false
+    type: String
   },
   name: {
-    type: String,
-    required: true
+    type: String
   },
   description: {
+    type: String
+  },
+  price: {
+    type: Object
+  },
+  type: {
+    type: String
+  },
+  category: {
+    type: String
+  },
+  image_url: {
+    type: String
+  },
+  isRecommended: {
+    type: Boolean
+  },
+  hasPurchased: {
+    type: Boolean
+  },
+  recurring: {
+    type: Object
+  },
+  productId: {
     type: String
   }
 }, {

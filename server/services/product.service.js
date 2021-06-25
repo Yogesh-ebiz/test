@@ -56,7 +56,7 @@ async function update(id, form) {
     product.lastUpdatedDate = Date.now();
     product.name = form.name;
     product.description = form.description;
-    product.listPrice = form.listPrice;
+    product.price.listPrice = form.price.listPrice;
 
     result = await product.save();
   }

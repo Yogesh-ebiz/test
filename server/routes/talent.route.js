@@ -59,13 +59,14 @@ router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updat
 router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
-router.route('/company/:id/jobs/:jobId/sources').post(asyncHandler(searchSources));
 
+router.route('/company/:id/jobs/:jobId/sources/:sourceId').post(asyncHandler(addSourceApplication));
 router.route('/company/:id/jobs/:jobId/campaigns').post(asyncHandler(searchCampaigns));
 
 router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
+router.route('/company/:id/applications').post(asyncHandler(addApplication));
 router.route('/company/:id/applications/endingsoon').get(asyncHandler(getAllApplicationsEndingSoon));
 router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
@@ -92,18 +93,22 @@ router.route('/company/:id/applications/:applicationId/progress/:progressId/even
 router.route('/company/:id/applications/:applicationId/disqualify').post(asyncHandler(disqualifyApplication));
 router.route('/company/:id/applications/:applicationId/revert').post(asyncHandler(revertApplication));
 router.route('/company/:id/applications/:applicationId').delete(asyncHandler(deleteApplication));
+router.route('/company/:id/applications/:applicationId/accept').post(asyncHandler(acceptApplication));
+router.route('/company/:id/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 
 
 router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHandler(subscribeApplication));
 router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
 
 router.route('/company/:id/applications/:applicationId/activities').get(asyncHandler(getApplicationActivities));
+router.route('/company/:id/applications/:applicationId/upload').post(asyncHandler(uploadApplication));
 router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(getFiles));
 
 
 
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
+router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
 router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
 router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
 router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
@@ -153,6 +158,7 @@ router.route('/company/:id/members/invites/:invitationId').delete(asyncHandler(c
 
 router.route('/company/:id/members').get(asyncHandler(getCompanyMembers));
 router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
+router.route('/company/:id/members/:memberId').get(asyncHandler(getCompanyMember));
 router.route('/company/:id/members/:memberId').put(asyncHandler(updateCompanyMember));
 router.route('/company/:id/members/:memberId/role').put(asyncHandler(updateCompanyMemberRole));
 router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompanyMember));
@@ -192,6 +198,7 @@ router.route('/company/:id/evaluations/templates').post(asyncHandler(addCompanyE
 router.route('/company/:id/evaluations/templates/:templateId').get(asyncHandler(getCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/templates/:templateId').put(asyncHandler(updateCompanyEvaluationTemplate));
 router.route('/company/:id/evaluations/templates/:templateId').delete(asyncHandler(deleteCompanyEvaluationTemplate));
+router.route('/company/:id/evaluations/filters').get(asyncHandler(getEvaluationFilters));
 
 
 
@@ -203,6 +210,9 @@ router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(de
 router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 
 
+router.route('/company/:id/sources').post(asyncHandler(searchSources));
+router.route('/company/:id/sources/:sourceId').delete(asyncHandler(removeSources));
+router.route('/company/:id/sources').delete(asyncHandler(removeSources));
 
 
 async function getUserSession(req, res) {
@@ -563,16 +573,51 @@ async function updateApplication(req, res) {
 async function searchSources(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let data;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let filter = req.body;
   let sort = req.query;
   filter.query = req.query.query;
 
+  filter.jobs = _.reduce(filter.jobs, function(res, job){res.push(ObjectID(job)); return res;}, []);
 
-  data = await talentCtrl.searchSources(currentUserId, company, filter, sort, res.locale);
+  data = await talentCtrl.searchSources(companyId, currentUserId, filter, sort, res.locale);
   res.json(new Response(data, data?'sources_retrieved_successful':'not_found', res));
 }
 
+
+
+async function removeSource(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+  let companyId = parseInt(req.params.id);
+  let source = ObjectID(req.param.sourceId);
+  data = await talentCtrl.removeSources(companyId, currentUserId, [source]);
+  res.json(new Response(data, data?'sources_removed_successful':'not_found', res));
+}
+
+
+async function removeSources(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+  let companyId = parseInt(req.params.id);
+  let sources = _.reduce(req.body.sources, function(res, id){res.push(ObjectID(id)); return res;}, []);
+  data = await talentCtrl.removeSources(companyId, currentUserId, sources);
+  res.json(new Response(data, data?'sources_removed_successful':'not_found', res));
+}
+
+
+async function addSourceApplication(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let jobId = ObjectID(req.params.jobId);
+  let sourceId = ObjectID(req.params.sourceId);
+
+  let application = req.body;
+  application.stage = ObjectID(application.stage);
+
+  let data = await talentCtrl.addSourceApplication(company, currentUserId, jobId, sourceId, application);
+  res.json(new Response(data, data?'source_added_successful':'not_found', res));
+}
 
 
 async function searchCampaigns(req, res) {
@@ -590,6 +635,16 @@ async function searchCampaigns(req, res) {
 }
 
 
+async function addApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let form = req.body;
+  form.jobId = ObjectID(form.jobId);
+  form.user = ObjectID(form.user);
+  let data = await talentCtrl.addApplication(companyId, currentUserId, form);
+
+  res.json(new Response(data, data?'applicagion_retrieved_successful':'not_found', res));
+}
 
 
 async function getAllApplicationsEndingSoon(req, res) {
@@ -841,6 +896,26 @@ async function deleteApplication(req, res) {
 }
 
 
+async function acceptApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = ObjectID(req.params.applicationId);
+
+  let data = await talentCtrl.acceptApplication(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_accepted_successful':'not_found', res));
+}
+
+async function rejectApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = ObjectID(req.params.applicationId);
+
+  let data = await talentCtrl.rejectApplication(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_rejected_successful':'not_found', res));
+}
+
 async function subscribeApplication(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -990,6 +1065,18 @@ async function getCandidateById(req, res) {
 }
 
 
+async function updateCandidateById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+  let company = parseInt(req.params.id);
+  let candidateId = parseInt(req.params.candidateId);
+  let form = req.body;
+
+  data = await talentCtrl.updateCandidateById(currentUserId, company, candidateId, form);
+  res.json(new Response(data, data?'candidate_retrieved_successful':'not_found', res));
+}
+
+
 
 async function addCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);
@@ -1105,8 +1192,9 @@ async function getCandidateEvaluationsStats(req, res) {
   let candidateId = parseInt(req.params.candidateId);
   let type = req.query.type;
   let stages = req.query.stage?req.query.stage.split(','):[]
+  let applicationId = req.query.applicationId?ObjectID(req.query.applicationId):null;
 
-  let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages);
+  let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages, applicationId);
 
   res.json(new Response(data, data?'evaluationstats_retrieved_successful':'not_found', res));
 }
@@ -1452,6 +1540,20 @@ async function addCompanyMember(req, res) {
   res.json(new Response(data, data?'member_added_successful':'not_found', res));
 }
 
+
+async function getCompanyMember(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let memberId = req.params.memberId;
+  let member = req.body;
+  member.company = company;
+  member.createdBy = currentUserId;
+
+  let data = await talentCtrl.getCompanyMember(company, memberId, currentUserId, member);
+  res.json(new Response(data, data?'member_retrieved_successful':'not_found', res));
+}
+
+
 async function updateCompanyMember(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -1724,6 +1826,16 @@ async function getPeopleFlagged(req, res) {
   res.json(new Response(data, data?'blacklist_retrieved_successful':'not_found', res));
 }
 
+
+async function uploadApplication(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = req.params.applicationId;
+  let data = await talentCtrl.uploadApplication(companyId, currentUserId, applicationId, req.files);
+
+  res.json(new Response(data, data?'files_retrieved_successful':'not_found', res));
+}
+
 async function getFiles(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
@@ -1787,6 +1899,15 @@ async function deleteCompanyEvaluationTemplate(req, res) {
 
   let data = await talentCtrl.deleteCompanyEvaluationTemplate(company, templateId, currentUserId);
   res.json(new Response(data, data?'evlaluation_deleted_successful':'not_found', res));
+}
+
+async function getEvaluationFilters(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+
+  let data = await talentCtrl.getEvaluationFilters(company, currentUserId);
+  res.json(new Response(data, data?'filters_retrieved_successful':'not_found', res));
 }
 
 

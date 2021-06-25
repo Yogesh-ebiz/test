@@ -8,14 +8,8 @@ const Joi = require('joi');
 
 
 const emailCampaignStageSchema = Joi.object({
-  token: Joi.string(),
-  createdBy: Joi.object(),
-  jobId: Joi.object(),
-  user: Joi.object().optional(),
-  userId: Joi.number(),
-  email: Joi.object(),
-  emailAddress: Joi.string(),
-  meta: Joi.object().optional(),
+  type: Joi.string(),
+  organic: Joi.boolean()
 });
 
 

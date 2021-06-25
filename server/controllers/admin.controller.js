@@ -64,7 +64,7 @@ async function addPlan(currentUserId, form) {
 
   let result;
   try {
-      result = await planService.addPlan(currentUserId, form);
+      result = await planService.add(currentUserId, form);
 
   } catch (error) {
     console.log(error);

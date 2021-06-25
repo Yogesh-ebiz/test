@@ -214,6 +214,17 @@ function searchTitle(keyword) {
   ])
 }
 
+
+function findById(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  return JobRequisition.findById(id);
+}
+
 async function findJobId(jobId, locale) {
   let data = null;
 
@@ -725,6 +736,7 @@ module.exports = {
   addJob:addJob,
   updateJob:updateJob,
   searchTitle: searchTitle,
+  findById:findById,
   findJobId: findJobId,
   findJob_Id:findJob_Id,
   findJobIds: findJobIds,

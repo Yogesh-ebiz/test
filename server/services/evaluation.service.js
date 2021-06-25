@@ -429,21 +429,26 @@ async function findByCandidateAndApplicationId(userId, filter, sort) {
 }
 
 
-async function getCandidateEvaluationsStats(userId, companyId, type, stages) {
+async function getCandidateEvaluationsStats(userId, companyId, type, stages, applicationId) {
   if(!userId || !companyId || !type || !stages){
     return;
   }
 
   let result = {internal: {}, external: {}};
-  let match = {partyId: userId};
+  let $match = {partyId: userId};
   if(type==='INTERNAL'){
-    match.companyId = companyId;
+    $match.companyId = companyId;
   } else if(type==='EXTERNAL'){
-    match.companyId = {$ne: companyId };
+    $match.companyId = {$ne: companyId };
   }
 
+  if(applicationId){
+    $match.applicationId = applicationId;
+  }
+
+  console.log($match)
   let aggregate = [{
-    $match: match
+    $match: $match
   },
     {
       $lookup: {
@@ -480,10 +485,8 @@ async function getCandidateEvaluationsStats(userId, companyId, type, stages) {
   let evaluations = await Evaluation.aggregate(aggregate);
 
   if(evaluations) {
-
-
     let data = _.reduce(evaluations, function (res, evaluation) {
-      let assessment = _.omit(evaluation.assessment, ['_id', 'createdBy', 'createdDate', 'candidateId',])
+      let assessment = _.omit(evaluation.assessment, ['_id', 'createdBy', 'createdDate', 'candidateId'])
 
 
       for (const prop in assessment) {
@@ -563,6 +566,38 @@ async function getEvaluationsByCandidateList(userIds) {
 
 }
 
+
+async function getFilters(companyId) {
+  if(!companyId){
+    return;
+  }
+
+  let result = {applications: []};
+  let applications = await Evaluation.aggregate([
+    {$match: {companyId: companyId } },
+    {
+      $lookup: {
+        from: 'applications',
+        localField: 'applicationId',
+        foreignField: '_id',
+        as: 'applicationId',
+      }
+    },
+    { $unwind: '$applicationId' }
+  ]);
+
+  result.applications = _.reduce(applications, function(res, item){
+    let exists = _.find(result.applications, {_id: item._id});
+    if(!exists) {
+      res.push({_id: item.applicationId._id, jobTitle: item.applicationId.jobTitle});
+    }
+    return res;
+    }, []);
+
+  return result;
+
+}
+
 module.exports = {
   findById:findById,
   add:add,
@@ -574,5 +609,6 @@ module.exports = {
   findByCandidateAndApplicationId:findByCandidateAndApplicationId,
   getCandidateEvaluationsStats:getCandidateEvaluationsStats,
   getCandidateEvaluations:getCandidateEvaluations,
-  getEvaluationsByCandidateList:getEvaluationsByCandidateList
+  getEvaluationsByCandidateList:getEvaluationsByCandidateList,
+  getFilters:getFilters
 }

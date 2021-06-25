@@ -12,7 +12,7 @@ const MemberSubscribeSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  memberId: {
+  member: {
     type: Object,
     required: true
   },
@@ -20,7 +20,7 @@ const MemberSubscribeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  subjectId: {
+  subject: {
     type: Object,
     required: true
   },

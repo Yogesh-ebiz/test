@@ -25,6 +25,7 @@ router.route('/company/top-five').get(asyncHandler(getTopFiveJobs));
 router.route('/:id').get(asyncHandler(getJobById));
 router.route('/:id').put(asyncHandler(updateJobById));
 router.route('/:id/report').post(asyncHandler(reportJobById));
+router.route('/:id/capture').get(asyncHandler(captureJob));
 
 
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
@@ -68,6 +69,7 @@ async function getJobById(req, res) {
 }
 
 
+
 async function updateJobById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
@@ -92,6 +94,15 @@ async function reportJobById(req, res) {
 }
 
 
+async function captureJob(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let jobId = parseInt(req.params.id);
+  let capture = {type: req.query.type, token: req.query.token};
+  let data = await jobRequisitionCtl.captureJob(currentUserId, jobId, capture);
+
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
 
 async function jobLanding(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -178,7 +189,8 @@ async function addBookmark(req, res) {
   // console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = ObjectID(req.params.id);
-  let data = await jobRequisitionCtl.addBookmark(currentUserId, jobId);
+  let token = req.query.token;
+  let data = await jobRequisitionCtl.addBookmark(currentUserId, jobId, token);
 
   res.json(new Response(data, data?'bookmark_saved_successful':'not_found', res));
 }

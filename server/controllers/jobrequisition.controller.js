@@ -14,12 +14,16 @@ const notificationType = require('../const/notificationType');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const jobType = require('../const/jobType');
+const emailCampaignStageType = require('../const/emailCampaignStageType');
 
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties} = require('../services/party.service');
 const feedService = require('../services/api/feed.service.api');
 const candidateService = require('../services/candidate.service');
 const activityService = require('../services/activity.service');
+const emailCampaignService = require('../services/emailcampaign.service');
+const emailCampaignServiceStage = require('../services/emailcampaignstage.service');
+const applicationService = require('../services/application.service');
 
 
 const {getListofSkillTypes} = require('../services/skilltype.service');
@@ -99,6 +103,7 @@ module.exports = {
   getJobById,
   updateJobById,
   reportJobById,
+  captureJob,
   getJobLanding,
   getTopFiveJobs,
   searchJob,
@@ -152,9 +157,9 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         partySkills = await findUserSkillsById(currentParty.id);
         partySkills = _.map(partySkills, "id");
 
-        await addJobViewByUserId(currentParty.id, job.company, job._id);
-        job.noOfViews++;
-        await job.save();
+        // await addJobViewByUserId(currentParty.id, job.company, job._id);
+        // job.noOfViews++;
+        // await job.save();
       }
 
 
@@ -378,6 +383,46 @@ async function reportJobById(currentUserId, jobId, report) {
 
   return newReport;
 }
+
+
+async function captureJob(currentUserId, jobId, capture) {
+
+  if(!jobId || !currentUserId || !capture){
+    return null;
+  }
+
+  try {
+    let job = await findJobId(jobId);
+
+    if(job) {
+
+      let currentParty = await findByUserId(currentUserId);
+
+      await addJobViewByUserId({partyId: currentParty.id, company: job.company, jobId: job._id, token: capture.token});
+      job.noOfViews++;
+      await job.save();
+
+      if(capture.token) {
+        let campaign = await emailCampaignService.findByToken(capture.token);
+        if(campaign) {
+          let exists = _.find(campaign.stages, {type: capture.type});
+          if (!exists) {
+            let stage = await emailCampaignServiceStage.add({type: capture.type, organic: campaign ? true : false});
+            campaign.stages.push(campaign);
+            campaign.currentStage = stage;
+            await campaign.save();
+          }
+        }
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {success: true};
+}
+
 
 async function getCategories(locale) {
 
@@ -818,7 +863,7 @@ async function applyJobById(currentUserId, jobId, application ) {
     if (isPartyActive(currentParty)) {
 
       let candidate = null;
-      let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE });
+      let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE }).populate('createdBy');
       if(job) {
         let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
         if(!candidate){
@@ -834,12 +879,10 @@ async function applyJobById(currentUserId, jobId, application ) {
         }
         candidate.hasApplied = true;
 
-        application.user = candidate._id;
-        application.jobId = job._id;
+        application.user = candidate;
+        application.jobId = job;
         application.jobTitle = job.title;
         application.partyId = currentParty.id;
-
-        application = await Joi.validate(application, applicationSchema, {abortEarly: false});
         application.company = job.company
 
         let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
@@ -859,75 +902,8 @@ async function applyJobById(currentUserId, jobId, application ) {
             delete application.source;
           }
 
-          savedApplication = await applyJob(application);
 
-
-          if (savedApplication) {
-            let jobPipeline = await getPipelineById(job.pipeline);
-            if (jobPipeline) {
-              let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
-
-              let progress = await  addApplicationProgress({
-                applicationId: savedApplication.applicationId,
-                stage: applyStage._id
-              });
-
-              job.noOfApplied+=1;
-              // progress.stage = applyStage._id;
-
-              if(jobPipeline.autoRejectBlackList && candidate.flag){
-                savedApplication.status = applicationEnum.REJECTED;
-              }
-
-              savedApplication.progress.push(progress._id);
-              savedApplication.allProgress.push(progress._id)
-              savedApplication.currentProgress = progress._id;
-
-
-              if(application.applicationQuestions) {
-                application.applicationQuestions.createdBy = currentUserId;
-                let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
-
-                if (questionSubmission) {
-                  savedApplication.questionSubmission = questionSubmission._id;
-                  savedApplication.hasSubmittedQuestion = true;
-                }
-              }
-
-              let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
-
-              candidate.applications.push(savedApplication._id);
-              await candidate.save();
-              await job.save();
-              await stageService.createTasksForStage(applyStage, job.title, taskMeta);
-              savedApplication = await savedApplication.save();
-            }
-
-
-
-            let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: currentParty.firstName + ' ' + currentParty.lastName, candidate: candidate._id, jobId: job._id, jobTitle: job.title}});
-
-
-
-            //Create Notification
-            let meta = {
-              companyId: job.company,
-              jobId: job.jobId,
-              jobTitle: job.title,
-              applicationId: savedApplication.applicationId,
-              applicantId: currentUserId,
-              createdBy: job.createdBy
-            };
-
-            // await feedService.createNotification(currentUserId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
-
-            //TODO: Call Follow API
-            if (application.follow) {
-              await followCompany(job.company, currentUserId);
-            }
-
-          }
-
+          savedApplication = await applicationService.apply(application);
         }
       }
     }
@@ -941,7 +917,7 @@ async function applyJobById(currentUserId, jobId, application ) {
   return savedApplication;
 }
 
-async function addBookmark(currentUserId, jobId) {
+async function addBookmark(currentUserId, jobId, token) {
 
   if(!currentUserId || !jobId){
     return null;
@@ -950,13 +926,23 @@ async function addBookmark(currentUserId, jobId) {
 
   let result;
   try {
-    console.log(jobId)
     let job = await JobRequisition.findById(jobId);
     if(job) {
       result = await bookmarkService.findBookById(currentUserId, ObjectID(jobId));
 
       if(!result) {
-        result = await bookmarkService.addBook(currentUserId, job.company, job._id);
+        result = await bookmarkService.addBook({partyId: currentUserId, company: job.company, jobId: job._id, token: token});
+
+        if(token) {
+          let campaign = await emailCampaignService.findByToken(token);
+          let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
+          if(!exists){
+            let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?true:false});
+            campaign.stages.push(campaign);
+            campaign.currentStage = stage;
+            await campaign.save();
+          }
+        }
       }
 
 

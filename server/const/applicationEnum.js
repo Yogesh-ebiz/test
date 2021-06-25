@@ -1,4 +1,5 @@
 module.exports = {
+  ACCEPTED: 'ACCEPTED',
   APPLIED: 'APPLIED',
   ACTIVE: 'ACTIVE',
   CANCELLED: 'CANCELLED',
