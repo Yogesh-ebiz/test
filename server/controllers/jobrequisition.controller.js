@@ -614,7 +614,7 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   }
 
   filter.status = [statusEnum.ACTIVE];
-  filter.types = [jobType.FREE, jobType.PROMOTE];
+  filter.types = [jobType.FREE, jobType.PROMOTION];
 
   let aList = [];
   let aMatch = { $match: new SearchParam(filter)};

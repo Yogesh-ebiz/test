@@ -1283,7 +1283,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
     if(job){
       job.status = statusEnum.ACTIVE;
       job.publishedDate = Date.now();
-      job.type = jobType.PROMOTE;
+      job.type = jobType.PROMOTION;
       job = await job.save();
     }
 
