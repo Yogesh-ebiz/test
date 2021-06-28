@@ -19,6 +19,7 @@ const productRoutes = require('./product.route');
 const peopleRoutes = require('./people.route');
 const emailRoutes = require('./email.route');
 const taskRoutes = require('./task.route');
+const adRoutes = require('./ad.route');
 
 const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
@@ -33,7 +34,7 @@ router.get('/health-check', (req, res) =>
 );
 
 router.use('/auth', authRoutes);
-
+router.use('/ads', adRoutes);
 router.use('/admin', adminRoutes);
 
 router.use('/applications', applicationRoutes);

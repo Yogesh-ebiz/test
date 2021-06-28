@@ -214,5 +214,6 @@
 	"member_retrieved_successful": "member_retrieved_successful",
 	"source_removed_successful": "source_removed_successful",
 	"source_added_successful": "source_added_successful",
-	"sources_removed_successful": "sources_removed_successful"
+	"sources_removed_successful": "sources_removed_successful",
+	"ads_retrieved_successful": "ads_retrieved_successful"
 }

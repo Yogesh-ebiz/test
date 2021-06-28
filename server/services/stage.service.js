@@ -82,9 +82,10 @@ async function createTasksForStage(stage, jobTitle, meta) {
           break;
       }
 
-      await add(newTask)
+      // await add(newTask)
+      task = await add(newTask);
     }
-    // task = await add(task)
+
   }
 
   stage = new Stage(stage).save();

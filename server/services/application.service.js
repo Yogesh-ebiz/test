@@ -509,6 +509,7 @@ async function apply(application) {
     return;
   }
 
+
   let job = application.jobId;
   let candidate = application.user;
   application.jobId = job._id;
@@ -519,6 +520,7 @@ async function apply(application) {
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
     let jobPipeline = await pipelineService.getPipelineById(job.pipeline);
+
     if (jobPipeline) {
 
       let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
@@ -550,7 +552,7 @@ async function apply(application) {
       await candidate.save();
       await job.save();
 
-      await stageService.createTasksForStage(applyStage, application.jobId.title, taskMeta);
+      await stageService.createTasksForStage(applyStage, job.title, taskMeta);
 
       let campaign;
       if(application.token){
@@ -564,7 +566,7 @@ async function apply(application) {
       if(campaign) {
         let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
         if (!exists) {
-          let organic = campaign.token===application.token?true:false;
+          let organic = campaign.token===application.token?false:true;
           let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: organic});
           campaign.stages.push(campaign);
           campaign.currentStage = stage;

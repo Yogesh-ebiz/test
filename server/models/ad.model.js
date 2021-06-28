@@ -11,42 +11,31 @@ const AdSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  internalCode: {
+  start_time: {
     type: String,
     required: false
   },
-  internalCode: {
+  end_time: {
     type: String,
     required: false
   },
-  internalCode: {
+  campaign_id: {
     type: String,
     required: false
   },
-  internalCode: {
+  bid_amount: {
     type: String,
     required: false
   },
-  internalCode: {
+  billing_event: {
     type: String,
     required: false
   },
-  internalCode: {
+  optimization_goal: {
     type: String,
     required: false
   },
-  internalCode: {
-    type: String,
-    required: false
-  },
-  internalCode: {
-    type: String,
-    required: false
-  },
-  internalCode: {
-    type: String,
-    required: false
-  },
+  targeting: { type: Schema.Types.ObjectId, ref: 'Target' },
   ads: [{ type: Schema.Types.ObjectId, ref: 'Ad' }],
 }, {
   versionKey: false
@@ -55,13 +44,6 @@ const AdSchema = new mongoose.Schema({
 
 module.exports = mongoose.model('Ad', AdSchema);
 
-
-//
-// {
-//   'name' : 'My First AdSet',
-//   'lifetime_budget' : '20000',
-//   'start_time' : '2021-04-25T09:42:08-0700',
-//   'end_time' : '2021-05-02T09:42:08-0700',
 //   'campaign_id' : '<adCampaignLinkClicksID>',
 //   'bid_amount' : '500',
 //   'billing_event' : 'IMPRESSIONS',

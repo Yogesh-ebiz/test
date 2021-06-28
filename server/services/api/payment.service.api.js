@@ -113,9 +113,30 @@ async function addProduct(userId, form) {
 };
 
 
+async function getAdroducts() {
+
+  let response = await client.get(`/products/providers?types=JOB`, null, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });;
+
+
+  return response.data;
+};
 
 
 module.exports = {
   charge:charge,
-  addProduct:addProduct
+  addProduct:addProduct,
+  getAdroducts:getAdroducts
 }

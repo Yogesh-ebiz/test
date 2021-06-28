@@ -407,7 +407,7 @@ async function captureJob(currentUserId, jobId, capture) {
         if(campaign) {
           let exists = _.find(campaign.stages, {type: capture.type});
           if (!exists) {
-            let stage = await emailCampaignServiceStage.add({type: capture.type, organic: campaign ? true : false});
+            let stage = await emailCampaignServiceStage.add({type: capture.type, organic: campaign ? false : true});
             campaign.stages.push(campaign);
             campaign.currentStage = stage;
             await campaign.save();
@@ -937,7 +937,7 @@ async function addBookmark(currentUserId, jobId, token) {
           let campaign = await emailCampaignService.findByToken(token);
           let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
           if(!exists){
-            let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?true:false});
+            let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?false:true});
             campaign.stages.push(campaign);
             campaign.currentStage = stage;
             await campaign.save();
