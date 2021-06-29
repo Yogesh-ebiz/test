@@ -17,16 +17,16 @@ const TargetSchema = new mongoose.Schema({
   geo_locations: {
     type: Object,
   },
-  interests: {
+  ad_positions: {
     type: Array,
   },
-  life_events: {
-    type: Array,
-  },
-  adPositions: {
-    type: Array,
-  },
-  behaviors: [{ type: Schema.Types.ObjectId, ref: "Behavior" }],
+  // interests: {
+  //   type: Array,
+  // },
+  // life_events: {
+  //   type: Array,
+  // },
+  // behaviors: [{ type: Schema.Types.ObjectId, ref: "Behavior" }],
 }, {
   versionKey: false
 });

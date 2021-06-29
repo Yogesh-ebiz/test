@@ -44,6 +44,17 @@ async function findById(id) {
   return Member.findById(id).populate('role');
 }
 
+
+async function findByUserId(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  return Member.findOne({userId: id}).populate('role');
+}
+
 async function inviteMembers(company, currentUserId, emails, role) {
   let data = null;
 
@@ -99,12 +110,12 @@ async function cancelMemberInvitation(company, invitationId) {
 
 async function getMembers(company) {
   let data = null;
-
   if(company==null){
     return;
   }
 
   let members = Member.find({company: company}).populate('role');
+  console.log(members)
   return members
 }
 
@@ -571,6 +582,7 @@ async function findApplicationSubscriptions(memberId, sort) {
 
 module.exports = {
   findById:findById,
+  findByUserId:findByUserId,
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   cancelMemberInvitation:cancelMemberInvitation,

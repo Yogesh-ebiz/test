@@ -159,6 +159,7 @@ router.route('/company/:id/members/invites/:invitationId').delete(asyncHandler(c
 router.route('/company/:id/members').get(asyncHandler(getCompanyMembers));
 router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
 router.route('/company/:id/members/:memberId').get(asyncHandler(getCompanyMember));
+
 router.route('/company/:id/members/:memberId').put(asyncHandler(updateCompanyMember));
 router.route('/company/:id/members/:memberId/role').put(asyncHandler(updateCompanyMemberRole));
 router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompanyMember));
@@ -1544,13 +1545,12 @@ async function getCompanyMember(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let memberId = req.params.memberId;
-  let member = req.body;
-  member.company = company;
-  member.createdBy = currentUserId;
 
-  let data = await talentCtrl.getCompanyMember(company, memberId, currentUserId, member);
+  let data = await talentCtrl.getCompanyMember(company, memberId, currentUserId);
   res.json(new Response(data, data?'member_retrieved_successful':'not_found', res));
 }
+
+
 
 
 async function updateCompanyMember(req, res) {

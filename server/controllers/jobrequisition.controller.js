@@ -876,6 +876,7 @@ async function applyJobById(currentUserId, jobId, application ) {
           candidate.firstName = currentParty.firstName;
           candidate.middleName = currentParty.middleName;
           candidate.lastName =  currentParty.lastName;
+          candidate.url = currentParty.shareUrl;
         }
         candidate.hasApplied = true;
 

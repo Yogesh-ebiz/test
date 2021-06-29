@@ -3999,7 +3999,6 @@ async function cancelMemberInvitation(companyId, currentUserId, invitationId) {
 
 
 async function getCompanyMembers(companyId, query, currentUserId, locale) {
-
   if(!companyId || !currentUserId){
     return null;
   }
@@ -4066,7 +4065,12 @@ async function getCompanyMember(companyId, memberId, currentUserId) {
 
   let result = null;
   try {
-    result = await memberService.findById(memberId);
+    if(isNaN(memberId)){
+      result = await memberService.findById(memberId);
+    } else {
+      result = await memberService.findByUserId(parseInt(memberId));
+    }
+
 
   } catch(e){
     console.log('updateCompanyMember: Error', e);
@@ -4075,6 +4079,8 @@ async function getCompanyMember(companyId, memberId, currentUserId) {
 
   return result
 }
+
+
 
 async function updateCompanyMember(companyId, memberId, currentUserId, form) {
   if(!companyId || !currentUserId || !memberId || !form){
