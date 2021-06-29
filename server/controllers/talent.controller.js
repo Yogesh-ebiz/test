@@ -270,15 +270,15 @@ async function getUserSession(currentUserId, preferredCompany) {
     return null;
   }
 
-
+  console.log(currentUserId)
   let result;
   let user = await feedService.findByUserId(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
+  let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
+  console.log(companies)
 
-  let companies = await feedService.searchCompany('', _.map(allAccounts, 'company'), currentUserId);
 
-
-  companies = _.reduce(companies.content, function(res, item){
+  companies = _.reduce(companies, function(res, item){
     let found = _.find(allAccounts, {company: item.id});
     item = convertToCompany(item);
     item.role = roleMinimal(found.role);
@@ -764,7 +764,7 @@ async function getCards(companyId, currentUserId) {
 
   let result = await cardService.findByUserId(currentUserId);
   result = _.reduce(result, function(res, c){
-    res.push({id: c._id, brand: c.brand, last4: c.last4, isDefault: c.isDefault});
+    res.push({id: c.id, brand: c.brand, last4: c.last4, isDefault: c.isDefault?true:false});
     return res;
   }, []);
   return result;

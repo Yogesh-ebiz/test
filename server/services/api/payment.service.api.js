@@ -134,9 +134,31 @@ async function getAdroducts() {
   return response.data;
 };
 
+async function getUserCards(userId) {
+
+  let response = await client.get(`/customers/${userId}/card/list`, null, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });;
+
+
+  return response.data;
+};
+
 
 module.exports = {
   charge:charge,
   addProduct:addProduct,
-  getAdroducts:getAdroducts
+  getAdroducts:getAdroducts,
+  getUserCards:getUserCards
 }

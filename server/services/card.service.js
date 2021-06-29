@@ -6,6 +6,7 @@ let SearchParam = require('../const/searchParam');
 const statusEnum = require('../const/statusEnum');
 const Card = require('../models/card.model');
 const feedService = require('../services/api/feed.service.api');
+const paymentService = require('../services/api/payment.service.api');
 
 const {convertToCandidate, cardTest} = require('../utils/helper');
 
@@ -16,6 +17,8 @@ const cardSchema = Joi.object({
   exp_year: Joi.number().required(),
   cvc: Joi.number().optional(),
   name: Joi.string().optional(),
+  email: Joi.string().optional(),
+  phone: Joi.string().allow('').optional(),
   address_line1: Joi.string(),
   address_line2: Joi.string().allow('').optional(),
   address_district: Joi.string().allow('').optional(),
@@ -100,12 +103,9 @@ async function findByUserId(userId) {
   if(!userId){
     return;
   }
-  return await Card.find({userId: userId}).limit(5);
-  // return [
-  //   {brand: 'Visa', last4: 4543, isDefault: false},
-  //   {brand: 'MasterCard', last4: 7544, isDefault: true},
-  //   {brand: 'Discover', last4: 6434, isDefault: false}
-  // ];
+
+  // return await Card.find({userId: userId}).limit(5);
+  return await paymentService.getUserCards(userId);
 }
 
 

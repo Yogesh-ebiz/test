@@ -30,12 +30,27 @@ async function register(user){
 
 
 
-async function registerCompany(company){
-  if(!company){
+async function registerCompany(userId, company){
+  if(!userId || !company){
     return null;
   }
 
-  let response = await client.post(`/company/register`, company, null);
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.post(`/company/register`, company, options);
+  return response.data.data;
+};
+
+async function getUserCompaniesCreated(userId){
+  if(!userId){
+    return null;
+  }
+
+
+  let response = await client.get(`/user/${userId}/company/created`, null, null);
   return response.data.data;
 };
 

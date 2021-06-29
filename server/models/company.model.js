@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const CompanySchema = new mongoose.Schema({
   name: {
@@ -23,7 +24,7 @@ const CompanySchema = new mongoose.Schema({
   status: {
     type: String
   },
-
+  subscription: { type: Schema.Types.ObjectId, ref: 'Subscription' },
 
 }, {
   versionKey: false

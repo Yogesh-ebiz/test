@@ -7,12 +7,11 @@ const Role = require('../models/role.model');
 function getRoleByRole(role) {
   let data = null;
 
-  if(role==null){
+  if(!role){
     return;
   }
 
-  console.log(role)
-  return Role.findOne({role: role});
+  return Role.findOne({default: true});
 }
 
 

@@ -37,8 +37,11 @@ const PaymentSchema = new mongoose.Schema({
   chargeId: {
     type: String
   },
+  product: {
+    type: String
+  },
   refund: { type: Schema.Types.ObjectId, ref: 'Refund' },
-  product: { type: Schema.Types.ObjectId, ref: 'Product' },
+  // product: { type: Schema.Types.ObjectId, ref: 'Product' },
   comments:[{ type: Schema.Types.ObjectId, ref: 'Comment'}],
   tags:[{ type: Schema.Types.ObjectId, ref: 'Label'}]
 }, {

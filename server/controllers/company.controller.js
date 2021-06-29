@@ -180,7 +180,7 @@ async function register(currentUserId, form) {
       company = await companyService.register(currentParty, form);
     }
   } catch(e){
-    console.log('addNewSalary: Error', e);
+    console.log('register: Error', e);
   }
 
 

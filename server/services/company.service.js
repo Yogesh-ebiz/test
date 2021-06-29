@@ -2,6 +2,8 @@ const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 
+const roleType = require('../const/roleType');
+
 const Company = require('../models/company.model');
 const CompanySalary = require('../models/companysalary.model');
 const CompanySalaryHistory = require('../models/companysalaryhistory.model');
@@ -20,8 +22,11 @@ const roleService = require('../services/role.service');
 
 const companySchema = Joi.object({
   name: Joi.string(),
+  displayName: Joi.string(),
   about: Joi.string().allow(''),
-  size: Joi.number(),
+  mission: Joi.string().allow(''),
+  size: Joi.string(),
+  type: Joi.string(),
   industry: Joi.array(),
   website: Joi.string().allow(''),
   yearFounded: Joi.number(),
@@ -37,17 +42,20 @@ async function register(currentParty, form) {
   }
 
   form = await Joi.validate(form, companySchema, {abortEarly: false});
-  let company = await feedService.registerCompany(form);
+  let company = await feedService.registerCompany(currentParty.id, form);
+
   if(company){
+
     company = await new Company({
       name: company.name,
-      companyId: company.id
+      companyId: company.id,
+      createdBy: currentParty.id
     }).save();
 
-    let role = await roleService.getRoleByRole('ADMIN');
+    let role = await roleService.getRoleByRole(roleType.ADMIN);
     let member = {
       createdBy: currentParty.id,
-      company: company.companyId,
+      company: company.id,
       firstName: currentParty.firstName,
       middleName: currentParty.middleName,
       lastName: currentParty.lastName,
