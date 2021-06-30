@@ -187,12 +187,11 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
       let sourcesAdding = _.reduce(jobIds, function(res, id){
         let exist = _.find(sources, {jobId: id});
         if(!exist){
-          res.push({job: id, candidate: candidate._id, createdBy: member._id})
+          res.push({job: id, candidate: candidate._id, createdBy: member})
         }
         return res;
       }, []);
 
-      console.log(sourcesAdding)
       result = await sourceService.addSources(sourcesAdding);
 
     }

@@ -860,10 +860,11 @@ async function applyJobById(currentUserId, jobId, application ) {
 
     let currentParty = await findCandidateById(currentUserId);
     //Security Check if user is part of meeting attendees that is ACTIVE.
+
     if (isPartyActive(currentParty)) {
 
       let candidate = null;
-      let job = await JobRequisition.findOne({jobId: jobId, status: statusEnum.ACTIVE }).populate('createdBy');
+      let job = await JobRequisition.findOne({jobId: jobId }).populate('createdBy');
       if(job) {
         let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
         if(!candidate){

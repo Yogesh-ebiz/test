@@ -24,6 +24,10 @@ const CompanySchema = new mongoose.Schema({
   status: {
     type: String
   },
+  primaryAddress: {
+    type: Object
+  },
+
   subscription: { type: Schema.Types.ObjectId, ref: 'Subscription' },
 
 }, {

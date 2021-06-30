@@ -1830,6 +1830,7 @@ async function uploadApplication(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = req.params.applicationId;
+  console.log(companyId, currentUserId, applicationId, req.files)
   let data = await talentCtrl.uploadApplication(companyId, currentUserId, applicationId, req.files);
 
   res.json(new Response(data, data?'files_retrieved_successful':'not_found', res));

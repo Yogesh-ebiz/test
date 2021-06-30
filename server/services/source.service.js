@@ -37,6 +37,8 @@ async function addSources(sources) {
 
   for(const [i, source] of sources.entries()){
     await Joi.validate(source, sourceSchema, {abortEarly: false});
+
+
   }
 
   await Source.insertMany(sources);

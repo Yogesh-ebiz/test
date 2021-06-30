@@ -46,10 +46,11 @@ async function register(currentParty, form) {
 
   if(company){
 
-    company = await new Company({
+    let savedCompany = await new Company({
       name: company.name,
       companyId: company.id,
-      createdBy: currentParty.id
+      createdBy: currentParty.id,
+      primaryAddress: {district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
     }).save();
 
     let role = await roleService.getRoleByRole(roleType.ADMIN);

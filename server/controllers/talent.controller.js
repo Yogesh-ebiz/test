@@ -270,12 +270,10 @@ async function getUserSession(currentUserId, preferredCompany) {
     return null;
   }
 
-  console.log(currentUserId)
   let result;
   let user = await feedService.findByUserId(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
-  console.log(companies)
 
 
   companies = _.reduce(companies, function(res, item){
@@ -4878,12 +4876,13 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
 
 
 async function uploadApplication(companyId, currentUserId, applicationId, files) {
+  console.log(companyId, currentUserId, applicationId, files)
   if(!companyId || !currentUserId || !applicationId || !files){
     return null;
   }
 
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-
+  console.log(member)
   if(!member){
     return null;
   }
