@@ -5,7 +5,7 @@ const { PaymentError } = require('../../middleware/baseError');
 
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-payment-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/api');
 // let client = new ApiClient('http://localhost:5000/api');
 
 async function findUserByIdFull(id) {

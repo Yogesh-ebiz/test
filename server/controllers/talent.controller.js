@@ -271,7 +271,7 @@ async function getUserSession(currentUserId, preferredCompany) {
   }
 
   let result;
-  let user = await feedService.findByUserId(currentUserId);
+  let user = await feedService.findUserByIdFull(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
 
