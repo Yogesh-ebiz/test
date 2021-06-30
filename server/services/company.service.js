@@ -22,7 +22,7 @@ const roleService = require('../services/role.service');
 
 const companySchema = Joi.object({
   name: Joi.string(),
-  displayName: Joi.string(),
+  legalName: Joi.string(),
   about: Joi.string().allow(''),
   mission: Joi.string().allow(''),
   size: Joi.string(),
