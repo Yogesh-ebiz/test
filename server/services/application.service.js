@@ -1115,7 +1115,6 @@ async function search(jobId, filter, sort) {
   let aLookup = [];
   let aMatch = {};
 
-
   aList.push({ $match: {jobId: jobId, status: {$in: filter.status} } });
   aList.push(
     {

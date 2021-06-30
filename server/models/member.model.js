@@ -66,6 +66,9 @@ const MemberSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  id: {
+    type: Number
+  },
   userId: {
     type: Number,
     required:true

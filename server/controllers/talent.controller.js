@@ -1438,7 +1438,6 @@ async function searchPeopleSuggestions(companyId, currentUserId, jobId, filter, 
 
 
 async function searchApplications(currentUserId, jobId, filter, sort, locale) {
-
   if(!currentUserId || !jobId || !filter){
     return null;
   }

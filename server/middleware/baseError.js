@@ -11,7 +11,6 @@ class BaseError extends Error {
     } if (this instanceof NotFound) {
       return 404;
     } if (this instanceof PaymentError) {
-      console.log(this.status)
       return this.status;
     }
     return 500;

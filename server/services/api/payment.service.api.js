@@ -106,7 +106,7 @@ async function addProduct(userId, form) {
       console.log('Error', error.message);
     }
 
-  });;
+  });
 
 
   return response.data;
@@ -131,8 +131,37 @@ async function getAdroducts() {
   });;
 
 
+  return response.data.data;
+};
+
+
+async function addCard(userId, form) {
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.post(`/customers/${userId}/card`, form, options).catch(function (error) {
+    console.log(error)
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
   return response.data;
 };
+
 
 async function getUserCards(userId) {
 
@@ -160,5 +189,6 @@ module.exports = {
   charge:charge,
   addProduct:addProduct,
   getAdroducts:getAdroducts,
+  addCard:addCard,
   getUserCards:getUserCards
 }

@@ -42,13 +42,33 @@ async function add(card) {
   card = await Joi.validate(card, cardSchema, {abortEarly: false});
   card.last4 = card.number.substring(card.number.length-4, card.number.length);
   card.brand = cardTest(card.number)
-  card.isDefault = true;
-  card = new Card(card).save();
+  // card.isDefault = true;
+  // card = new Card(card).save();
 
-  if(card.isDefault) {
-    await Card.update({}, {$set: {isDefault: false}});
-    await Card.update({last4: {$ne: card.last4}}, {$set: {isDefault: true}});
-  }
+  // if(card.isDefault) {
+  //   await Card.update({}, {$set: {isDefault: false}});
+  //   await Card.update({last4: {$ne: card.last4}}, {$set: {isDefault: true}});
+  // }
+
+  card = await paymentService.addCard(card.userId, {
+    name: card.name,
+    email: card.email,
+    phone: card.phone,
+    number: card.number,
+    exp_month: card.exp_month,
+    exp_year: card.exp_year,
+    cvc: card.cvc,
+    billingAddress: {
+      address: card.address_line1,
+      addressLine2: card.address_line2,
+      city: card.address_city,
+      state: card.address_state,
+      country: card.address_country,
+      zipCode: card.address_zip
+    }
+
+
+  });
   return card;
 
 }
