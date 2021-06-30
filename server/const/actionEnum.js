@@ -2,6 +2,7 @@ module.exports = {
   ACCEPTED: 'ACCEPTED',
   ADDED: 'ADDED',
   APPLIED: 'APPLIED',
+  INVITED: 'INVITED',
   SENT: "SENT",
   UPDATED: "UPDATED",
   DELETED: "DELETED",

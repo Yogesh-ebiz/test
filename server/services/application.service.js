@@ -583,7 +583,7 @@ async function apply(application) {
     //Create Notification
     let meta = {
       companyId: job.company,
-      jobId: job._id,
+      jobId: job.jobId,
       jobTitle: job.title,
       applicationId: savedApplication.applicationId,
       applicantId: candidate.userId,

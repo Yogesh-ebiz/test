@@ -2,12 +2,16 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const actionEnum = require('../const/actionEnum');
+const subjectType = require('../const/subjectType');
 const emailType = require('../const/emailType');
 
 const Email = require('../models/email.model');
 const applicationService = require('../services/application.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const sourceService = require('../services/source.service');
+const activityService = require('../services/activity.service');
+const jobService = require('../services/jobrequisition.service');
 
 
 const emailSchema = Joi.object({
@@ -56,6 +60,8 @@ async function compose(form) {
   } else if(form.type===emailType.JOB_INVITE) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
 
+    let job = await jobService.findJob_Id(form.meta.jobId);
+
     for (let [i, contact] of form.to.entries()) {
       let nMail = _.clone(form);
       nMail.to = [contact];
@@ -88,10 +94,21 @@ async function compose(form) {
 
             if(contact.sourceId){
               let source = await sourceService.findById(ObjectID(contact.sourceId));
-              source.campaign = campaign;
-              await source.save();
+              if(source) {
+                source.campaign = campaign;
+                await source.save();
+              }
             }
+
           }
+
+          if(contact.candidateId){
+
+            let meta= {candidateName: contact.name, candidate: contact.candidateId, jobTitlte: job.title, jobId: job._id};
+            await activityService.addActivity({causer: ObjectID(form.from.memberId), causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: ObjectID(contact.candidateId), action: actionEnum.INVITED, meta: meta});
+
+          }
+
 
         }
       }

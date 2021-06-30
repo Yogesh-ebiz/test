@@ -2,10 +2,16 @@ const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
+const actionEnum = require('../const/actionEnum');
+const subjectType = require('../const/subjectType');
+
 let SourceParam = require('../const/sourceParam');
 
 const Source = require('../models/source.model');
 const candidateService = require('../services/candidate.service');
+const jobService = require('../services/jobrequisition.service');
+const activityService = require('../services/activity.service');
+
 
 const sourceSchema = Joi.object({
   job: Joi.object(),
@@ -29,15 +35,27 @@ async function add(source) {
 
 
 
-async function addSources(sources) {
+async function addSources(candidate, jobIds, member) {
 
-  if(!sources){
+  if(!candidate || !jobIds || !member){
     return;
   }
 
-  for(const [i, source] of sources.entries()){
+
+  let sources = [];
+  let jobs = await jobService.findJob_Ids(jobIds);
+
+  for(const [i, job] of jobs.entries()){
+    let source = {
+      job: job._id,
+      candidate: candidate._id,
+      createdBy: member._id
+    };
     await Joi.validate(source, sourceSchema, {abortEarly: false});
 
+    sources.push(source);
+    let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitlte: job.title, jobId: job._id};
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
 
   }
 
