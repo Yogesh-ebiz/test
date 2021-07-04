@@ -3,21 +3,21 @@ const Schema = mongoose.Schema;
 
 
 const TargetSchema = new mongoose.Schema({
-  age_min: {
-    type: String,
+  ageMin: {
+    type: Number,
     required: false
   },
-  age_max: {
-    type: String,
+  ageMax: {
+    type: Number,
     required: false
   },
   genders: {
-    type: String,
+    type: Array,
   },
-  geo_locations: {
+  geoLocations: {
     type: Object,
   },
-  ad_positions: {
+  adPositions: {
     type: Array,
   },
   // interests: {

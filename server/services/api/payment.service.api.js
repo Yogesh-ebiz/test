@@ -29,6 +29,7 @@ async function charge(userId, form) {
   const options = {
     headers: {'userId': userId}
   };
+
   let response = await client.post(`/payment/charge`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
@@ -44,7 +45,7 @@ async function charge(userId, form) {
           status = 500;
           break;
       }
-
+      console.log(error)
       throw new PaymentError(status, error.response.data.message);
 
     } else if (error.request) {
@@ -185,10 +186,29 @@ async function getUserCards(userId) {
 };
 
 
+async function lookupProducts(ids) {
+
+  let response = await client.get(`/products/lookup?ids=${ids}`, null, null).catch(function (error) {
+    if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data.data;
+};
+
+
 module.exports = {
   charge:charge,
   addProduct:addProduct,
   getAdroducts:getAdroducts,
   addCard:addCard,
-  getUserCards:getUserCards
+  getUserCards:getUserCards,
+  lookupProducts:lookupProducts
 }

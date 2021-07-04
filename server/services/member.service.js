@@ -149,7 +149,7 @@ async function findMemberByUserId(userId) {
     return;
   }
 
-  let allAccounts = Member.find({userId: userId}).populate('role')
+  let allAccounts = Member.find({userId: userId}).populate('role');
   return allAccounts
 }
 

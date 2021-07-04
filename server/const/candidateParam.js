@@ -8,9 +8,13 @@ function CandidateParam(filter) {
   // this.query.$or = [];
 
 
+  this.query.hasApplied =  filter.hasApplied?true:false;
+  this.query.hasImported =  filter.hasImported?true:false;
+
   if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };
   }
+
 
   if(filter.userId){
     this.query.userId =  filter.userid;

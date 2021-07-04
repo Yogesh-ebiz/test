@@ -215,5 +215,8 @@
 	"source_removed_successful": "source_removed_successful",
 	"source_added_successful": "source_added_successful",
 	"sources_removed_successful": "sources_removed_successful",
-	"ads_retrieved_successful": "ads_retrieved_successful"
+	"ads_retrieved_successful": "ads_retrieved_successful",
+	"tempalte_added_successful": "tempalte_added_successful",
+	"template_added_successful": "template_added_successful",
+	"template_removed_successful": "template_removed_successful"
 }

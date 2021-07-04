@@ -34,7 +34,7 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
-const {getPipelineById, getPipelineByJobId} = require('../services/pipeline.service');
+const {findById, findByJobId} = require('../services/pipeline.service');
 
 
 const {findJobId, getCountsGroupByCompany, getNewJobs, getGroupOfCompanyJobs} = require('../services/jobrequisition.service');

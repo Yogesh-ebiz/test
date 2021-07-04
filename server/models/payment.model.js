@@ -38,7 +38,7 @@ const PaymentSchema = new mongoose.Schema({
     type: String
   },
   product: {
-    type: String
+    type: Array
   },
   refund: { type: Schema.Types.ObjectId, ref: 'Refund' },
   // product: { type: Schema.Types.ObjectId, ref: 'Product' },

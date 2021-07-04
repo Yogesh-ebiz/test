@@ -12,8 +12,7 @@ const PipelineSchema = new mongoose.Schema({
     required: true
   },
   jobId: {
-    type: Object,
-    required: true
+    type: Object
   },
   createdAt: {
     type: Number,

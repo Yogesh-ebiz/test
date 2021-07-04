@@ -238,7 +238,8 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false
   },
   pipeline: { type: Schema.Types.ObjectId, ref: 'Pipeline' },
-  campaign: { type: Schema.Types.ObjectId, ref: 'Campaign' }
+  searchAd: { type: Schema.Types.ObjectId, ref: 'Ad' },
+  ads: [{ type: Schema.Types.ObjectId, ref: 'Ad' }]
 }, {
   versionKey: false
 });

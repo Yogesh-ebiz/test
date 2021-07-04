@@ -8,12 +8,14 @@ const ObjectID = require('mongodb').ObjectID;
 
 const pipelineSchema = Joi.object({
   name: Joi.string().required(),
-  department: Joi.number().required(),
-  category: Joi.string().required(),
-  company: Joi.number().required(),
+  department: Joi.number().optional(),
+  category: Joi.string().optional(),
+  company: Joi.number().optional(),
   stages: Joi.array().required(),
   createdBy: Joi.number(),
-  updatedBy: Joi.number()
+  updatedBy: Joi.number(),
+  default: Joi.boolean().optional(),
+  custom: Joi.boolean().optional()
 });
 
 function findById(id) {
@@ -100,7 +102,11 @@ async function remove(id) {
 
 }
 
+async function getDefaultTemplate() {
 
+  return PipelineTemplate.findOne({default: true});
+
+}
 
 
 module.exports = {
@@ -108,5 +114,6 @@ module.exports = {
   getPipelineTemplates:getPipelineTemplates,
   add:add,
   remove:remove,
-  update:update
+  update:update,
+  getDefaultTemplate: getDefaultTemplate
 }

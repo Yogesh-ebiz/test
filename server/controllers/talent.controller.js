@@ -30,7 +30,7 @@ const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
 const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
-const {getPipelineByJobId, getPipelineById, getPipelines, addPipeline} = require('../services/pipeline.service');
+const {findByJobId, findById, getPipelines, addPipeline} = require('../services/pipeline.service');
 const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
 const pipelineTemplateService = require('../services/pipelineTemplate.service');
 
@@ -57,8 +57,9 @@ const stageService = require('../services/stage.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const sourceService = require('../services/source.service');
 const fileService = require('../services/file.service');
-
+const adService = require('../services/ad.service');
 const checkoutService = require('../services/checkout.service');
+const paymentProvider = require('../services/api/payment.service.api');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -118,6 +119,7 @@ module.exports = {
   getCards,
   removeCard,
   verifyCard,
+  updateSubscription,
   createJob,
   updateJob,
   closeJob,
@@ -135,6 +137,7 @@ module.exports = {
   getJobMembers,
   updateJobMembers,
   updateJobApplicationForm,
+  getJobAds,
   getBoard,
   publishJob,
   payJob,
@@ -804,6 +807,30 @@ async function verifyCard(companyId, currentUserId, jobId, form) {
 }
 
 
+async function updateSubscription(companyId, currentUserId, subscription) {
+
+  if(!companyId || !currentUserId  || !subscription){
+    return null;
+  }
+
+  let result;
+  let oneOrZero = (Math.random()>=0.5)? 1 : 0;
+
+  if(oneOrZero) {
+    let job = await jobService.findJob_Id(jobId);
+    if (job) {
+      job.status = statusEnum.ACTIVE;
+      await job.save();
+    }
+
+    result = {success: true};
+  } else {
+    result = {success: false};
+  }
+  return result;
+}
+
+
 async function createJob(companyId, currentUserId, job) {
   if(!companyId || !currentUserId || !job){
     return null;
@@ -1233,6 +1260,23 @@ async function updateJobApplicationForm(companyId, currentUserId, jobId, form) {
 }
 
 
+async function getJobAds(companyId, currentuserId, jobId) {
+  let result;
+  try {
+    let job = await jobService.getJobAds(jobId);
+    if (job){
+      result = {today: Date.now(), suggestedBudget: 3.80, searchAd: job.searchAd, ads: job.ads}
+    }
+
+  } catch(e){
+    console.log('getJobAds: Error', e);
+  }
+
+
+  return result
+}
+
+
 async function publishJob(companyId, currentUserId, jobId, type) {
 
   if(!companyId  || !currentUserId || !jobId || !type){
@@ -1274,25 +1318,56 @@ async function payJob(companyId, currentUserId, jobId, form) {
   }
 
   let result;
-  let checkout = await checkoutService.pay(member, form);
-  // if(checkout){
-    let job = await jobService.findJob_Id(jobId);
+  let job = await jobService.getJobAds(jobId)
 
-    if(job){
+  if(job) {
+    let checkout = await checkoutService.payJob(member, form);
+    if (checkout) {
+
+      if(form.dailyBudget){
+        let startTime = new Date();
+        let endTime = new Date();
+        endTime.setDate(endTime.getDate()+30);
+        endTime.setHours(23);
+        endTime.setMinutes(59);
+        let ad = {lifetimeBudget: form.dailyBudget * 30, startTime: startTime.getTime(), endTime: endTime.getTime(), bidAmount: form.dailyBudget,
+          targeting: {ageMin: 0, ageMax: 100, genders: [], geoLocations: {countries: [job.country]}, adPositions: ['feed']} };
+        ad = await adService.add(ad);
+        job.searchAd = ad;
+      }
+
+      if(form.cart.items.length){
+        let products = await paymentProvider.lookupProducts(_.map(form.cart.items, 'id'));
+        for(const [i, product] of products.entries()){
+
+          let startTime = new Date();
+          let endTime = new Date();
+          endTime.setDate(endTime.getDate()+parseInt(product.durationDay));
+          endTime.setHours(23);
+          endTime.setMinutes(59);
+
+          let ad = {productId: product.id, lifetimeBudget: product.listPrice, startTime: startTime.getTime(), endTime: endTime.getTime(), bidAmount: 0,
+            targeting: {ageMin: 0, ageMax: 100, genders: [], geoLocations: {countries: [job.country]}, adPositions: [product.adPosition]} };
+          ad = await adService.add(ad);
+          job.ads.push(ad);
+        }
+      }
+
+
       job.status = statusEnum.ACTIVE;
       job.publishedDate = Date.now();
       job.type = jobType.PROMOTION;
       job = await job.save();
     }
 
-    result = { success: true, verification: false };
-  // } else {
-  //   result = { success: false, verification: true };
-  // }
+    result = {success: true, verification: false};
+    // } else {
+    //   result = { success: false, verification: true };
+    // }
 
+  }
   return result;
 }
-
 
 
 async function getJobInsights(currentUserId, companyId, jobId) {
@@ -1365,6 +1440,9 @@ async function getJobInsights(currentUserId, companyId, jobId) {
 
   let applicationByStages = await applicationService.getApplicationsStagesByJobId(jobId);
   result.stages = applicationByStages;
+
+  let job = await jobService.getJobAds(jobId);
+  result.ads = {searchAd: job.searchAd, ads: job.ads};
 
   return result;
 
@@ -1869,7 +1947,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
         await application.save();
 
       } else {
-        let pipeline = await getPipelineByJobId(application.jobId);
+        let pipeline = await findByJobId(application.jobId);
         if(pipeline) {
           foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
           if(foundStage) {
@@ -2599,7 +2677,7 @@ async function getBoard(currentUserId, jobId, locale) {
   let pipelineStages;
   let job = await jobService.findJob_Id(jobId, locale);
 
-  let pipeline = await getPipelineByJobId(job._id);
+  let pipeline = await findByJobId(job._id);
   if(pipeline.stages) {
 
     let pipelineStages = pipeline.stages;

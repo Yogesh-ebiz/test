@@ -519,7 +519,7 @@ async function apply(application) {
 
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
-    let jobPipeline = await pipelineService.getPipelineById(job.pipeline);
+    let jobPipeline = await pipelineService.findById(job.pipeline);
 
     if (jobPipeline) {
 
@@ -1172,7 +1172,7 @@ async function search(jobId, filter, sort) {
   let result = await Application.aggregatePaginate(aggregate, options);
   if(result.docs.length){
     let job = await jobService.findJob_Id(result.docs[0].jobId);
-    let pipeline = await pipelineService.getPipelineByJobId(job._id);
+    let pipeline = await pipelineService.findByJobId(job._id);
 
     if(pipeline){
       result.docs.forEach(function(app){

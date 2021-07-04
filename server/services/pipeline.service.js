@@ -10,26 +10,59 @@ const Joi = require('joi');
 
 
 const pipelineSchema = Joi.object({
+  name: Joi.string().allow('').optional(),
   createdBy: Joi.number().required(),
-  jobId: Joi.object().required(),
+  jobId: Joi.object().optional(),
   pipelineTemplateId: Joi.string().required(),
   stages: Joi.array().required(),
-  autoRejectBlackList: Joi.boolean().optional()
+  autoRejectBlackList: Joi.boolean().optional(),
+  custom: Joi.boolean().optional(),
+  default: Joi.boolean().optional()
 });
 
-async function getPipelineById(pipelineId) {
+
+
+async function add(pipeline) {
   let data = null;
 
-  if(!pipelineId){
+  if(!pipeline){
+    return;
+  }
+
+  pipeline = await Joi.validate(pipeline, pipelineSchema, {abortEarly: false});
+
+  for (let stage of pipeline.stages) {
+    stage._id = new ObjectID();
+    stage = await addStage(stage)
+  }
+
+  pipeline = new Pipeline(pipeline).save();
+  return pipeline;
+
+}
+
+
+async function remove(id) {
+  if(!id){
+    return;
+  }
+
+  return Pipeline.deleteOne({_id: id});
+
+}
+
+
+async function findById(id) {
+  if(!id){
     return;
   }
 
 
-  return await Pipeline.findById(pipelineId).populate('stages');
+  return await Pipeline.findById(id).populate('stages');
 }
 
 
-async function getPipelineByJobId(jobId) {
+async function findByJobId(jobId) {
   let data = null;
 
   if(!jobId){
@@ -77,9 +110,19 @@ async function addPipeline(jobId, newPipeline) {
 
 
 
+async function getDefaultTemplate() {
+
+  return Pipeline.findOne({default: true});
+
+}
+
+
 module.exports = {
-  getPipelineById:getPipelineById,
+  add:add,
+  remove:remove,
+  findById:findById,
   getPipelines:getPipelines,
-  getPipelineByJobId:getPipelineByJobId,
-  addPipeline:addPipeline
+  findByJobId:findByJobId,
+  addPipeline:addPipeline,
+  getDefaultTemplate:getDefaultTemplate
 }

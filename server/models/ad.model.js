@@ -3,40 +3,39 @@ const Schema = mongoose.Schema;
 
 
 const AdSchema = new mongoose.Schema({
-  name: {
+  status: {
+    type: String
+  },
+  productId: {
+    type: String
+  },
+  lifetimeBudget: {
+    type: Number,
+    required: false
+  },
+  startTime: {
+    type: Number
+  },
+  endTime: {
+    type: Number
+  },
+  campaignId: {
     type: String,
     required: false
   },
-  lifetime_budget: {
+  bidAmount: {
+    type: Number,
+    required: false
+  },
+  billingEvent: {
     type: String,
     required: false
   },
-  start_time: {
+  optimizationGoal: {
     type: String,
     required: false
   },
-  end_time: {
-    type: String,
-    required: false
-  },
-  campaign_id: {
-    type: String,
-    required: false
-  },
-  bid_amount: {
-    type: String,
-    required: false
-  },
-  billing_event: {
-    type: String,
-    required: false
-  },
-  optimization_goal: {
-    type: String,
-    required: false
-  },
-  targeting: { type: Schema.Types.ObjectId, ref: 'Target' },
-  ads: [{ type: Schema.Types.ObjectId, ref: 'Ad' }],
+  targeting: { type: Schema.Types.ObjectId, ref: 'Target' }
 }, {
   versionKey: false
 });

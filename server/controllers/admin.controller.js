@@ -7,8 +7,14 @@ let Pagination = require('../utils/pagination');
 let statusEnum = require('../const/statusEnum');
 const planService = require('../services/plan.service');
 const productService = require('../services/product.service');
+const pipelineTemplateService = require('../services/pipelineTemplate.service');
+const pipelineService = require('../services/pipeline.service');
 
 module.exports = {
+  addPipelineTemplate,
+  addPipeline,
+  getPipeline,
+  removePipeline,
   getPlans,
   getPlanById,
   addPlan,
@@ -20,6 +26,91 @@ module.exports = {
   deleteProduct,
   updateProduct
 }
+
+
+
+
+
+async function addPipelineTemplate(currentUserId, form) {
+
+  if(!currentUserId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    form.createdBy = currentUserId;
+    result = await pipelineTemplateService.add(form);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function addPipeline(currentUserId, form) {
+
+  if(!currentUserId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    let template = await pipelineTemplateService.findById(form.pipelineTemplateId);
+    if(template) {
+      let pipeline = {createdBy: currentUserId, custom: false, default: true, pipelineTemplateId: form.pipelineTemplateId, stages: template.stages, name: form.name};
+      result = await pipelineService.add(pipeline)
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function getPipeline(id) {
+
+  if(!id){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await pipelineService.findById(id);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function removePipeline(id) {
+
+  if(!id){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await pipelineService.remove(id);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {success: true};
+}
+
 
 
 

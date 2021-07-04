@@ -13,8 +13,8 @@ const QuestionTemplate = require('../models/questiontemplate.model');
 
 const Promotion = require('../models/promotion.model');
 const Pipeline = require('../models/pipeline.model');
-const PipelineTemplate = require('../models/pipelineTemplate.model');
-const PipelineService = require('../services/pipeline.service');
+const pipelineService = require('../services/pipeline.service');
+const pipelineTemplate = require('../services/pipelineTemplate.service');
 const memberService = require('../services/member.service');
 const feedService = require('../services/api/feed.service.api');
 const activityService = require('../services/activity.service');
@@ -76,8 +76,6 @@ async function addJob(companyId, member, form) {
     return;
   }
 
-
-
   let result;
 
   if(form.department) {
@@ -86,6 +84,10 @@ async function addJob(companyId, member, form) {
 
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
+  let pipeline = await pipelineService.getDefaultTemplate();
+
+  console.log(pipeline)
+  form.pipeline = pipeline;
   form.company = companyId
   form.members = [member._id];
   form.createdBy = member._id;
@@ -304,7 +306,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
     if(!job.pipeline) {
       form.createdBy = currentUserId
       form.jobId = job._id;
-      pipeline = await PipelineService.addPipeline(jobId, form);
+      pipeline = await pipelineService.addPipeline(jobId, form);
 
       if (pipeline) {
         job.pipeline = pipeline._id;
@@ -344,7 +346,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
         form.createdBy = currentUserId
         form.jobId = job._id;
-        pipeline = await PipelineService.addPipeline(jobId, form);
+        pipeline = await pipelineService.addPipeline(jobId, form);
 
         if (pipeline) {
           job.pipeline = pipeline._id;
@@ -496,6 +498,59 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
 
 
   return data;
+}
+
+
+
+async function getJobAds(jobId) {
+  let data = null;
+
+  if(!jobId){
+    return;
+  }
+
+  console.log(jobId)
+  /*
+  let job = await JobRequisition.aggregate([
+    {$match: {_id: jobId}},
+    {$lookup:{
+        from:"ads",
+        let:{ads:"$ads"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$ads"]}}},
+          // {
+          //   $lookup: {
+          //     from: 'targets',
+          //     localField: 'targeting',
+          //     foreignField: '_id',
+          //     as: 'targeting',
+          //   },
+          // }
+        ],
+        as: 'ads'
+      }},
+    // {$unwind: '$user'},
+  ]);
+ */
+
+  let job = await JobRequisition.findOne({_id: jobId}).populate([
+    {
+      path: 'searchAd',
+      populate: {
+        path: 'targeting',
+        model: 'Target'
+      }
+    },
+    {
+      path: 'ads',
+      model: 'Ad',
+      populate: {
+        path: 'targeting',
+        model: 'Target'
+      }
+    }]);
+
+  return job;
 }
 
 
@@ -745,6 +800,7 @@ module.exports = {
   updateJobMembers:updateJobMembers,
   getJobMembers:getJobMembers,
   updateJobApplicationForm:updateJobApplicationForm,
+  getJobAds:getJobAds,
   closeJob:closeJob,
   archiveJob:archiveJob,
   unarchiveJob:unarchiveJob,

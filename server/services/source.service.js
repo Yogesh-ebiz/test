@@ -16,6 +16,7 @@ const activityService = require('../services/activity.service');
 const sourceSchema = Joi.object({
   job: Joi.object(),
   candidate: Joi.object(),
+  userId: Joi.number(),
   createdBy: Joi.object()
 });
 
@@ -95,6 +96,16 @@ function findByJobId(jobId) {
   }
 
   return Source.find({job: jobId});
+
+}
+
+
+function findByJobIdAndCandidateId(jobId, candidateId) {
+  if(!jobId || !candidateId){
+    return;
+  }
+
+  return Source.find({job: jobId, candidate: candidateId});
 
 }
 
@@ -187,5 +198,6 @@ module.exports = {
   findById:findById,
   findByCandidateId:findByCandidateId,
   findByJobId:findByJobId,
+  findByJobIdAndCandidateId:findByJobIdAndCandidateId,
   search:search
 }

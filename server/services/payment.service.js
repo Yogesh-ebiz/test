@@ -28,7 +28,7 @@ const paymentSchema = Joi.object({
 const cartSchema = Joi.object({
   dailyBudget: Joi.number().optional(),
   cart: Joi.object(),
-  payment: Joi.object(),
+  payment: Joi.object()
 });
 
 
@@ -67,7 +67,8 @@ async function charge(member, cart) {
       userId: member.userId,
       member: member._id,
       paymentType: paid.payment_method_details.type,
-      paymentMethod: paymentMethod
+      paymentMethod: paymentMethod,
+
     };
 
     payment = await log(payment);

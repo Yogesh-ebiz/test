@@ -9,8 +9,8 @@ const {add} = require('../services/task.service');
 
 const stageSchema = Joi.object({
   _id: Joi.object().required(),
-  custom: Joi.boolean().required(),
-  default: Joi.boolean().required(),
+  custom: Joi.boolean().optional(),
+  default: Joi.boolean().optional(),
   name: Joi.string().required(),
   type: Joi.string().required(),
   timeLimit: Joi.number().required(),

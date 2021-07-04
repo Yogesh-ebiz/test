@@ -38,8 +38,7 @@ const PipelineTemplateSchema = new mongoose.Schema({
     type: Number
   },
   company: {
-    type: Number,
-    required: true
+    type: Number
   },
   /*
     stages: List of stages.  Each stages has a list of option. Option types are [EMAIL, EVALUATION, QUESTIONS, SURVEY]

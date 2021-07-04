@@ -1,5 +1,7 @@
 const express = require('express');
 const passport = require('passport');
+const ObjectID = require('mongodb').ObjectID;
+
 const asyncHandler = require('express-async-handler');
 const adminCtl = require('../controllers/admin.controller');
 let Response = require('../const/response');
@@ -9,6 +11,13 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
+router.route('/pipelinetemplates').post(asyncHandler(addPipelineTemplate));
+
+router.route('/pipelines').post(asyncHandler(addPipeline));
+router.route('/pipelines/:id').get(asyncHandler(getPipeline));
+router.route('/pipelines/:id').delete(asyncHandler(removePipeline));
+
+
 router.route('/plans').get(asyncHandler(getPlans));
 router.route('/plans').post(asyncHandler(addPlan));
 router.route('/plans/:id').get(asyncHandler(getPlanById));
@@ -21,6 +30,54 @@ router.route('/products/:id').get(asyncHandler(getById));
 router.route('/products/:id').put(asyncHandler(updateProduct));
 router.route('/products/:id').delete(asyncHandler(deleteProduct));
 
+
+async function addPipelineTemplate(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let template = req.body;
+  let data = await adminCtl.addPipelineTemplate(currentUserId, template);
+
+  res.json(new Response(data, data?'template_added_successful':'not_found', res));
+}
+
+
+async function addPipeline(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let template = req.body;
+  let data = await adminCtl.addPipeline(currentUserId, template);
+
+  res.json(new Response(data, data?'template_added_successful':'not_found', res));
+}
+
+async function getPipeline(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = ObjectID(req.params.id);
+  let data = await adminCtl.getPipeline(id);
+
+  res.json(new Response(data, data?'template_added_successful':'not_found', res));
+}
+
+
+
+async function removePipeline(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = ObjectID(req.params.id);
+  let data = await adminCtl.removePipeline(id);
+
+  res.json(new Response(data, data?'template_removed_successful':'not_found', res));
+}
+
+async function removePipeline(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = ObjectID(req.params.id);
+  let data = await adminCtl.removePipeline(id);
+
+  res.json(new Response(data, data?'template_removed_successful':'not_found', res));
+}
 
 
 async function getPlans(req, res) {

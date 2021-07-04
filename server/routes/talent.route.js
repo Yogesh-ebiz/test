@@ -28,6 +28,7 @@ router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
 router.route('/company/:id/payment/cards/:cardId').delete(asyncHandler(removeCard));
 router.route('/company/:id/payment/cards/verify').post(asyncHandler(verifyCard));
 
+router.route('/company/:id/subscription').post(asyncHandler(updateSubscription));
 
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
 router.route('/company/:id/jobs/search').post(asyncHandler(searchJob));
@@ -62,6 +63,9 @@ router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncH
 
 router.route('/company/:id/jobs/:jobId/sources/:sourceId').post(asyncHandler(addSourceApplication));
 router.route('/company/:id/jobs/:jobId/campaigns').post(asyncHandler(searchCampaigns));
+router.route('/company/:id/jobs/:jobId/ads').get(asyncHandler(getJobAds));
+router.route('/company/:id/jobs/:jobId/ads').get(asyncHandler(getJobAds));
+
 
 router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
@@ -327,6 +331,16 @@ async function verifyCard(req, res) {
   let verification = req.body;
   let data = await talentCtrl.verifyCard(companyId, currentUserId, jobId, verification);
   res.json(new Response(data, data?'card_verified_successful':'not_found', res));
+}
+
+
+
+async function updateSubscription(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let subscription = req.body;
+  let data = await talentCtrl.updateSubscription(companyId, currentUserId, subscription);
+  res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
 
 
@@ -632,6 +646,16 @@ async function searchCampaigns(req, res) {
 
   let data = await talentCtrl.searchCampaigns(company, currentUserId, jobId, filter, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
+}
+
+
+async function getJobAds(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let jobId = ObjectID(req.params.jobId);
+
+  let data = await talentCtrl.getJobAds(company, currentUserId, jobId, res.locale);
+  res.json(new Response(data, data?'ads_retrieved_successful':'not_found', res));
 }
 
 

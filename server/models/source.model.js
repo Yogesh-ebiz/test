@@ -21,6 +21,15 @@ const SourceSchema = new mongoose.Schema({
     type: Date,
     required: false
   },
+  userId: {
+    type: Number
+  },
+  hasViewed: {
+    type: Boolean
+  },
+  hasSaved: {
+    type: Boolean
+  },
   hasApplied: {
     type: Boolean
   },
@@ -28,7 +37,7 @@ const SourceSchema = new mongoose.Schema({
   updatedBy: { type: Schema.Types.ObjectId, ref: 'Candidate' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'Candidate' },
   candidate: { type: Schema.Types.ObjectId, ref: 'Candidate' },
-  campaign: { type: Schema.Types.ObjectId, ref: 'Campaign' }
+  campaign: [{ type: Schema.Types.ObjectId, ref: 'Campaign' }]
 }, {
   versionKey: false
 });

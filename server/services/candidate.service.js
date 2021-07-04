@@ -170,8 +170,6 @@ async function search(filter, sort) {
     limit: limit,
   };
 
-  console.log(options)
-
   let aList = [];
   let aLookup = [];
   let aMatch = { $match: new CandidateParam(filter)};
