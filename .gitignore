@@ -44,7 +44,7 @@ testem.log
 Thumbs.db
 
 # Env file
-*.env
+#*.env
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

@@ -124,6 +124,8 @@ router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').g
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
+router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
+
 
 router.route('/company/:id/filter/skills').get(asyncHandler(getAllCandidatesSkills));
 
@@ -1206,6 +1208,17 @@ async function getCandidateActivities(req, res) {
   let sort = req.query;
 
   let data = await talentCtrl.getCandidateActivities(company, currentUserId, candidateId, sort);
+  res.json(new Response(data, data?'activities_retrieved_successful':'not_found', res));
+}
+
+
+async function assignCandidatesJobs(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidates = _.reduce(req.body.candidates, function(res, i){ res.push(ObjectID(i)); return res;}, []);
+  let jobs = _.reduce(req.body.jobs, function(res, i){ res.push(ObjectID(i)); return res;}, []);
+
+  let data = await talentCtrl.assignCandidatesJobs(company, currentUserId, candidates, jobs);
   res.json(new Response(data, data?'activities_retrieved_successful':'not_found', res));
 }
 

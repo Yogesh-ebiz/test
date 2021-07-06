@@ -185,8 +185,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
         job.employmentType = employmentType[0];
 
-        let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
-        job.level = experienceLevel[0];
+        // let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
+        // job.level = experienceLevel[0];
 
 
 

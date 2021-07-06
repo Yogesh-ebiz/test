@@ -207,6 +207,8 @@ function searchTitle(keyword) {
     return;
   }
   var regex = new RegExp(keyword, 'i');
+  console.log(regex)
+
   return JobRequisition.aggregate([
     { $match: {title: regex} },
     { $group: {_id:{title:'$title'}} },
@@ -223,6 +225,18 @@ function findById(id) {
   }
 
   return JobRequisition.findById(id);
+}
+
+
+async function findByIds(ids) {
+  let data = null;
+
+  if(ids==null){
+    return;
+  }
+
+
+  return JobRequisition.find({_id: {$in: ids }});
 }
 
 async function findJobId(jobId, locale) {
@@ -790,6 +804,7 @@ module.exports = {
   updateJob:updateJob,
   searchTitle: searchTitle,
   findById:findById,
+  findByIds:findByIds,
   findJobId: findJobId,
   findJob_Id:findJob_Id,
   findJobIds: findJobIds,

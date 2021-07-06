@@ -61,6 +61,19 @@ async function findById(id) {
   return await Candidate.findById(id);
 }
 
+
+async function findByIds(ids) {
+  let data = null;
+
+  if(ids==null){
+    return;
+  }
+
+
+  return Candidate.find({_id: {$in: ids }});
+}
+
+
 async function findByUserId(userId) {
 
   if(!userId){
@@ -340,9 +353,11 @@ async function getCompanyBlacklisted(company, sort) {
 
 
 
+
 module.exports = {
   addCandidate:addCandidate,
   findById:findById,
+  findByIds:findByIds,
   findByUserId:findByUserId,
   findByCompany:findByCompany,
   findByUserIdAndCompanyId:findByUserIdAndCompanyId,

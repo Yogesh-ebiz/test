@@ -45,14 +45,14 @@ async function findById(id) {
 }
 
 
-async function findByUserId(id) {
+async function findByUserId(company, id) {
   let data = null;
 
-  if(!id){
+  if(!company || !id){
     return;
   }
 
-  return Member.findOne({userId: id}).populate('role');
+  return Member.findOne({company: company, userId: id}).populate('role');
 }
 
 async function inviteMembers(company, currentUserId, emails, role) {

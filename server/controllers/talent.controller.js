@@ -185,6 +185,7 @@ module.exports = {
   getCandidateEvaluationById,
   getCandidatesSimilar,
   getCandidateActivities,
+  assignCandidatesJobs,
   getAllCandidatesSkills,
   addCandidateTag,
   removeCandidateTag,
@@ -3196,6 +3197,49 @@ async function getCandidateActivities(companyId, currentUserId, userId, sort) {
 
 
 
+async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) {
+  if(!companyId || !currentUserId || !candidates || !jobs){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    job = await jobService.findByIds(jobs);
+    candidates = await candidateService.findByIds(candidates);
+
+
+    for(const [i, job] of jobs.entries()){
+      for(const [i, candidate] of candidates.entries()){
+        let source = {
+          job: job._id,
+          candidate: candidate._id,
+          createdBy: member._id
+        };
+        sourceService.add(source);
+
+        let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitlte: job.title, jobId: job._id};
+        await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
+
+
+      }
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {success: true}
+}
+
+
+
 async function getAllCandidatesSkills(companyId, currentUserId, locale) {
   if(!companyId || !currentUserId){
     return null;
@@ -4143,7 +4187,7 @@ async function getCompanyMember(companyId, memberId, currentUserId) {
     if(isNaN(memberId)){
       result = await memberService.findById(memberId);
     } else {
-      result = await memberService.findByUserId(parseInt(memberId));
+      result = await memberService.findByUserId(companyId, parseInt(memberId));
     }
 
 
