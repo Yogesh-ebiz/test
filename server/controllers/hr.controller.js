@@ -12,7 +12,7 @@ const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, ord
 const {lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findJobId} = require('../services/jobrequisition.service');
-const {findApplicationsByJobId, findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
+const {findApplicationsByJobId, findApplicationByUserIdAndJobId, findByApplicationId, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
@@ -151,7 +151,7 @@ async function rejectApplication(currentUserId, jobId, applicationId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    job = await findApplicationById(applicationId, locale);
+    job = await findByApplicationId(applicationId, locale);
 
     if(job) {;
 

@@ -631,6 +631,7 @@ function addCompanyReviewReport(report) {
 
 module.exports = {
   register:register,
+  // getCreditRemaining:getCreditRemaining,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,
   findSalariesByCompanyId: findSalariesByCompanyId,

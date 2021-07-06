@@ -316,6 +316,8 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
     }
   );
 
+  console.log(job)
+
   if(job) {
     if(!job.pipeline) {
       form.createdBy = currentUserId

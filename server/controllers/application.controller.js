@@ -22,15 +22,16 @@ const jobService = require('../services/jobrequisition.service');
 const fileService = require('../services/file.service');
 
 const {upload} = require('../services/aws.service');
-const {findApplicationByIdAndUserId, findApplicationByUserId, findApplicationById} = require('../services/application.service');
+const {findApplicationByIdAndUserId, findApplicationByUserId, findById, findByApplicationId} = require('../services/application.service');
 const {findWorkflowById} = require('../services/workflow.service');
 
-const {createEvent, acceptEvent, declineEvent} = require('../services/calendar.service');
+const {createEvent, acceptEvent, declineEvent} = require('../services/api/calendar.service.api');
 
 
 
 module.exports = {
-  getApplicationById,
+  getById,
+  getByApplicationId,
   uploadCV,
   uploadOffer,
   accept,
@@ -43,7 +44,7 @@ module.exports = {
 
 
 
-async function getApplicationById(currentUserId, applicationId) {
+async function getById(currentUserId, id) {
 
   if(!applicationId || !currentUserId){
     return null;
@@ -55,7 +56,7 @@ async function getApplicationById(currentUserId, applicationId) {
 
 
     if(isPartyActive(currentParty)) {
-      application = await findApplicationById(applicationId).populate([
+      application = await find(applicationId).populate([
         {
           path: 'currentProgress',
           model: 'ApplicationProgress',
@@ -105,6 +106,71 @@ async function getApplicationById(currentUserId, applicationId) {
   return application;
 }
 
+
+
+async function getByApplicationId(currentUserId, applicationId) {
+
+  if(!applicationId || !currentUserId){
+    return null;
+  }
+
+  let application;
+  try {
+    let currentParty = await findByUserId(currentUserId);
+
+
+    if(isPartyActive(currentParty)) {
+      application = await findByApplicationId(applicationId).populate([
+        {
+          path: 'currentProgress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        },
+        {
+          path: 'progress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        }
+      ]);
+      if (application) {
+        let job = await jobService.findJob_Id(application.jobId);
+        let company = await findCompanyById(job.company, currentUserId);
+        // application.job.company = company;
+        // application.job.responsibilities=[];
+        // application.job.qualifications = [];
+        // application.job.skills = []
+        job.company = convertToCompany(company);
+        application.job = jobMinimal(job);
+        application.progress = _.reduce(application.progress, function(res, progress){
+
+          progress.stage.evaluations = [];
+          progress.stage.members = [];
+          progress.stage.tasks = [];
+          res.push(progress);
+          return res;
+        }, [])
+
+        // application.job = job;
+
+      } else {
+        application=null;
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return application;
+}
+
+
 async function uploadCV(currentUserId, applicationId, files, name) {
   if(currentUserId==null || applicationId==null || files==null){
     return null;
@@ -116,7 +182,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
     let currentParty = await findByUserId(currentUserId);
     if (isPartyActive(currentParty)) {
 
-      let application = await findApplicationById(applicationId).populate('user');
+      let application = await findByApplicationId(applicationId).populate('user');
 
       if (application && application.user.userId == currentUserId) {
         let type;
@@ -211,7 +277,7 @@ async function uploadOffer(currentUserId, applicationId, file) {
 
     if (isPartyActive(currentParty)) {
 
-      let application = await findApplicationById(applicationId);
+      let application = await findByApplicationId(applicationId);
 
       if (application) {
 
@@ -363,7 +429,7 @@ async function addProgress(currentUserId, applicationId, progress) {
     let currentParty = await findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
-      let application = await findApplicationById(applicationId);
+      let application = await findByApplicationId(applicationId);
 
       if (application) {
         // application = await Application.populate(application, 'job');
@@ -446,7 +512,7 @@ async function updateProgress(currentUserId, applicationId, progress) {
     let currentParty = await findEmployeeById(currentUserId);
 
     if(isPartyActive(currentParty)) {
-      let application = await findApplicationById(applicationId);
+      let application = await findByApplicationId(applicationId);
 
       if (application) {
         // application = await Application.populate(application, 'job');
@@ -527,7 +593,7 @@ async function submitApplicationQuestions(currentUserId, applicationId, form) {
     let application;
 
     if(isPartyActive(currentParty)) {
-      application = await findApplicationById(applicationId);
+      application = await findByApplicationId(applicationId);
       let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, application.company);
       if (application && !application.hasSubmittedQuestion && application.user.equals(candidate._id)) {
         form.createdBy = currentUserId;
@@ -573,7 +639,7 @@ async function getFiles(company, currentUserId, applicationId) {
 
 
     if(isPartyActive(currentParty)) {
-      application = await findApplicationById(applicationId).populate([
+      application = await findByApplicationId(applicationId).populate([
         {
           path: 'currentProgress',
           model: 'ApplicationProgress',

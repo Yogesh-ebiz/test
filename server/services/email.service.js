@@ -12,6 +12,7 @@ const emailCampaignService = require('../services/emailcampaign.service');
 const sourceService = require('../services/source.service');
 const activityService = require('../services/activity.service');
 const jobService = require('../services/jobrequisition.service');
+const feedService = require('../services/api/feed.service.api');
 
 
 const emailSchema = Joi.object({
@@ -41,6 +42,28 @@ async function compose(form) {
   form.threadId = form.threadId?ObjectID(form.threadId):'';
   form = await Joi.validate(form, emailSchema, {abortEarly: false});
 
+  let contacts = _.reduce(form.to, function(res, contact){
+    if(!contact.email){
+      res.push(contact.id)
+    }
+    return res;
+  }, []);
+
+  contacts = await feedService.lookupContacts(contacts, 'EMAIL_ADDRESS');
+
+  form.to = _.reduce(form.to, function(res, contact){
+
+    if(!contact.email){
+      let found = _.find(contacts, {id: contact.id});
+      if(found){
+        contact.email = found.value;
+      }
+    }
+    res.push(contact);
+    return res;
+  }, []);
+
+
   let threadId = new ObjectID;
   form.threadId = threadId;
   if(form.type===emailType.DEFAULT) {
@@ -59,11 +82,13 @@ async function compose(form) {
     }
   } else if(form.type===emailType.JOB_INVITE) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
-
     let job = await jobService.findJob_Id(form.meta.jobId);
 
     for (let [i, contact] of form.to.entries()) {
       let nMail = _.clone(form);
+      if(!contact.email){
+
+      }
       nMail.to = [contact];
       let token;
       if(jobLink) {

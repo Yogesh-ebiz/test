@@ -27,7 +27,7 @@ const applicationService = require('../services/application.service');
 
 
 const {getListofSkillTypes} = require('../services/skilltype.service');
-const {findApplicationByUserIdAndJobId, findApplicationById, applyJob, findAppliedCountByJobId} = require('../services/application.service');
+const {findApplicationByUserIdAndJobId, findByApplicationId, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findApplicationByCurrentStatus, findApplicationProgresssById, addApplicationProgress} = require('../services/applicationprogress.service');
 const {findApplicationHistoryById, addApplicationHistory} = require('../services/applicationhistory.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');

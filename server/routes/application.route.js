@@ -1,5 +1,7 @@
 const express = require('express');
 const passport = require('passport');
+const ObjectID = require('mongodb').ObjectID;
+
 const asyncHandler = require('express-async-handler');
 const applicationCtl = require('../controllers/application.controller');
 let Response = require('../const/response');
@@ -9,7 +11,8 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
-router.route('/:id').get(asyncHandler(getApplicationById));
+router.route('/:id').get(asyncHandler(getById));
+router.route('/id/:id').get(asyncHandler(getByApplicationId));
 router.route('/:id/upload').post(asyncHandler(uploadCV));
 router.route('/:id/offer/upload').post(asyncHandler(uploadOffer));
 router.route('/:id/progresses/:applicationProgressId/accept').post(asyncHandler(accept));
@@ -19,14 +22,26 @@ router.route('/:id/progress').put(asyncHandler(updateProgress));
 router.route('/:id/questions').post(asyncHandler(submitApplicationQuestions));
 
 
-async function getApplicationById(req, res) {
+async function getById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = parseInt(req.params.id);
-  let data = await applicationCtl.getApplicationById(currentUserId, applicationId);
+  let id = ObjectID(req.params.id);
+  let data = await applicationCtl.getById(currentUserId, id);
 
   res.json(new Response(data, data?'application_retrieved_successful':'not_found', res));
 }
+
+
+
+async function getByApplicationId(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let applicationId = parseInt(req.params.id);
+  let data = await applicationCtl.getByApplicationId(currentUserId, applicationId);
+
+  res.json(new Response(data, data?'application_retrieved_successful':'not_found', res));
+}
+
 
 async function uploadCV(req, res) {
   let currentUserId = parseInt(req.header('UserId'));

@@ -286,8 +286,14 @@ async function lookupPeopleIds(ids) {
 };
 
 
+
+async function lookupContacts(ids, type) {
+  let response = await client.get(`/people/contacts/lookup?ids=${ids.join(',')}&type=${type}`, null, options);
+  return response.data.data;
+};
+
+
 async function findCandidateById(id) {
-  console.log(id)
   let response = await client.get(`/people/candidates/${id}`, null, options);
   return response.data.data;
 };
@@ -429,6 +435,7 @@ module.exports = {
   findCandidateById:findCandidateById,
   lookupUserIds:lookupUserIds,
   lookupPeopleIds:lookupPeopleIds,
+  lookupContacts:lookupContacts,
   lookupCompaniesIds:lookupCompaniesIds,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,

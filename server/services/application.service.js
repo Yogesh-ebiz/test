@@ -73,7 +73,7 @@ function findById(applicationId) {
 }
 
 
-function findApplicationById(applicationId) {
+function findByApplicationId(applicationId) {
   let data = null;
 
   if(applicationId==null){
@@ -1294,7 +1294,7 @@ async function searchEmails(applicationId, sort) {
 module.exports = {
   add:add,
   findById: findById,
-  findApplicationById: findApplicationById,
+  findByApplicationId: findByApplicationId,
   findApplicationBy_Id:findApplicationBy_Id,
   findApplicationsByJobIds:findApplicationsByJobIds,
   findApplicationByUserId: findApplicationByUserId,
