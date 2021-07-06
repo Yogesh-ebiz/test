@@ -34,6 +34,21 @@ async function add(source) {
 
 }
 
+async function addWithCheck(source) {
+  if(!source){
+    return;
+  }
+
+  source = await Joi.validate(source, sourceSchema, {abortEarly: false});
+  source.status = statusEnum.ACTIVE;
+  source.campaign = [];
+  source.createdDate = Date.now();
+  source = await Source.findOneAndUpdate({job: source.job, candidate: source.candidate}, source, {upsert: true});
+
+  return source;
+
+}
+
 
 
 async function addSources(candidate, jobIds, member) {
@@ -193,6 +208,7 @@ async function search(filter, sort) {
 
 module.exports = {
   add:add,
+  addWithCheck:addWithCheck,
   addSources:addSources,
   remove:remove,
   findById:findById,

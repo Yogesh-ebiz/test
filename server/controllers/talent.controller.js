@@ -3221,11 +3221,24 @@ async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) 
           candidate: candidate._id,
           createdBy: member._id
         };
-        sourceService.add(source);
+        source = sourceService.addWithCheck(source);
 
-        let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitlte: job.title, jobId: job._id};
-        await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
-
+        if(source) {
+          let meta = {
+            candidateName: candidate.firstName + ' ' + candidate.lastName,
+            candidate: candidate._id,
+            jobTitlte: job.title,
+            jobId: job._id
+          };
+          await activityService.addActivity({
+            causer: member._id,
+            causerType: subjectType.MEMBER,
+            subjectType: subjectType.CANDIDATE,
+            subject: candidate._id,
+            action: actionEnum.ADDED,
+            meta: meta
+          });
+        }
 
       }
     }
