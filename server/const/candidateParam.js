@@ -8,6 +8,13 @@ function CandidateParam(filter) {
   // this.query.$or = [];
 
 
+  this.query.$and = [];
+
+  // if(filter.has)
+  //   { $or: [ { hasApplied: true }, { hasImported : true } ] },
+  //   // { $or: [ { sale: true }, { price : { $lt : 5 } } ] }
+  // ];
+
   this.query.hasApplied =  filter.hasApplied?true:false;
   this.query.hasImported =  filter.hasImported?true:false;
 
@@ -38,6 +45,7 @@ function CandidateParam(filter) {
     this.query.$or = [];
     this.query.$or.push({firstName: { $regex: filter.query, $options: "i" }});
     this.query.$or.push({lastName: { $regex: filter.query, $options: "i" }});
+    this.query.$or.push({email: { $regex: filter.query, $options: "i" }});
   }
 
   if (filter.level && filter.level.length) {

@@ -33,6 +33,7 @@ const SourceSchema = new mongoose.Schema({
   hasApplied: {
     type: Boolean
   },
+  application: { type: Schema.Types.ObjectId, ref: 'Application' },
   job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
   updatedBy: { type: Schema.Types.ObjectId, ref: 'Member' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },

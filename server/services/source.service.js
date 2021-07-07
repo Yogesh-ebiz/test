@@ -170,21 +170,21 @@ async function search(filter, sort) {
     // {$lookup: {from: 'emailcampaigns', localField: 'campaign', foreignField: '_id', as: 'campaign' } },
     {$lookup:{
         from:"emailcampaigns",
-        let:{campaign:"$campaign"},
+        let:{campaigns:"$campaigns"},
         pipeline:[
-          {$match:{$expr:{$eq:["$_id","$$campaign"]}}},
-          {$lookup: {from: 'emailcampaignstages', localField: 'currentStage', foreignField: '_id', as: 'currentStage' } },
-          {$unwind: '$currentStage'}
+          {$match:{$expr:{$in:["$_id","$$campaigns"]}}},
+          // {$lookup: {from: 'emailcampaignstages', localField: 'currentStage', foreignField: '_id', as: 'currentStage' } },
+          // {$unwind: '$currentStage'}
         ],
-        as: 'campaign'
+        as: 'campaigns'
       },
     },
     // {$unwind: '$campaign'}
-    {$unwind: {
-        path: "$campaign",
-        preserveNullAndEmptyArrays: true
-      }
-    }
+    // {$unwind: {
+    //     path: "$campaigns",
+    //     preserveNullAndEmptyArrays: true
+    //   }
+    // }
   );
 
   aList.push(aMatch);
