@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:90/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:90/api');
 
 async function createJobFeed(jobId, partyId, text, userId){
 
@@ -148,6 +148,11 @@ async function hasFollowed(id, userId){
   return await client.get(`/company/${id}/hasfollow`, {}, options);
 };
 
+
+async function syncPeople(form) {
+  let response = await client.post(`/people/sync`, form, null);
+  return response.data.data;
+};
 
 
 async function searchCompany(query, ids, userId){
@@ -419,6 +424,7 @@ module.exports = {
 
   followCompany: followCompany,
   hasFollowed:hasFollowed,
+  syncPeople:syncPeople,
   searchCompany:searchCompany,
   searchPopularCompany:searchPopularCompany,
 

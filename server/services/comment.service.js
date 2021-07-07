@@ -111,14 +111,14 @@ async function addComment(comment, member) {
   if(comment.subjectType==subjectType.JOB){
     job = await jobService.findJob_Id(comment.subject);
 
-    activity.meta= {name: member.firstName + ' ' + member.lastName, jobTitlte: job.title, jobId: job._id};
+    activity.meta= {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id};
   } else if(comment.subjectType==subjectType.APPLICATION) {
     application = await applicationService.findApplicationBy_Id(comment.subject).populate('user');
     if(application){
       job = await jobService.findJob_Id(application.jobId);
     }
 
-    activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitlte: job.title, jobId: job._id};
+    activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: job.title, jobId: job._id};
   }
 
   await activityService.addActivity(activity);

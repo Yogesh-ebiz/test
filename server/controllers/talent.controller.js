@@ -3227,7 +3227,7 @@ async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) 
           let meta = {
             candidateName: candidate.firstName + ' ' + candidate.lastName,
             candidate: candidate._id,
-            jobTitlte: job.title,
+            jobTitle: job.title,
             jobId: job._id
           };
           await activityService.addActivity({

@@ -12,6 +12,8 @@ const emailCampaignService = require('../services/emailcampaign.service');
 const sourceService = require('../services/source.service');
 const activityService = require('../services/activity.service');
 const jobService = require('../services/jobrequisition.service');
+const candidateService = require('../services/candidate.service');
+
 const feedService = require('../services/api/feed.service.api');
 
 
@@ -31,7 +33,7 @@ const emailSchema = Joi.object({
 
 
 
-async function compose(form) {
+async function compose(form, companyId) {
   let data = null;
 
   if(!form){
@@ -84,61 +86,132 @@ async function compose(form) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
     let job = await jobService.findJob_Id(form.meta.jobId);
 
-    for (let [i, contact] of form.to.entries()) {
-      let nMail = _.clone(form);
-      if(!contact.email){
+    if(job) {
+      for (let [i, contact] of form.to.entries()) {
+        let nMail = _.clone(form);
+        if (!contact.email) {
 
-      }
-      nMail.to = [contact];
-      let token;
-      if(jobLink) {
-        token = new ObjectID;
-        let link = `${jobLink.url}?tracking=${token}`;
-        nMail.attachments[0].url = link;
+        }
+        nMail.to = [contact];
+        let token;
+        if (jobLink) {
+          token = new ObjectID;
+          let link = `${jobLink.url}?tracking=${token}`;
+          nMail.attachments[0].url = link;
 
-        nMail = await new Email(nMail).save();
-        if (nMail) {
-          let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(form.meta.jobId));
-          let hasInvitation = campaign ? _.find(campaign.stages, {type: 'INVITED'}) : false;
+          nMail = await new Email(nMail).save();
+          if (nMail) {
 
-          if (!hasInvitation) {
-            let campaign = {
-              token: token.toString(),
-              createdBy: form.createdBy,
-              jobId: ObjectID(form.meta.jobId),
-              emailAddress: contact.email,
-              email: nMail._id,
-              meta: form.meta,
-            };
+            let candidate = null;
+            if (contact.candidateId) {
+              candidate = await candidateService.findById(ObjectID(contact.candidateId));
+            } else {
 
-            if(contact.id){
-              campaign.userId = contact.id;
-            }
-
-            campaign = await emailCampaignService.add(campaign);
-
-            if(contact.sourceId){
-              let source = await sourceService.findById(ObjectID(contact.sourceId));
-              if(source) {
-                source.campaign = campaign;
-                await source.save();
+              if (contact.id && !contact.candidateId) {
+                candidate = await candidateService.findByUserIdAndCompanyId(contact.id, companyId);
+                if (!candidate) {
+                  let user = await feedService.findCandidateById(contact.id);
+                  if (user) {
+                    candidate = await candidateService.addCandidate(companyId, user);
+                  }
+                }
+              } else {
+                candidate = await candidateService.findByEmailAndCompanyId(contact.email, companyId);
+                if(!candidate) {
+                  //Sync: Create new User or Return if exist by email
+                  let user = await feedService.syncPeople({
+                    email: contact.email,
+                    primaryAddress: {city: job.city, state: job.state, country: job.country}
+                  });
+                  if (user) {
+                    candidate = await candidateService.addCandidate(companyId, user, contact.email);
+                  }
+                }
               }
             }
 
+            if (candidate) {
+              let source = await sourceService.findByJobIdAndCandidateId(ObjectID(form.meta.jobId), candidate._id);
+
+              let campaign = {
+                token: token.toString(),
+                createdBy: ObjectID(form.from.memberId),
+                candidate: candidate._id,
+                jobId: ObjectID(form.meta.jobId),
+                emailAddress: contact.email,
+                email: nMail._id,
+                meta: form.meta,
+              };
+
+              campaign.userId = candidate.userId;
+              campaign = await emailCampaignService.add(campaign);
+
+
+              if (!source) {
+                source = {
+                  job: ObjectID(form.meta.jobId),
+                  candidate: candidate._id,
+                  createdBy: ObjectID(form.from.memberId)
+                };
+                source = await sourceService.add(source);
+              }
+
+              source.campaigns.push(campaign);
+              await source.save();
+
+              /*
+              let campaign = await emailCampaignService.findByEmailAndJobId(contact.email, ObjectID(form.meta.jobId));
+              let hasInvitation = campaign ? _.find(campaign.stages, {type: 'INVITED'}) : false;
+
+              if (!hasInvitation) {
+                let campaign = {
+                  token: token.toString(),
+                  createdBy: form.createdBy,
+                  jobId: ObjectID(form.meta.jobId),
+                  emailAddress: contact.email,
+                  email: nMail._id,
+                  meta: form.meta,
+                };
+
+                if(contact.id){
+                  campaign.userId = contact.id;
+                }
+
+                campaign = await emailCampaignService.add(campaign);
+
+                if(contact.sourceId){
+                  let source = await sourceService.findById(ObjectID(contact.sourceId));
+                  if(source) {
+                    source.campaign = campaign;
+                    await source.save();
+                  }
+                }
+
+              }
+              */
+
+              let meta = {
+                candidateName: candidate.firstName + " " + candidate.lastName,
+                candidate: candidate._id,
+                jobTitle: job.title,
+                jobId: job._id
+              };
+              await activityService.addActivity({
+                causer: ObjectID(form.from.memberId),
+                causerType: subjectType.MEMBER,
+                subjectType: subjectType.CANDIDATE,
+                subject: candidate._id,
+                action: actionEnum.INVITED,
+                meta: meta
+              });
+
+            }
+
+
           }
-
-          if(contact.candidateId){
-
-            let meta= {candidateName: contact.name, candidate: contact.candidateId, jobTitlte: job.title, jobId: job._id};
-            await activityService.addActivity({causer: ObjectID(form.from.memberId), causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: ObjectID(contact.candidateId), action: actionEnum.INVITED, meta: meta});
-
-          }
-
-
         }
       }
     }
-
   }
 
 

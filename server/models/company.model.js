@@ -17,7 +17,7 @@ const CompanySchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  creditLeft: {
+  credit: {
     type: Number,
     default: 0
   },

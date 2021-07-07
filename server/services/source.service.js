@@ -70,7 +70,7 @@ async function addSources(candidate, jobIds, member) {
     await Joi.validate(source, sourceSchema, {abortEarly: false});
 
     sources.push(source);
-    let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitlte: job.title, jobId: job._id};
+    let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.title, jobId: job._id};
     await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
 
   }
@@ -120,7 +120,7 @@ function findByJobIdAndCandidateId(jobId, candidateId) {
     return;
   }
 
-  return Source.find({job: jobId, candidate: candidateId});
+  return Source.findOne({job: jobId, candidate: candidateId}).populate('campaigns');
 
 }
 

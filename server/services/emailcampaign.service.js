@@ -16,7 +16,7 @@ const emailCampaignSchema = Joi.object({
   token: Joi.string(),
   createdBy: Joi.object(),
   jobId: Joi.object(),
-  user: Joi.object().optional(),
+  candidate: Joi.object().optional(),
   userId: Joi.number().optional(),
   email: Joi.object(),
   emailAddress: Joi.string(),
@@ -34,7 +34,6 @@ async function add(emailCampaign) {
   emailCampaign = await new EmailCampaign(emailCampaign).save();
 
   let stage = await emailCampaignStageService.add({type: emailCampaignStageType.INVITED});
-  console.log(emailCampaign)
   emailCampaign.stages.push(stage);
   emailCampaign.currentStage = stage;
 

@@ -35,7 +35,7 @@ const EmailCampaignSchema = new mongoose.Schema({
     type: String
   },
   email: { type: Schema.Types.ObjectId, ref: 'Email' },
-  user: { type: Schema.Types.ObjectId, ref: 'Candidate' },
+  candidate: { type: Schema.Types.ObjectId, ref: 'Candidate' },
   job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
   application: { type: Schema.Types.ObjectId, ref: 'Application' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },

@@ -34,10 +34,10 @@ const SourceSchema = new mongoose.Schema({
     type: Boolean
   },
   job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
-  updatedBy: { type: Schema.Types.ObjectId, ref: 'Candidate' },
-  createdBy: { type: Schema.Types.ObjectId, ref: 'Candidate' },
+  updatedBy: { type: Schema.Types.ObjectId, ref: 'Member' },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },
   candidate: { type: Schema.Types.ObjectId, ref: 'Candidate' },
-  campaign: [{ type: Schema.Types.ObjectId, ref: 'Campaign' }]
+  campaigns: [{ type: Schema.Types.ObjectId, ref: 'EmailCampaign' }]
 }, {
   versionKey: false
 });

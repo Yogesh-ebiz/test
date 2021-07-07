@@ -15,8 +15,8 @@ const candidateSchema = Joi.object({
   userId: Joi.number().optional(),
   company: Joi.number(),
   avatar: Joi.string().allow('').optional(),
-  firstName: Joi.string(),
-  lastName: Joi.string(),
+  firstName: Joi.string().allow(''),
+  lastName: Joi.string().allow(''),
   middleName: Joi.string().allow('').optional(),
   city: Joi.string().allow('').optional(),
   state: Joi.string().allow('').optional(),
@@ -32,16 +32,19 @@ const candidateSchema = Joi.object({
 
 
 async function addCandidate(companyId, user, email, phone) {
-
   if(!companyId || !user){
     return;
   }
 
+  let city = user.primary && user.primaryAddress.city?user.primaryAddress.city:'';
+  let state = user.primary && user.primaryAddress.state?user.primaryAddress.state:'';
+  let country = user.primary && user.primaryAddress.country?user.primaryAddress.country:'';
   email = email?email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
   phone = phone?phone:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
+
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
-    city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country,
+    city: city, state: state, country: country,
     skills: _.map(user.skills, 'id'), url: user.shareUrl
   }
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
@@ -139,6 +142,18 @@ function findByUserIdAndCompanyId(userId, companyId) {
   }
 
   return Candidate.findOne({userId: userId, company: companyId});
+}
+
+
+
+function findByEmailAndCompanyId(email, companyId) {
+
+
+  if(!email || !companyId){
+    return;
+  }
+
+  return Candidate.findOne({email: email, company: companyId});
 }
 
 
@@ -361,6 +376,7 @@ module.exports = {
   findByUserId:findByUserId,
   findByCompany:findByCompany,
   findByUserIdAndCompanyId:findByUserIdAndCompanyId,
+  findByEmailAndCompanyId:findByEmailAndCompanyId,
   getListofCandidates:getListofCandidates,
   searchCandidates:searchCandidates,
   search:search,

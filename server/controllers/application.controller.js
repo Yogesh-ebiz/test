@@ -46,7 +46,7 @@ module.exports = {
 
 async function getById(currentUserId, id) {
 
-  if(!applicationId || !currentUserId){
+  if(!id || !currentUserId){
     return null;
   }
 
@@ -56,7 +56,7 @@ async function getById(currentUserId, id) {
 
 
     if(isPartyActive(currentParty)) {
-      application = await find(applicationId).populate([
+      application = await findById(id).populate([
         {
           path: 'currentProgress',
           model: 'ApplicationProgress',

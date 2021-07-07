@@ -16,10 +16,11 @@ router.route('/:emailId/upload').post(asyncHandler(uploadEmailAttachmentById));
 
 async function composeEmail(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = req.header('companyId') ? parseInt(req.header('companyId')) : null;
   let form = req.body;
 
 
-  let data = await emailCtl.composeEmail(currentUserId, form);
+  let data = await emailCtl.composeEmail(currentUserId, form, companyId);
   res.json(new Response(data, data?'email_composed_successful':'not_found', res));
 }
 

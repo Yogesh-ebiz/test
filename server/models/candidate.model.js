@@ -12,7 +12,6 @@ const CandidateSchema = new mongoose.Schema({
   },
   company: {
     type: Number,
-    required: true
   },
   createdDate: {
     type: Number,

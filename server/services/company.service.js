@@ -77,6 +77,18 @@ async function register(currentParty, form) {
 }
 
 
+async function getCreditRemaining(companyId) {
+
+  if(!companyId){
+    return;
+  }
+
+  let company = await Company.findOne({companyId: companyId});
+
+  return company.credit;
+
+}
+
 
 function addCompanySalary(salary) {
 
@@ -631,7 +643,7 @@ function addCompanyReviewReport(report) {
 
 module.exports = {
   register:register,
-  // getCreditRemaining:getCreditRemaining,
+  getCreditRemaining:getCreditRemaining,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,
   findSalariesByCompanyId: findSalariesByCompanyId,

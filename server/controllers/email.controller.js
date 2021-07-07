@@ -24,13 +24,13 @@ module.exports = {
 
 /************************** EMAIL *****************************/
 
-async function composeEmail(currentUserId, form)  {
+async function composeEmail(currentUserId, form, companyId)  {
 
   if(!currentUserId ||  !form){
     return null;
   }
 
-  let result = await emailService.compose(form);
+  let result = await emailService.compose(form, companyId);
 
   return result;
 
