@@ -30,10 +30,9 @@ const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
 const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
-const {findByJobId, findById, getPipelines, addPipeline} = require('../services/pipeline.service');
-const {getPipelineTemplateById, getPipelineTemplates, addPipelineTemplate} = require('../services/pipelineTemplate.service');
 const pipelineTemplateService = require('../services/pipelineTemplate.service');
 
+const pipelineService = require('../services/pipeline.service');
 const applicationProgressService = require('../services/applicationprogress.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
@@ -1942,6 +1941,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
         }
       });
 
+
       if(progress){
         application.currentProgress = progress;
         newStage = progress.stage;
@@ -1971,7 +1971,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
       }
 
       let job = await jobService.findJob_Id(application.jobId);
-      let activity = await activityService.addActivity({causerId: ''+currentUserId, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
+      let activity = await activityService.addActivity({causer: member, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
     }
 
   } catch (error) {
@@ -2678,7 +2678,7 @@ async function getBoard(currentUserId, jobId, locale) {
   let pipelineStages;
   let job = await jobService.findJob_Id(jobId, locale);
 
-  let pipeline = await findByJobId(job._id);
+  let pipeline = await pipelineService.findById(job.pipeline);
   if(pipeline.stages) {
 
     let pipelineStages = pipeline.stages;
@@ -3866,7 +3866,7 @@ async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
     return null;
   }
 
-  let result = await getPipelineTemplates(companyId);
+  let result = await pipelineTemplateService.getPipelineTemplates(companyId);
 
   return result;
 

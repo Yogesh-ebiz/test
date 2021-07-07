@@ -8,15 +8,15 @@ function CandidateParam(filter) {
   // this.query.$or = [];
 
 
-  this.query.$and = [];
 
-  // if(filter.has)
-  //   { $or: [ { hasApplied: true }, { hasImported : true } ] },
-  //   // { $or: [ { sale: true }, { price : { $lt : 5 } } ] }
-  // ];
 
-  this.query.hasApplied =  filter.hasApplied?true:false;
-  this.query.hasImported =  filter.hasImported?true:false;
+  if(filter.hasApplied || filter.hasImported) {
+    this.query.$and = [];
+    this.query.$and.push({$or: [{hasApplied: true}, {hasImported: true}]})
+  }
+
+  // this.query.hasApplied =  filter.hasApplied?true:false;
+  // this.query.hasImported =  filter.hasImported?true:false;
 
   if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };

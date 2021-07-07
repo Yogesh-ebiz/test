@@ -84,10 +84,6 @@ async function addJob(companyId, member, form) {
 
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
-  let pipeline = await pipelineService.getDefaultTemplate();
-
-  console.log(pipeline)
-  form.pipeline = pipeline;
   form.company = companyId
   form.members = [member._id];
   form.createdBy = member._id;
@@ -315,8 +311,6 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
       }
     }
   );
-
-  console.log(job)
 
   if(job) {
     if(!job.pipeline) {

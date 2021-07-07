@@ -15,7 +15,7 @@ const emailCampaignStageService = require('../services/emailcampaignstage.servic
 const emailCampaignSchema = Joi.object({
   token: Joi.string(),
   createdBy: Joi.object(),
-  jobId: Joi.object(),
+  job: Joi.object(),
   candidate: Joi.object().optional(),
   userId: Joi.number().optional(),
   email: Joi.object(),
@@ -49,7 +49,17 @@ async function findByEmailAndJobId(email, jobId) {
     return;
   }
 
-  return EmailCampaign.findOne({emailAddress: email, jobId: jobId}).populate('stages').populate('currentStage');
+  return EmailCampaign.findOne({email: email, job: jobId}).populate('stages').populate('currentStage');
+}
+
+
+
+async function findByEmailAddressAndJobId(email, jobId) {
+  if(!email || !jobId){
+    return;
+  }
+
+  return EmailCampaign.findOne({emailAddress: email, job: jobId}).populate('stages').populate('currentStage');
 }
 
 
@@ -207,6 +217,7 @@ async function search(jobId, filter, sort) {
 module.exports = {
   add:add,
   findByEmailAndJobId:findByEmailAndJobId,
+  findByEmailAddressAndJobId:findByEmailAddressAndJobId,
   findByJobId:findByJobId,
   findCampaignsByJobId:findCampaignsByJobId,
   findByToken:findByToken,

@@ -109,6 +109,7 @@ async function compose(form, companyId) {
 
               if (contact.id && !contact.candidateId) {
                 candidate = await candidateService.findByUserIdAndCompanyId(contact.id, companyId);
+                console.log(contact.id, companyId, candidate);
                 if (!candidate) {
                   let user = await feedService.findCandidateById(contact.id);
                   if (user) {
@@ -131,13 +132,14 @@ async function compose(form, companyId) {
             }
 
             if (candidate) {
+              console.log(form.meta.jobId, candidate._id)
               let source = await sourceService.findByJobIdAndCandidateId(ObjectID(form.meta.jobId), candidate._id);
 
               let campaign = {
                 token: token.toString(),
                 createdBy: ObjectID(form.from.memberId),
                 candidate: candidate._id,
-                jobId: ObjectID(form.meta.jobId),
+                job: ObjectID(form.meta.jobId),
                 emailAddress: contact.email,
                 email: nMail._id,
                 meta: form.meta,
@@ -146,7 +148,7 @@ async function compose(form, companyId) {
               campaign.userId = candidate.userId;
               campaign = await emailCampaignService.add(campaign);
 
-
+              console.log('source', source)
               if (!source) {
                 source = {
                   job: ObjectID(form.meta.jobId),

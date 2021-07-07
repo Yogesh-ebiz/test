@@ -558,13 +558,14 @@ async function apply(application) {
       if(application.token){
         campaign = await emailCampaignService.findByToken(application.token);
       } else {
-        campaign = await emailCampaignService.findByEmailAndJobId(application.email, job._id);
+        campaign = await emailCampaignService.findByEmailAddressAndJobId(application.email, job._id);
       }
 
       savedApplication = await savedApplication.save();
 
       if(campaign) {
         let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
+
         if (!exists) {
           let organic = campaign.token===application.token?false:true;
           let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: organic});
