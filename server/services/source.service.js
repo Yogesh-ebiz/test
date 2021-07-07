@@ -173,8 +173,8 @@ async function search(filter, sort) {
         let:{campaigns:"$campaigns"},
         pipeline:[
           {$match:{$expr:{$in:["$_id","$$campaigns"]}}},
-          // {$lookup: {from: 'emailcampaignstages', localField: 'currentStage', foreignField: '_id', as: 'currentStage' } },
-          // {$unwind: '$currentStage'}
+          {$lookup: {from: 'emailcampaignstages', localField: 'currentStage', foreignField: '_id', as: 'currentStage' } },
+          {$unwind: '$currentStage'}
         ],
         as: 'campaigns'
       },
