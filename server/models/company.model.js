@@ -10,6 +10,12 @@ const CompanySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  customerId: {
+    type: String
+  },
+  email: {
+    type: String
+  },
   createdBy: {
     type: Number,
   },

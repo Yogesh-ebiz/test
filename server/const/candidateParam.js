@@ -13,7 +13,11 @@ function CandidateParam(filter) {
   if(filter.hasApplied || filter.hasImported) {
     this.query.$and = [];
     this.query.$and.push({$or: [{hasApplied: true}, {hasImported: true}]})
+  } else {
+    this.query.hasApplied = false;
+    this.query.hasImported = false;
   }
+
 
   // this.query.hasApplied =  filter.hasApplied?true:false;
   // this.query.hasImported =  filter.hasImported?true:false;

@@ -50,7 +50,8 @@ async function register(currentParty, form) {
       name: company.name,
       companyId: company.id,
       createdBy: currentParty.id,
-      primaryAddress: {district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
+      email:currentParty.primaryEmail?currentParty.primaryEmail.value:'',
+      primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
     }).save();
 
     let role = await roleService.getRoleByRole(roleType.ADMIN);
@@ -71,6 +72,21 @@ async function register(currentParty, form) {
     await memberService.addMember(member);
 
   }
+
+  return company;
+
+}
+
+
+
+
+async function findById(companyId) {
+
+  if(!companyId){
+    return;
+  }
+
+  let company = await Company.findOne({companyId: companyId});
 
   return company;
 
@@ -643,6 +659,7 @@ function addCompanyReviewReport(report) {
 
 module.exports = {
   register:register,
+  findById:findById,
   getCreditRemaining:getCreditRemaining,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,

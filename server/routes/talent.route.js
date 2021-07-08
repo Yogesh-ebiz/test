@@ -23,7 +23,7 @@ router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
 router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
 router.route('/company/:id/stats').get(asyncHandler(getStats));
 
-router.route('/company/:id/payment/cards').post(asyncHandler(addCard));
+router.route('/company/:id/payment/cards').post(asyncHandler(updateCard));
 router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
 router.route('/company/:id/payment/cards/:cardId').delete(asyncHandler(removeCard));
 router.route('/company/:id/payment/cards/verify').post(asyncHandler(verifyCard));
@@ -302,11 +302,11 @@ async function getCompanies(req, res) {
 
 
 
-async function addCard(req, res) {
+async function updateCard(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
   let card = req.body;
-  let data = await talentCtrl.addCard(companyId, currentUserId, card);
+  let data = await talentCtrl.updateCard(companyId, currentUserId, card);
   res.json(new Response(data, data?'card_created_successful':'not_found', res));
 }
 

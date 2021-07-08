@@ -8,6 +8,30 @@ const options = { headers: {'userId': null } };
 let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/api');
 // let client = new ApiClient('http://localhost:5000/api');
 
+
+async function addCustomer(form) {
+
+
+  let response = await client.post(`/customers/`, form, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data;
+};
+
+
 async function findUserByIdFull(id) {
   let user = null;
 
@@ -136,15 +160,10 @@ async function getAdroducts() {
 };
 
 
-async function addCard(userId, form) {
-
-  const options = {
-    headers: {'userId': userId}
-  };
+async function updatePaymentMethod(customerId, form) {
 
 
-  let response = await client.post(`/customers/${userId}/card`, form, options).catch(function (error) {
-    console.log(error)
+  let response = await client.post(`/customers/${customerId}/payment/method`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.status, error.response.data.message);
@@ -186,6 +205,29 @@ async function getUserCards(userId) {
 };
 
 
+
+async function getCards(partyId) {
+
+  let response = await client.get(`/customers/${partyId}/card/list`, null, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });;
+
+
+  return response.data;
+};
+
+
 async function lookupProducts(ids) {
 
   let response = await client.get(`/products/lookup?ids=${ids}`, null, null).catch(function (error) {
@@ -204,11 +246,72 @@ async function lookupProducts(ids) {
 };
 
 
+
+async function addSubscription(userId, form) {
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.post(`/customers/${userId}/card`, form, options).catch(function (error) {
+    console.log(error)
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data;
+};
+
+
+async function updateSubscription(userId, id, form) {
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.post(`/subscription/${id}/card`, form, options).catch(function (error) {
+    console.log(error)
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data;
+};
+
+
 module.exports = {
+  addCustomer:addCustomer,
   charge:charge,
   addProduct:addProduct,
   getAdroducts:getAdroducts,
-  addCard:addCard,
+  updatePaymentMethod:updatePaymentMethod,
+  getCards:getCards,
   getUserCards:getUserCards,
-  lookupProducts:lookupProducts
+  lookupProducts:lookupProducts,
+  addSubscription:addSubscription,
+  updateSubscription:updateSubscription
 }

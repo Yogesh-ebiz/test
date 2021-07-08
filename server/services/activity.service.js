@@ -175,6 +175,8 @@ async function findByJobId(companyId, jobId, sort) {
     return;
   }
 
+  console.log(jobId, companyId)
+
   let select = '';
   let limit = (sort.size && sort.size>0) ? parseInt(sort.size):20;
   let page = (sort.page && sort.page==0) ? 1:parseInt(sort.page)+1;
@@ -198,7 +200,7 @@ async function findByJobId(companyId, jobId, sort) {
         from: "candidates",
         pipeline: [
           { $match: {company: companyId} },
-          { $project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1} },
+          { $project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1} },
           {
             $unionWith: {
               coll: "members",

@@ -132,6 +132,8 @@ const convertToCandidate = (user) => {
     past: past,
     current: current,
     links: user.links?user.links:[],
+    dob: user.dob,
+    maritalStatus: user.maritalStatus,
     tags: user.tags?user.tags:[],
     sources: user.sources?user.sources:[],
     applications: user.applications?user.applications:[],

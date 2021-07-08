@@ -21,6 +21,7 @@ const {upload} = require('../services/aws.service');
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
+const companyService = require('../services/company.service');
 
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const jobService = require('../services/jobrequisition.service');
@@ -114,7 +115,7 @@ module.exports = {
   getTaxAndFee,
   getImpressionCandidates,
   getStats,
-  addCard,
+  updateCard,
   getCards,
   removeCard,
   verifyCard,
@@ -745,14 +746,42 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 }
 
 
-async function addCard(companyId, currentUserId, card) {
+async function updateCard(companyId, currentUserId, card) {
 
   if(!companyId || !currentUserId || !card){
     return null;
   }
-  card.userId = currentUserId;
-  card.companyId = companyId;
-  let result = await cardService.add(card);
+
+  let company = await companyService.findById(companyId);
+  if(!company.customerId){
+    console.log('create')
+    let customer = {
+      partyId: companyId,
+      partyType: 'COMPANY',
+      name: company.name,
+      phone: card.phone,
+      email: card.email,
+      address: {
+        address1: company.primaryAddress.address1,
+        address2: company.primaryAddress.address2,
+        city: company.primaryAddress.city,
+        state: company.primaryAddress.state,
+        country: company.primaryAddress.country,
+        postalCode: company.primaryAddress.postalCode,
+      }
+    }
+
+    customer = await paymentProvider.addCustomer(customer);
+    console.log(customer)
+    if(customer){
+      console.log('saving customer')
+      company.customerId = customer.id;
+      await company.save();
+    }
+  }
+
+  console.log('adding card', card)
+  let result = await cardService.updatePaymentMethod(company.customerId, card);
   return result;
 }
 
@@ -763,7 +792,7 @@ async function getCards(companyId, currentUserId) {
     return null;
   }
 
-  let result = await cardService.findByUserId(currentUserId);
+  let result = await cardService.findByCompany(companyId);
   result = _.reduce(result, function(res, c){
     res.push({id: c.id, brand: c.brand, last4: c.last4, isDefault: c.isDefault?true:false});
     return res;
@@ -1934,6 +1963,8 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
 
 
     if(application) {
+      let job = await jobService.findJob_Id(application.jobId);
+
       let previousProgress = application.currentProgress;
       _.forEach(application.progress, function(item){
         if(item.stage._id.equals(ObjectID(newStage))){
@@ -1948,7 +1979,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
         await application.save();
 
       } else {
-        let pipeline = await findByJobId(application.jobId);
+        let pipeline = await pipelineService.findById(job.pipeline);
         if(pipeline) {
           foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
           if(foundStage) {
@@ -1970,8 +2001,8 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
         }
       }
 
-      let job = await jobService.findJob_Id(application.jobId);
-      let activity = await activityService.addActivity({causer: member, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
+
+      let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
     }
 
   } catch (error) {
@@ -2385,7 +2416,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
         await application.currentProgress.save();
         await application.user.save();
         let job = await jobService.findJob_Id(application.jobId);
-        let activity = await activityService.addActivity({causerId: ''+result.createdBy, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {candidate: application.user._id, name: application.currentProgress.stage.name, jobId: job._id}});
+        let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {candidate: application.user._id, name: application.currentProgress.stage.name, jobId: job._id}});
       }
     }
 
@@ -2997,10 +3028,10 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
     }
     candidate.match = 78;
-    let partyLink = await feedService.getUserLinks(candidate.userId);
-    if (partyLink) {
-      candidate.links = partyLink.links;
-    }
+    // let partyLink = await feedService.getUserLinks(candidate.userId);
+    // if (partyLink) {
+    //   candidate.links = partyLink.links;
+    // }
     result = convertToCandidate(candidate);
   } else {
     let people = await feedService.findCandidateById(candidateId);
