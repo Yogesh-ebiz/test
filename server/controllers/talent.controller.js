@@ -1346,50 +1346,77 @@ async function payJob(companyId, currentUserId, jobId, form) {
     return null;
   }
 
-  let result;
+  let result = {success: false, verification: false};
   let job = await jobService.getJobAds(jobId)
 
   if(job) {
-    let checkout = await checkoutService.payJob(member, form);
-    if (checkout) {
+    let company = await companyService.findById(companyId);
+    form.customer = {id: company.customerId};
+    if(company.customerId) {
+      let checkout = await checkoutService.payJob(member, form);
+      if (checkout) {
 
-      if(form.dailyBudget){
-        let startTime = new Date();
-        let endTime = new Date();
-        endTime.setDate(endTime.getDate()+30);
-        endTime.setHours(23);
-        endTime.setMinutes(59);
-        let ad = {lifetimeBudget: form.dailyBudget * 30, startTime: startTime.getTime(), endTime: endTime.getTime(), bidAmount: form.dailyBudget,
-          targeting: {ageMin: 0, ageMax: 100, genders: [], geoLocations: {countries: [job.country]}, adPositions: ['feed']} };
-        ad = await adService.add(ad);
-        job.searchAd = ad;
-      }
-
-      if(form.cart.items.length){
-        let products = await paymentProvider.lookupProducts(_.map(form.cart.items, 'id'));
-        for(const [i, product] of products.entries()){
-
+        if (form.dailyBudget) {
           let startTime = new Date();
           let endTime = new Date();
-          endTime.setDate(endTime.getDate()+parseInt(product.durationDay));
+          endTime.setDate(endTime.getDate() + 30);
           endTime.setHours(23);
           endTime.setMinutes(59);
-
-          let ad = {productId: product.id, lifetimeBudget: product.listPrice, startTime: startTime.getTime(), endTime: endTime.getTime(), bidAmount: 0,
-            targeting: {ageMin: 0, ageMax: 100, genders: [], geoLocations: {countries: [job.country]}, adPositions: [product.adPosition]} };
+          let ad = {
+            lifetimeBudget: form.dailyBudget * 30,
+            startTime: startTime.getTime(),
+            endTime: endTime.getTime(),
+            bidAmount: form.dailyBudget,
+            targeting: {
+              ageMin: 0,
+              ageMax: 100,
+              genders: [],
+              geoLocations: {countries: [job.country]},
+              adPositions: ['feed']
+            }
+          };
           ad = await adService.add(ad);
-          job.ads.push(ad);
+          job.searchAd = ad;
         }
+
+        if (form.cart.items.length) {
+          let products = await paymentProvider.lookupProducts(_.map(form.cart.items, 'id'));
+          for (const [i, product] of products.entries()) {
+
+            let startTime = new Date();
+            let endTime = new Date();
+            endTime.setDate(endTime.getDate() + parseInt(product.durationDay));
+            endTime.setHours(23);
+            endTime.setMinutes(59);
+
+            let ad = {
+              productId: product.id,
+              lifetimeBudget: product.listPrice,
+              startTime: startTime.getTime(),
+              endTime: endTime.getTime(),
+              bidAmount: 0,
+              targeting: {
+                ageMin: 0,
+                ageMax: 100,
+                genders: [],
+                geoLocations: {countries: [job.country]},
+                adPositions: [product.adPosition]
+              }
+            };
+            ad = await adService.add(ad);
+            job.ads.push(ad);
+          }
+        }
+
+
+        job.status = statusEnum.ACTIVE;
+        job.publishedDate = Date.now();
+        job.type = jobType.PROMOTION;
+        job = await job.save();
       }
 
-
-      job.status = statusEnum.ACTIVE;
-      job.publishedDate = Date.now();
-      job.type = jobType.PROMOTION;
-      job = await job.save();
+      result = {success: true, verification: false};
     }
-
-    result = {success: true, verification: false};
     // } else {
     //   result = { success: false, verification: true };
     // }

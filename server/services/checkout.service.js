@@ -18,6 +18,7 @@ async function payJob(member, form) {
   }
 
   let ads = [];
+
   let payment = await paymentService.charge(member, form);
 
   return ads;

@@ -28,7 +28,8 @@ const paymentSchema = Joi.object({
 const cartSchema = Joi.object({
   dailyBudget: Joi.number().optional(),
   cart: Joi.object(),
-  payment: Joi.object()
+  payment: Joi.object(),
+  customer: Joi.object()
 });
 
 

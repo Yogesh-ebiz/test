@@ -23,7 +23,8 @@ const cardSchema = Joi.object({
   currency: Joi.string().allow('').optional(),
   meta: Joi.object().optional(),
   companyId: Joi.number(),
-  userId: Joi.number()
+  userId: Joi.number(),
+  customer: Joi.object()
 });
 
 
