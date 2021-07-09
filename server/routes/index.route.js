@@ -20,6 +20,7 @@ const peopleRoutes = require('./people.route');
 const emailRoutes = require('./email.route');
 const taskRoutes = require('./task.route');
 const adRoutes = require('./ad.route');
+const subscriptionRoutes = require('./subscription.route');
 
 const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
@@ -56,6 +57,8 @@ router.use('/policies', policyRoutes);
 router.use('/products', productRoutes);
 router.use('/people', peopleRoutes);
 router.use('/emails', emailRoutes);
+router.use('/subscriptions', subscriptionRoutes);
+
 router.use('/tasks', taskRoutes);
 
 

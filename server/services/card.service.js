@@ -7,6 +7,7 @@ const statusEnum = require('../const/statusEnum');
 const Card = require('../models/card.model');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
+const companyService = require('../services/company.service');
 
 const {convertToCandidate, cardTest} = require('../utils/helper');
 
@@ -79,7 +80,16 @@ async function findByCompany(companyId) {
   if(!companyId){
     return;
   }
-  return await paymentService.getCards(companyId);
+
+  let list = [];
+  let company = await companyService.findById(companyId);
+  if(company.customerId){
+    list = await paymentService.getPaymentMethod(company.customerId);
+    //temporary set to array for later multi-cards
+    list = [list];
+
+  }
+  return list;
 
 }
 

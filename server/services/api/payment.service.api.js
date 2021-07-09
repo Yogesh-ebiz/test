@@ -184,9 +184,9 @@ async function updatePaymentMethod(customerId, form) {
 };
 
 
-async function getUserCards(userId) {
+async function getPaymentMethod(customerId) {
 
-  let response = await client.get(`/customers/${userId}/card/list`, null, null).catch(function (error) {
+  let response = await client.get(`/customers/${customerId}/payment/method`, null, null).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.message);
@@ -202,14 +202,14 @@ async function getUserCards(userId) {
   });;
 
 
-  return response.data;
+  return response.data.data;
 };
 
 
 
-async function getCards(partyId) {
+async function getCards(customerId) {
 
-  let response = await client.get(`/customers/${partyId}/card/list`, null, null).catch(function (error) {
+  let response = await client.get(`/customers/${customerId}/card/list`, null, null).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.message);
@@ -304,15 +304,38 @@ async function updateSubscription(userId, id, form) {
 };
 
 
+async function getPlans() {
+
+  let response = await client.get(`/plans/list?category=JOB&type=MEMBERSHIP`, null, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });;
+
+
+  return response.data.data;
+};
+
+
 module.exports = {
   addCustomer:addCustomer,
   charge:charge,
   addProduct:addProduct,
   getAdroducts:getAdroducts,
   updatePaymentMethod:updatePaymentMethod,
+  getPaymentMethod:getPaymentMethod,
   getCards:getCards,
-  getUserCards:getUserCards,
   lookupProducts:lookupProducts,
   addSubscription:addSubscription,
-  updateSubscription:updateSubscription
+  updateSubscription:updateSubscription,
+  getPlans:getPlans
 }
