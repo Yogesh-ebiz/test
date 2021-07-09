@@ -80,7 +80,21 @@ async function register(currentParty, form) {
 
 
 
-async function findById(companyId) {
+async function findById(id) {
+
+  if(!id){
+    return;
+  }
+
+  let company = await Company.findById(id);
+
+  return company;
+
+}
+
+
+
+async function findByCompanyId(companyId) {
 
   if(!companyId){
     return;
@@ -660,6 +674,7 @@ function addCompanyReviewReport(report) {
 module.exports = {
   register:register,
   findById:findById,
+  findByCompanyId:findByCompanyId,
   getCreditRemaining:getCreditRemaining,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,

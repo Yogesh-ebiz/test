@@ -180,7 +180,7 @@ async function updatePaymentMethod(customerId, form) {
   });
 
 
-  return response.data;
+  return response.data.data;
 };
 
 
@@ -220,7 +220,7 @@ async function getDefaultCard(customerId) {
       console.log('Error', error.message);
     }
 
-  });;
+  });
 
 
   return response.data.data;
@@ -268,15 +268,9 @@ async function lookupProducts(ids) {
 };
 
 
+async function addSubscription(form) {
 
-async function addSubscription(userId, form) {
-
-  const options = {
-    headers: {'userId': userId}
-  };
-
-
-  let response = await client.post(`/customers/${userId}/card`, form, options).catch(function (error) {
+  let response = await client.post(`/subscriptions`, form, options).catch(function (error) {
     console.log(error)
     if (error.response) {
       // Request made and server responded
@@ -293,18 +287,37 @@ async function addSubscription(userId, form) {
   });
 
 
-  return response.data;
+  return response.data.data;
 };
 
 
-async function updateSubscription(userId, id, form) {
+async function updateSubscription(id, form) {
 
-  const options = {
-    headers: {'userId': userId}
-  };
+  console.log(id, form)
+  let response = await client.put(`/subscriptions/${id}`, form, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
 
 
-  let response = await client.post(`/subscription/${id}/card`, form, options).catch(function (error) {
+  return response.data.data;
+};
+
+
+async function cancelSubscription(id, form) {
+
+
+  let response = await client.post(`/subscription/${id}/cancel`, form, options).catch(function (error) {
     console.log(error)
     if (error.response) {
       // Request made and server responded
@@ -321,7 +334,7 @@ async function updateSubscription(userId, id, form) {
   });
 
 
-  return response.data;
+  return response.data.data;
 };
 
 
@@ -347,6 +360,7 @@ async function getPlans() {
 };
 
 
+
 module.exports = {
   addCustomer:addCustomer,
   charge:charge,
@@ -359,5 +373,6 @@ module.exports = {
   lookupProducts:lookupProducts,
   addSubscription:addSubscription,
   updateSubscription:updateSubscription,
+  cancelSubscription:cancelSubscription,
   getPlans:getPlans
 }

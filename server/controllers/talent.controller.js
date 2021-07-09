@@ -752,7 +752,7 @@ async function updateCard(companyId, currentUserId, card) {
     return null;
   }
 
-  let company = await companyService.findById(companyId);
+  let company = await companyService.findByCompanyId(companyId);
   if(!company.customerId){
     console.log('create')
     let customer = {
@@ -780,7 +780,6 @@ async function updateCard(companyId, currentUserId, card) {
     }
   }
 
-  console.log('adding card', card)
   let result = await cardService.updatePaymentMethod(company.customerId, card);
   return result;
 }
@@ -1350,7 +1349,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
   let job = await jobService.getJobAds(jobId)
 
   if(job) {
-    let company = await companyService.findById(companyId);
+    let company = await companyService.findByCompanyId(companyId);
     form.customer = {id: company.customerId};
     if(company.customerId) {
       let checkout = await checkoutService.payJob(member, form);

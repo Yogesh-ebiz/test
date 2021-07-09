@@ -82,7 +82,8 @@ async function findByCompany(companyId) {
   }
 
   let list = [];
-  let company = await companyService.findById(companyId);
+  let company = await companyService.findByCompanyId(companyId);
+  console.log(company)
   if(company.customerId){
     list = await paymentService.getDefaultCard(company.customerId);
 
