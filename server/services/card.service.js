@@ -84,10 +84,12 @@ async function findByCompany(companyId) {
   let list = [];
   let company = await companyService.findById(companyId);
   if(company.customerId){
-    list = await paymentService.getPaymentMethod(company.customerId);
-    //temporary set to array for later multi-cards
-    list = [list];
+    list = await paymentService.getDefaultCard(company.customerId);
 
+    //temporary set to array for later multi-cards
+    if(!_.isEmpty(list)) {
+      list = [list];
+    }
   }
   return list;
 

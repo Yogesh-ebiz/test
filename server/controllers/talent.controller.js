@@ -794,7 +794,6 @@ async function getCards(companyId, currentUserId) {
 
   let result = await cardService.findByCompany(companyId);
   result = _.reduce(result, function(res, c){
-    console.log(c)
     res.push({id: c.id?c.id:'', brand: c.brand, last4: c.last4, isDefault: c.isDefault?true:false});
     return res;
   }, []);
