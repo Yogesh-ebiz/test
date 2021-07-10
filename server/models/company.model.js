@@ -33,7 +33,9 @@ const CompanySchema = new mongoose.Schema({
   primaryAddress: {
     type: Object
   },
-  subscription: { type: Schema.Types.ObjectId, ref: 'Subscription' },
+  subscription: {
+    type: Object
+  }
 
 }, {
   versionKey: false

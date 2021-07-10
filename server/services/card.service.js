@@ -45,22 +45,14 @@ async function updatePaymentMethod(customerId, card) {
 
 }
 
-async function remove(cardId) {
+async function remove(customerId, cardId) {
 
-  if(!cardId){
+  if(!customerId || !cardId){
     return;
   }
 
-  let result;
-  let card = await Card.findById(cardId);
-  if(card){
-    result = await card.delete();
-    if(result){
-      result = {success: true}
-    }
-  }
-
-  return result;
+  await paymentService.removeDefaultCard(customerId, cardId);
+  return {success: true};
 
 }
 

@@ -5,6 +5,9 @@ const { autoIncrement } = require('mongoose-plugin-autoinc');
 const Schema = mongoose.Schema;
 
 const SubscriptionSchema = new mongoose.Schema({
+  status: {
+    type: String
+  },
   createdDate: {
     type: Number,
     default: Date.now

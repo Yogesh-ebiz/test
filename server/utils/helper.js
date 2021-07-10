@@ -155,12 +155,12 @@ const convertToCompany = (company) => {
     address1: company.primaryAddress.address1,
     city: company.primaryAddress.city,
     state: company.primaryAddress.state,
-    country: company.primaryAddress.country,
-    images: company.images
+    country: company.primaryAddress.country
   }: null;
 
   return {
-    id: company.id,
+    id: company.id?company.id:company.companyId?company.companyId:null,
+    companyId: company.companyId?company.companyId:null,
     name: company.name,
     avatar: company.avatar,
     cover: company.cover,
@@ -170,7 +170,9 @@ const convertToCompany = (company) => {
     hasFollowed:company.hasFollowed,
     images: company.images,
     rating: company.rating,
-    noOfFollowers: company.noOfFollowers
+    noOfFollowers: company.noOfFollowers,
+    customerId: company.customerId,
+    subscription: company.subscription
   };
 }
 

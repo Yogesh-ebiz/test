@@ -106,6 +106,19 @@ async function findByCompanyId(companyId) {
 
 }
 
+async function findByCompanyIds(companyIds) {
+
+  console.log(companyIds)
+  if(!companyIds){
+    return;
+  }
+
+  let companies = await Company.find({companyId: {$in: companyIds}});
+
+  return companies;
+
+}
+
 
 async function getCreditRemaining(companyId) {
 
@@ -675,6 +688,7 @@ module.exports = {
   register:register,
   findById:findById,
   findByCompanyId:findByCompanyId,
+  findByCompanyIds:findByCompanyIds,
   getCreditRemaining:getCreditRemaining,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,

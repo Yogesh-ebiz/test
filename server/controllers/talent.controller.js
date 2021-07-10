@@ -277,23 +277,22 @@ async function getUserSession(currentUserId, preferredCompany) {
   let result;
   let user = await feedService.findUserByIdFull(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
-  let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
-
+  // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
+  let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'));
 
   companies = _.reduce(companies, function(res, item){
-    let found = _.find(allAccounts, {company: item.id});
+    let found = _.find(allAccounts, {company: item.companyId});
     item = convertToCompany(item);
     item.role = roleMinimal(found.role);
     item.memberId = found._id
+
     res.push(item)
 
     return res;
   }, [])
   user = convertToTalentUser(user);
   user.company = companies;
-  user.currentCompanyId = preferredCompany? _.some(companies, {id: preferredCompany})?preferredCompany:companies.length?companies[0].id:null:companies.length?companies[0].id:null;
-
-
+  user.currentCompanyId = preferredCompany? _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length?companies[0].company:null:companies.length?companies[0].company:null;
 
   return user;
 
@@ -752,9 +751,14 @@ async function updateCard(companyId, currentUserId, card) {
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
   let company = await companyService.findByCompanyId(companyId);
   if(!company.customerId){
-    console.log('create')
     let customer = {
       partyId: companyId,
       partyType: 'COMPANY',
@@ -772,9 +776,7 @@ async function updateCard(companyId, currentUserId, card) {
     }
 
     customer = await paymentProvider.addCustomer(customer);
-    console.log(customer)
     if(customer){
-      console.log('saving customer')
       company.customerId = customer.id;
       await company.save();
     }
@@ -788,6 +790,12 @@ async function updateCard(companyId, currentUserId, card) {
 async function getCards(companyId, currentUserId) {
 
   if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
@@ -806,7 +814,19 @@ async function removeCard(companyId, currentUserId, cardId) {
     return null;
   }
 
-  let result = await cardService.remove(cardId);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let company = await companyService.findByCompanyId(companyId);
+  if(company && company.customerId){
+    console.log(company.customerId, cardId)
+    result = await cardService.remove(company.customerId, cardId);
+  }
+
   return result;
 }
 

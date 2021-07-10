@@ -18,31 +18,35 @@ module.exports = {
 
 
 
-async function addSubscription(currentUserId, subscription) {
+async function addSubscription(currentUserId, form) {
 
-  if(!currentUserId || !subscription){
+  if(!currentUserId || !form){
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, subscription.company);
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
 
   if(!member){
     return null;
   }
 
-  let result;
+  let subscription = null;
   try {
-    subscription.createdBy = currentUserId;
-    result = await paymentService.addSubscription(subscription);
-    if(result){
+    form.createdBy = currentUserId;
+    subscription = await paymentService.addSubscription(form);
+    if(subscription){
+
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
-      console.log(subscription.company)
+
+      subscription = {id: subscription.id, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id}}
+      company.subscription = subscription;
+      await company.save();
     }
   } catch (error) {
     console.log(error);
   }
 
-  return result;
+  return subscription;
 }
 
 
@@ -52,47 +56,51 @@ async function getSubscription(currentUserId, id) {
     return null;
   }
 
-  let result;
+  let subscription = null;
   try {
-    result = await paymentService.getSubscription(id);
-    if(result){
-      // let company = await companyService.findByCompanyId(parseInt(subscription.companyId));
-      // console.log(company)
-
-
+    subscription = await paymentService.getSubscription(id);
+    if(subscription){
+      let company = await companyService.findByCompanyId(parseInt(subscription.company));
+      subscription = {id: subscription.id, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id}}
+      company.subscription = subscription;
+      await company.save();
     }
   } catch (error) {
     console.log(error);
   }
 
-  return result;
+  return subscription;
 }
 
 
 
-async function updateSubscription(currentUserId, id, subscription) {
-  if(!currentUserId || !id || !subscription){
+async function updateSubscription(currentUserId, id, form) {
+  if(!currentUserId || !id || !form){
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, subscription.company);
+  console.log(form)
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
 
   if(!member){
     return null;
   }
 
-  let result;
+  let subscription = null;
   try {
-    result = await paymentService.updateSubscription(id, subscription);
-    if(result){
-      let company = await companyService.findByCompanyId(parseInt(subscription.companyId));
-      console.log(company)
+    form.updatedBy = currentUserId;
+    subscription = await paymentService.updateSubscription(id, form);
+    if(subscription){
+      let company = await companyService.findByCompanyId(parseInt(subscription.company));
+      subscription = {id: subscription.id, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id}}
+      company.subscription = subscription;
+      await company.save();
     }
   } catch (error) {
     console.log(error);
   }
 
-  return result;
+  return subscription;
 }
 
 
@@ -102,6 +110,7 @@ async function getPlans(locale) {
 
   let result;
   try {
+    console.log('getPlans')
     result = await paymentService.getPlans();
   } catch (error) {
     console.log(error);

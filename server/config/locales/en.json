@@ -220,5 +220,6 @@
 	"template_added_successful": "template_added_successful",
 	"template_removed_successful": "template_removed_successful",
 	"subscription_updated_successful": "subscription_updated_successful",
-	"subscription_retrieved_successful": "subscription_retrieved_successful"
+	"subscription_retrieved_successful": "subscription_retrieved_successful",
+	"card_removed_successful": "card_removed_successful"
 }
