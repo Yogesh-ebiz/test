@@ -11,6 +11,7 @@ const memberService = require('../services/member.service');
 
 module.exports = {
   addSubscription,
+  getSubscription,
   updateSubscription,
   getPlans
 }
@@ -31,6 +32,7 @@ async function addSubscription(currentUserId, subscription) {
 
   let result;
   try {
+    subscription.createdBy = currentUserId;
     result = await paymentService.addSubscription(subscription);
     if(result){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
@@ -45,10 +47,30 @@ async function addSubscription(currentUserId, subscription) {
 
 
 
+async function getSubscription(currentUserId, id) {
+  if(!currentUserId || !id){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await paymentService.getSubscription(id);
+    if(result){
+      // let company = await companyService.findByCompanyId(parseInt(subscription.companyId));
+      // console.log(company)
+
+
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 
 
 async function updateSubscription(currentUserId, id, subscription) {
-  console.log(currentUserId, id, subscription)
   if(!currentUserId || !id || !subscription){
     return null;
   }

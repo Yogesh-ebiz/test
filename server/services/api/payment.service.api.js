@@ -290,11 +290,30 @@ async function addSubscription(form) {
   return response.data.data;
 };
 
+async function getSubscription(id) {
+
+  let response = await client.get(`/subscriptions/${id}`, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data.data;
+};
 
 async function updateSubscription(id, form) {
 
-  console.log(id, form)
-  let response = await client.put(`/subscriptions/${id}`, form, options).catch(function (error) {
+  let response = await client.put(`/subscriptions/${id}`, form, null).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.status, error.response.data.message);
@@ -372,6 +391,7 @@ module.exports = {
   getCards:getCards,
   lookupProducts:lookupProducts,
   addSubscription:addSubscription,
+  getSubscription:getSubscription,
   updateSubscription:updateSubscription,
   cancelSubscription:cancelSubscription,
   getPlans:getPlans

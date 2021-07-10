@@ -10,6 +10,7 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('').post(asyncHandler(addSubscription));
+router.route('/:id').get(asyncHandler(getSubscription));
 router.route('/:id').put(asyncHandler(updateSubscription));
 router.route('/plans').get(asyncHandler(getPlans));
 
@@ -23,6 +24,15 @@ async function addSubscription(req, res) {
   res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
 
+
+async function getSubscription(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await subscriptionCtl.getSubscription(currentUserId, id);
+
+  res.json(new Response(data, data?'subscription_retrieved_successful':'not_found', res));
+}
 
 
 async function updateSubscription(req, res) {
