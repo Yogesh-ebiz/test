@@ -2,42 +2,45 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
-const Schema = mongoose.Schema;
 
 const SubscriptionSchema = new mongoose.Schema({
   status: {
     type: String
   },
   createdDate: {
-    type: Number,
-    default: Date.now
-  },
-  currentPeriodEnd: {
     type: Number
   },
-  currentPeriodStart: {
+  subscriptionId: {
+    type: String
+  },
+  cancelAt: {
     type: Number
   },
-  trialEnd: {
+  cancelAtPeriodEnd: {
+    type: Boolean
+  },
+  canceledAt: {
     type: Number
   },
   trialStart: {
     type: Number
   },
-  product: {
-    type: String
+  trialEnd: {
+    type: Number
   },
-  latestInvoice: {
-    type: String
+  plan: {
+    type: Object
   },
   startDate: {
     type: Number
   },
-  status: {
-    type: String,
-    required: true
+  endDate: {
+    type: Number
   },
-  payment: { type: Schema.Types.ObjectId, ref: 'Payment' },
+  type: {
+    type: String
+  }
+
 }, {
   versionKey: false
 });

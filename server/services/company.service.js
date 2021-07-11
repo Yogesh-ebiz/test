@@ -86,7 +86,7 @@ async function findById(id) {
     return;
   }
 
-  let company = await Company.findById(id);
+  let company = await Company.findById(id).populate('subscription');
 
   return company;
 
@@ -100,7 +100,7 @@ async function findByCompanyId(companyId) {
     return;
   }
 
-  let company = await Company.findOne({companyId: companyId});
+  let company = await Company.findOne({companyId: companyId}).populate('subscription');
 
   return company;
 
@@ -113,7 +113,7 @@ async function findByCompanyIds(companyIds) {
     return;
   }
 
-  let companies = await Company.find({companyId: {$in: companyIds}});
+  let companies = await Company.find({companyId: {$in: companyIds}}).populate('subscription');
 
   return companies;
 

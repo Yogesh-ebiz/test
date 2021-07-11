@@ -8,6 +8,7 @@ let statusEnum = require('../const/statusEnum');
 const paymentService = require('../services/api/payment.service.api');
 const companyService = require('../services/company.service');
 const memberService = require('../services/member.service');
+const subscriptionService = require('../services/subscription.service');
 
 
 module.exports = {
@@ -24,7 +25,6 @@ async function getPlans(locale) {
 
   let result;
   try {
-    console.log('getPlans')
     result = await paymentService.getPlans();
   } catch (error) {
     console.log(error);
@@ -56,16 +56,17 @@ async function addSubscription(currentUserId, form) {
     form.createdBy = currentUserId;
     subscription = await paymentService.addSubscription(form);
     if(subscription){
-      subscription = {id: subscription.id, type: subscription.type, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
-
+      let newSubscription = {subscriptionId: subscription.id, type: subscription.type, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
+      subscription = await subscriptionService.add(newSubscription);
       company.subscription = subscription;
+
       if(subscription.plan.tier==1){
         company.credit = 30;
       } else if(subscription.plan.tier==2){
         company.credit = 150;
       }
 
-      subscription = await company.save();
+      await company.save();
     }
   } catch (error) {
     console.log('throwing...................')
@@ -87,9 +88,12 @@ async function getSubscription(currentUserId, id) {
     subscription = await paymentService.getSubscription(id);
     if(subscription){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
-      subscription = {id: subscription.id, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, cancelAt: subscription.cancelAt, cancelAtPeriodEnd: subscription.cancelAtPeriodEnd, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id}}
-      company.subscription = subscription;
-      await company.save();
+      company.subscription.status = subscription.status;
+      company.subscription.cancelAt = subscription.cancelAt;
+      company.subscription.canceledAt = subscription.canceledAt;
+      company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
+      company.subscription.plan = subscription.plan;
+      await company.subscription.save();
     }
   } catch (error) {
     console.log(error);
@@ -117,9 +121,12 @@ async function updateSubscription(currentUserId, id, form) {
     subscription = await paymentService.updateSubscription(id, form);
     if(subscription){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
+      company.subscription.status = subscription.status;
+      company.subscription.cancelAt = subscription.cancelAt;
+      company.subscription.canceledAt = subscription.canceledAt;
+      company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
+      company.subscription.plan.priceId = subscription.plan.priceId;
 
-
-      console.log(company.subscription.plan.id!=subscription.plan.id, company.subscription.plan.id, subscription.plan.id)
       if(company.subscription.plan.id!=subscription.plan.id) {
         if (subscription.plan.tier == 1) {
           company.credit = 30;
@@ -128,8 +135,7 @@ async function updateSubscription(currentUserId, id, form) {
         }
       }
 
-      subscription = {id: subscription.id, status: subscription.status, cancelAt: subscription.cancelAt, cancelAtPeriodEnd: subscription.cancelAtPeriodEnd, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
-      company.subscription = subscription;
+      subscription = await company.subscription.save();
       await company.save();
     }
   } catch (error) {
@@ -156,12 +162,14 @@ async function cancelSubscription(currentUserId, id, form) {
   try {
     form.updatedBy = currentUserId;
     subscription = await paymentService.cancelSubscription(id, form);
-    console.log(subscription)
     if(subscription){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
-      subscription = {status: subscription.status, cancelAt: subscription.cancelAt, cancelAtPeriodEnd: subscription.cancelAtPeriodEnd, canceledAt: subscription.canceledAt}
-      company.subscription = subscription;
-      await company.save();
+      company.subscription.status = subscription.status;
+      company.subscription.cancelAt = subscription.cancelAt;
+      company.subscription.canceledAt = subscription.canceledAt;
+      company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
+      company.subscription.plan.priceId = subscription.plan.priceId;
+      subscription = await company.subscription.save();
     }
   } catch (error) {
     console.log(error);
