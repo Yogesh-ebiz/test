@@ -1,6 +1,6 @@
 const { BaseError } = require('./baseError');
 
-const handleErrors = (err, req, res, next) => {
+const handleErrors = function(err, req, res, next) {
   if (err instanceof BaseError) {
     return res.status(err.getCode()).json({
       status: 'error',

@@ -14,6 +14,17 @@ router.route('/plans').get(asyncHandler(getPlans));
 
 router.route('/:id').get(asyncHandler(getSubscription));
 router.route('/:id').put(asyncHandler(updateSubscription));
+router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
+
+
+
+async function getPlans(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await subscriptionCtl.getPlans(currentUserId, res.locale);
+
+  res.json(new Response(data, data?'ads_retrieved_successful':'not_found', res));
+}
 
 
 async function addSubscription(req, res) {
@@ -46,13 +57,14 @@ async function updateSubscription(req, res) {
   res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
 
-
-
-async function getPlans(req, res) {
+async function cancelSubscription(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
-  let data = await subscriptionCtl.getPlans(currentUserId, res.locale);
+  let id = req.params.id;
+  let subscription = req.body;
+  let data = await subscriptionCtl.cancelSubscription(currentUserId, id, subscription);
 
-  res.json(new Response(data, data?'ads_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
+
 

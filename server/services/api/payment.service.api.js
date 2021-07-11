@@ -293,7 +293,6 @@ async function lookupProducts(ids) {
 async function addSubscription(form) {
 
   let response = await client.post(`/subscriptions`, form, options).catch(function (error) {
-    console.log(error)
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.status, error.response.data.message);
@@ -358,8 +357,7 @@ async function updateSubscription(id, form) {
 async function cancelSubscription(id, form) {
 
 
-  let response = await client.post(`/subscription/${id}/cancel`, form, options).catch(function (error) {
-    console.log(error)
+  let response = await client.post(`/subscriptions/${id}/cancel`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.status, error.response.data.message);
@@ -373,7 +371,6 @@ async function cancelSubscription(id, form) {
     }
 
   });
-
 
   return response.data.data;
 };
