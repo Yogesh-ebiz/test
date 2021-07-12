@@ -104,6 +104,7 @@ module.exports = {
   updateJobById,
   reportJobById,
   captureJob,
+  getJobInsight,
   getJobLanding,
   getTopFiveJobs,
   searchJob,
@@ -140,7 +141,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
-    job = await findJobId(jobId, locale);
+    job = await findJobId(jobId, locale).populate('tags').populate('createdBy');;
 
     if(job) {
 
@@ -421,6 +422,39 @@ async function captureJob(currentUserId, jobId, capture) {
   }
 
   return {success: true};
+}
+
+
+async function getJobInsight(currentUserId, jobId, locale) {
+
+  if(!currentUserId || !jobId){
+    return null;
+  }
+
+  let result = {};
+  try {
+    console.log(jobId)
+    let job = await findJobId(jobId);
+    let jobSkills = [];
+    if(job.skills.length){
+      jobSkills = await feedService.findSkillsById(job.skills);
+    }
+    // let currentParty = await findByUserId(currentUserId);
+
+    let min = Math.ceil(60);
+    let max = Math.floor(100);
+    result.match = {rank: Math.floor(Math.random() * (max - min + 1)) + min, role: Math.floor(Math.random() * (max - min + 1)) + min, skills:Math.floor(Math.random() * (max - min + 1)) + min,  experience: Math.floor(Math.random() * (max - min + 1)) + min};
+
+    let applications = await applicationService.findByJobId(job._id);
+    let applicants = await feedService.lookupPeopleIds(_.map(applications, 'partyId'));
+    result.noOfApplications = applications.length;
+    result.applications = applicants;
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
 }
 
 

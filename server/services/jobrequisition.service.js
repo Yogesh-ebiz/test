@@ -235,17 +235,18 @@ async function findByIds(ids) {
   return JobRequisition.find({_id: {$in: ids }});
 }
 
-async function findJobId(jobId, locale) {
+
+function findJobId(jobId, locale) {
   let data = null;
 
-  if(jobId==null){
+  if(!jobId){
     return;
   }
   // let localeStr = locale? locale.toLowerCase() : 'en';
   // let propLocale = '$name.'+localeStr;
 
 
-  data = await JobRequisition.findOne({jobId: jobId}).populate('tags').populate('createdBy');
+  data = JobRequisition.findOne({jobId: jobId});
 
   // Promotion.populate(data, {path: "promotion"});
 

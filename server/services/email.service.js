@@ -40,7 +40,8 @@ async function compose(form, companyId) {
     return;
   }
 
-  let email;
+  let email, inmailCredit = 0;
+
   form.threadId = form.threadId?ObjectID(form.threadId):'';
   form = await Joi.validate(form, emailSchema, {abortEarly: false});
 
@@ -59,12 +60,14 @@ async function compose(form, companyId) {
       let found = _.find(contacts, {id: contact.id});
       if(found){
         contact.email = found.value;
+        inmailCredit++;
       }
     }
     res.push(contact);
     return res;
   }, []);
 
+  // let company = await companyService.findByCompanyId(companyId)
 
   let threadId = new ObjectID;
   form.threadId = threadId;

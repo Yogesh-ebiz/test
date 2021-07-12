@@ -92,8 +92,17 @@ async function getSubscription(currentUserId, id) {
       company.subscription.cancelAt = subscription.cancelAt;
       company.subscription.canceledAt = subscription.canceledAt;
       company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
-      company.subscription.plan = subscription.plan;
+      company.subscription.plan.id = subscription.plan.id;
+      company.subscription.plan.name = subscription.plan.name;
+      company.subscription.plan.price = subscription.price;
       await company.subscription.save();
+
+      subscription.customer = null;
+      subscription.plan.prices  = [];
+      subscription.plan.features = [];
+      subscription.price = null;
+      subscription.defaultSource = null;
+      subscription.invoice = null;
     }
   } catch (error) {
     console.log(error);

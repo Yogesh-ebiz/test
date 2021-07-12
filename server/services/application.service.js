@@ -252,6 +252,21 @@ async function getLatestCandidates(company) {
 }
 
 
+async function findByJobId(jobId) {
+  let data = null;
+
+  if(!jobId){
+    return;
+  }
+  console.log(jobId)
+  let applications = await Application.find({jobId:jobId});
+
+
+  return applications;
+
+}
+
+
 function findAppliedCountByJobId(jobId) {
   let data = null;
 
@@ -1305,6 +1320,7 @@ module.exports = {
   findAppliedCountByJobId: findAppliedCountByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
   findApplicationsByUserId:findApplicationsByUserId,
+  findByJobId: findByJobId,
   getLatestCandidates:getLatestCandidates,
   disqualify:disqualify,
   revert:revert,

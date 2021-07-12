@@ -291,6 +291,11 @@ async function lookupPeopleIds(ids) {
 };
 
 
+async function lookupCandidateIds(ids) {
+  let response = await client.get(`/people/candidates/lookup?ids=${ids}`, null, options);
+  return response.data.data;
+};
+
 
 async function lookupContacts(ids, type) {
   let response = await client.get(`/people/contacts/lookup?ids=${ids.join(',')}&type=${type}`, null, options);

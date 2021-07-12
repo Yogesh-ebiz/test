@@ -15,6 +15,7 @@ module.exports = router;
 
 // router.route('/').post(asyncHandler(insert));
 router.route('/').post(asyncHandler(importJobs));
+
 router.route('/landing').get(asyncHandler(jobLanding));
 router.route('/search').post(asyncHandler(searchJob));
 router.route('/search/suggestions').get(asyncHandler(searchSuggestions));
@@ -26,6 +27,7 @@ router.route('/:id').get(asyncHandler(getJobById));
 router.route('/:id').put(asyncHandler(updateJobById));
 router.route('/:id/report').post(asyncHandler(reportJobById));
 router.route('/:id/capture').get(asyncHandler(captureJob));
+router.route('/:id/insight').get(asyncHandler(getJobInsight));
 
 
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
@@ -103,6 +105,17 @@ async function captureJob(req, res) {
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
+
+
+async function getJobInsight(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let jobId = parseInt(req.params.id);
+
+  let data = await jobRequisitionCtl.getJobInsight(currentUserId, jobId, res.locale);
+  res.json(new Response(data, data?'insight_retrieved_successful':'not_found', res));
+}
+
+
 
 async function jobLanding(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
