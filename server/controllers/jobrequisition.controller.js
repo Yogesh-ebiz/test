@@ -433,7 +433,6 @@ async function getJobInsight(currentUserId, jobId, locale) {
 
   let result = {};
   try {
-    console.log(jobId)
     let job = await findJobId(jobId);
     let jobSkills = [];
     if(job.skills.length){
@@ -446,9 +445,35 @@ async function getJobInsight(currentUserId, jobId, locale) {
     result.match = {rank: Math.floor(Math.random() * (max - min + 1)) + min, role: Math.floor(Math.random() * (max - min + 1)) + min, skills:Math.floor(Math.random() * (max - min + 1)) + min,  experience: Math.floor(Math.random() * (max - min + 1)) + min};
 
     let applications = await applicationService.findByJobId(job._id);
-    let applicants = await feedService.lookupPeopleIds(_.map(applications, 'partyId'));
+    let lookupIds = _.map(applications, 'partyId');
+    lookupIds.push(currentUserId)
+    let applicants = await feedService.lookupCandidateIds(lookupIds);
+    let currentUser = _.remove(applicants, function(n) {
+      return n.id == currentUserId;
+    })[0];
+
+    currentUser.educations = null;
+    currentUser.experiences = null;
+    currentUser.skills = null;
     result.noOfApplications = applications.length;
-    result.applications = applicants;
+    result.applications = {
+      levels: [
+        {"JUNIOR": 4},
+        {"MID": 26},
+        {"SENIOR": 23},
+        {"MANAGER": 47}
+      ],
+      educations: [
+        {"ASSOCIATE": 20},
+        {"BACHELOR": 58},
+        {"MASTER": 10},
+        {"DOCTORAL": 12}
+      ]
+    };
+    result.skills = _.reduce(jobSkills, function(res, item){
+      res.push({name: item.name, hasSkill: false});
+      return res;
+    }, []);
 
   } catch (error) {
     console.log(error);

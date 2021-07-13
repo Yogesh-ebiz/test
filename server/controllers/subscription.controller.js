@@ -96,7 +96,7 @@ async function getSubscription(currentUserId, id) {
       company.subscription.plan.name = subscription.plan.name;
       company.subscription.plan.price = subscription.price;
       await company.subscription.save();
-
+      subscription.plan.price = subscription.price;
       subscription.customer = null;
       subscription.plan.prices  = [];
       subscription.plan.features = [];

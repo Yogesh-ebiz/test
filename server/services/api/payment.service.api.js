@@ -378,7 +378,7 @@ async function cancelSubscription(id, form) {
 
 async function getPlans() {
 
-  let response = await client.get(`/plans/list?category=JOB&type=MEMBERSHIP`, null, null).catch(function (error) {
+  let response = await client.get(`/plans/list?category=TALENT&type=MEMBERSHIP`, null, null).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.message);
