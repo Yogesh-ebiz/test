@@ -34,6 +34,19 @@ async function add(subscription) {
 }
 
 
+
+async function findById(id) {
+
+  if(!id){
+    return;
+  }
+
+  return Subscription.findById(id);
+
+}
+
+
 module.exports = {
-  add:add
+  add:add,
+  findById:findById
 }
