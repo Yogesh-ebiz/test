@@ -37,7 +37,7 @@ const SubscriptionSchema = new mongoose.Schema({
   endDate: {
     type: Number
   },
-  type: {
+  category: {
     type: String
   }
 

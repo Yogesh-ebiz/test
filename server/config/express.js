@@ -31,7 +31,7 @@ const locale = require("locale")
 // SET STORAGE
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '/tmp/uploads')
+    cb(null, '/tmp')
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname)

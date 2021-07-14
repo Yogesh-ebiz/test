@@ -56,7 +56,7 @@ async function addSubscription(currentUserId, form) {
     form.createdBy = currentUserId;
     subscription = await paymentService.addSubscription(form);
     if(subscription){
-      let newSubscription = {subscriptionId: subscription.id, type: subscription.type, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
+      let newSubscription = {subscriptionId: subscription.id, category: subscription.category, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
       subscription = await subscriptionService.add(newSubscription);
       company.subscription = subscription;
 
@@ -145,6 +145,7 @@ async function updateSubscription(currentUserId, id, form) {
       company.subscription.canceledAt = subscription.canceledAt;
       company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
       company.subscription.plan = {id: subscription.plan.id, name: subscription.plan.name, tier: subscription.plan.tier, price: subscription.price.id};
+
       subscription = await company.subscription.save();
       await company.save();
     }
@@ -152,7 +153,7 @@ async function updateSubscription(currentUserId, id, form) {
     console.log(error);
   }
 
-  return subscription;
+    return subscription;
 }
 
 
@@ -178,7 +179,7 @@ async function cancelSubscription(currentUserId, id, form) {
       company.subscription.cancelAt = subscription.cancelAt;
       company.subscription.canceledAt = subscription.canceledAt;
       company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
-      company.subscription.plan.priceId = subscription.plan.priceId;
+      company.subscription.plan.price = subscription.plan.priceId;
       subscription = await company.subscription.save();
     }
   } catch (error) {

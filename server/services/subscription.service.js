@@ -16,7 +16,7 @@ const subscriptionSchema = Joi.object({
   cancelAt: Joi.number().optional(),
   canceledAt: Joi.number().optional(),
   cancelAtPeriodEnd: Joi.string().allow('').optional(),
-  type: Joi.string().allow('').optional()
+  category: Joi.string().allow('').optional()
 });
 
 
