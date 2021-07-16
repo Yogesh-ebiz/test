@@ -15,7 +15,7 @@ module.exports = router;
 router.route('/session').get(asyncHandler(getUserSession));
 router.route('/market/salary').get(asyncHandler(getMarketSalary));
 
-router.route('/company').get(asyncHandler(getCompanies));
+router.route('/company/search').post(asyncHandler(searchCompany));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
 router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
@@ -113,6 +113,7 @@ router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(
 router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
+router.route('/company/:id/candidates/:candidateId').delete(asyncHandler(removeCandidateById));
 router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
 router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
 router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
@@ -173,6 +174,7 @@ router.route('/company/:id/members/:memberId').delete(asyncHandler(deleteCompany
 router.route('/company/:id/members/:memberId/jobs/subscribes').get(asyncHandler(getJobsSubscribed));
 router.route('/company/:id/members/:memberId/applications/subscribes').get(asyncHandler(getApplicationsSubscribed));
 router.route('/company/:id/members/:memberId/tasks').post(asyncHandler(searchTasks));
+
 
 
 router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
@@ -293,15 +295,14 @@ async function getStats(req, res) {
   res.json(new Response(data, data?'get_stats_successful':'not_found', res));
 }
 
-async function getCompanies(req, res) {
+
+async function searchCompany(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let sort = req.query;
   let filter = req.body;
-  let data = await talentCtrl.getCompanies(currentUserId, filter, sort);
+  let data = await talentCtrl.searchCompany(currentUserId, filter, sort);
   res.json(new Response(data, data?'companies_retrieved_successful':'not_found', res));
 }
-
-
 
 async function updateCard(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -1104,6 +1105,16 @@ async function updateCandidateById(req, res) {
 }
 
 
+async function removeCandidateById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data;
+  let company = parseInt(req.params.id);
+  let candidateId = parseInt(req.params.candidateId);
+
+  data = await talentCtrl.removeCandidateById(currentUserId, company, candidateId);
+  res.json(new Response(data, data ? 'candidate_removed_successful' : 'not_found', res));
+
+}
 
 async function addCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);

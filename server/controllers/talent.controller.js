@@ -115,7 +115,7 @@ module.exports = {
   getTaxAndFee,
   getImpressionCandidates,
   getStats,
-  getCompanies,
+  searchCompany,
   updateCard,
   getCards,
   removeCard,
@@ -181,6 +181,7 @@ module.exports = {
   searchCandidates,
   getCandidateById,
   updateCandidateById,
+  removeCandidateById,
   getCandidateEvaluations,
   getCandidateEvaluationsStats,
   getCandidateEvaluationById,
@@ -349,31 +350,6 @@ async function getTaxAndFee(companyId, currentUserId) {
 
 }
 
-
-async function getCompanies(currentUserId, filter, sort) {
-
-  if(currentUserId==null){
-    return null;
-  }
-
-  let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
-  let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'));
-
-  companies = _.reduce(companies, function(res, item){
-    let found = _.find(result.docs, {company: item.companyId});
-    item = convertToCompany(item);
-    item.role = roleMinimal(found.role);
-    item.memberId = found._id
-
-    res.push(item)
-
-    return res;
-  }, [])
-
-  result.docs = companies;
-  return new Pagination(result);
-
-}
 
 
 async function getCompanyInsights(currentUserId, companyId, timeframe) {
@@ -665,6 +641,35 @@ async function getStats(currentUserId, companyId) {
 
 
   return result;
+
+}
+
+
+async function searchCompany(currentUserId, filter, sort) {
+
+  if(currentUserId==null){
+    return null;
+  }
+
+  let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
+  let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'));
+
+  companies = _.reduce(companies, function(res, item){
+    let found = _.find(result.docs, {company: item.companyId});
+    item = convertToCompany(item);
+    item.role = null;
+    item.subscription = null;
+    item.primaryAddress = null;
+    item.customerId=null;
+    item.memberId = found._id
+
+    res.push(item)
+
+    return res;
+  }, [])
+
+  result.docs = companies;
+  return new Pagination(result);
 
 }
 
@@ -3137,6 +3142,28 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
   }
 
   return result;
+
+}
+
+
+async function removeCandidateById(currentUserId, companyId, candidateId) {
+
+  if(!currentUserId || !companyId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result;
+
+  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+  await candidate.delete();
+
+  return {success: true};
 
 }
 
