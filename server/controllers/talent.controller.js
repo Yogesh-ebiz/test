@@ -115,6 +115,7 @@ module.exports = {
   getTaxAndFee,
   getImpressionCandidates,
   getStats,
+  getCompanies,
   updateCard,
   getCards,
   removeCard,
@@ -349,22 +350,27 @@ async function getTaxAndFee(companyId, currentUserId) {
 }
 
 
-async function getCompanies(currentUserId) {
+async function getCompanies(currentUserId, filter, sort) {
 
   if(currentUserId==null){
     return null;
   }
 
-  let company = await findCompanyById(companyId, currentUserId);
+  let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
+  let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'));
 
+  companies = _.reduce(companies, function(res, item){
+    let found = _.find(result.docs, {company: item.companyId});
+    item = convertToCompany(item);
+    item.role = roleMinimal(found.role);
+    item.memberId = found._id
 
-  const loadPromises = result.docs.map(job => {
+    res.push(item)
 
-    job.company = convertToCompany(company);
-    return job;
-  });
-  // result = await Promise.all(loadPromises);
+    return res;
+  }, [])
 
+  result.docs = companies;
   return new Pagination(result);
 
 }
@@ -661,6 +667,7 @@ async function getStats(currentUserId, companyId) {
   return result;
 
 }
+
 
 async function searchJobs(currentUserId, companyId, filter, sort, locale) {
 

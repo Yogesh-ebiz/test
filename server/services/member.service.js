@@ -580,6 +580,44 @@ async function findApplicationSubscriptions(memberId, sort) {
 
 
 
+async function searchCompanyByUserId(userId, filter, sort) {
+  let data = null;
+
+  if(userId==null || !filter || !sort){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? parseInt(sort.size):20;
+  let page = (sort.page && sort.page==0) ? 1:parseInt(sort.page)+1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+
+
+  const options = {
+    page: page,
+    limit: limit,
+  };
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = { $match: {userId: userId}};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+
+  aList.push(
+    { $lookup: {from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
+    { $unwind: '$role'}
+  );
+
+  const aggregate = Member.aggregate(aList);
+
+  return await Member.aggregatePaginate(aggregate, options);
+}
+
+
+
 module.exports = {
   findById:findById,
   findByUserId:findByUserId,
@@ -604,5 +642,6 @@ module.exports = {
   findSubscribeByMemberIdAndSubjectType:findSubscribeByMemberIdAndSubjectType,
   findSubscribeByUserIdAndSubjectTypeAndSubjectIds:findSubscribeByUserIdAndSubjectTypeAndSubjectIds,
   findJobSubscriptions:findJobSubscriptions,
-  findApplicationSubscriptions:findApplicationSubscriptions
+  findApplicationSubscriptions:findApplicationSubscriptions,
+  searchCompanyByUserId:searchCompanyByUserId
 }

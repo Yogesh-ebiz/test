@@ -27,8 +27,8 @@ router.route('/company/:id/payment/cards').post(asyncHandler(updateCard));
 router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
 router.route('/company/:id/payment/cards/:cardId').delete(asyncHandler(removeCard));
 router.route('/company/:id/payment/cards/verify').post(asyncHandler(verifyCard));
-
 router.route('/company/:id/subscription').post(asyncHandler(updateSubscription));
+
 
 router.route('/company/:id/jobs').post(asyncHandler(createJob));
 router.route('/company/:id/jobs/search').post(asyncHandler(searchJob));
@@ -295,8 +295,9 @@ async function getStats(req, res) {
 
 async function getCompanies(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-
-  let data = await talentCtrl.getCompanies(currentUserId);
+  let sort = req.query;
+  let filter = req.body;
+  let data = await talentCtrl.getCompanies(currentUserId, filter, sort);
   res.json(new Response(data, data?'companies_retrieved_successful':'not_found', res));
 }
 

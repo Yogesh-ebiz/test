@@ -268,8 +268,6 @@ async function search(filter, sort) {
     aList.push(aSort);
   }
 
-  console.log(aSort)
-
   const aggregate = Candidate.aggregate(aList);
 
   return await Candidate.aggregatePaginate(aggregate, options);

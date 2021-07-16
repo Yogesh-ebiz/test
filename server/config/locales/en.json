@@ -222,5 +222,6 @@
 	"subscription_updated_successful": "subscription_updated_successful",
 	"subscription_retrieved_successful": "subscription_retrieved_successful",
 	"card_removed_successful": "card_removed_successful",
-	"insight_retrieved_successful": "insight_retrieved_successful"
+	"insight_retrieved_successful": "insight_retrieved_successful",
+	"companies_retrieved_successful": "companies_retrieved_successful"
 }
