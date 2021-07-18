@@ -72,17 +72,26 @@ async function getById(currentUserId, id) {
             path: 'stage',
             model: 'Stage'
           }
-        }
+        },
+        {
+          path: 'job',
+          model: 'JobRequisition',
+          populate: {
+            path: 'company',
+            model: 'Company'
+          }
+        },
       ]);
+
       if (application) {
-        let job = await jobService.findJob_Id(application.jobId);
-        let company = await findCompanyById(job.company, currentUserId);
+        // let job = await jobService.findJob_Id(application.jobId);
+        // let company = await findCompanyById(job.company, currentUserId);
         // application.job.company = company;
         // application.job.responsibilities=[];
         // application.job.qualifications = [];
         // application.job.skills = []
-        job.company = convertToCompany(company);
-        application.job = jobMinimal(job);
+        // job.company = convertToCompany(company);
+        application.job = jobMinimal(application.job);
         application.progress = _.reduce(application.progress, function(res, progress){
 
           progress.stage.evaluations = [];

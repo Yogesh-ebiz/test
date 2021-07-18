@@ -30,6 +30,7 @@ const {convertToAvatar} = require('../utils/helper');
 
 const applicationSchema = Joi.object({
   jobTitle: Joi.string().allow(''),
+  job: Joi.object().required(),
   jobId: Joi.object().required(),
   user: Joi.object().required(),
   partyId: Joi.number().required(),
@@ -525,9 +526,9 @@ async function apply(application) {
   }
 
 
-  let job = application.jobId;
+  let job = application.job;
   let candidate = application.user;
-  application.jobId = job._id;
+  application.job = job._id;
   application.user = candidate._id;
   application = await Joi.validate(application, applicationSchema, {abortEarly: false});
 

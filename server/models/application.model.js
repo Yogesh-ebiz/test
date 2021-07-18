@@ -111,6 +111,7 @@ const ApplicationSchema = new mongoose.Schema({
   token: {
     type: String
   },
+  job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
   questionSubmission: { type: Schema.Types.ObjectId, ref: 'QuestionSubmission' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],

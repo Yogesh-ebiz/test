@@ -671,11 +671,11 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   filter.status = [statusEnum.ACTIVE];
   filter.types = [jobType.FREE, jobType.PROMOTION];
 
+
+  let currentDate = Date.now();
   let aList = [];
   let aMatch = { $match: new SearchParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
-
-
 
   aList.push(aMatch);
   aList.push(
@@ -687,6 +687,7 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
         as: "company"
       }
     },
+    { $unwind: '$company' },
     {
       $lookup: {
         from: 'labels',
@@ -721,12 +722,27 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
         as: 'ads'
     }},
     { $addFields:
-        {
-          isHot: {$avg: "$evaluations.rating"}
-        }
+        // {
+        //   hasHotTag: {$and: [ { $gt: [ "$qty", 100 ] }, { $lt: [ "$qty", 250 ] }}
+        // }
+        {isHot: {
+            $reduce: {
+              input: "$ads",
+              initialValue: false,
+              in: {
+                $cond: [
+                 { $and: [ {$in: [ "feed" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
+                  true,
+                  false
+                ]
+
+              }
+            }
+          } }
     },
   );
 
+  console.log(currentDate)
   if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
     aList.push(aSort);
@@ -764,8 +780,6 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
     job.minimumQualifications=[];
     job.applicationForm=null;
     job.description = null;
-    job.isHot = false;
-    console.log(job.ads)
 
 
   })
@@ -986,7 +1000,8 @@ async function applyJobById(currentUserId, jobId, application ) {
         candidate.hasApplied = true;
 
         application.user = candidate;
-        application.jobId = job;
+        application.jobId = job._id;
+        application.job = job;
         application.jobTitle = job.title;
         application.partyId = currentParty.id;
         application.company = job.company.companyId;
