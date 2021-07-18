@@ -10,6 +10,7 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
+router.route('/sync').post(asyncHandler(sync));
 router.route('/register').post(asyncHandler(register));
 
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
@@ -54,6 +55,14 @@ router.route('/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
 
 
+
+async function sync(req, res) {
+  let company = req.body;
+  console.log(req.body)
+  let data = await companyCtl.sync(company);
+  res.json(new Response(data, data?'company_synced_successful':'not_found', res));
+}
+
 async function register(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = req.body;
@@ -64,8 +73,8 @@ async function register(req, res) {
 
 async function adminCompanyJobs(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
-  let company = parseInt(req.params.id);
-  let data = await hr.getCompanyJobs(currentUserId, company);
+  let companyId = parseInt(req.params.id);
+  let data = await hr.getCompanyJobs(currentUserId, companyId);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }
 
@@ -80,8 +89,8 @@ async function getCompanyJobs(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.body;
   let pagination = req.query;
-  filter.company = [parseInt(req.params.id)];
-  let data = await companyCtl.getCompanyJobs(currentUserId, filter, pagination, res.locale);
+  let companyId = parseInt(req.params.id);
+  let data = await companyCtl.getCompanyJobs(currentUserId, companyId, filter, pagination, res.locale);
   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 }
 

@@ -65,6 +65,7 @@ const ReportedJob = require('../models/reportedjob.model');
 
 
 let Pagination = require('../utils/pagination');
+let JobSearchParam = require('../const/jobSearchParam');
 let SearchParam = require('../const/searchParam');
 
 const applicationSchema = Joi.object({
@@ -141,10 +142,10 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
-    job = await findJobId(jobId, locale).populate('tags').populate('createdBy');;
+    job = await findJobId(jobId, locale).populate('tags').populate('createdBy').populate('company');
 
     if(job) {
-
+      job = job.toObject();
       let currentParty = await findByUserId(currentUserId);
 
       if (isPartyActive(currentParty)) {
@@ -166,8 +167,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
 
 
-      let company = await findCompanyById(job.company, currentUserId);
-      job.company = convertToCompany(company);
+      // let company = await findCompanyById(job.company, currentUserId);
+      job.company = convertToCompany(job.company);
 
       if(!isMinimal) {
         // let hiringManager = await findByUserId(job.createdBy.userId);
@@ -502,71 +503,66 @@ async function getJobLanding(currentUserId, locale) {
   let result = {categories: [], popularJobs: [], popularCompanies: [], viewedJobs: [], savedJobs: [], newJobs: [], highlightJobs: []};
   try {
     let industries = await getTopIndustry();
-    let viewed = await findJobViewByUserId(currentUserId, 4)
+    let viewed = await findJobViewByUserId(currentUserId, 4);
     let saved = await bookmarkService.findBookByUserId(currentUserId, 4);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
     let newJobs = await getNewJobs();
     let popularJobs = await findMostViewed();
-
 
     if(!popularJobs.length){
       popularJobs = await bookmarkService.findMostBookmarked();
     }
 
     let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, '_id')).concat(_.map(highlight, '_id')).concat(_.map(newJobs, '_id'));
-    let jobs = await JobRequisition.find({_id: {$in: ids}});
-    let listOfCompanyIds = _.map(jobs, 'company');
 
-    let res = await searchCompany('', listOfCompanyIds, currentUserId);
-    let foundCompanies = res.content;
+    let jobs = await JobRequisition.find({_id: {$in: ids}}).populate('company');
+    let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(jobs, function(res, i){ res.push(i.company.companyId); return res;},  []));
+    jobs = _.reduce(jobs, function(res, job){
+      job.company = convertToCompany(job.company);
+      job.description = null;
+      job.industry = [];
+      job.responsibilities = [];
+      job.qualifications = [];
+      job.skills = [];
+      job.applicationForm= null;
+      job.members = [];
+      job.tags = [];
+
+      res.push(job);
+      return res;
+    }, [])
+
+
 
     // let popular = await searchCompany('', listOfCompanyIds, currentUserId);
     let popularCompanies = foundCompanies;
 
 
-    _.forEach(jobs, function(job){
-      job.company = _.find(foundCompanies, {id: job.company});
-      job.description = null;
-      job.responsibilities = [];
-      job.qualifications = [];
-      job.skills = [];
-    });
-
-    _.forEach(viewed, function(item){
+    result.viewedJobs = _.reduce(viewed, function(res, item){
       let job = _.find(jobs, {_id: item.jobId});
-
-      if(job) {
-        // job.company = _.find(foundCompanies, {id: job.company});
-        job.description = null;
-        job.industry = [];
-        job.responsibilities = [];
-        job.qualifications = [];
-        job.skills = [];
-        result.viewedJobs.push(job);
-
+      if(job){
+        res.push(job);
       }
-    })
+      return res;
+    }, []);
 
-
-    _.forEach(saved, function(item){
+    result.savedJobs = _.reduce(saved, function(res, item){
       let job = _.find(jobs, {_id: item.jobId});
-
-      if(job) {
-        // job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-
-        job.hasSaved=true;
-        result.savedJobs.push(job);
+      if(job){
+        res.push(job);
       }
-    })
+      return res;
+    }, []);
 
-    _.forEach(popularJobs, function(item){
+    result.popularJobs = _.reduce(popularJobs, function(res, item){
       let job = _.find(jobs, {_id: item.jobId});
-
-      if(job) {
-        result.popularJobs.push(job);
-
+      if(job){
+        res.push(job);
       }
-    })
+      return res;
+    }, []);
+
+
 
     _.forEach(highlight, function(item){
       let job = _.find(jobs, {_id: item.jobId});
@@ -679,7 +675,58 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   let aMatch = { $match: new SearchParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
 
+
+
   aList.push(aMatch);
+  aList.push(
+    {
+      $lookup: {
+        from: 'companies',
+        localField: "company",
+        foreignField: "_id",
+        as: "company"
+      }
+    },
+    {
+      $lookup: {
+        from: 'labels',
+        localField: "tags",
+        foreignField: "_id",
+        as: "tags"
+      }
+    },
+    // {
+    //   $lookup: {
+    //     from: 'ads',
+    //     localField: "ads",
+    //     foreignField: "_id",
+    //     as: "ads"
+    //   }
+    // },
+    {$lookup:{
+        from:"ads",
+        let:{ads: '$ads'},
+        pipeline:[
+          {$match:{$expr:{$in:["$_id", "$$ads"]}}},
+          {
+            $lookup: {
+              from: 'targets',
+              localField: "targeting",
+              foreignField: "_id",
+              as: "targeting"
+            }
+          },
+          {$unwind: '$targeting' }
+        ],
+        as: 'ads'
+    }},
+    { $addFields:
+        {
+          isHot: {$avg: "$evaluations.rating"}
+        }
+    },
+  );
+
   if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
     aList.push(aSort);
@@ -691,19 +738,9 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   let result = await JobRequisition.aggregatePaginate(aggregate, options);
   let docs = [];
 
-  // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-  // let listOfSkills = await findSkillsById(skills, locale);
-  let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
+  let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentfoundCompaniesType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
-  let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
-  let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
-
-  // let userIds = _.uniq(_.flatten(_.map(result.docs, 'createdBy')));
-  // let users = await lookupUserIds(userIds);
-
-  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-  let foundCompanies = await feedService.lookupCompaniesIds(listOfCompanyIds);
-
+  let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
   let hasSaves = [];
 
   if(currentUserId){
@@ -713,33 +750,24 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
 
   _.forEach(result.docs, function(job){
     job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
-    job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
+    job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
 
     job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
-    job.promotion = _.find(promotions, {promotionId: job.promotion});
 
-    let industry = _.reduce(industries, function(res, item){
-      if(_.includes(job.industry, item.shortCode)){
-        res.push(item);
-      }
-      return res;
-    }, []);
+    job.skills=[];
+    job.industry=[];
+    job.members=[];
+    job.responsibilities=[];
+    job.qualifications = [];
+    job.minimumQualifications=[];
+    job.applicationForm=null;
+    job.description = null;
+    job.isHot = false;
+    console.log(job.ads)
 
-    job.industry = industry;
 
-
-
-    // var skills = _.reduce(job.skills, function(res, skill){
-    //   let find = _.filter(listOfSkills, { 'id': skill});
-    //   if(find){
-    //     res.push(find[0]);
-    //   }
-    //   return res;
-    // }, [])
-    //
-    // job.skills = skills;
   })
 
   return new Pagination(result);
@@ -793,47 +821,64 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
   if(jobId){
     foundJob = await JobRequisition.findOne({jobId: jobId});
 
-    //filter.query = foundJob.title;
-    filter.level = foundJob.level;
-    filter.jobFunction=foundJob.jobFunction;
-    filter.employmentType=foundJob.employmentType;
-    filter.employmentType=null;
+    if(foundJob) {
+      //filter.query = foundJob.title;
+      filter.level = foundJob.level;
+      filter.jobFunction = foundJob.jobFunction;
+      filter.employmentType = foundJob.employmentType;
+      filter.employmentType = null;
 
 
-    const aggregate = JobRequisition.aggregate([
-      { $match: { $text: { $search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false } } }
+      const aggregate = JobRequisition.aggregate([
+        {$match: {$text: {$search: foundJob.title, $diacriticSensitive: true, $caseSensitive: false}}},
+        {
+          $lookup: {
+            from: 'companies',
+            localField: "company",
+            foreignField: "_id",
+            as: "company"
+          }
+        },
+        { $unwind: '$company'}
     ]);
 
-    result = await JobRequisition.aggregatePaginate(aggregate , options);
-    let docs = [];
+      result = await JobRequisition.aggregatePaginate(aggregate, options);
+      let docs = [];
 
-    let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-    let listOfSkills = await findSkillsById(skills);
-
-
-    let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-    let foundCompanies = await feedService.lookupCompaniesIds(listOfCompanyIds);
-
-    let hasSaves = await bookmarkService.findBookByUserId(currentUserId);
+      // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
+      // let listOfSkills = await findSkillsById(skills);
 
 
-    _.forEach(result.docs, function(job){
-      job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
-      job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-      job.company = _.find(foundCompanies, {id: job.company});
-      var skills = _.reduce(job.skills, function(res, skill){
-        let find = _.filter(listOfSkills, { 'id': skill});
-        if(find){
-          res.push(find[0]);
-        }
+      let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
 
-        return res;
-      }, [])
-
-      job.skills = skills;
-    })
+      let hasSaves = await bookmarkService.findBookByUserId(currentUserId);
 
 
+      _.forEach(result.docs, function (job) {
+        job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
+        job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+        job.skills=[];
+        job.industry=[];
+        job.members=[];
+        job.responsibilities=[];
+        job.qualifications = [];
+        job.minimumQualifications=[];
+        job.applicationForm=null;
+        job.description = null;
+        job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
+        // var skills = _.reduce(job.skills, function (res, skill) {
+        //   let find = _.filter(listOfSkills, {'id': skill});
+        //   if (find) {
+        //     res.push(find[0]);
+        //   }
+        //
+        //   return res;
+        // }, [])
+
+        // job.skills = skills;
+      })
+
+    }
 
 
   }
@@ -923,16 +968,16 @@ async function applyJobById(currentUserId, jobId, application ) {
     if (isPartyActive(currentParty)) {
 
       let candidate = null;
-      let job = await JobRequisition.findOne({jobId: jobId }).populate('createdBy');
+      let job = await JobRequisition.findOne({jobId: jobId }).populate('createdBy').populate('company');
       if(job) {
-        let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company);
+        let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company.companyId);
         if(!candidate){
-          candidate = await candidateService.addCandidate(job.company, currentParty, application.email, application.phoneNumber);
+          candidate = await candidateService.addCandidate(job.company.companyId, currentParty, application.email, application.phoneNumber);
         } else {
           candidate.email = application.email;
           candidate.phoneNumber = application.phoneNumber;
           candidate.avatar = currentParty.avatar;
-          candidate.company = job.company;
+          candidate.company = job.company.companyId;
           candidate.firstName = currentParty.firstName;
           candidate.middleName = currentParty.middleName;
           candidate.lastName =  currentParty.lastName;
@@ -944,7 +989,7 @@ async function applyJobById(currentUserId, jobId, application ) {
         application.jobId = job;
         application.jobTitle = job.title;
         application.partyId = currentParty.id;
-        application.company = job.company
+        application.company = job.company.companyId;
 
         let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
         if (!foundApplication) {

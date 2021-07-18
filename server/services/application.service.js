@@ -238,7 +238,7 @@ async function getLatestCandidates(company) {
     return;
   }
 
-  let jobs = await jobService.findJobsByCompanyId(company);
+  // let jobs = await jobService.findJobsByCompanyId(company);
 
   var from = new Date();
   from.setDate(from.getDate()-1);
@@ -597,8 +597,9 @@ async function apply(application) {
 
 
     //Create Notification
+    console.log(job.company.companyId)
     let meta = {
-      companyId: job.company,
+      companyId: job.company.companyId,
       jobId: job.jobId,
       jobTitle: job.title,
       applicationId: savedApplication.applicationId,
@@ -609,7 +610,7 @@ async function apply(application) {
     await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
     if (application.follow) {
-      await feedService.followCompany(job.company, candidate.userId);
+      await feedService.followCompany(application.company, candidate.userId);
     }
 
   }

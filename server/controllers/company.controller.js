@@ -9,6 +9,8 @@ let statusEnum = require('../const/statusEnum');
 let employmentTypeEnum = require('../const/employmentTypeEnum');
 
 const {convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const feedService = require('../services/api/feed.service.api');
+
 const {getUserExperienceById, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findUserByIdFull, findCompanyById, searchUsers, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
 const {findListOfPartyEmploymentTitle} = require('../services/partyemployment.service');
@@ -130,6 +132,7 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
+  sync,
   register,
   getCompanyJobs,
   addNewSalary,
@@ -166,6 +169,29 @@ module.exports = {
 }
 
 
+async function sync(form) {
+
+  if(!form){
+    return null;
+  }
+
+  let result;
+  try {
+    console.log(form)
+    let company = await companyService.findByCompanyId(form.id);
+    if(company){
+      company.avatar = form.avatar;
+      company.name = form.name;
+    }
+  } catch(e){
+    console.log('sync: Error', e);
+  }
+
+
+  return result;
+
+}
+
 async function register(currentUserId, form) {
 
   if(!currentUserId || !form){
@@ -188,11 +214,12 @@ async function register(currentUserId, form) {
 
 }
 
-async function getCompanyJobs(currentUserId, filter, sort, locale) {
+async function getCompanyJobs(currentUserId, companyId, filter, sort, locale) {
 
-  if(!filter || !sort){
+  if(!companyId || !filter || !sort){
     return null;
   }
+  let company = await companyService.findByCompanyId(companyId);
 
   let foundJob = null;
   let select = '';
@@ -208,12 +235,27 @@ async function getCompanyJobs(currentUserId, filter, sort, locale) {
     page: parseInt(sort.page)+1
   };
 
+  filter.company = [company._id];
   filter.status = [statusEnum.ACTIVE];
 
   let aList = [];
   let aMatch = { $match: new SearchParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
   aList.push(aMatch);
+
+  aList.push(
+    {
+      $lookup: {
+        from: 'companies',
+        localField: "company",
+        foreignField: "_id",
+        as: "company"
+      }
+    },
+    { $unwind: '$company'}
+  );
+
+
   if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
     aList.push(aSort);
@@ -229,13 +271,10 @@ async function getCompanyJobs(currentUserId, filter, sort, locale) {
   // let listOfSkills = await findSkillsById(skills, locale);
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
-  let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
-  let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
+  // let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
+  // let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
 
-  let listOfCompanyIds = _.uniq(_.flatten(_.map(result.docs, 'company')));
-
-  let res = await searchCompany('', listOfCompanyIds, currentUserId);
-  let foundCompanies = res.content;
+  let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
 
   let hasSaves = [];
 
@@ -246,31 +285,20 @@ async function getCompanyJobs(currentUserId, filter, sort, locale) {
 
   _.forEach(result.docs, function(job){
     job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-    job.company = _.find(foundCompanies, {id: job.company});
+    job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
     job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
     job.level = _.find(experienceLevels, {shortCode: job.level});
 
     job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
-    job.promotion = _.find(promotions, {promotionId: job.promotion});
-
-    let industry = _.reduce(industries, function(res, item){
-      if(_.includes(job.industry, item.shortCode)){
-        res.push(item);
-      }
-      return res;
-    }, []);
-
-    job.industry = industry;
-
-    // var skills = _.reduce(job.skills, function(res, skill){
-    //   let find = _.filter(listOfSkills, { 'id': skill});
-    //   if(find){
-    //     res.push(find[0]);
-    //   }
-    //   return res;
-    // }, [])
-    //
-    // job.skills = skills;
+    job.skills=[];
+    job.industry=[];
+    job.members=[];
+    job.responsibilities=[];
+    job.qualifications = [];
+    job.minimumQualifications=[];
+    job.applicationForm=null;
+    job.description = null;
+    job.isHot = false;
   })
 
   return new Pagination(result);

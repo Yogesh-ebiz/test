@@ -19,7 +19,7 @@ const JobViewSchema = new mongoose.Schema({
     required: true
   },
   company: {
-    type: Number,
+    type: Object,
     required: true
   },
   viewCount: {

@@ -19,13 +19,14 @@ const memberService = require('../services/member.service');
 const feedService = require('../services/api/feed.service.api');
 const activityService = require('../services/activity.service');
 const labelService = require('../services/label.service');
+const companyService = require('../services/company.service');
 
 let SearchParam = require('../const/searchParam');
 
 
 
 const jobSchema = Joi.object({
-  company: Joi.number(),
+  company: Joi.object(),
   jobId: Joi.number().optional(),
   createdBy: Joi.object(),
   title: Joi.string().required(),
@@ -84,7 +85,9 @@ async function addJob(companyId, member, form) {
 
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
-  form.company = companyId
+  let company = await companyService.findByCompanyId(companyId);
+
+  form.company = company._id;
   form.members = [member._id];
   form.createdBy = member._id;
 
@@ -652,9 +655,11 @@ function getNewJobs(filter) {
   //   return;
   // }
 
-  var twoWeeksAgo = new Date(Date.now() - 12096e5);
+  // var twoWeeksAgo = new Date(Date.now() - 12096e5);
+  var date = new Date();
+  date.setDate(date.getDate()-30);
   // filter = {createdDate: {$gte: twoWeeksAgo.getTime()},level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
-  filter = {createdDate: {$gte: twoWeeksAgo.getTime()}};
+  filter = {createdDate: {$gte: date.getTime()}};
 
   let search = new SearchParam(filter);
 

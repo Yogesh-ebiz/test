@@ -7,7 +7,7 @@ const Ad = require('../models/ad.model');
 const targetService = require('../services/target.service');
 
 const adSchema = Joi.object({
-  name: Joi.object(),
+  name: Joi.string(),
   lifetimeBudget: Joi.number(),
   startTime: Joi.number(),
   endTime: Joi.number(),

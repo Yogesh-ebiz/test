@@ -284,7 +284,7 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   companies = _.reduce(companies, function(res, item){
     let found = _.find(allAccounts, {company: item.companyId});
-    item = convertToCompany(item);
+    // item = convertToCompany(item);
     item.role = roleMinimal(found.role);
     item.memberId = found._id
 
@@ -580,8 +580,10 @@ async function getStats(currentUserId, companyId) {
   if(!member){
     return null;
   }
-
+  let result;
   let data = [];
+
+  let company = await companyService.findByCompanyId(companyId);
 
   let newApplications = await applicationService.getLatestCandidates(companyId);
 
@@ -590,7 +592,7 @@ async function getStats(currentUserId, companyId) {
 
   });
 
-  let mostViewed = await jobViewService.findMostViewedByCompany(companyId);
+  let mostViewed = await jobViewService.findMostViewedByCompany(company._id);
   let jobIds = _.map(mostViewed, '_id');
 
   let subscribes = [];
@@ -630,7 +632,7 @@ async function getStats(currentUserId, companyId) {
     job.tags = [];
   });
 
-  let result = {
+  result = {
     taskDueSoon: taskDueSoon,
     newApplications: newApplications,
     mostViewedJobs: mostViewed,
@@ -686,6 +688,12 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
     return null;
   }
 
+  let company = await companyService.findByCompanyId(companyId);
+  company.subscription = null;
+  console.log(company)
+
+  filter.company = [company._id];
+
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page:1;
@@ -703,6 +711,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
   let aMatch = { $match: new JobSearchParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
 
+
   aList.push(aMatch);
   aList.push(
     {
@@ -713,7 +722,7 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
         as: "createdBy"
       }
     },
-    { $unwind: '$createdBy'},
+    { $unwind: '$createdBy'}
     // {
     //   $lookup: {
     //     from: 'departments',
@@ -741,13 +750,14 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
     let departmentIds = _.map(result.docs, 'department');
     let departments = await departmentService.findDepartmentsByCompany(companyId);
 
-    let company = await feedService.findCompanyById(companyId, currentUserId);
+    // let company = await feedService.findCompanyById(companyId, currentUserId);
     let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.JOB);
 
     result.docs.map(job => {
-      job.company = company;
+      job.company = convertToCompany(company);
       job.department = _.find(departments, {_id: job.department});
       job.hasSaved = _.find(jobSubscribed, {subject: job._id})?true:false;
+
       return job;
     });
 
@@ -1422,6 +1432,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
 
             let ad = {
               productId: product.id,
+              name: product.name,
               lifetimeBudget: product.listPrice,
               startTime: startTime.getTime(),
               endTime: endTime.getTime(),
@@ -1434,6 +1445,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
                 adPositions: [product.adPosition]
               }
             };
+            console.log(ad);
             ad = await adService.add(ad);
             job.ads.push(ad);
           }
@@ -1529,7 +1541,11 @@ async function getJobInsights(currentUserId, companyId, jobId) {
   result.stages = applicationByStages;
 
   let job = await jobService.getJobAds(jobId);
-  result.ads = {searchAd: job.searchAd, ads: job.ads};
+  let ads = {
+    budget: job.searchAd?{lifetimeBudget: job.searchAd.lifetimeBudget, remainingBudget: 100, startTime: job.searchAd.startTime, endTime: job.searchAd.endTime, bidAmount: job.searchAd.bidAmount}:null,
+    ads: job.ads? _.reduce(job.ads, function(res, ad){ad.target=null; res.push(ad); return res;}, []):[]
+  };
+  result.advertising = ads;
 
   return result;
 

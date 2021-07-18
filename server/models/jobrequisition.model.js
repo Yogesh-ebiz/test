@@ -106,6 +106,9 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: false
   },
+  isHot: {
+    type: Boolean
+  },
   hasApplied: {
     type: Boolean,
     default: false
@@ -168,10 +171,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  company: {
-    type: Object,
-    required: true
-  },
+
   connection: {
     type: Object,
     required: false
@@ -218,6 +218,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: 'http://www.anymay.com/jobs/'
   },
+  company: { type: Schema.Types.ObjectId, ref: 'Company' },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
   department: { type: Schema.Types.ObjectId, ref: 'Department'},
   tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],

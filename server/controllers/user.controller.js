@@ -27,8 +27,9 @@ const alertEnum = require('../const/alertEnum');
 
 
 const {upload} = require('../services/aws.service');
+const feedService = require('../services/api/feed.service.api');
+
 const {addCompany} = require('../services/api/party.service.api');
-const {updateResumeDefault, addUserResume, getUserLast5Resumes, syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds, findJob_Ids} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
@@ -321,7 +322,7 @@ async function uploadResume(currentUserId, file) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -428,7 +429,7 @@ async function uploadResume(currentUserId, files, name) {
   let result = null;
   let basePath = 'user/';
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
     if (isPartyActive(currentParty)) {
 
       let file = files.file;
@@ -455,7 +456,7 @@ async function uploadResume(currentUserId, files, name) {
       }
       console.log('fileExt', fileExt, type)
 
-      await addUserResume(currentUserId, name, type);
+      await feedService.addUserResume(currentUserId, name, type);
 
       result = {
         employments: [
@@ -545,7 +546,7 @@ async function getPartyExperiences(currentUserId, locale) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -582,7 +583,7 @@ async function updatePartyExperiences(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -700,7 +701,7 @@ async function updatePartyExperiences(currentUserId, data) {
 
         result = _.orderBy(newEmployments.concat(updateEmployments), ['fromDate'], ['desc']);
 
-        syncExperiences(currentParty.id, result);
+        feedService.syncExperiences(currentParty.id, result);
 
         newSalaries = _.reduce(newSalaries, function(res, item){
           let exist = _.find(result, {fromDate: item.fromDate, thruDate: item.thruDate});
@@ -738,7 +739,7 @@ async function getPartyEducations(currentUserId) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -770,7 +771,7 @@ async function updatePartyEducations(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -880,7 +881,7 @@ async function updatePartySkills(currentUserId, data, locale) {
   locale = locale?locale: 'en';
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -985,7 +986,7 @@ async function getPartyAccomplishments(currentUserId, userId, locale) {
   let result = null;
   try {
 
-    let user = await findByUserId(userId);
+    let user = await feedService.findByUserId(userId);
 
 
     if(isPartyActive(user)) {
@@ -1023,7 +1024,7 @@ async function updateSkillsAndAccomplishments(currentUserId, data, locale) {
   locale = locale?locale: 'en';
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -1143,7 +1144,7 @@ async function getPartySkillsByUserId(currentUserId, userId, filter, locale) {
   let result = {topSkills: [], industrySkills: [], interpersonalSkills: [], toolAndTechnologySkills: [], otherSkills: []};
   try {
 
-    let user = await findByUserId(userId);
+    let user = await feedService.findByUserId(userId);
 
 
     if(isPartyActive(user)) {
@@ -1210,7 +1211,7 @@ async function addPartySkill(currentUserId, partySkill) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillByUserIdAndSkillTypeId(currentParty.id, partySkill.skillTypeId);
@@ -1244,7 +1245,7 @@ async function updatePartySkillById(currentUserId, partySkill) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkill.partySkillId);
@@ -1276,7 +1277,7 @@ async function removePartySkillById(currentUserId, partySkillId) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkillId);
@@ -1311,7 +1312,7 @@ async function getPartyLanguages(currentUserId, locale) {
   let result = null;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if(isPartyActive(currentParty)) {
@@ -1343,7 +1344,7 @@ async function updatePartyLanguages(currentUserId, data, locale) {
   locale = locale?locale: 'en';
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
 
     if (isPartyActive(currentParty)) {
@@ -1424,7 +1425,7 @@ async function addEndorsement(currentUserId, endorsement) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(endorsement.partySkillId);
@@ -1475,7 +1476,7 @@ async function removeEndorsement(currentUserId, partySkillId) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findPartySkillById(partySkillId);
@@ -1517,7 +1518,7 @@ async function getEndorsementsByPartySkill(currentUserId, partySkillId, filter, 
   let result = null;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
     if(isPartyActive(currentParty)) {
 
       let partySkill = await findPartySkillById(partySkillId, filter);
@@ -1586,7 +1587,7 @@ async function getUserResumes(currentUserId) {
 
   let result = null;
   try {
-    result = await getUserLast5Resumes(currentUserId);
+    result = await feedService.getUserLast5Resumese(currentUserId);
 
   } catch (error) {
     console.log(error);
@@ -1626,10 +1627,9 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
   let result = null;
   try {
 
-      let currentParty = await findByUserId(currentUserId);
+      let currentParty = await feedService.findByUserId(currentUserId);
 
       if(isPartyActive(currentParty)) {
-        // console.debug('isActive', currentParty)
         let select = '';
         let limit = (filter.size && filter.size > 0) ? filter.size : 20;
         let page = (filter.page && filter.page == 0) ? filter.page : 1;
@@ -1650,63 +1650,39 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
 
         const aggregate = Application.aggregate([
+          {$lookup:{
+              from:"jobrequisitions",
+              let:{job: '$jobId'},
+              pipeline:[
+                {$match:{$expr:{$eq:["$$job","$_id"]}}},
+                {
+                  $lookup: {
+                    from: 'companies',
+                    localField: "company",
+                    foreignField: "_id",
+                    as: "company"
+                  }
+                },
+                { $unwind: '$company' }
+              ],
+              as: 'job'
+            }},
+          { $unwind: '$job' },
           { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
           { $unwind: '$user'},
           { $match: {'user.userId': currentUserId}}
         ]);
+
         result = await Application.aggregatePaginate(aggregate, options);
-
-        let jobIds = _.map(result.docs, 'jobId');
-
-        let jobs = await findJob_Ids(jobIds);
-
-        let companyIds = _.map(jobs, 'company');
-
-        let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
-        let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
-
-        // let industries = await getIndustry(_.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
-
-
-
-        let res = await searchCompany('', companyIds, currentUserId);
-        let foundCompanies = res.content;
-
-        let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
+        let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
         let hasSaves = await findBookByUserId(currentParty.id);
 
-
         _.forEach(result.docs, function(application, idx) {
-
-          let job = _.find(jobs, {_id: ObjectID(application.jobId)});
-          if(job) {
-            job.hasSaved = _.some(hasSaves, {jobId: job._id});
-            job.description = null;
-            job.responsibilities = [];
-            job.qualifications = [];
-            job.skills = [];
-            job.connection = {noConnection: 0, list: []};
-            job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-            job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-            job.level = _.find(experienceLevels, {shortCode: job.level});
-            job.promotion = _.find(promotions, {promotionId: job.promotion});
-          }
-          // let industry = _.reduce(industries, function(res, item){
-          //   if(_.includes(job.industry, item.shortCode)){
-          //     res.push(item);
-          //   }
-          //   return res;
-          // }, []);
-          //
-          // job.industry = industry;
-
-          application.job = jobMinimal(job);
-
-
+          application.job.hasSaved = _.some(hasSaves, {jobId: application.job._id});
+          application.job.company = convertToCompany(_.find(foundCompanies, {id: application.job.company.companyId}));
+          application.job = jobMinimal(application.job);
 
         })
-
-        // result.docs = jobs;
 
       }
 
@@ -1727,7 +1703,7 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
   let result = null;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
 
@@ -1749,48 +1725,41 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
 
       filter.partyId=currentParty.id;
 
-      result = await Bookmark.aggregatePaginate(new BookmarkSearchParam(filter), options);
-      let jobIds = _.map(result.docs, 'jobId');
-      let jobs = await findJob_Ids(jobIds);
 
-      let companyIds = _.map(jobs, 'company');
-      let res = await searchCompany('', companyIds, currentUserId);
-      let foundCompanies = res.content;
+      const aggregate = Bookmark.aggregate([
+        { $match: {partyId: currentUserId}},
+        {$lookup:{
+            from:"jobrequisitions",
+            let:{job: '$jobId'},
+            pipeline:[
+              {$match:{$expr:{$eq:["$$job","$_id"]}}},
+              {
+                $lookup: {
+                  from: 'companies',
+                  localField: "company",
+                  foreignField: "_id",
+                  as: "company"
+                }
+              },
+              { $unwind: '$company' }
+            ],
+            as: 'job'
+          }},
+        { $unwind: '$job'}
+      ]);
 
-      let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
-      let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
-      let industries = await findIndustry('', _.uniq(_.flatten(_.map(jobs, 'industry'))), locale);
+      result = await Bookmark.aggregatePaginate(aggregate, options);
 
-      let promotions = await getPromotions(_.uniq(_.flatten(_.map(jobs, 'promotion'))), locale);
+      let hasSaves = await findBookByUserId(currentUserId);
+      let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
 
-
-      _.forEach(result.docs, function(bookmark, idx) {
-        let job = _.find(jobs, {_id: ObjectID(bookmark.jobId)});
-        if(job) {
-          job.hasSaved = true;
-          job.description = null;
-          job.responsibilities = [];
-          job.qualifications = [];
-          job.skills = [];
-          job.connection = {noConnection: 0, list: []};
-          job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-          job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-          job.level = _.find(experienceLevels, {shortCode: job.level});
-          job.promotion = _.find(promotions, {promotionId: job.promotion});
-          let industry = _.reduce(industries, function (res, item) {
-            if (_.includes(job.industry, item.shortCode)) {
-              res.push(item);
-            }
-            return res;
-          }, []);
-
-          job.industry = industry;
-
-          bookmark.job = jobMinimal(job);
-        }
-
-      })
-
+      result.docs = _.reduce(result.docs, function(res, view){
+        view.job.hasSaved = _.some(hasSaves, {jobId: view.jobId});
+        view.job.company = convertToCompany(_.find(foundCompanies, {id: view.job.company.companyId}));
+        view.job = jobMinimal(view.job);
+        res.push(view);
+        return res;
+      }, []);
 
 
       // result.docs = jobs;
@@ -1814,7 +1783,7 @@ async function getAlertsByUserId(currentUserId, filter) {
   let result = null;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       let select = '';
@@ -1878,7 +1847,7 @@ async function addPartyAlert(currentUserId, alert) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
     // console.log('currentParty', currentParty)
 
     //Security Check if user is part of meeting attendees that is ACTIVE.
@@ -1909,7 +1878,7 @@ async function removePartyAlert(currentUserId, alertId) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
@@ -1944,7 +1913,7 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       found = await findJobAlertById(alertId);
@@ -1989,7 +1958,7 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
   let result = null;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if(isPartyActive(currentParty)) {
       // console.debug('isActive', currentParty.id)
@@ -2014,47 +1983,40 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
 
       const aggregate = JobView.aggregate([
         { $match: {partyId: currentUserId}},
-        { $lookup: {from: 'jobrequisitions', localField: 'jobId', foreignField: '_id', as: 'job' } },
+        {$lookup:{
+            from:"jobrequisitions",
+            let:{job: '$jobId'},
+            pipeline:[
+              {$match:{$expr:{$eq:["$$job","$_id"]}}},
+              {
+                $lookup: {
+                  from: 'companies',
+                  localField: "company",
+                  foreignField: "_id",
+                  as: "company"
+                }
+              },
+              { $unwind: '$company' }
+            ],
+            as: 'job'
+          }},
         { $unwind: '$job'}
       ]);
 
       result = await JobView.aggregatePaginate(aggregate, options);
-      let jobIds = _.map(result.docs, 'jobId');
 
       let hasSaves = await findBookByUserId(currentUserId);
+      let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
 
-
-      let jobs = await findJob_Ids(jobIds);
-      let companyIds = _.map(jobs, 'company');
-      let res = await searchCompany('', companyIds, currentUserId);
-      let foundCompanies = res.content;
-
-      let employmentTypes = await getEmploymentTypes(_.uniq(_.map(jobs, 'employmentType')), locale);
-      let experienceLevels = await getExperienceLevels(_.uniq(_.map(jobs, 'level')), locale);
-
-      let promotionIds = _.map(jobs, 'promotion');
-      let promotions = await getPromotions(promotionIds);
-
-      _.forEach(result.docs, function(view, idx) {
-        let job = _.find(jobs, {_id: ObjectID(view.jobId)});
-        job.hasSaved = _.some(hasSaves, {jobId: job._id});
-        job.description = null;
-        job.responsibilities=[];
-        job.qualifications = [];
-        job.skills = [];
-        job.connection = {noConnection: 0, list: []};
-        job.company = convertToCompany(_.find(foundCompanies, {id: job.company}));
-        job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-        job.level = _.find(experienceLevels, {shortCode: job.level});
-        job.promotion = _.find(promotions, {promotionId: job.promotion});
-
-        view.job = job;
-
-      })
-
+      result.docs = _.reduce(result.docs, function(res, view){
+        view.job.hasSaved = _.some(hasSaves, {jobId: view.jobId});
+        view.job.company = convertToCompany(_.find(foundCompanies, {id: view.job.company.companyId}));
+        view.job = jobMinimal(view.job);
+        res.push(view);
+        return res;
+      }, []);
 
     }
-
 
   } catch (error) {
     console.log(error);
@@ -2072,7 +2034,7 @@ async function getPartyPublications(currentUserId) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       result = await findPartyPublicationByUserId(currentParty.id);
@@ -2097,7 +2059,7 @@ async function addPartyPublication(currentUserId, publication) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       let found;
@@ -2141,7 +2103,7 @@ async function updatePartyPublications(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
@@ -2228,7 +2190,7 @@ async function getPartyCertifications(currentUserId) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       result = await findPartyCertificationByUserId(currentParty.id);
@@ -2254,7 +2216,7 @@ async function addPartyCertification(currentUserId, certification) {
   let result;
   try {
 
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
       let found;
@@ -2297,7 +2259,7 @@ async function updatePartyCertifications(currentUserId, data) {
 
   let result = null;
   try {
-    let currentParty = await findByUserId(currentUserId);
+    let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
 
@@ -2389,7 +2351,7 @@ async function getUserEmployersJobs(currenterUserid, locale) {
     return null;
   }
 
-  let employers = await getUserEmployers(currenterUserid, locale);
+  let employers = await feedService.getUserEmployers(currenterUserid, locale);
   let employerIds = _.reduce(employers, function(a,b){
     a.push(parseInt(b.id));
     return a;
