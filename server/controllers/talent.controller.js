@@ -287,7 +287,6 @@ async function getUserSession(currentUserId, preferredCompany) {
     // item = convertToCompany(item);
     item.role = roleMinimal(found.role);
     item.memberId = found._id
-
     res.push(item)
 
     return res;
@@ -656,15 +655,16 @@ async function searchCompany(currentUserId, filter, sort) {
   let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
   let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'));
 
+
   companies = _.reduce(companies, function(res, item){
     let found = _.find(result.docs, {company: item.companyId});
+    console.log(item.avatar)
     item = convertToCompany(item);
     item.role = found.role;
     item.subscription = null;
     item.primaryAddress = null;
     item.customerId=null;
     item.memberId = found._id
-
     res.push(item)
 
     return res;
@@ -845,7 +845,6 @@ async function removeCard(companyId, currentUserId, cardId) {
   let result = null;
   let company = await companyService.findByCompanyId(companyId);
   if(company && company.customerId){
-    console.log(company.customerId, cardId)
     result = await cardService.remove(company.customerId, cardId);
   }
 
@@ -1445,7 +1444,6 @@ async function payJob(companyId, currentUserId, jobId, form) {
                 adPositions: [product.adPosition]
               }
             };
-            console.log(ad);
             ad = await adService.add(ad);
             job.ads.push(ad);
           }
@@ -1542,8 +1540,13 @@ async function getJobInsights(currentUserId, companyId, jobId) {
 
   let job = await jobService.getJobAds(jobId);
   let ads = {
-    budget: job.searchAd?{lifetimeBudget: job.searchAd.lifetimeBudget, remainingBudget: 100, startTime: job.searchAd.startTime, endTime: job.searchAd.endTime, bidAmount: job.searchAd.bidAmount}:null,
-    ads: job.ads? _.reduce(job.ads, function(res, ad){ad.target=null; res.push(ad); return res;}, []):[]
+    budget: job.searchAd?{lifetimeBudget: parseInt(job.searchAd.lifetimeBudget), remainingBudget: 100, startTime: job.searchAd.startTime, endTime: job.searchAd.endTime, bidAmount: job.searchAd.bidAmount}:null,
+    ads: job.ads? _.reduce(job.ads, function(res, ad){
+
+      ad.targeting=null;
+      res.push(ad);
+      return res;
+      }, []):[]
   };
   result.advertising = ads;
 
@@ -3142,17 +3145,20 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
     candidate.lastName = form.lastName;
     candidate.email = form.email;
     candidate.phoneNumber = form.phoneNumber;
-    candidate.address1 = form.address1;
-    candidate.district = form.district;
-    candidate.city = form.city;
-    candidate.state = form.state;
-    candidate.country = form.country;
-    candidate.postalCode = form.postalCode;
     candidate.about = form.about;
     candidate.gender = form.gender;
     candidate.maritalStatus = form.maritalStatus;
     candidate.dob = form.dob;
     candidate.links = form.links;
+    candidate.primaryAddress = {
+      address1: form.address1,
+      address2: form.address2,
+      district: form.district,
+      city: form.city,
+      state: form.state,
+      country:form.country,
+      postalCode: form.postalCode
+    };
 
     result = await candidate.save();
   }

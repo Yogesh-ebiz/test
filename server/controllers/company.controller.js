@@ -170,18 +170,47 @@ module.exports = {
 
 
 async function sync(form) {
-
   if(!form){
     return null;
   }
 
   let result;
   try {
-    console.log(form)
     let company = await companyService.findByCompanyId(form.id);
     if(company){
       company.avatar = form.avatar;
       company.name = form.name;
+    } else {
+      let user = await feedService.lookupPeopleIds([form.createdBy]);
+      let role = await roleService.getAdminRole();
+      if(user && company) {
+        let company = await new Company({
+          name: form.name,
+          companyId: form.id,
+          createdBy: form.createdBy,
+          email: user[0].primaryEmail ? user[0].primaryEmail.value : '',
+          primaryAddress: {
+            address1: form.primaryAddress.address1,
+            address2: form.primaryAddress.address2,
+            district: form.primaryAddress.district,
+            city: form.primaryAddress.city,
+            state: form.primaryAddress.state,
+            country: form.primaryAddress.country
+          }
+        }).save();
+
+        let member = memberService.addMember({
+          company: form.id,
+          userId: user.id,
+          firstName: user.firstName,
+          middleName: user.middleName,
+          lastName: user.lastName,
+          email: user.primaryEmail.value,
+          phone: user.primaryPhone?user.primaryPhone.value:'',
+          role: role
+        });
+        
+      }
     }
   } catch(e){
     console.log('sync: Error', e);
@@ -220,7 +249,6 @@ async function getCompanyJobs(currentUserId, companyId, filter, sort, locale) {
     return null;
   }
   let company = await companyService.findByCompanyId(companyId);
-
   let foundJob = null;
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;

@@ -19,6 +19,9 @@ const AdSchema = new mongoose.Schema({
   endTime: {
     type: Number
   },
+  name: {
+    type: String
+  },
   campaignId: {
     type: String,
     required: false

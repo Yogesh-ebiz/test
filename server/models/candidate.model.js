@@ -33,22 +33,15 @@ const CandidateSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  about: {
+    type: String,
+    required:false
+  },
   url: {
     type: String
   },
-  district: {
-    type: String
-  },
-  city: {
-    type: String,
-    required:false
-  },
-  state: {
-    type: String,
-    required:false
-  },
-  country: {
-    type: String,
+  primaryAddress: {
+    type: Object,
     required:false
   },
   email: {

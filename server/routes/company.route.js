@@ -10,8 +10,8 @@ const router = express.Router();
 module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
-router.route('/sync').post(asyncHandler(sync));
 router.route('/register').post(asyncHandler(register));
+router.route('/:id/sync').post(asyncHandler(sync));
 
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
@@ -58,7 +58,6 @@ router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
 
 async function sync(req, res) {
   let company = req.body;
-  console.log(req.body)
   let data = await companyCtl.sync(company);
   res.json(new Response(data, data?'company_synced_successful':'not_found', res));
 }

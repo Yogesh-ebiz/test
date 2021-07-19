@@ -26,6 +26,7 @@ const companySchema = Joi.object({
   about: Joi.string().allow(''),
   mission: Joi.string().allow(''),
   size: Joi.string(),
+  avatar: Joi.string().allow(''),
   type: Joi.string(),
   industry: Joi.array(),
   website: Joi.string().allow(''),

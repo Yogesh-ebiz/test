@@ -3,6 +3,12 @@ const statusEnum = require('../const/statusEnum');
 const Role = require('../models/role.model');
 
 
+function getAdminRole() {
+  let data = null;
+
+  return Role.findOne({default: true});
+}
+
 
 function getRoleByRole(role) {
   let data = null;
@@ -54,6 +60,7 @@ function getRoles(company) {
 
 
 module.exports = {
+  getAdminRole:getAdminRole,
   getRoleByRole:getRoleByRole,
   getRoleByName:getRoleByName,
   addRole:addRole,

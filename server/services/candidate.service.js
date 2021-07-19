@@ -14,13 +14,12 @@ const {convertToCandidate} = require('../utils/helper');
 const candidateSchema = Joi.object({
   userId: Joi.number().optional(),
   company: Joi.number(),
+  about: Joi.string().allow('').optional(),
   avatar: Joi.string().allow('').optional(),
   firstName: Joi.string().allow(''),
   lastName: Joi.string().allow(''),
   middleName: Joi.string().allow('').optional(),
-  city: Joi.string().allow('').optional(),
-  state: Joi.string().allow('').optional(),
-  country: Joi.string().allow('').optional(),
+  primaryAddress: Joi.object().optional(),
   skills: Joi.array().optional(),
   jobTitle: Joi.string().allow('').optional(),
   phoneNumber: Joi.string().allow('').optional(),
@@ -44,7 +43,7 @@ async function addCandidate(companyId, user, email, phone) {
 
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
-    city: city, state: state, country: country,
+    primaryAddress: {city: city, state: state, country: country},
     skills: _.map(user.skills, 'id'), url: user.shareUrl
   }
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});

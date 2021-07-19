@@ -184,8 +184,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         let noApplied = await findAppliedCountByJobId(job.jobId);
         job.noApplied = noApplied;
 
-        let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
-        job.employmentType = employmentType[0];
+        // let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
+        // job.employmentType = employmentType[0];
 
         // let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
         // job.level = experienceLevel[0];
@@ -696,14 +696,6 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
         as: "tags"
       }
     },
-    // {
-    //   $lookup: {
-    //     from: 'ads',
-    //     localField: "ads",
-    //     foreignField: "_id",
-    //     as: "ads"
-    //   }
-    // },
     {$lookup:{
         from:"ads",
         let:{ads: '$ads'},
@@ -722,16 +714,13 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
         as: 'ads'
     }},
     { $addFields:
-        // {
-        //   hasHotTag: {$and: [ { $gt: [ "$qty", 100 ] }, { $lt: [ "$qty", 250 ] }}
-        // }
         {isHot: {
             $reduce: {
               input: "$ads",
               initialValue: false,
               in: {
                 $cond: [
-                 { $and: [ {$in: [ "feed" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
+                 { $and: [ {$in: [ "hottag" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
                   true,
                   false
                 ]
@@ -742,7 +731,6 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
     },
   );
 
-  console.log(currentDate)
   if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
     aList.push(aSort);
@@ -767,8 +755,8 @@ async function searchJob(currentUserId, jobId, filter, sort, locale) {
   _.forEach(result.docs, function(job){
     job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
     job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
-    job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-    job.level = _.find(experienceLevels, {shortCode: job.level});
+    // job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
+    // job.level = _.find(experienceLevels, {shortCode: job.level});
 
     job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
 

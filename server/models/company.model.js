@@ -30,7 +30,16 @@ const CompanySchema = new mongoose.Schema({
   status: {
     type: String
   },
+  avatar: {
+    type: String
+  },
   primaryAddress: {
+    type: Object
+  },
+  role: {
+    type: Object
+  },
+  memberId: {
     type: Object
   },
   subscription: { type: Schema.Types.ObjectId, ref: 'Subscription' }
