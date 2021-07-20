@@ -11,6 +11,8 @@ const {upload} = require('../services/aws.service');
 
 const feedService = require('../services/api/feed.service.api');
 const emailService = require('../services/email.service');
+const applicationService = require('../services/application.service');
+const fileService = require('../services/file.service');
 
 
 
@@ -137,6 +139,21 @@ async function uploadEmailAttachmentById(currentUserId, threadId, files)  {
         }
 
         email.attachments.push({type: type, url: path});
+        if(email.type===emailType.JOB_OFFER){
+          let application = await applicationService.findById(ObjectID(email.meta.applicationId)).populate([
+            {
+              path: 'files',
+              model: 'File'
+            }
+          ]);
+
+          if(application){
+            let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+            application.files.push(file._id);
+            application.offerLetter = file._id;
+            await application.save();
+          }
+        }
 
       }
 

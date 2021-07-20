@@ -171,7 +171,6 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-
   connection: {
     type: Object,
     required: false

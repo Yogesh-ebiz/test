@@ -1883,6 +1883,14 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
       {
         path: 'user',
         model: 'Candidate'
+      },
+      {
+        path: 'resume',
+        model: 'File'
+      },
+      {
+        path: 'offerLetter',
+        model: 'File'
       }
     ]);
     if (application) {

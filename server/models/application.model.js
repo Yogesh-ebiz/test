@@ -75,6 +75,9 @@ const ApplicationSchema = new mongoose.Schema({
   coverLetter: {
     type: String
   },
+  offerLetter: {
+    type: Object
+  },
   photo: {
     type: Object
   },

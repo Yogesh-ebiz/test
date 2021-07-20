@@ -71,21 +71,7 @@ async function compose(form, companyId) {
 
   let threadId = new ObjectID;
   form.threadId = threadId;
-  if(form.type===emailType.DEFAULT) {
-    email = await new Email(form).save();
-    if(email) {
-      if (form.meta && form.meta.applicationId) {
-        let application = await applicationService.findById(ObjectID(form.meta.applicationId)).populate('currentProgress');
-        if (application) {
-          application.currentProgress.emails.push(email._id);
-          await application.currentProgress.save();
-
-          application.emails.push(email._id);
-          await application.save();
-        }
-      }
-    }
-  } else if(form.type===emailType.JOB_INVITE) {
+  if(form.type===emailType.JOB_INVITE) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
     let job = await jobService.findJob_Id(form.meta.jobId);
 
@@ -135,7 +121,6 @@ async function compose(form, companyId) {
             }
 
             if (candidate) {
-              console.log(form.meta.jobId, candidate._id)
               let source = await sourceService.findByJobIdAndCandidateId(ObjectID(form.meta.jobId), candidate._id);
 
               let campaign = {
@@ -214,6 +199,20 @@ async function compose(form, companyId) {
 
 
           }
+        }
+      }
+    }
+  } else{
+    email = await new Email(form).save();
+    if(email) {
+      if (form.meta && form.meta.applicationId) {
+        let application = await applicationService.findById(ObjectID(form.meta.applicationId)).populate('currentProgress');
+        if (application) {
+          application.currentProgress.emails.push(email._id);
+          await application.currentProgress.save();
+
+          application.emails.push(email._id);
+          await application.save();
         }
       }
     }

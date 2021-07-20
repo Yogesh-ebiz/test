@@ -39,7 +39,6 @@ async function uploadEmailAttachmentById(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let emailId = ObjectID(req.params.emailId);
   let files = req.files;
-  console.log(req.files)
   let data = await emailCtl.uploadEmailAttachmentById(currentUserId, emailId, files.file);
   res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
 }

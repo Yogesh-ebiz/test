@@ -220,9 +220,12 @@ async function uploadCV(currentUserId, applicationId, files, name) {
               break;
 
           }
-          application.resume = {filename: name, type: type};
+
           let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+          // application.resume = {filename: name, type: type};
+
           if(file){
+            application.resume = file._id;
             application.files.push(file._id);
           }
         }
@@ -250,9 +253,10 @@ async function uploadCV(currentUserId, applicationId, files, name) {
               break;
 
           }
-          application.photo = {filename: path, type: type};
+          // application.photo = {filename: path, type: type};
           let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
           if(file){
+            application.photo = file_id;
             application.files.push(file._id);
           }
         }
