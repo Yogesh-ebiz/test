@@ -144,14 +144,20 @@ async function uploadEmailAttachmentById(currentUserId, threadId, files)  {
             {
               path: 'files',
               model: 'File'
+            },
+            {
+              path: 'currentProgress',
+              model: 'ApplicationProgress'
             }
           ]);
 
+          console.log(application)
           if(application){
             let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
             application.files.push(file._id);
-            application.offerLetter = file._id;
+            application.currentProgress.attachment = file._id;
             await application.save();
+            await application.currentProgress.save();
           }
         }
 

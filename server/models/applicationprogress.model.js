@@ -42,10 +42,6 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  attachment: {
-    type: Object,
-    required: false
-  },
   noOfComments: {
     type: Number,
     required: false
@@ -54,10 +50,8 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  candidateAttachment: {
-    type: Object,
-    required: false
-  },
+  attachment: { type: Schema.Types.ObjectId, ref: 'File' },
+  candidateAttachment: { type: Schema.Types.ObjectId, ref: 'File' },
   stage: { type: Schema.Types.ObjectId, ref: 'Stage' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],

@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
+const config = require('../config/config');
+
 let CustomPagination = require('../utils/custompagination');
 let Pagination = require('../utils/pagination');
 
@@ -1875,8 +1877,12 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
             model: 'Stage'
           },
           {
-            path: 'evaluations',
-            model: 'Evaluation'
+            path: 'attachment',
+            model: 'File'
+          },
+          {
+            path: 'candidateAttachment',
+            model: 'File'
           }
         ]
       },
@@ -1907,7 +1913,31 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
       application.noOfEvaluations = noOfEvaluations;
       application.rating = Math.round(rating / noOfEvaluations * 10) /10;
 
-      application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
+      // application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
+      application.progress = _.reduce(application.progress, function(res, progress){
+
+        progress.stage.evaluations = [];
+        progress.stage.members = [];
+        progress.stage.tasks = [];
+
+
+        if(progress.attachment){
+          progress.attachment.path = config.cdn + progress.attachment.path;
+        }
+
+        if(progress.candidateAttachment){
+          progress.candidateAttachment.path = config.cdn + progress.candidateAttachment.path;
+        }
+
+        if(progress._id.equals(application.currentProgress)){
+          application.currentProgress = progress
+        }
+
+        res.push(progress);
+        return res;
+      }, [])
+
+
       hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
       // application.currentProgress.hasEvaluated = hasEvaluated;
       // application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
@@ -5199,6 +5229,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
         application.resume = {filename: name, type: type};
         let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
         if(file){
+          application.resume = file._id;
           application.files.push(file._id);
         }
 
@@ -5228,6 +5259,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
         application.photo = {filename: path, type: type};
         let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
         if(file){
+          application.photo = file._id;
           application.files.push(file._id);
         }
       }

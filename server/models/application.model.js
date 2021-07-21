@@ -40,6 +40,9 @@ const ApplicationSchema = new mongoose.Schema({
     required: false,
     default: statusEnum.ACTIVE
   },
+  reason: {
+    type: String
+  },
   type: {
     type: String,
     required: false

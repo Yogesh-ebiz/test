@@ -377,6 +377,7 @@ async function disqualify(applicationId, reason, member) {
 
   if(application && application.status==statusEnum.ACTIVE){
     application.status = statusEnum.DISQUALIFIED;
+    application.reason = reason;
     application = await application.save();
 
     if(application.status==statusEnum.DISQUALIFIED){
@@ -400,6 +401,7 @@ async function revert(applicationId, member) {
 
   let application = await Application.findById(applicationId).populate('user');
   if(application.status==statusEnum.DISQUALIFIED){
+    application.reason = null;
     application.status = statusEnum.ACTIVE;
     application = await application.save();
 

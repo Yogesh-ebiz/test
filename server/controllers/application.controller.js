@@ -4,6 +4,8 @@ const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
 const AWS = require('aws-sdk');
+const config = require('../config/config');
+
 const {convertToCompany, jobMinimal} = require('../utils/helper');
 
 const partyEnum = require('../const/partyEnum');
@@ -58,20 +60,22 @@ async function getById(currentUserId, id) {
     if(isPartyActive(currentParty)) {
       application = await findById(id).populate([
         {
-          path: 'currentProgress',
-          model: 'ApplicationProgress',
-          populate: {
-            path: 'stage',
-            model: 'Stage'
-          }
-        },
-        {
           path: 'progress',
           model: 'ApplicationProgress',
-          populate: {
-            path: 'stage',
-            model: 'Stage'
-          }
+          populate: [
+            {
+              path: 'stage',
+              model: 'Stage'
+            },
+            {
+              path: 'attachment',
+              model: 'File'
+            },
+            {
+              path: 'candidateAttachment',
+              model: 'File'
+            }
+          ]
         },
         {
           path: 'job',
@@ -81,6 +85,10 @@ async function getById(currentUserId, id) {
             model: 'Company'
           }
         },
+        {
+          path: 'resume',
+          model: 'File'
+        }
       ]);
 
       if (application) {
@@ -97,6 +105,20 @@ async function getById(currentUserId, id) {
           progress.stage.evaluations = [];
           progress.stage.members = [];
           progress.stage.tasks = [];
+
+
+          if(progress.attachment){
+            progress.attachment.path = config.cdn + progress.attachment.path;
+          }
+
+          if(progress.candidateAttachment){
+            progress.candidateAttachment.path = config.cdn + progress.candidateAttachment.path;
+          }
+
+          if(progress._id.equals(application.currentProgress)){
+            application.currentProgress = progress
+          }
+
           res.push(progress);
           return res;
         }, [])
@@ -130,21 +152,24 @@ async function getByApplicationId(currentUserId, applicationId) {
 
     if(isPartyActive(currentParty)) {
       application = await findByApplicationId(applicationId).populate([
-        {
-          path: 'currentProgress',
-          model: 'ApplicationProgress',
-          populate: {
-            path: 'stage',
-            model: 'Stage'
-          }
-        },
+
         {
           path: 'progress',
           model: 'ApplicationProgress',
-          populate: {
-            path: 'stage',
-            model: 'Stage'
-          }
+          populate: [
+            {
+              path: 'stage',
+              model: 'Stage'
+            },
+            {
+              path: 'attachment',
+              model: 'File'
+            },
+            {
+              path: 'candidateAttachment',
+              model: 'File'
+            }
+          ]
         }
       ]);
       if (application) {
@@ -276,9 +301,9 @@ async function uploadCV(currentUserId, applicationId, files, name) {
 
 }
 
-async function uploadOffer(currentUserId, applicationId, file) {
+async function uploadOffer(currentUserId, applicationId, files) {
 
-  if(currentUserId==null || applicationId==null || file==null){
+  if(currentUserId==null || applicationId==null || files==null){
     return null;
   }
 
@@ -290,46 +315,82 @@ async function uploadOffer(currentUserId, applicationId, file) {
 
     if (isPartyActive(currentParty)) {
 
-      let application = await findByApplicationId(applicationId);
+      let application = await findByApplicationId(applicationId).populate('currentProgress');
 
       if (application) {
 
-        application = await Application.populate(application, 'job');
+        // application = await Application.populate(application, 'job').populate('currentProgress');
         let job = application.job;
-        let currentProgress = _.find(application.progress, {type: 'OFFER'});
+        if(files.file && (application.partyId == currentUserId || job.partyId==currentParty.id)) {
 
-        console.log(application.job);
-        if(application.partyId == currentUserId || job.partyId==currentParty.id){
-          let fileName = file.originalFilename.split('.');
+          let offerLetter = files.file[0];
+          let fileName = offerLetter.originalname.split('.');
           let fileExt = fileName[fileName.length - 1];
+          // let date = new Date();
           let timestamp = Date.now();
           let name = 'Offer_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
-
-          let path = basePath + 'JOB_' + application.jobId + '/offers/' + name;
-          let res = await upload(path, file);
-
-
-          let type;
-          switch(fileExt){
+          let path = basePath + application.applicationId + '/' + 'JOB_' + application.jobId + '/offers/' + name;
+          let response = await upload(path, offerLetter);
+          switch (fileExt) {
             case 'pdf':
-              type='PDF';
+              type = 'PDF';
               break;
             case 'doc':
-              type='WORD';
+              type = 'WORD';
               break;
             case 'docx':
-              type='WORD';
+              type = 'WORD';
               break;
 
           }
 
-          if(currentParty.id==application.partyId){
-            currentProgress.candidateAttachment = { url: name, type: type, createdDate: Date.now()};
-          } else if(currentParty.id==job.partyId){
-            currentProgress.attachment = { url: name, type: type, createdDate: Date.now()};
+          let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+          if(file){
+            if(currentParty.id==application.partyId){
+              application.currentProgress.candidateAttachment = file._id;
+            } else {
+              application.currentProgress.attachment = file._id;
+            }
+
+            application.files.push(file._id);
+            await application.save();
+            result = await application.currentProgress.save();
+
           }
-          result = await currentProgress.save();
         }
+        //
+        // if(application.partyId == currentUserId || job.partyId==currentParty.id){
+        //   let cv = files.file[0];
+        //   let fileName = file.originalFilename.split('.');
+        //   let fileExt = fileName[fileName.length - 1];
+        //   let timestamp = Date.now();
+        //   let name = 'Offer_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
+        //
+        //   let path = basePath + 'JOB_' + application.jobId + '/offers/' + name;
+        //   let res = await upload(path, file);
+        //
+        //
+        //   let type;
+        //   switch(fileExt){
+        //     case 'pdf':
+        //       type='PDF';
+        //       break;
+        //     case 'doc':
+        //       type='WORD';
+        //       break;
+        //     case 'docx':
+        //       type='WORD';
+        //       break;
+        //
+        //   }
+        //
+        //   if(currentParty.id==application.partyId){
+        //     currentProgress.candidateAttachment = { url: name, type: type, createdDate: Date.now()};
+        //   } else if(currentParty.id==job.partyId){
+        //     currentProgress.attachment = { url: name, type: type, createdDate: Date.now()};
+        //   }
+        //   result = await currentProgress.save();
+        // }
 
       }
 

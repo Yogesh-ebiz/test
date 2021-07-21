@@ -267,7 +267,6 @@ async function getCompanyJobs(currentUserId, companyId, filter, sort, locale) {
     page: parseInt(sort.page)+1
   };
 
-  console.log(company)
   if(company) {
     filter.company = [company._id];
     filter.status = [statusEnum.ACTIVE];

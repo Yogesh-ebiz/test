@@ -55,7 +55,7 @@ async function uploadOffer(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = parseInt(req.params.id);
 
-  let data = await applicationCtl.uploadOffer(currentUserId, applicationId, req.files.file);
+  let data = await applicationCtl.uploadOffer(currentUserId, applicationId, req.files);
   res.json(new Response(data, data?'offer_uploaded_successful':'not_found', res));
 }
 
