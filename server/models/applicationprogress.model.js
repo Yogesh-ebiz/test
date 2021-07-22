@@ -24,6 +24,9 @@ const ApplicationProgressSchema = new mongoose.Schema({
     required: true,
     default: statusEnum.ACTIVE
   },
+  isRequired: {
+    type: Boolean
+  },
   candidateComment: {
     type: String,
     required: false,
@@ -31,6 +34,10 @@ const ApplicationProgressSchema = new mongoose.Schema({
   },
   event: {
     type: Object,
+    required: false
+  },
+  reasons: {
+    type: Array,
     required: false
   },
   createdDate: {

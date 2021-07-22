@@ -10,7 +10,7 @@ let client = new ApiClient('http://accessed-calendar-service.us-west-2.elasticbe
 
 
 function createEvent(event) {
-  if(event==null){
+  if(!event){
     return;
   }
 
@@ -22,33 +22,61 @@ function createEvent(event) {
     data: event
   };
 
-  return axios.post('/calendars/1/events', event, {headers: {"UserId":event.organizer}})
+  return client.post('/calendars/1/events', event, {headers: {"UserId":event.organizer}})
 }
 
 
 
 function acceptEvent(userId, eventId) {
-  if(userId==null || eventId==null){
+  if(!userId || !eventId){
     return;
   }
 
-  return axios.post('/calendars/'+userId+ '/events/' + eventId + '/accept', {}, {headers: {"UserId":userId}})
+  return client.post('/calendars/'+userId+ '/events/' + eventId + '/accept', {}, {headers: {"UserId":userId}})
 }
 
 
 function declineEvent(userId, eventId) {
-  if(userId==null || eventId==null){
+  if(!userId || !eventId){
     return;
   }
 
-  return axios.post('/calendars/'+userId+ '/events/' + eventId + '/decline', null, {headers: {"UserId":userId}})
+  return client.post('/calendars/'+userId+ '/events/' + eventId + '/decline', null, {headers: {"UserId":userId}})
+}
+
+
+
+async function getEventByEventId(userId, eventId) {
+  if (!userId || !eventId) {
+    return;
+  }
+
+  const options = {
+    headers: {'UserId': userId}
+  };
+
+
+  let response = await client.get('/calendars/'+userId+ '/events/' + eventId, options);
+  return response.data.data;
+}
+
+
+async function lookupEvents(listOfIds) {
+  if (!listOfIds) {
+    return;
+  }
+  let ids = listOfIds.join(",")
+  let response = await client.get(`/calendars/events/lookup?ids=${ids}`, null);
+  return response.data.data;
 }
 
 
 module.exports = {
   createEvent: createEvent,
   acceptEvent: acceptEvent,
-  declineEvent:declineEvent
+  declineEvent:declineEvent,
+  getEventByEventId:getEventByEventId,
+  lookupEvents:lookupEvents
 }
 
 

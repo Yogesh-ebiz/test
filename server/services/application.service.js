@@ -77,7 +77,7 @@ function findById(applicationId) {
 function findByApplicationId(applicationId) {
   let data = null;
 
-  if(applicationId==null){
+  if(!applicationId){
     return;
   }
 

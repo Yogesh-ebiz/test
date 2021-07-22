@@ -11,6 +11,7 @@ const {convertToCompany, jobMinimal} = require('../utils/helper');
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
 const workflowEnum = require('../const/workflowEnum');
+const stageType = require('../const/stageType');
 
 
 const Application = require('../models/application.model');
@@ -22,6 +23,7 @@ const questionSubmissionService = require('../services/questionsubmission.servic
 const candidateService = require('../services/candidate.service');
 const jobService = require('../services/jobrequisition.service');
 const fileService = require('../services/file.service');
+const calendarService = require('../services/api/calendar.service.api');
 
 const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findById, findByApplicationId} = require('../services/application.service');
@@ -74,6 +76,10 @@ async function getById(currentUserId, id) {
             {
               path: 'candidateAttachment',
               model: 'File'
+            },
+            {
+              path: 'emails',
+              model: 'Email'
             }
           ]
         },
@@ -99,6 +105,9 @@ async function getById(currentUserId, id) {
         // application.job.qualifications = [];
         // application.job.skills = []
         // job.company = convertToCompany(company);
+
+        let events = await calendarService.lookupEvents(_.map(application.progress, 'event'));
+        console.log(events)
         application.job = jobMinimal(application.job);
         application.progress = _.reduce(application.progress, function(res, progress){
 
@@ -117,13 +126,27 @@ async function getById(currentUserId, id) {
 
           if(progress._id.equals(application.currentProgress)){
             application.currentProgress = progress
+
+            if(progress.stage.type==stageType.OFFERED){
+              application.currentProgress.isRequired = application.currentProgress.status==applicationEnum.ACCEPTED?false:true;
+            } else {
+              application.currentProgress.isRequired = application.currentProgress.event?false:true;
+            }
           }
 
           res.push(progress);
           return res;
         }, [])
 
-        // application.job = job;
+        if(application.currentProgress.event){
+          let event = await calendarService.getEventByEventId(currentUserId, application.currentProgress.event);
+
+          if(event){
+            application.currentProgress.event = event;
+            application.currentProgress.isRequired = _.some(event.attendees, {confirmStatus: 'REQUIRED', id:application.partyId});
+          }
+
+        }
 
       } else {
         application=null;
@@ -404,9 +427,8 @@ async function uploadOffer(currentUserId, applicationId, files) {
 
 }
 
-async function accept(currentUserId, applicationId, applicationProgressId, action) {
-
-  if(!applicationId || !applicationProgressId || !currentUserId || !action){
+async function accept(currentUserId, applicationId, applicationProgressId) {
+  if(!applicationId || !applicationProgressId || !currentUserId){
     return null;
   }
 
@@ -414,34 +436,35 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
   try {
     let currentParty = await findByUserId(currentUserId);
 
-    if(isPartyActive(currentParty)) {
-      application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
-      if (application) {
 
+    if(isPartyActive(currentParty)) {
+      let application = await findByApplicationId(applicationId).populate({
+        path: 'currentProgress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
+      });
+
+      if (application) {
         // let workflow = await findWorkflowById(application.job.workflowId);
         // console.log('workflow', workflow)
 
-        let progresses = application.progress;
+        if(application.currentProgress.applicationProgressId===applicationProgressId){
 
-        if(progresses){
+          application.currentProgress.status = applicationEnum.ACCEPTED;
+          application.currentProgress.requiredAction = false;
+          application.currentProgress.lastUpdatedDate = Date.now();
+          result = await application.currentProgress.save();
 
-          let currentProgress = progresses[progresses.length -1 ];
 
-          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && currentProgress.type==action.type && action.accept && currentProgress.requiredAction){
-
-            currentProgress.status = applicationEnum.ACCEPTED;
-            currentProgress.candidateComment = action.candidateComment;
-            currentProgress.requiredAction = false;
-            currentProgress.lastUpdatedDate = Date.now();
-            let saved = await currentProgress.save();
-            if(saved){
-              result = saved;
-              let event = acceptEvent(currentParty.id, currentProgress.event.eventId);
-            }
-
+          if(application.currentProgress.stage.type!=stageType.OFFERED){
+            await acceptEvent(currentParty.id, application.currentProgress.event);
 
           }
         }
+
       }
     }
 
@@ -452,34 +475,36 @@ async function accept(currentUserId, applicationId, applicationProgressId, actio
   return result;
 }
 
-async function decline(currentUserId, applicationId, applicationProgressId, action) {
-
-  if(!applicationId || !applicationProgressId || !currentUserId || !action){
+async function decline(currentUserId, applicationId, applicationProgressId, form) {
+  if(!applicationId || !applicationProgressId || !currentUserId || !form){
     return null;
   }
 
   let result;
   try {
     let currentParty = await findByUserId(currentUserId);
-
     if(isPartyActive(currentParty)) {
-      application = await findApplicationByIdAndUserId(applicationId, currentParty.id);
+      let application = await findApplicationByIdAndUserId(applicationId, currentParty.id).populate({
+        path: 'currentProgress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
+      });
+
       if (application) {
-
-        let progresses = application.progress;
-        if(progresses){
-          let currentProgress = progresses[progresses.length -1 ];
-          if(currentProgress && currentProgress.applicationProgressId==applicationProgressId && currentProgress.type==action.type && !action.accept && currentProgress.requiredAction){
-            currentProgress.status = applicationEnum.DECLINED;
-            currentProgress.requiredAction = false;
-            currentProgress.candidateComment = action.candidateComment;
-            currentProgress.lastUpdatedDate = Date.now();
-            let saved = await currentProgress.save();
-            if(saved){
-              result = saved;
-              let event = declineEvent(currentParty.id, currentProgress.event.eventId);
-            }
-
+        if(application.currentProgress && application.currentProgress.applicationProgressId==applicationProgressId){
+          application.status=applicationEnum.DECLINED;
+          application.currentProgress.status = applicationEnum.DECLINED;
+          application.currentProgress.requiredAction = false;
+          application.currentProgress.candidateComment = form.candidateComment;
+          application.currentProgress.lastUpdatedDate = Date.now();
+          application.currentProgress.reasons = form.reasons;
+          result = await application.currentProgress.save();
+          await application.save();
+          if(result && application.currentProgress.event){
+            let event = declineEvent(currentParty.id, application.currentProgress.event);
           }
         }
       }

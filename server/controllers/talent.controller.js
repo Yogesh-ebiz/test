@@ -62,6 +62,7 @@ const fileService = require('../services/file.service');
 const adService = require('../services/ad.service');
 const checkoutService = require('../services/checkout.service');
 const paymentProvider = require('../services/api/payment.service.api');
+const calendarService = require('../services/api/calendar.service.api');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -939,6 +940,7 @@ async function updateJob(companyId, currentUserId, jobId, form) {
   let currentParty = await feedService.findByUserId(currentUserId);
 
   if (isPartyActive(currentParty)) {
+    form.company = companyId;
     result = await jobService.updateJob(jobId, member, form);
   }
 
@@ -1166,10 +1168,6 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
 
       let noApplied = await applicationService.findAppliedCountByJobId(job._id);
       job.noApplied = noApplied;
-
-
-      let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
-      job.level = experienceLevel[0];
 
       let industry = await feedService.findIndustry('', job.industry, locale);
       job.industry = industry;
@@ -1910,6 +1908,18 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           noOfEvaluations += 1;
         }
       }
+
+      let eventIds = _.map(application.progress, 'event');
+      eventIds = _.reduce(eventIds, function(res, id){
+        if(!isNaN(id)){
+          res.push(parseInt(id));
+        }
+
+        return res;
+      }, []);
+
+      let events = await calendarService.lookupEvents(eventIds)  ;
+
       application.noOfEvaluations = noOfEvaluations;
       application.rating = Math.round(rating / noOfEvaluations * 10) /10;
 
@@ -1931,6 +1941,13 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
         if(progress._id.equals(application.currentProgress)){
           application.currentProgress = progress
+        }
+
+        if(progress.event){
+          let event = _.find(events, {eventId: progress.event});
+          event.eventTopic = null;
+          event.meta = null;
+          progress.event = event;
         }
 
         res.push(progress);

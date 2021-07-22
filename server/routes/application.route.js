@@ -64,8 +64,7 @@ async function accept(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = parseInt(req.params.id);
   let applicationProgressId = parseInt(req.params.applicationProgressId);
-  let action = req.body;
-  let data = await applicationCtl.accept(currentUserId, applicationId, applicationProgressId, action);
+  let data = await applicationCtl.accept(currentUserId, applicationId, applicationProgressId);
 
   res.json(new Response(data, data?'application_accepted_successful':'not_found', res));
 }
@@ -76,8 +75,8 @@ async function decline(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = parseInt(req.params.id);
   let applicationProgressId = parseInt(req.params.applicationProgressId);
-  let action = req.body;
-  let data = await applicationCtl.decline(currentUserId, applicationId, applicationProgressId, action);
+  let form = req.body;
+  let data = await applicationCtl.decline(currentUserId, applicationId, applicationProgressId, form);
 
   res.json(new Response(data, data?'application_decline_successful':'not_found', res));
 }
