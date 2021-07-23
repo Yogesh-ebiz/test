@@ -127,8 +127,8 @@ async function getById(currentUserId, id) {
           if(progress._id.equals(application.currentProgress)){
             application.currentProgress = progress
 
-            if(progress.stage.type==stageType.OFFERED){
-              application.currentProgress.isRequired = (application.hasAccepted || application.hasAccepted==false)?false:true;
+            if(progress.stage.type==stageType.OFFER){
+              application.currentProgress.isRequired = typeof application.hasAccepted==='undefined';
             }
           }
 
@@ -143,9 +143,7 @@ async function getById(currentUserId, id) {
             application.currentProgress.isRequired = _.some(event.attendees, {confirmStatus: 'REQUIRED', id:application.partyId});
           }
 
-        } else {
-          application.currentProgress.isRequired = false;
-        }
+        } 
 
       } else {
         application=null;
@@ -457,12 +455,12 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
           application.currentProgress.lastUpdatedDate = Date.now();
           result = await application.currentProgress.save();
 
-          if(application.currentProgress.stage.type===stageType.OFFERED){
+          if(application.currentProgress.stage.type===stageType.OFFER){
             application.hasAccepted = true;
             await application.save();
           }
 
-          if(application.currentProgress.stage.type!=stageType.OFFERED){
+          if(application.currentProgress.stage.type!=stageType.OFFER){
             await acceptEvent(currentParty.id, application.currentProgress.event);
 
           }
@@ -505,11 +503,11 @@ async function decline(currentUserId, applicationId, applicationProgressId, form
           application.currentProgress.reasons = form.reasons;
           result = await application.currentProgress.save();
 
-          if(application.currentProgress.stage.type===stageType.OFFERED){
+          if(application.currentProgress.stage.type===stageType.OFFER){
             application.hasAccepted = false;
             await application.save();
           }
-          await application.save();
+
           if(result && application.currentProgress.event){
             let event = declineEvent(currentParty.id, application.currentProgress.event);
           }

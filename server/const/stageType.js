@@ -4,6 +4,6 @@ module.exports = {
   PHONESCREEN: "PHONESCREEN",
   TEST: "TEST",
   INTERVIEW: "INTERVIEW",
-  OFFERED: "OFFERED",
+  OFFER: "OFFER",
   HIRED: "HIRED"
 };
