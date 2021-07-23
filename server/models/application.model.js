@@ -75,6 +75,9 @@ const ApplicationSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  hasAccepted: {
+    type: Boolean
+  },
   coverLetter: {
     type: String
   },

@@ -457,6 +457,10 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
           application.currentProgress.lastUpdatedDate = Date.now();
           result = await application.currentProgress.save();
 
+          if(application.currentProgress.stage.type===stageType.OFFERED){
+            application.hasAccepted = true;
+            await application.save();
+          }
 
           if(application.currentProgress.stage.type!=stageType.OFFERED){
             await acceptEvent(currentParty.id, application.currentProgress.event);
@@ -494,13 +498,17 @@ async function decline(currentUserId, applicationId, applicationProgressId, form
 
       if (application) {
         if(application.currentProgress && application.currentProgress.applicationProgressId==applicationProgressId){
-          application.status=applicationEnum.DECLINED;
           application.currentProgress.status = applicationEnum.DECLINED;
           application.currentProgress.requiredAction = false;
           application.currentProgress.candidateComment = form.candidateComment;
           application.currentProgress.lastUpdatedDate = Date.now();
           application.currentProgress.reasons = form.reasons;
           result = await application.currentProgress.save();
+
+          if(application.currentProgress.stage.type===stageType.OFFERED){
+            application.hasAccepted = false;
+            await application.save();
+          }
           await application.save();
           if(result && application.currentProgress.event){
             let event = declineEvent(currentParty.id, application.currentProgress.event);
