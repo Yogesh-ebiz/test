@@ -128,7 +128,7 @@ async function getById(currentUserId, id) {
             application.currentProgress = progress
 
             if(progress.stage.type==stageType.OFFERED){
-              application.currentProgress.isRequired = (application.hasAccepted || application==false)?true:false;
+              application.currentProgress.isRequired = (application.hasAccepted || application.hasAccepted==false)?false:true;
             }
           }
 
