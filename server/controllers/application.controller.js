@@ -143,7 +143,7 @@ async function getById(currentUserId, id) {
             application.currentProgress.isRequired = _.some(event.attendees, {confirmStatus: 'REQUIRED', id:application.partyId});
           }
 
-        } 
+        }
 
       } else {
         application=null;
@@ -457,9 +457,11 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
 
           if(application.currentProgress.stage.type===stageType.OFFER){
             application.hasAccepted = true;
-            await application.save();
           }
 
+          application.status = applicationEnum.ACCEPTED;
+          await application.save();
+          
           if(application.currentProgress.stage.type!=stageType.OFFER){
             await acceptEvent(currentParty.id, application.currentProgress.event);
 
@@ -505,8 +507,10 @@ async function decline(currentUserId, applicationId, applicationProgressId, form
 
           if(application.currentProgress.stage.type===stageType.OFFER){
             application.hasAccepted = false;
-            await application.save();
           }
+
+          application.status = applicationEnum.DECLINED;
+          await application.save();
 
           if(result && application.currentProgress.event){
             let event = declineEvent(currentParty.id, application.currentProgress.event);
