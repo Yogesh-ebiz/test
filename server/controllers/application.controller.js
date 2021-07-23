@@ -106,8 +106,8 @@ async function getById(currentUserId, id) {
         // application.job.skills = []
         // job.company = convertToCompany(company);
 
-        let events = await calendarService.lookupEvents(_.map(application.progress, 'event'));
-        console.log(events)
+        // let events = await calendarService.lookupEvents(_.map(application.progress, 'event'));
+        // console.log(events)
         application.job = jobMinimal(application.job);
         application.progress = _.reduce(application.progress, function(res, progress){
 
@@ -128,9 +128,7 @@ async function getById(currentUserId, id) {
             application.currentProgress = progress
 
             if(progress.stage.type==stageType.OFFERED){
-              application.currentProgress.isRequired = application.currentProgress.status==applicationEnum.ACCEPTED?false:true;
-            } else {
-              application.currentProgress.isRequired = application.currentProgress.event?false:true;
+              application.currentProgress.isRequired = (application.hasAccepted || application==false)?true:false;
             }
           }
 
@@ -140,12 +138,13 @@ async function getById(currentUserId, id) {
 
         if(application.currentProgress.event){
           let event = await calendarService.getEventByEventId(currentUserId, application.currentProgress.event);
-
           if(event){
             application.currentProgress.event = event;
             application.currentProgress.isRequired = _.some(event.attendees, {confirmStatus: 'REQUIRED', id:application.partyId});
           }
 
+        } else {
+          application.currentProgress.isRequired = false;
         }
 
       } else {
