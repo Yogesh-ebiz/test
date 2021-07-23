@@ -145,6 +145,8 @@ async function getById(currentUserId, id) {
 
         }
 
+        application.progress = _.orderBy(application.progress, p => p.stage.stageId, ['asc']);
+
       } else {
         application=null;
       }
@@ -461,7 +463,7 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
 
           application.status = applicationEnum.ACCEPTED;
           await application.save();
-          
+
           if(application.currentProgress.stage.type!=stageType.OFFER){
             await acceptEvent(currentParty.id, application.currentProgress.event);
 

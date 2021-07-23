@@ -1900,87 +1900,85 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
     if (application) {
       let requiredEvaluation = false;
       let hasEvaluated = false
-      let noOfEvaluations=0;
-      let rating=0;
-      for([i, progress] of application.progress.entries()){
-        for([i, evaluation] of progress.evaluations.entries()){
+      let noOfEvaluations = 0;
+      let rating = 0;
+      for ([i, progress] of application.progress.entries()) {
+        for ([i, evaluation] of progress.evaluations.entries()) {
           rating += evaluation.rating
           noOfEvaluations += 1;
         }
+
+
+        let eventIds = _.map(application.progress, 'event');
+        eventIds = _.reduce(eventIds, function (res, id) {
+          if (!isNaN(id)) {
+            res.push(parseInt(id));
+          }
+
+          return res;
+        }, []);
+
+        let events = await calendarService.lookupEvents(eventIds);
+
+        application.noOfEvaluations = noOfEvaluations;
+        application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
+
+        // application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
+        application.progress = _.reduce(application.progress, function (res, progress) {
+
+          progress.stage.evaluations = [];
+          progress.stage.members = [];
+          progress.stage.tasks = [];
+
+
+          if (progress.attachment) {
+            progress.attachment.path = config.cdn + progress.attachment.path;
+          }
+
+          if (progress.candidateAttachment) {
+            progress.candidateAttachment.path = config.cdn + progress.candidateAttachment.path;
+          }
+
+          if (progress._id.equals(application.currentProgress)) {
+            application.currentProgress = progress
+          }
+
+          if (progress.event) {
+            let event = _.find(events, {eventId: progress.event});
+            event.eventTopic = null;
+            event.meta = null;
+            progress.event = event;
+          }
+
+          res.push(progress);
+          return res;
+        }, [])
+
+
+        hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
+        // application.currentProgress.hasEvaluated = hasEvaluated;
+        // application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
+
+        application.currentProgress.stage.tasks.forEach(function (task) {
+          if (task.type === taskType.EMAIL) {
+            task.isCompleted = application.currentProgress.emails.length ? true : false;
+            task.required = (!application.currentProgress.emails.length && task.required) ? true : false;
+          }
+
+          if (task.type === taskType.EVENT) {
+            task.isCompleted = application.currentProgress.event ? true : false;
+            task.required = (!application.currentProgress.event && task.required) ? true : false;
+          }
+
+          if (task.type === taskType.EVALUATION) {
+            task.isCompleted = hasEvaluated;
+            task.required = (!hasEvaluated && task.required) ? true : false;
+          }
+        });
+        application.progress = _.orderBy(application.progress, p => p.stage.stageId, ['desc']);
+
       }
-
-      let eventIds = _.map(application.progress, 'event');
-      eventIds = _.reduce(eventIds, function(res, id){
-        if(!isNaN(id)){
-          res.push(parseInt(id));
-        }
-
-        return res;
-      }, []);
-
-      let events = await calendarService.lookupEvents(eventIds)  ;
-
-      application.noOfEvaluations = noOfEvaluations;
-      application.rating = Math.round(rating / noOfEvaluations * 10) /10;
-
-      // application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
-      application.progress = _.reduce(application.progress, function(res, progress){
-
-        progress.stage.evaluations = [];
-        progress.stage.members = [];
-        progress.stage.tasks = [];
-
-
-        if(progress.attachment){
-          progress.attachment.path = config.cdn + progress.attachment.path;
-        }
-
-        if(progress.candidateAttachment){
-          progress.candidateAttachment.path = config.cdn + progress.candidateAttachment.path;
-        }
-
-        if(progress._id.equals(application.currentProgress)){
-          application.currentProgress = progress
-        }
-
-        if(progress.event){
-          let event = _.find(events, {eventId: progress.event});
-          event.eventTopic = null;
-          event.meta = null;
-          progress.event = event;
-        }
-
-        res.push(progress);
-        return res;
-      }, [])
-
-
-      hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
-      // application.currentProgress.hasEvaluated = hasEvaluated;
-      // application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
-
-      application.currentProgress.stage.tasks.forEach(function(task){
-        if(task.type===taskType.EMAIL){
-          task.isCompleted = application.currentProgress.emails.length?true:false;
-          task.required = (!application.currentProgress.emails.length && task.required)?true: false;
-        }
-
-        if(task.type===taskType.EVENT){
-          task.isCompleted = application.currentProgress.event?true:false;
-          task.required = (!application.currentProgress.event && task.required)?true: false;
-        }
-
-        if(task.type===taskType.EVALUATION){
-          task.isCompleted = hasEvaluated;
-          task.required = (!hasEvaluated && task.required)?true: false;
-        }
-      });
-
-
-    } else {
-      application=null;
     }
-
 
   } catch (error) {
     console.log(error);
