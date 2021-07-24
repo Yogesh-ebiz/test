@@ -470,10 +470,8 @@ async function searchJob(req, res) {
   let sort = req.query;
   let filter = req.body;
   let pagination = req.query;
-  filter.company = [companyId];
-  filter.title = req.query.query;
 
-  let data = await talentCtrl.searchJobs(currentUserId, companyId, filter, sort, res.locale);
+  let data = await talentCtrl.searchJobs(currentUserId, companyId, req.query.query, filter, sort, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

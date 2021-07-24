@@ -283,7 +283,7 @@ async function getUserSession(currentUserId, preferredCompany) {
   let user = await feedService.findUserByIdFull(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
-  let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'));
+  let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
 
   companies = _.reduce(companies, function(res, item){
     let found = _.find(allAccounts, {company: item.companyId});
@@ -656,7 +656,7 @@ async function searchCompany(currentUserId, filter, sort) {
   }
 
   let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
-  let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'));
+  let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'), true);
 
 
   companies = _.reduce(companies, function(res, item){
@@ -679,7 +679,7 @@ async function searchCompany(currentUserId, filter, sort) {
 }
 
 
-async function searchJobs(currentUserId, companyId, filter, sort, locale) {
+async function searchJobs(currentUserId, companyId, query, filter, sort, locale) {
 
   if(!currentUserId || !companyId || !filter || !sort){
     return null;
@@ -691,73 +691,18 @@ async function searchJobs(currentUserId, companyId, filter, sort, locale) {
     return null;
   }
 
-  let company = await companyService.findByCompanyId(companyId);
-  company.subscription = null;
-  console.log(company)
 
-  filter.company = [company._id];
+  filter.company = [companyId];
+  filter.status = []
 
-  let select = '';
-  let limit = (sort.size && sort.size>0) ? sort.size:20;
-  let page = (sort.page && sort.page==0) ? sort.page:1;
-  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
-
-  let options = {
-    select:   select,
-    sort:     null,
-    lean:     true,
-    limit:    limit,
-    page: parseInt(sort.page)+1
-  };
-
-  let aList = [];
-  let aMatch = { $match: new JobSearchParam(filter)};
-  let aSort = { $sort: {createdDate: direction} };
-
-
-  aList.push(aMatch);
-  aList.push(
-    {
-      $lookup: {
-        from: 'members',
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "createdBy"
-      }
-    },
-    { $unwind: '$createdBy'}
-    // {
-    //   $lookup: {
-    //     from: 'departments',
-    //     localField: "department",
-    //     foreignField: "_id",
-    //     as: "department"
-    //   }
-    // },
-    // { $unwind: '$department'}
-
-  );
-
-
-  if(sort && sort.sortBy=='popular'){
-    aSort = { $sort: { noOfViews: direction} };
-    aList.push(aSort);
-  } else {
-    aList.push(aSort);
-  }
-  const aggregate = JobRequisition.aggregate(aList);
-
-  let result = await JobRequisition.aggregatePaginate(aggregate, options);
+  let result = await jobService.search(currentUserId, query, filter, sort, locale);
 
   if(result) {
     let departmentIds = _.map(result.docs, 'department');
     let departments = await departmentService.findDepartmentsByCompany(companyId);
-
-    // let company = await feedService.findCompanyById(companyId, currentUserId);
     let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.JOB);
 
     result.docs.map(job => {
-      job.company = convertToCompany(company);
       job.department = _.find(departments, {_id: job.department});
       job.hasSaved = _.find(jobSubscribed, {subject: job._id})?true:false;
 
@@ -1881,6 +1826,10 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           {
             path: 'candidateAttachment',
             model: 'File'
+          },
+          {
+            path: 'emails',
+            model: 'Email'
           }
         ]
       },
@@ -1975,7 +1924,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
             task.required = (!hasEvaluated && task.required) ? true : false;
           }
         });
-        application.progress = _.orderBy(application.progress, p => p.stage.stageId, ['desc']);
+        application.progress = _.orderBy(application.progress, p => p.stage.stageId, ['asc']);
 
       }
     }
@@ -2844,7 +2793,7 @@ async function getBoard(currentUserId, jobId, locale) {
 
     let pipelineStages = pipeline.stages;
     let applicationsGroupByStage = await Application.aggregate([
-      {$match: {jobId: job._id, status:'ACTIVE'}},
+      {$match: {job: job._id, status: {$in: ['ACTIVE', 'ACCEPTED']}}},
       // {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
       {$lookup:{
           from:"applicationprogresses",
@@ -2908,6 +2857,7 @@ async function getBoard(currentUserId, jobId, locale) {
 
     let sources = await sourceService.findByJobId(jobId).populate('candidate');
 
+    console.log(applicationsGroupByStage)
     applicationsGroupByStage.forEach(function(stage){
 
       stage.applications = _.reduce(stage.applications, function(res, app){

@@ -107,14 +107,19 @@ async function findByCompanyId(companyId) {
 
 }
 
-async function findByCompanyIds(companyIds) {
+async function findByCompanyIds(companyIds, needSubscription) {
 
-  console.log(companyIds)
   if(!companyIds){
     return;
   }
 
-  let companies = await Company.find({companyId: {$in: companyIds}}).populate('subscription');
+  let companies = null;
+  
+  if(needSubscription){
+    companies = await Company.find({companyId: {$in: companyIds}}).populate('subscription');
+  } else {
+    companies = await Company.find({companyId: {$in: companyIds}});
+  }
 
   return companies;
 

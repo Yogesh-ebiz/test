@@ -134,8 +134,8 @@ async function searchJob(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.body;
   let sort = req.query;
-  filter.query = req.query.query;
-  let data = await jobRequisitionCtl.searchJob(currentUserId, null, filter, sort, res.locale);
+
+  let data = await jobRequisitionCtl.searchJob(currentUserId, req.query.query, filter, sort, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

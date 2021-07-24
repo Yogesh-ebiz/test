@@ -37,7 +37,7 @@ const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../
 const {findById, findByJobId} = require('../services/pipeline.service');
 
 
-const {findJobId, getCountsGroupByCompany, getNewJobs, getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
+const jobService = require('../services/jobrequisition.service');
 const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId, findMostViewed} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 const {getTopCategory} = require('../services/category.service');
@@ -142,7 +142,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
-    job = await findJobId(jobId, locale).populate('tags').populate('createdBy').populate('company');
+    job = await jobService.findJobId(jobId, locale).populate('tags').populate('createdBy').populate('company');
 
     if(job) {
       job = job.toObject();
@@ -394,7 +394,7 @@ async function captureJob(currentUserId, jobId, capture) {
   }
 
   try {
-    let job = await findJobId(jobId);
+    let job = await jobService.findJobId(jobId);
 
     if(job) {
 
@@ -434,7 +434,7 @@ async function getJobInsight(currentUserId, jobId, locale) {
 
   let result = {};
   try {
-    let job = await findJobId(jobId);
+    let job = await jobService.findJobId(jobId);
     let jobSkills = [];
     if(job.skills.length){
       jobSkills = await feedService.findSkillsById(job.skills);
@@ -506,7 +506,7 @@ async function getJobLanding(currentUserId, locale) {
     let viewed = await findJobViewByUserId(currentUserId, 4);
     let saved = await bookmarkService.findBookByUserId(currentUserId, 4);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
-    let newJobs = await getNewJobs();
+    let newJobs = await jobService.getNewJobs();
     let popularJobs = await findMostViewed();
 
     if(!popularJobs.length){
@@ -610,7 +610,7 @@ async function getTopFiveJobs(companies, locale) {
 
   let result = [];
   try {
-    result = await getGroupOfCompanyJobs(companies);
+    result = await jobService.getGroupOfCompanyJobs(companies);
 
   } catch (error) {
     console.log(error);
@@ -622,155 +622,18 @@ async function getTopFiveJobs(companies, locale) {
 
 
 
-async function searchJob(currentUserId, jobId, filter, sort, locale) {
+async function searchJob(currentUserId, query, filter, sort, locale) {
 
   if(!filter || !sort){
     return null;
   }
 
-  let foundJob = null;
-
-  let select = '';
-  let limit = (sort.size && sort.size>0) ? sort.size:20;
-  let page = (sort.page && sort.page==0) ? sort.page:1;
-  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
-
-  let options = {
-    select:   select,
-    sort:     null,
-    lean:     true,
-    limit:    limit,
-    page: parseInt(sort.page)+1
-  };
-
-
-  let history = await  saveSearch(currentUserId, filter.query);
-
-  if(jobId){
-    foundJob = await JobRequisition.findOne({jobId:jobId});
-    //
-    // if(!foundJob){
-    //   return new Pagination(null);
-    // }
-
-
-    if(foundJob) {
-      filter.similarId = jobId;
-      //filter.query = foundJob.title;
-      // filter.level = [foundJob.level];
-      filter.jobFunction = [foundJob.jobFunction];
-      filter.industry = [foundJob.industry];
-      filter.employmentType = [];
-      // filter.city = [foundJob.city];
-      // filter.state = [foundJob.state];
-      // filter.country = [foundJob.country];
-
-    }
-  }
 
   filter.status = [statusEnum.ACTIVE];
   filter.types = [jobType.FREE, jobType.PROMOTION];
 
-
-  let currentDate = Date.now();
-  let aList = [];
-  let aMatch = { $match: new SearchParam(filter)};
-  let aSort = { $sort: {createdDate: direction} };
-
-  aList.push(aMatch);
-  aList.push(
-    {
-      $lookup: {
-        from: 'companies',
-        localField: "company",
-        foreignField: "_id",
-        as: "company"
-      }
-    },
-    { $unwind: '$company' },
-    {
-      $lookup: {
-        from: 'labels',
-        localField: "tags",
-        foreignField: "_id",
-        as: "tags"
-      }
-    },
-    {$lookup:{
-        from:"ads",
-        let:{ads: '$ads'},
-        pipeline:[
-          {$match:{$expr:{$in:["$_id", "$$ads"]}}},
-          {
-            $lookup: {
-              from: 'targets',
-              localField: "targeting",
-              foreignField: "_id",
-              as: "targeting"
-            }
-          },
-          {$unwind: '$targeting' }
-        ],
-        as: 'ads'
-    }},
-    { $addFields:
-        {isHot: {
-            $reduce: {
-              input: "$ads",
-              initialValue: false,
-              in: {
-                $cond: [
-                 { $and: [ {$in: [ "hottag" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
-                  true,
-                  false
-                ]
-
-              }
-            }
-          } }
-    },
-  );
-
-  if(sort && sort.sortBy=='popular'){
-    aSort = { $sort: { noOfViews: direction} };
-    aList.push(aSort);
-  } else {
-    aList.push(aSort);
-  }
-
-  const aggregate = JobRequisition.aggregate(aList);
-  let result = await JobRequisition.aggregatePaginate(aggregate, options);
-  let docs = [];
-
-  let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentfoundCompaniesType')), locale);
-  let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
-  let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
-  let hasSaves = [];
-
-  if(currentUserId){
-    hasSaves=await bookmarkService.findBookByUserId(currentUserId);
-  }
-
-
-  _.forEach(result.docs, function(job){
-    job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
-    job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
-    // job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-    // job.level = _.find(experienceLevels, {shortCode: job.level});
-
-    job.shareUrl = 'https://www.anymay.com/jobs/'+job.jobId;
-
-    job.skills=[];
-    job.industry=[];
-    job.members=[];
-    job.responsibilities=[];
-    job.qualifications = [];
-    job.minimumQualifications=[];
-    job.applicationForm=null;
-    job.description = null;
-
-
-  })
+  let result = await jobService.search(currentUserId, query, filter, sort, locale);
+  let history = await  saveSearch(currentUserId, filter.query);
 
   return new Pagination(result);
 
@@ -927,7 +790,7 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
       let match = {level: foundJob.level, jobFunction: foundJob.jobFunction};
       // let match = {level: foundJob.level};
 
-      let group = await getCountsGroupByCompany(match);
+      let group = await jobService.getCountsGroupByCompany(match);
       group = _.reduce(group, function(res, item){
         res.push(item._id.company);
         return res;

@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
+const {convertToCompany, convertToAvatar} = require('../utils/helper');
 
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
@@ -800,6 +801,162 @@ async function getJobsEndingSoon(company) {
 
 
 
+async function search(currentUserId, query, filter, sort, locale) {
+  if(!filter || !sort){
+    return null;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+
+
+  let result;
+  let currentDate = Date.now();
+  let aList = [];
+  let aMatch = {$match: {}};
+  let aSort;
+
+
+  if(query){
+    aMatch.$match.$or =  [{$text: { $search: query, $diacriticSensitive: true, $caseSensitive: false }}, {title: { $regex: query, $options: 'i'} }];
+  }
+
+
+  if(filter.company.length){
+    let companies = await companyService.findByCompanyIds(filter.company, false);
+    aMatch.$match.company = {$in: _.reduce(companies, function(res, item){res.push(item._id); return res;}, [])};
+    filter.company = [];
+  }
+
+  if(filter.status.length){
+    aMatch.$match.status = {$in:filter.status};
+    filter.status = [];
+  }
+
+
+
+  if(sort && sort.sortBy=='popular'){
+    aSort = { $sort: { noOfViews: direction} };
+  } else if(sort && sort.sortBy=='relevant'){
+    aSort = { $sort: { score: direction} };
+  } else {
+    aSort = { $sort: {createdDate: direction} };
+  }
+
+  console.log(aMatch)
+  aList.push(aMatch);
+  aList.push(
+    {
+      $lookup: {
+        from: 'companies',
+        localField: "company",
+        foreignField: "_id",
+        as: "company"
+      }
+    },
+    { $unwind: '$company' },
+    {
+      $lookup: {
+        from: 'members',
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy"
+      }
+    },
+    { $unwind: '$createdBy'},
+    {
+      $lookup: {
+        from: 'labels',
+        localField: "tags",
+        foreignField: "_id",
+        as: "tags"
+      }
+    },
+    {$lookup:{
+        from:"ads",
+        let:{ads: '$ads'},
+        pipeline:[
+          {$match:{$expr:{$in:["$_id", "$$ads"]}}},
+          {
+            $lookup: {
+              from: 'targets',
+              localField: "targeting",
+              foreignField: "_id",
+              as: "targeting"
+            }
+          },
+          {$unwind: '$targeting' }
+        ],
+        as: 'ads'
+      }},
+    { $addFields:
+        {isHot: {
+            $reduce: {
+              input: "$ads",
+              initialValue: false,
+              in: {
+                $cond: [
+                  { $and: [ {$in: [ "hottag" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
+                  true,
+                  false
+                ]
+
+              }
+            }
+          } }
+    },
+  );
+
+  aList.push({ $match: new SearchParam(filter)});
+  aList.push(aSort);
+
+  const aggregate = JobRequisition.aggregate(aList);
+  result = await JobRequisition.aggregatePaginate(aggregate, options);
+
+  let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
+  let hasSaves = [];
+
+  // if(currentUserId){
+  //   hasSaves=await bookmarkService.findBookByUserId(currentUserId);
+  // }
+
+
+  _.forEach(result.docs, function(job){
+    job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
+    job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
+    job.createdBy = convertToAvatar(job.createdBy);
+    job.shareUrl = 'https://www.accessed.co/jobs/'+job.jobId;
+
+    job.skills=[];
+    job.industry=[];
+    job.members=[];
+    job.responsibilities=[];
+    job.qualifications = [];
+    job.minimumQualifications=[];
+    job.applicationForm=null;
+    job.description = null;
+    job.ads = [];
+
+  })
+
+
+
+  return result;
+
+}
+
+
 
 module.exports = {
   addJob:addJob,
@@ -826,5 +983,6 @@ module.exports = {
   getNewJobs:getNewJobs,
   findJobsByCompanyId:findJobsByCompanyId,
   getGroupOfCompanyJobs:getGroupOfCompanyJobs,
-  getJobsEndingSoon:getJobsEndingSoon
+  getJobsEndingSoon:getJobsEndingSoon,
+  search:search
 }
