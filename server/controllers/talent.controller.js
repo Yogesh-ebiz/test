@@ -19,7 +19,7 @@ const taskType = require('../const/taskType');
 const stageType = require('../const/stageType');
 const jobType = require('../const/jobType');
 
-const {upload} = require('../services/aws.service');
+const awsService = require('../services/aws.service');
 const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
@@ -190,6 +190,7 @@ module.exports = {
   getCandidateEvaluationById,
   getCandidatesSimilar,
   getCandidateActivities,
+  uploadAvatar,
   assignCandidatesJobs,
   getAllCandidatesSkills,
   addCandidateTag,
@@ -3333,6 +3334,61 @@ async function getCandidateActivities(companyId, currentUserId, userId, sort) {
 
 
 
+async function uploadAvatar(companyId, currentUserId, candidateId, files) {
+  if(!companyId || !currentUserId || !candidateId || !files){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'candidates/';
+  try {
+
+    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+
+    if (candidate) {
+      let type, name;
+      if(files.file) {
+        let cv = files.file[0];
+        let fileName = cv.originalname.split('.');
+        let fileExt = fileName[fileName.length - 1];
+        let timestamp = Date.now();
+        name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
+        let path = basePath + candidate._id + '/' + name;
+        let response = await awsService.upload(path, cv);
+        switch (fileExt) {
+          case 'png':
+            type = 'PNG';
+            break;
+          case 'jpeg':
+            type = 'JPG';
+            break;
+          case 'jpg':
+            type = 'JPG';
+            break;
+
+        }
+
+        candidate.avatar = name;
+        result = await candidate.save();
+      }
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
+
 async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) {
   if(!companyId || !currentUserId || !candidates || !jobs){
     return null;
@@ -4550,7 +4606,8 @@ async function addCompanyPool(companyId, form, currentUserId) {
   let result = null;
   try {
 
-    result = await poolService.addPool(currentUserId, form);
+    form.createdBy = currentUserId;
+    result = await poolService.add(form);
 
   } catch(e){
     console.log('addCompanyPool: Error', e);
@@ -5177,7 +5234,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
         let timestamp = Date.now();
         name = application.user.firstName + '_' + application.user.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt;
         let path = basePath + application.applicationId + '/' + name;
-        let response = await upload(path, cv);
+        let response = await awsService.upload(path, cv);
         switch (fileExt) {
           case 'pdf':
             type = 'PDF';
@@ -5208,7 +5265,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
         timestamp = Date.now();
         name = application.user.firstName + '_' + application.user.lastName + '_' + application.user._id + '_' + application.applicationId + '-' + timestamp + '.' + fileExt;
         path = basePath + application.applicationId + '/photos/' + name;
-        response = await upload(path, photo);
+        response = await awsService.upload(path, photo);
         switch (fileExt) {
           case 'png':
             type = 'PNG';

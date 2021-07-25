@@ -125,6 +125,9 @@ router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').g
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
+router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
+
+router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
 router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
 
 
@@ -1219,6 +1222,16 @@ async function getCandidateActivities(req, res) {
 
   let data = await talentCtrl.getCandidateActivities(company, currentUserId, candidateId, sort);
   res.json(new Response(data, data?'activities_retrieved_successful':'not_found', res));
+}
+
+
+async function uploadAvatar(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = req.params.candidateId;
+  let data = await talentCtrl.uploadAvatar(companyId, currentUserId, candidateId, req.files);
+
+  res.json(new Response(data, data?'avatar_uploaded_successful':'not_found', res));
 }
 
 

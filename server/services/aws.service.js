@@ -109,3 +109,35 @@ exports.uploadToS3 = async function(path, fileName) {
     });
   });
 }
+
+
+
+exports.copy = function(source, path, file){
+  let data = fs.readFileSync(file.path);
+
+  // var params = {
+  //   Key: path,
+  //   Body: data,
+  //   ACL:'public-read'
+  // };
+
+  var params = {
+    Key: path + "/" + file,
+    CopySource: source,
+    ACL:'public-read'
+  };
+
+  console.log(params)
+
+  return s3bucket.copyObject(params, function (err, data) {
+
+    // console.log("PRINT FILE:", file);
+    if (err) {
+      console.log('ERROR MSG: ', err);
+    }
+
+    return data;
+
+  });
+
+}

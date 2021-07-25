@@ -7,6 +7,7 @@ const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
 const evaluationService = require('../services/evaluation.service');
 const feedService = require('../services/api/feed.service.api');
+const awsService = require('../services/aws.service');
 
 const {convertToCandidate} = require('../utils/helper');
 
@@ -47,7 +48,13 @@ async function addCandidate(companyId, user, email, phone) {
     skills: _.map(user.skills, 'id'), url: user.shareUrl
   }
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
-  candidate = new Candidate(candidate).save();
+  candidate = await new Candidate(candidate).save();
+
+  if(user.avatar){
+    await awsService.copy("/user/" + user.id + "/images/" + user.avatar, "/candidates/" + candidate._id, user.avatar)
+  }
+
+
 
   return candidate;
 

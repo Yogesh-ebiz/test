@@ -10,10 +10,26 @@ const feedService = require('../services/api/feed.service.api');
 const poolSchema = Joi.object({
   company: Joi.number().required(),
   name: Joi.string().required(),
-  candidates: Joi.array(),
+  candidates: Joi.array().optional(),
   description: Joi.string().allow(''),
-  department: Joi.object()
+  createdBy: Joi.number()
 });
+
+
+
+async function add(pool) {
+  if(!pool){
+    return;
+  }
+
+
+  let result;
+  pool = await Joi.validate(pool, poolSchema, {abortEarly: false});
+  result = new Pool(pool).save();
+
+  return result;
+
+}
 
 
 async function findByCompany(company, query) {
@@ -98,21 +114,6 @@ async function getPoolCandidates(poolId) {
   return pool
 }
 
-async function addPool(currentUserId, pool) {
-  if(!currentUserId || !pool || !pool.department){
-    return;
-  }
-
-
-  let result;
-  pool.department = ObjectID(pool.department);
-  pool = await Joi.validate(pool, poolSchema, {abortEarly: false});
-  pool.createdBy = currentUserId;
-  result = new Pool(pool).save();
-
-  return result;
-
-}
 
 async function updatePool(poolId, form) {
   if(!poolId || !form){
@@ -136,8 +137,8 @@ async function updatePool(poolId, form) {
 
 
 module.exports = {
+  add:add,
   findByCompany:findByCompany,
-  addPool:addPool,
   findPoolBy_Id:findPoolBy_Id,
   getPoolCandidates: getPoolCandidates,
   updatePool:updatePool
