@@ -142,7 +142,30 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     // job = await JobRequisition.findOne({jobId: jobId, status: { $nin: [statusEnum.DELETED, statusEnum.SUSPENDED] } }).populate('promotion')
-    job = await jobService.findJobId(jobId, locale).populate('tags').populate('createdBy').populate('company');
+    job = await jobService.findJobId(jobId, locale).populate([
+      {
+        path: 'tags',
+        model: 'Label'
+      },
+      {
+        path: 'createdBy',
+        model: 'Member'
+      },
+      {
+        path: 'company',
+        model: 'Company'
+      },
+      {
+        path: 'ads',
+        model: 'Ad',
+        populate: {
+          path: 'targeting',
+          model: 'Target'
+        }
+      }
+
+      ])
+
 
     if(job) {
       job = job.toObject();
@@ -171,68 +194,72 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
       job.company = convertToCompany(job.company);
 
       if(!isMinimal) {
-        // let hiringManager = await findByUserId(job.createdBy.userId);
-        job.createdBy = convertToAvatar(job.createdBy);
+          // let hiringManager = await findByUserId(job.createdBy.userId);
+          job.createdBy = convertToAvatar(job.createdBy);
 
-        let jobSkills = [];
-        if(job.skills.length){
-          jobSkills = await findSkillsById(job.skills);
-        }
-        // console.log('jobSkils', jobSkills)
-
-
-        let noApplied = await findAppliedCountByJobId(job.jobId);
-        job.noApplied = noApplied;
-
-        // let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
-        // job.employmentType = employmentType[0];
-
-        // let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
-        // job.level = experienceLevel[0];
+          let jobSkills = [];
+          if(job.skills.length){
+            jobSkills = await findSkillsById(job.skills);
+          }
+          // console.log('jobSkils', jobSkills)
 
 
+          let noApplied = await findAppliedCountByJobId(job.jobId);
+          job.noApplied = noApplied;
 
-        if(job.industry) {
-          let industry = await findIndustry('', job.industry, locale);
-          job.industry = industry;
-        }
+          // let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
+          // job.employmentType = employmentType[0];
 
-        if(job.jobFunction) {
-          let jobFunction = await findJobfunction('', job.jobFunction, locale);
-          job.jobFunction = jobFunction;
-        }
+          // let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
+          // job.level = experienceLevel[0];
 
-        if (job.promotion) {
-          let promotion = await findPromotionById(job.promotion);
 
-          job.promotion = promotion?promotion[0]:null;
-        }
 
-        if(job.category) {
-          job.category = await feedService.findCategoryByShortCode(job.category, locale, true);
-          job.category = categoryMinimal(job.category);
-        }
-
-        // let promotion = await JobRequisition.populate(job, 'promotion')
-
-        let currentParty, partySkills = [];
-
-        let skills = _.reduce(jobSkills, function (res, skill, key) {
-          let temp = _.clone(skill);
-
-          if (_.includes(partySkills, skill.id)) {
-            temp.hasSkill = true;
-          } else {
-            temp.hasSkill = false;
+          if(job.industry) {
+            let industry = await findIndustry('', job.industry, locale);
+            job.industry = industry;
           }
 
-          res.push(temp);
-          return res;
-        }, []);
+          if(job.jobFunction) {
+            let jobFunction = await findJobfunction('', job.jobFunction, locale);
+            job.jobFunction = jobFunction;
+          }
 
-        job.skills = skills;
-        job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
+          if (job.promotion) {
+            let promotion = await findPromotionById(job.promotion);
 
+            job.promotion = promotion?promotion[0]:null;
+          }
+
+          if(job.category) {
+            job.category = await feedService.findCategoryByShortCode(job.category, locale, true);
+            job.category = categoryMinimal(job.category);
+          }
+
+          // let promotion = await JobRequisition.populate(job, 'promotion')
+
+          let currentParty, partySkills = [];
+
+          let skills = _.reduce(jobSkills, function (res, skill, key) {
+            let temp = _.clone(skill);
+
+            if (_.includes(partySkills, skill.id)) {
+              temp.hasSkill = true;
+            } else {
+              temp.hasSkill = false;
+            }
+
+            res.push(temp);
+            return res;
+          }, []);
+
+          job.skills = skills;
+          job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
+          job.isHot = job.ads?_.reduce(job.ads, function(res, ad){
+            if(_.includes(ad.targeting.adPositions, 'hottag')){
+              return true;
+            }
+          }, false):false;
       }
     }
 
