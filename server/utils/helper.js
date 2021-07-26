@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const fs = require('fs');
 const AWS = require('aws-sdk');
+const config = require('../config/config');
 
 
 const timestamp = () => {
@@ -262,7 +263,13 @@ const skillMinimal = (job) => {
   };
 }
 
+const buildUserUrl = (user) => {
+  return config.cdn + '/user/' + user.id + '/images/' + user.avatar;
+}
 
+const buildCandidateUrl = (candidate) => {
+    return config.cdn + '/candidates/' + candidate._id + '/images/' + candidate.avatar;
+}
 
 module.exports = {
   capitalizeLocale:capitalizeLocale,
@@ -274,5 +281,7 @@ module.exports = {
   convertToCandidate:convertToCandidate,
   roleMinimal:roleMinimal,
   jobMinimal:jobMinimal,
+  buildUserUrl:buildUserUrl,
+  buildCandidateUrl:buildCandidateUrl,
   cardTest:cardTest
 };

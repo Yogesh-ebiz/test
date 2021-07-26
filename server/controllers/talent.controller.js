@@ -20,7 +20,7 @@ const stageType = require('../const/stageType');
 const jobType = require('../const/jobType');
 
 const awsService = require('../services/aws.service');
-const {jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
 const companyService = require('../services/company.service');
@@ -1882,11 +1882,11 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
 
           if (progress.attachment) {
-            progress.attachment.path = config.cdn + progress.attachment.path;
+            progress.attachment.path = config.cdn + "/" + progress.attachment.path;
           }
 
           if (progress.candidateAttachment) {
-            progress.candidateAttachment.path = config.cdn + progress.candidateAttachment.path;
+            progress.candidateAttachment.path = config.cdn + "/" + progress.candidateAttachment.path;
           }
 
           if (progress._id.equals(application.currentProgress)) {
@@ -3047,8 +3047,9 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
   }
 
   result = await candidateService.search(filter, sort);
-  result.docs = _.reduce(result.docs, function(res, item){
-    res.push(convertToCandidate(item));
+  result.docs = _.reduce(result.docs, function(res, candidate){
+    candidate.avatar = buildCandidateUrl(candidate);
+    res.push(convertToCandidate(candidate));
     return res;
   }, []);
 
@@ -3113,11 +3114,13 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
     // if (partyLink) {
     //   candidate.links = partyLink.links;
     // }
+    candidate.avatar = buildCandidateUrl(candidate);
     result = convertToCandidate(candidate);
   } else {
     let people = await feedService.findCandidateById(candidateId);
 
     people.match = 78;
+    people.avatar = buildUserUrl(people);
     result = convertToCandidate(people);
   }
 
@@ -3358,7 +3361,7 @@ async function uploadAvatar(companyId, currentUserId, candidateId, files) {
         let fileExt = fileName[fileName.length - 1];
         let timestamp = Date.now();
         name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
-        let path = basePath + candidate._id + '/' + name;
+        let path = basePath + candidate._id + '/images/' + name;
         let response = await awsService.upload(path, cv);
         switch (fileExt) {
           case 'png':
@@ -5599,6 +5602,7 @@ async function searchContacts(companyId, currentUserId, query) {
     members = _.reduce(members, function(res, m){
       m.isMember = true;
       m.isCandidate = false;
+      m.avatar = buildUserUrl(m);
       res.push(m);
       return res;
     }, []);
@@ -5607,6 +5611,7 @@ async function searchContacts(companyId, currentUserId, query) {
     candidates = _.reduce(candidates, function(res, c){
       c.isMember = false;
       c.isCandidate = (c.hasApplied || c.hasImported)?true: false
+      c.avatar = buildCandidateUrl(c);
       res.push(c);
       return res;
     }, []);

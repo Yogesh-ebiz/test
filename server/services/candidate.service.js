@@ -51,7 +51,7 @@ async function addCandidate(companyId, user, email, phone) {
   candidate = await new Candidate(candidate).save();
 
   if(user.avatar){
-    await awsService.copy("/user/" + user.id + "/images/" + user.avatar, "/candidates/" + candidate._id, user.avatar)
+    await awsService.copy("/user/" + user.id + "/images/" + user.avatar, "candidates/" + candidate._id + "/images", user.avatar)
   }
 
 

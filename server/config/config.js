@@ -6,7 +6,7 @@ require('dotenv').config();
 // define validation for all the env vars
 const envVarsSchema = Joi.object({
   BASE_URL: Joi.string().default('https://www.accessed.com/'),
-  CDN: Joi.string().default('https://accessed.s3.us-west-2.amazonaws.com/'),
+  CDN: Joi.string().default('https://accessed.s3.us-west-2.amazonaws.com'),
   NODE_ENV: Joi.string()
     .allow(['development', 'production', 'test', 'provision'])
     .default('development'),

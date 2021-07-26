@@ -113,7 +113,6 @@ exports.uploadToS3 = async function(path, fileName) {
 
 
 exports.copy = function(source, path, file){
-  let data = fs.readFileSync(file.path);
 
   // var params = {
   //   Key: path,
@@ -122,8 +121,9 @@ exports.copy = function(source, path, file){
   // };
 
   var params = {
+    Bucket : BUCKET_NAME,
     Key: path + "/" + file,
-    CopySource: source,
+    CopySource: BUCKET_NAME + source,
     ACL:'public-read'
   };
 

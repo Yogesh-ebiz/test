@@ -117,11 +117,11 @@ async function getById(currentUserId, id) {
 
 
           if(progress.attachment){
-            progress.attachment.path = config.cdn + progress.attachment.path;
+            progress.attachment.path = config.cdn + "/" + progress.attachment.path;
           }
 
           if(progress.candidateAttachment){
-            progress.candidateAttachment.path = config.cdn + progress.candidateAttachment.path;
+            progress.candidateAttachment.path = config.cdn + "/" + progress.candidateAttachment.path;
           }
 
           if(progress._id.equals(application.currentProgress)){
