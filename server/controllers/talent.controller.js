@@ -592,7 +592,7 @@ async function getStats(currentUserId, companyId) {
 
   newApplications.forEach(function(app){
     app.progress=[];
-
+    app.user.avatar = buildCandidateUrl(app.user);
   });
 
   let mostViewed = await jobViewService.findMostViewedByCompany(company._id);
@@ -618,6 +618,7 @@ async function getStats(currentUserId, companyId) {
     app.user.evaluations = [];
     app.user.sources = [];
     app.user.tags = [];
+    app.user.avatar = buildCandidateUrl(app.user);
   });
 
   let taskDueSoon = await taskService.getTasksDueSoon(member)
@@ -1585,6 +1586,7 @@ async function searchApplications(currentUserId, jobId, filter, sort, locale) {
     if(_.some(subscriptions, {subjectId: ObjectID(app._id)})){
       app.hasFollowed = true;
     }
+    app.user.avatar = buildCandidateUrl(app.user);
   })
 
   return new Pagination(result);
@@ -1612,6 +1614,7 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
   result.docs.forEach(function(source){
+    source.candidate.avatar = buildCandidateUrl(source.candidate);
     source.candidate = convertToCandidate(source.candidate);
   })
 
@@ -2858,10 +2861,10 @@ async function getBoard(currentUserId, jobId, locale) {
 
     let sources = await sourceService.findByJobId(jobId).populate('candidate');
 
-    console.log(applicationsGroupByStage)
     applicationsGroupByStage.forEach(function(stage){
 
       stage.applications = _.reduce(stage.applications, function(res, app){
+        app.user.avatar = buildCandidateUrl(app.user);
         let application = {
           application: app,
           user: convertToCandidate(app.user)
@@ -2898,7 +2901,6 @@ async function getBoard(currentUserId, jobId, locale) {
                 // }
                 let createdBy = _.sortedUniq(_.reduce(item.application.currentProgress.evaluations, function(res, item){res.push(item.createdBy.toString()); return res;}, []));
                 let members = _.sortedUniq(_.reduce(task.members, function(res, item){res.push(item.toString()); return res;}, []));
-                console.log(createdBy, members, createdBy===members, _.difference(createdBy, members))
                 completed[j]=(!_.difference(createdBy, members).length)? true:false;
               } else{
                 completed[j]=true;

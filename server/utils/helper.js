@@ -264,11 +264,14 @@ const skillMinimal = (job) => {
 }
 
 const buildUserUrl = (user) => {
-  return config.cdn + '/user/' + user.id + '/images/' + user.avatar;
+  let id = user.id?user.id:user._id?user.userId:null;
+  let avatar = user.avatar?user.avatar:'';
+  return config.cdn + '/user/' + id + '/images/' + avatar;
 }
 
 const buildCandidateUrl = (candidate) => {
-    return config.cdn + '/candidates/' + candidate._id + '/images/' + candidate.avatar;
+  let avatar = candidate.avatar?candidate.avatar:'';
+  return config.cdn + '/candidates/' + candidate._id + '/images/' + avatar;
 }
 
 module.exports = {

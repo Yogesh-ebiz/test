@@ -8,7 +8,7 @@ let JobSearchParam = require('../const/jobSearchParam');
 let SearchParam = require('../const/searchParam');
 
 let statusEnum = require('../const/statusEnum');
-const {convertToCandidate} = require('../utils/helper');
+const {buildUserUrl, convertToCandidate} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const memberService = require('../services/member.service');
 const candidateService = require('../services/candidate.service');
@@ -53,6 +53,7 @@ async function searchPeople(companyId, filter, sort, locale) {
     }
 
     people.hasSaved=hasSaved;
+    people.avatar = buildUserUrl(people)
     res.push(convertToCandidate(people));
     return res;
   }, []);
