@@ -144,6 +144,7 @@ async function updateSubscription(currentUserId, id, form) {
       company.subscription.cancelAt = subscription.cancelAt;
       company.subscription.canceledAt = subscription.canceledAt;
       company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
+      company.subscription.currentPeriodEnd = subscription.currentPeriodEnd;
       company.subscription.plan = {id: subscription.plan.id, name: subscription.plan.name, tier: subscription.plan.tier, price: subscription.price.id};
 
       subscription = await company.subscription.save();
@@ -162,25 +163,27 @@ async function cancelSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
-
   if(!member){
     return null;
   }
 
+
   let subscription = null;
   try {
-    form.updatedBy = currentUserId;
-    subscription = await paymentService.cancelSubscription(id, form);
-    if(subscription){
-      let company = await companyService.findByCompanyId(parseInt(subscription.company));
-      company.subscription.status = subscription.status;
-      company.subscription.cancelAt = subscription.cancelAt;
-      company.subscription.canceledAt = subscription.canceledAt;
-      company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
-      company.subscription.plan.price = subscription.plan.priceId;
-      subscription = await company.subscription.save();
+    let company = await companyService.findByCompanyId(parseInt(form.company));
+    if(company.subscription.subscriptionId===id) {
+      form.updatedBy = currentUserId;
+      subscription = await paymentService.cancelSubscription(id, form);
+      if (subscription) {
+        company.subscription.status = subscription.status;
+        company.subscription.cancelAt = subscription.cancelAt;
+        company.subscription.canceledAt = subscription.canceledAt;
+        company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
+        company.subscription.currentPeriodEnd = subscription.currentPeriodEnd;
+        company.subscription.plan.price = subscription.plan.priceId;
+        subscription = await company.subscription.save();
+      }
     }
   } catch (error) {
     console.log(error);

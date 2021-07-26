@@ -37,6 +37,9 @@ const SubscriptionSchema = new mongoose.Schema({
   endDate: {
     type: Number
   },
+  currentPeriodEnd: {
+    type: Number
+  },
   category: {
     type: String
   }
