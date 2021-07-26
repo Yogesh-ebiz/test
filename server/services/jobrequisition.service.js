@@ -124,7 +124,6 @@ async function updateJob(jobId, member, form) {
     form.department = ObjectID(form.department);
   }
 
-  console.log(form)
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
 
   let job = await findJob_Id(jobId);
