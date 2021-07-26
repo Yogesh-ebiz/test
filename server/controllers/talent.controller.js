@@ -1829,6 +1829,10 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           {
             path: 'emails',
             model: 'Email'
+          },
+          {
+            path: 'evaluations',
+            model: 'Evaluation'
           }
         ]
       },
@@ -1856,6 +1860,9 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           noOfEvaluations += 1;
         }
 
+        application.noOfEvaluations = noOfEvaluations;
+        application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
+
 
         let eventIds = _.map(application.progress, 'event');
         eventIds = _.reduce(eventIds, function (res, id) {
@@ -1868,8 +1875,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
         let events = await calendarService.lookupEvents(eventIds);
 
-        application.noOfEvaluations = noOfEvaluations;
-        application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
+
 
         // application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
         application.progress = _.reduce(application.progress, function (res, progress) {
@@ -1877,6 +1883,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           progress.stage.evaluations = [];
           progress.stage.members = [];
           progress.stage.tasks = [];
+          progress.evaluations = [];
 
 
           if (progress.attachment) {
@@ -1893,9 +1900,12 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
           if (progress.event) {
             let event = _.find(events, {eventId: progress.event});
-            event.eventTopic = null;
-            event.meta = null;
-            progress.event = event;
+            if(event){
+              event.eventTopic = null;
+              event.meta = null;
+              progress.event = event;
+            }
+
           }
 
           res.push(progress);
