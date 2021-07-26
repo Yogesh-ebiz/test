@@ -383,8 +383,9 @@ async function disqualify(applicationId, reason, member) {
 
 
     if(application.currentProgress.event) {
+      await calendarService.cancelEvent(application.company, member.userId, application.currentProgress.event);
       application.currentProgress.event = null;
-      await calendarService.cancelEvent(application.company, member.userId, application.currentProgress.event)
+      await application.currentProgress.save();
     }
     let job = await application.job;
     //Add activity
