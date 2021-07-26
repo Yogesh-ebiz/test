@@ -853,7 +853,6 @@ async function search(currentUserId, query, filter, sort, locale) {
     aSort = { $sort: {createdDate: direction} };
   }
 
-  console.log(aMatch)
   aList.push(aMatch);
   aList.push(
     {

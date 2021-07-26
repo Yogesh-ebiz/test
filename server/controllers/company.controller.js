@@ -31,6 +31,7 @@ const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitle
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
 const memberService = require('../services/member.service');
+const jobService = require('../services/jobrequisition.service');
 
 
 const JobRequisition = require('../models/jobrequisition.model');
@@ -251,92 +252,21 @@ async function getCompanyJobs(currentUserId, companyId, filter, sort, locale) {
     return null;
   }
 
-  let result;
-  let company = await companyService.findByCompanyId(companyId);
-  let foundJob = null;
-  let select = '';
-  let limit = (sort.size && sort.size>0) ? sort.size:20;
-  let page = (sort.page && sort.page==0) ? sort.page:1;
-  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+  filter.company = [companyId];
+  filter.status = [statusEnum.ACTIVE];
 
-  let options = {
-    select:   select,
-    sort:     null,
-    lean:     true,
-    limit:    limit,
-    page: parseInt(sort.page)+1
-  };
+  let result = await jobService.search(currentUserId, null, filter, sort, locale);
 
-  if(company) {
-    filter.company = [company._id];
-    filter.status = [statusEnum.ACTIVE];
+  let hasSaves = [];
 
-    let aList = [];
-    let aMatch = {$match: new SearchParam(filter)};
-    let aSort = {$sort: {createdDate: direction}};
-    aList.push(aMatch);
-
-    aList.push(
-      {
-        $lookup: {
-          from: 'companies',
-          localField: "company",
-          foreignField: "_id",
-          as: "company"
-        }
-      },
-      {$unwind: '$company'}
-    );
-
-
-    if (sort && sort.sortBy == 'popular') {
-      aSort = {$sort: {noOfViews: direction}};
-      aList.push(aSort);
-    } else {
-      aList.push(aSort);
-    }
-
-    const aggregate = JobRequisition.aggregate(aList);
-    result = await JobRequisition.aggregatePaginate(aggregate, options);
-    let docs = [];
-
-    // let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-    // let listOfSkills = await findSkillsById(skills, locale);
-    let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
-    let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
-    // let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);
-    // let promotions = await getPromotions(_.uniq(_.flatten(_.map(result.docs, 'promotion'))), locale);
-
-    let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function (res, i) {
-      res.push(i.company.companyId);
-      return res;
-    }, []));
-
-    let hasSaves = [];
-
-    if (currentUserId) {
-      hasSaves = await findBookByUserId(currentUserId);
-    }
-
-
-    _.forEach(result.docs, function (job) {
-      job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
-      job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
-      job.employmentType = _.find(employmentTypes, {shortCode: job.employmentType});
-      job.level = _.find(experienceLevels, {shortCode: job.level});
-
-      job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
-      job.skills = [];
-      job.industry = [];
-      job.members = [];
-      job.responsibilities = [];
-      job.qualifications = [];
-      job.minimumQualifications = [];
-      job.applicationForm = null;
-      job.description = null;
-      job.isHot = false;
-    })
+  if (currentUserId) {
+    hasSaves = await findBookByUserId(currentUserId);
   }
+
+  _.forEach(result.docs, function (job) {
+    job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
+  })
+
   return new Pagination(result);
 
 }
