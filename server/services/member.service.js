@@ -21,6 +21,7 @@ const memberSchema = Joi.object({
   language: Joi.string().allow('').optional(),
   timezone: Joi.string().allow('').optional(),
   preferTimeFormat: Joi.string().allow('').optional(),
+  currency: Joi.string().allow('').optional(),
   userId: Joi.number(),
   role: Joi.object().optional()
 });
@@ -228,6 +229,7 @@ async function updateMember(memberId, form) {
     member.language = form.language;
     member.timezone = form.timezone;
     member.preferTimeFormat = form.preferTimeFormat;
+    member.currency = form.currency;
     result = await member.save();
   }
   return member;

@@ -50,6 +50,10 @@ const MemberSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  isMember: {
+    type: Boolean,
+    default: true
+  },
   language: {
     type: String,
     required:false
@@ -58,9 +62,9 @@ const MemberSchema = new mongoose.Schema({
     type: String,
     required:false
   },
-  isMember: {
-    type: Boolean,
-    default: true
+  currency: {
+    type: String,
+    required:false
   },
   preferTimeFormat: {
     type: String,
