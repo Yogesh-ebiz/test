@@ -27,7 +27,6 @@ let SearchParam = require('../const/searchParam');
 
 
 const jobSchema = Joi.object({
-  company: Joi.object(),
   jobId: Joi.number().optional(),
   createdBy: Joi.object(),
   title: Joi.string().required(),
@@ -125,6 +124,7 @@ async function updateJob(jobId, member, form) {
     form.department = ObjectID(form.department);
   }
 
+  console.log(form)
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
 
   let job = await findJob_Id(jobId);

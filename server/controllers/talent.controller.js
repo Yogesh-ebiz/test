@@ -884,12 +884,7 @@ async function updateJob(companyId, currentUserId, jobId, form) {
   }
 
   let result;
-  let currentParty = await feedService.findByUserId(currentUserId);
-
-  if (isPartyActive(currentParty)) {
-    form.company = companyId;
-    result = await jobService.updateJob(jobId, member, form);
-  }
+  result = await jobService.updateJob(jobId, member, form);
 
   return result;
 }

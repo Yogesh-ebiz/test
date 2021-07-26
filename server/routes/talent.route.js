@@ -365,7 +365,6 @@ async function updateJob(req, res) {
   let jobId = req.params.jobId;
   let companyId = parseInt(req.params.id);
   let job = req.body;
-  job.company = companyId;
   let data = await talentCtrl.updateJob(companyId, currentUserId, jobId, job);
   res.json(new Response(data, data?'job_updated_successful':'not_found', res));
 }
