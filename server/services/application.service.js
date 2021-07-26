@@ -23,6 +23,7 @@ const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignStageService = require('../services/emailcampaignstage.service');
 
 const feedService = require('../services/api/feed.service.api');
+const calendarService = require('../services/api/calendar.service.api');
 
 const {convertToAvatar} = require('../utils/helper');
 
@@ -373,20 +374,23 @@ async function disqualify(applicationId, reason, member) {
     return;
   }
 
-  let application = await Application.findById(applicationId).populate('user');
+  let application = await Application.findById(applicationId).populate('user').populate('job').populate('currentProgress');
 
   if(application && application.status==statusEnum.ACTIVE){
     application.status = statusEnum.DISQUALIFIED;
     application.reason = reason;
     application = await application.save();
 
-    if(application.status==statusEnum.DISQUALIFIED){
-      result = {status: statusEnum.DISQUALIFIED};
 
-      let job = await jobService.findJob_Id(ObjectID(application.jobId));
-      //Add activity
-      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id, reason: reason}});
+    if(application.currentProgress.event) {
+      application.currentProgress.event = null;
+      await calendarService.cancelEvent(application.company, member.userId, application.currentProgress.event)
     }
+    let job = await application.job;
+    //Add activity
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id, reason: reason}});
+
+    result = {status: statusEnum.DISQUALIFIED};
   }
   return result;
 }

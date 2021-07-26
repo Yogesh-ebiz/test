@@ -45,6 +45,14 @@ function declineEvent(userId, eventId) {
 }
 
 
+function cancelEvent(companyId, userId, eventId) {
+  if(!companyId || !userId || !eventId){
+    return;
+  }
+
+  return client.post(`/company/${companyId}/events/${eventId}/cancel`, null, {headers: {"UserId":userId}})
+}
+
 
 async function getEventByEventId(userId, eventId) {
   if (!userId || !eventId) {
@@ -75,6 +83,8 @@ module.exports = {
   createEvent: createEvent,
   acceptEvent: acceptEvent,
   declineEvent:declineEvent,
+  cancelEvent:cancelEvent,
+  cancelEvent:cancelEvent,
   getEventByEventId:getEventByEventId,
   lookupEvents:lookupEvents
 }
