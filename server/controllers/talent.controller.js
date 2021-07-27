@@ -1882,7 +1882,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
           progress.stage.evaluations = [];
           progress.stage.members = [];
-          progress.stage.tasks = [];
+          // progress.stage.tasks = [];
           progress.evaluations = [];
 
 
