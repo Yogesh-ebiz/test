@@ -2868,19 +2868,20 @@ async function getBoard(currentUserId, jobId, locale) {
     let sources = await sourceService.findByJobId(jobId).populate('candidate');
 
     applicationsGroupByStage.forEach(function(stage){
-
+      console.log(stage.applications)
       stage.applications = _.reduce(stage.applications, function(res, app){
         app.user.avatar = buildCandidateUrl(app.user);
-        let application = {
-          application: app,
-          user: convertToCandidate(app.user)
-        };
-
-        application.application.user = null;
-        res.push(application);
-        return res;
+      //   let application = {
+      //     application: app,
+      //     user: convertToCandidate(app.user)
+      //   };
+      //
+      //   application.application.user = null;
+      //   res.push(application);
+      //   return res;
       }, [])
     }, []);
+
 
     pipelineStages.forEach(function(item){
       let found = _.find(applicationsGroupByStage, {'_id': item._id});

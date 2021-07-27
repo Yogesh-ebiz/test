@@ -87,9 +87,13 @@ async function addJob(companyId, member, form) {
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
   let company = await companyService.findByCompanyId(companyId);
 
+  let pipeline = await pipelineService.getDefaultTemplate();
+  form.pipeline = pipeline._id;
   form.company = company._id;
   form.members = [member._id];
   form.createdBy = member._id;
+
+
 
 
   for (let tag of form.tags) {
@@ -383,6 +387,7 @@ async function getJobPipeline(jobId) {
 
   let job = await JobRequisition.findById(jobId).populate({
     path: 'pipeline',
+    model: 'Pipeline',
     populate:[{
       path: 'stages',
       populate:[
@@ -397,7 +402,6 @@ async function getJobPipeline(jobId) {
       ]
     }]
   });
-
 
 
   if(job){
