@@ -2867,22 +2867,6 @@ async function getBoard(currentUserId, jobId, locale) {
 
     let sources = await sourceService.findByJobId(jobId).populate('candidate');
 
-    // applicationsGroupByStage.forEach(function(stage){
-    //   console.log(stage.applications)
-    //   stage.applications = _.reduce(stage.applications, function(res, app){
-    //     app.user.avatar = buildCandidateUrl(app.user);
-    //   //   let application = {
-    //   //     application: app,
-    //   //     user: convertToCandidate(app.user)
-    //   //   };
-    //   //
-    //   //   application.application.user = null;
-    //     res.push(application);
-    //     return res;
-    //   }, [])
-    // }, []);
-
-
     pipelineStages.forEach(function(item){
       let found = _.find(applicationsGroupByStage, {'_id': item._id});
       if(found){
@@ -2911,7 +2895,7 @@ async function getBoard(currentUserId, jobId, locale) {
                   //     }
                   //   }
                   // }
-                  let createdBy = _.sortedUniq(_.reduce(item.application.currentProgress.evaluations, function (res, item) {
+                  let createdBy = _.sortedUniq(_.reduce(item.currentProgress.evaluations, function (res, item) {
                     res.push(item.createdBy.toString());
                     return res;
                   }, []));
@@ -2924,9 +2908,9 @@ async function getBoard(currentUserId, jobId, locale) {
                   completed[j] = true;
                 }
               } else if (task.type === taskType.EMAIL) {
-                completed[j] = (task.required && item.application.currentProgress.emails.length) ? true : false;
+                completed[j] = (task.required && item.currentProgress.emails.length) ? true : false;
               } else if (task.type === taskType.EVENT) {
-                completed[j] = (task.required && item.application.currentProgress.event) ? true : false;
+                completed[j] = (task.required && item.currentProgress.event) ? true : false;
               }
 
             }

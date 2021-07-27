@@ -88,6 +88,7 @@ async function addJob(companyId, member, form) {
   let company = await companyService.findByCompanyId(companyId);
 
   let pipeline = await pipelineService.getDefaultTemplate();
+  console.log(pipeline);
   form.pipeline = pipeline._id;
   form.company = company._id;
   form.members = [member._id];
