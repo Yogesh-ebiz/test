@@ -2867,20 +2867,20 @@ async function getBoard(currentUserId, jobId, locale) {
 
     let sources = await sourceService.findByJobId(jobId).populate('candidate');
 
-    applicationsGroupByStage.forEach(function(stage){
-      console.log(stage.applications)
-      stage.applications = _.reduce(stage.applications, function(res, app){
-        app.user.avatar = buildCandidateUrl(app.user);
-      //   let application = {
-      //     application: app,
-      //     user: convertToCandidate(app.user)
-      //   };
-      //
-      //   application.application.user = null;
-      //   res.push(application);
-      //   return res;
-      }, [])
-    }, []);
+    // applicationsGroupByStage.forEach(function(stage){
+    //   console.log(stage.applications)
+    //   stage.applications = _.reduce(stage.applications, function(res, app){
+    //     app.user.avatar = buildCandidateUrl(app.user);
+    //   //   let application = {
+    //   //     application: app,
+    //   //     user: convertToCandidate(app.user)
+    //   //   };
+    //   //
+    //   //   application.application.user = null;
+    //     res.push(application);
+    //     return res;
+    //   }, [])
+    // }, []);
 
 
     pipelineStages.forEach(function(item){
@@ -2891,39 +2891,50 @@ async function getBoard(currentUserId, jobId, locale) {
 
       let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: item.applications}
 
+      if(stage.applications) {
+        for (let [i, item] of stage.applications.entries()) {
 
-      for(let [i, item] of stage.applications.entries()){
-        if(item.application.currentProgress) {
-          let completed = _.reduce(stage.tasks, function(res, item){res.push(false); return res;}, []);
-          for (const [j, task] of stage.tasks.entries()) {
-            if (task.type === taskType.EVALUATION && task.required) {
-              let noOfCompletedEvaluation = 0;
-              if (task.members.length) {
-                // for (let [k, member] of task.members.entries()) {
-                //   for (let [l, evaluation] of item.application.currentProgress.evaluations.entries()) {
-                //     if (ObjectID(member).equals(evaluation.createdBy)) {
-                //       noOfCompletedEvaluation++;
-                //     }
-                //   }
-                // }
-                let createdBy = _.sortedUniq(_.reduce(item.application.currentProgress.evaluations, function(res, item){res.push(item.createdBy.toString()); return res;}, []));
-                let members = _.sortedUniq(_.reduce(task.members, function(res, item){res.push(item.toString()); return res;}, []));
-                completed[j]=(!_.difference(createdBy, members).length)? true:false;
-              } else{
-                completed[j]=true;
+          item.user.avatar = buildCandidateUrl(item.user);
+          if (item.currentProgress) {
+            let completed = _.reduce(stage.tasks, function (res, item) {
+              res.push(false);
+              return res;
+            }, []);
+            for (const [j, task] of stage.tasks.entries()) {
+              if (task.type === taskType.EVALUATION && task.required) {
+                let noOfCompletedEvaluation = 0;
+                if (task.members.length) {
+                  // for (let [k, member] of task.members.entries()) {
+                  //   for (let [l, evaluation] of item.application.currentProgress.evaluations.entries()) {
+                  //     if (ObjectID(member).equals(evaluation.createdBy)) {
+                  //       noOfCompletedEvaluation++;
+                  //     }
+                  //   }
+                  // }
+                  let createdBy = _.sortedUniq(_.reduce(item.application.currentProgress.evaluations, function (res, item) {
+                    res.push(item.createdBy.toString());
+                    return res;
+                  }, []));
+                  let members = _.sortedUniq(_.reduce(task.members, function (res, item) {
+                    res.push(item.toString());
+                    return res;
+                  }, []));
+                  completed[j] = (!_.difference(createdBy, members).length) ? true : false;
+                } else {
+                  completed[j] = true;
+                }
+              } else if (task.type === taskType.EMAIL) {
+                completed[j] = (task.required && item.application.currentProgress.emails.length) ? true : false;
+              } else if (task.type === taskType.EVENT) {
+                completed[j] = (task.required && item.application.currentProgress.event) ? true : false;
               }
-            } else if (task.type === taskType.EMAIL) {
-              completed[j]=(task.required && item.application.currentProgress.emails.length)? true: false;
-            } else if (task.type === taskType.EVENT) {
-              completed[j]=(task.required && item.application.currentProgress.event)? true: false;
+
             }
 
+            item.isCompleted = (!_.includes(completed, false)) ? true : false;
           }
-
-          item.isCompleted = (!_.includes(completed, false)) ? true : false;
         }
       }
-
 
       //Temporary not returning SOURCED
       // if(stage.type===stageType.SOURCED && sources.length){
