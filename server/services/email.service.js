@@ -38,13 +38,15 @@ async function compose(form, companyId) {
 
   if(!form){
     return;
+  }
+
 
 
   form.threadId = form.threadId?ObjectID(form.threadId):'';
   form = await Joi.validate(form, emailSchema, {abortEarly: false});
 
-  let result = {emails: []};
   let email, inmailCredit = 0;
+  let result = {threadId: null, emails: []};
 
   let contacts = _.reduce(form.to, function(res, contact){
     if(!contact.email){
@@ -71,8 +73,8 @@ async function compose(form, companyId) {
   // let company = await companyService.findByCompanyId(companyId)
 
   let threadId = new ObjectID;
-  result.threadId = threadId;
   form.threadId = threadId;
+  result.threadId = threadId;
   if(form.type===emailType.JOB_INVITE) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
     let job = await jobService.findJob_Id(form.meta.jobId);
@@ -91,9 +93,9 @@ async function compose(form, companyId) {
           nMail.attachments[0].url = link;
 
           nMail = await new Email(nMail).save();
-          result.emails.push(email._id);
-          if (nMail) {
 
+          if (nMail) {
+            result.emails.push(nMail._id);
             let candidate = null;
             if (contact.candidateId) {
               candidate = await candidateService.findById(ObjectID(contact.candidateId));
