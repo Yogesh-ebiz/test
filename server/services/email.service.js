@@ -38,12 +38,13 @@ async function compose(form, companyId) {
 
   if(!form){
     return;
-  }
 
-  let email, inmailCredit = 0;
 
   form.threadId = form.threadId?ObjectID(form.threadId):'';
   form = await Joi.validate(form, emailSchema, {abortEarly: false});
+
+  let result = {emails: []};
+  let email, inmailCredit = 0;
 
   let contacts = _.reduce(form.to, function(res, contact){
     if(!contact.email){
@@ -70,6 +71,7 @@ async function compose(form, companyId) {
   // let company = await companyService.findByCompanyId(companyId)
 
   let threadId = new ObjectID;
+  result.threadId = threadId;
   form.threadId = threadId;
   if(form.type===emailType.JOB_INVITE) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
@@ -89,6 +91,7 @@ async function compose(form, companyId) {
           nMail.attachments[0].url = link;
 
           nMail = await new Email(nMail).save();
+          result.emails.push(email._id);
           if (nMail) {
 
             let candidate = null;
@@ -205,6 +208,7 @@ async function compose(form, companyId) {
   } else{
     email = await new Email(form).save();
     if(email) {
+      result.emails.push(email._id);
       if (form.meta && form.meta.applicationId) {
         let application = await applicationService.findById(ObjectID(form.meta.applicationId)).populate('currentProgress');
         if (application) {
@@ -219,7 +223,7 @@ async function compose(form, companyId) {
   }
 
 
-  return {threadId: threadId};
+  return result;
 
 }
 
