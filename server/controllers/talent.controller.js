@@ -1883,7 +1883,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           progress.stage.evaluations = [];
           progress.stage.members = [];
           // progress.stage.tasks = [];
-          progress.evaluations = [];
+          // progress.evaluations = [];
 
 
           if (progress.attachment) {
@@ -1933,7 +1933,8 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
             task.required = (!hasEvaluated && task.required) ? true : false;
           }
         });
-        application.progress = _.orderBy(application.progress, p => p.stage.stageId, ['asc']);
+        application.progress = _.orderBy(application.progress, p => { p.evaluations=[]; return p.stage.stageId; }, ['asc']);
+
 
       }
     }
