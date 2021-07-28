@@ -2865,17 +2865,13 @@ async function getBoard(currentUserId, jobId, locale) {
       {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
     ]);
 
-    let sources = await sourceService.findByJobId(jobId).populate('candidate');
-
     pipelineStages.forEach(function(item){
+
+      let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: []}
       let found = _.find(applicationsGroupByStage, {'_id': item._id});
       if(found){
-        item.applications = found.applications;
-      }
 
-      let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: item.applications}
-
-      if(stage.applications) {
+        stage.applications = found.applications;
         for (let [i, item] of stage.applications.entries()) {
 
           item.user.avatar = buildCandidateUrl(item.user);
@@ -2888,13 +2884,6 @@ async function getBoard(currentUserId, jobId, locale) {
               if (task.type === taskType.EVALUATION && task.required) {
                 let noOfCompletedEvaluation = 0;
                 if (task.members.length) {
-                  // for (let [k, member] of task.members.entries()) {
-                  //   for (let [l, evaluation] of item.application.currentProgress.evaluations.entries()) {
-                  //     if (ObjectID(member).equals(evaluation.createdBy)) {
-                  //       noOfCompletedEvaluation++;
-                  //     }
-                  //   }
-                  // }
                   let createdBy = _.sortedUniq(_.reduce(item.currentProgress.evaluations, function (res, item) {
                     res.push(item.createdBy.toString());
                     return res;
@@ -2919,19 +2908,7 @@ async function getBoard(currentUserId, jobId, locale) {
           }
         }
       }
-
-      //Temporary not returning SOURCED
-      // if(stage.type===stageType.SOURCED && sources.length){
-      //   stage.applications = _.reduce(sources, function(res, source){
-      //     let application = {application: null, user: source.candidate};
-      //     res.push(application);
-      //     return res;
-      //   }, []);
-      // }
-
-      if(stage.type!==stageType.SOURCED) {
-        boardStages.push(stage);
-      }
+      
 
     });
   }
