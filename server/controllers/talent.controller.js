@@ -292,7 +292,6 @@ async function getUserSession(currentUserId, preferredCompany) {
     item.role = roleMinimal(found.role);
     item.memberId = found._id
     res.push(item)
-    console.log(item);
     return res;
   }, [])
   user = convertToTalentUser(user);

@@ -44,10 +44,10 @@ async function register(currentParty, form) {
 
   form = await Joi.validate(form, companySchema, {abortEarly: false});
   let company = await feedService.registerCompany(currentParty.id, form);
-
+  let savedCompany;
   if(company){
 
-    let savedCompany = await new Company({
+    savedCompany = await new Company({
       name: company.name,
       companyId: company.id,
       createdBy: currentParty.id,
@@ -55,7 +55,10 @@ async function register(currentParty, form) {
       primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
     }).save();
 
+    console.log('new', savedCompany)
     let role = await roleService.getRoleByRole(roleType.ADMIN);
+    console.log('role', role)
+
     let member = {
       createdBy: currentParty.id,
       company: company.id,
@@ -70,16 +73,13 @@ async function register(currentParty, form) {
       role: role._id
     }
 
-    await memberService.addMember(member);
-
+    member = await memberService.addMember(member);
+    console.log(member)
   }
 
-  return company;
+  return savedCompany;
 
 }
-
-
-
 
 async function findById(id) {
 
@@ -126,7 +126,7 @@ async function findByCompanyIds(companyIds, needSubscription) {
         ],
         as: 'subscription'
       }},
-      { $unwind: '$subscription' },
+      { $unwind: { path: '$subscription', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: 'jobrequisitions',
@@ -135,10 +135,11 @@ async function findByCompanyIds(companyIds, needSubscription) {
           as: 'jobs',
         },
       },
-      // { $unwind: '$jobs'},
+      // { $unwind: { path: '$jobs' }},
       { $addFields:
           {
-            noOfJobs: {$size: '$jobs'}
+            noOfJobs: {$size: '$jobs'},
+            jobs: []
           }
       },
       ]);
