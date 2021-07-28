@@ -1168,7 +1168,7 @@ async function search(jobId, filter, sort) {
         as: 'currentProgress'
       }},
     {$unwind: '$currentProgress'}
-  );
+    );
 
   aList.push(
     {$lookup:{

@@ -1860,9 +1860,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           noOfEvaluations += 1;
         }
 
-        application.noOfEvaluations = noOfEvaluations;
-        application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
-
 
         let eventIds = _.map(application.progress, 'event');
         eventIds = _.reduce(eventIds, function (res, id) {
@@ -1877,13 +1874,12 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
 
 
-        // application.currentProgress = _.find(application.progress, {_id: application.currentProgress})
-        application.progress = _.reduce(application.progress, function (res, progress) {
+        // application.progress = _.reduce(application.progress, function (res, progress) {
 
-          progress.stage.evaluations = [];
+          // progress.stage.evaluations = [];
           progress.stage.members = [];
           // progress.stage.tasks = [];
-          // progress.evaluations = [];
+          progress.evaluations = [];
 
 
           if (progress.attachment) {
@@ -1892,10 +1888,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
           if (progress.candidateAttachment) {
             progress.candidateAttachment.path = config.cdn + "/" + progress.candidateAttachment.path;
-          }
-
-          if (progress._id.equals(application.currentProgress)) {
-            application.currentProgress = progress
           }
 
           if (progress.event) {
@@ -1908,24 +1900,22 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
           }
 
-          res.push(progress);
-          return res;
-        }, [])
+          // res.push(progress);
+        //   return res;
+        // }, [])
 
 
-        hasEvaluated = _.some(application.currentProgress.evaluations, {createdBy: member._id});
-        // application.currentProgress.hasEvaluated = hasEvaluated;
-        // application.currentProgress.requireEvaluation = (!hasEvaluated && _.include(currentProgress.stage.members, member._id))?true:false;
+        hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
 
-        application.currentProgress.stage.tasks.forEach(function (task) {
+        progress.stage.tasks.forEach(function (task) {
           if (task.type === taskType.EMAIL) {
-            task.isCompleted = application.currentProgress.emails.length ? true : false;
-            task.required = (!application.currentProgress.emails.length && task.required) ? true : false;
+            task.isCompleted = progress.emails.length ? true : false;
+            task.required = (!progress.emails.length && task.required) ? true : false;
           }
 
           if (task.type === taskType.EVENT) {
-            task.isCompleted = application.currentProgress.event ? true : false;
-            task.required = (!application.currentProgress.event && task.required) ? true : false;
+            task.isCompleted = progress.event ? true : false;
+            task.required = (!progress.event && task.required) ? true : false;
           }
 
           if (task.type === taskType.EVALUATION) {
@@ -1933,10 +1923,16 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
             task.required = (!hasEvaluated && task.required) ? true : false;
           }
         });
-        application.progress = _.orderBy(application.progress, p => { p.evaluations=[]; return p.stage.stageId; }, ['asc']);
 
-
+        if (progress._id.equals(application.currentProgress)) {
+          application.currentProgress = progress
+        }
       }
+
+      application.progress = _.orderBy(application.progress, p => { return p.stage.stageId; }, ['asc']);
+
+      application.noOfEvaluations = noOfEvaluations;
+      application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
     }
 
   } catch (error) {

@@ -57,6 +57,9 @@ const ApplicationProgressSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  rating: {
+    type: Number
+  },
   attachment: { type: Schema.Types.ObjectId, ref: 'File' },
   candidateAttachment: { type: Schema.Types.ObjectId, ref: 'File' },
   stage: { type: Schema.Types.ObjectId, ref: 'Stage' },
