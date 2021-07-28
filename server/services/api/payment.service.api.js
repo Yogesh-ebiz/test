@@ -54,7 +54,6 @@ async function charge(userId, form) {
     headers: {'userId': userId}
   };
 
-  console.log(form)
   let response = await client.post(`/payment/charge`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded

@@ -2908,7 +2908,10 @@ async function getBoard(currentUserId, jobId, locale) {
           }
         }
       }
-      
+
+
+
+      boardStages.push(stage);
 
     });
   }
