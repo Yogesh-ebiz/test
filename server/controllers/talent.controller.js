@@ -1849,6 +1849,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         model: 'File'
       }
     ]);
+
     if (application) {
       let requiredEvaluation = false;
       let hasEvaluated = false
@@ -1860,7 +1861,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           noOfEvaluations += 1;
         }
 
-
         let eventIds = _.map(application.progress, 'event');
         eventIds = _.reduce(eventIds, function (res, id) {
           if (!isNaN(id)) {
@@ -1871,35 +1871,23 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         }, []);
 
         let events = await calendarService.lookupEvents(eventIds);
+        if (progress.attachment) {
+          progress.attachment.path = config.cdn + "/" + progress.attachment.path;
+        }
 
+        if (progress.candidateAttachment) {
+          progress.candidateAttachment.path = config.cdn + "/" + progress.candidateAttachment.path;
+        }
 
-
-        // application.progress = _.reduce(application.progress, function (res, progress) {
-
-
-
-          if (progress.attachment) {
-            progress.attachment.path = config.cdn + "/" + progress.attachment.path;
+        if (progress.event) {
+          let event = _.find(events, {eventId: progress.event});
+          if(event){
+            event.eventTopic = null;
+            event.meta = null;
+            progress.event = event;
           }
 
-          if (progress.candidateAttachment) {
-            progress.candidateAttachment.path = config.cdn + "/" + progress.candidateAttachment.path;
-          }
-
-          if (progress.event) {
-            let event = _.find(events, {eventId: progress.event});
-            if(event){
-              event.eventTopic = null;
-              event.meta = null;
-              progress.event = event;
-            }
-
-          }
-
-          // res.push(progress);
-        //   return res;
-        // }, [])
-
+        }
 
         hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
         progress.stage.tasks.forEach(function (task) {
@@ -2191,6 +2179,7 @@ async function getApplicationProgress(companyId, currentUserId, applicationId, p
 
       progress.noOfEvaluations = progress.evaluations.length;
       progress.noOfEmails = progress.emails.length;
+      progress.noOfEvents = progress.event?1:0;
       progress.stage.members = [];
       progress.evaluations = [];
       progress.emails = [];
