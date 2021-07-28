@@ -14,20 +14,7 @@ function findById(id) {
     return;
   }
 
-  return ApplicationProgress.findById(id).populate([
-    {
-      path: 'stage',
-      model: 'Stage',
-      populate: {
-        path: 'tasks',
-        model: 'Task',
-        populate: {
-          path: 'members',
-          model: 'Member'
-        }
-      }
-    }
-  ]);
+  return ApplicationProgress.findById(id);
 }
 
 
@@ -131,6 +118,7 @@ function removeApplicationProgressEvent(applicationProgress_Id) {
 
 
 module.exports = {
+  findById:findById,
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationProgresssByIds:findApplicationProgresssByIds,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,

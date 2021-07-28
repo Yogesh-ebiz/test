@@ -2115,71 +2115,85 @@ async function getApplicationProgress(companyId, currentUserId, applicationId, p
   let progress;
   try {
 
-    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+    progress = await applicationProgressService.findById(progressId).populate([
       {
-        path: 'currentProgress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
+        path: 'stage',
+        model: 'Stage'
       },
       {
-        path: 'progress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
+        path: 'attachment',
+        model: 'File'
       },
       {
-        path: 'user',
-        model: 'Candidate'
+        path: 'candidateAttachment',
+        model: 'File'
+      },
+      {
+        path: 'emails',
+        model: 'Email'
+      },
+      {
+        path: 'evaluations',
+        model: 'Evaluation'
       }
     ]);
 
 
-    if(application) {
-      let job = await jobService.findJob_Id(application.jobId);
+    if(progress) {
+      let rating = 0;
+      let noOfEvaluations = 0;
 
-      let previousProgress = application.currentProgress;
-      _.forEach(application.progress, function(item){
-        if(item.stage._id.equals(ObjectID(newStage))){
-          progress = item;
+      for ([i, evaluation] of progress.evaluations.entries()) {
+        rating += evaluation.rating
+        noOfEvaluations += 1;
+      }
+
+      let events = await calendarService.lookupEvents([progress.event]);
+
+
+      if (progress.attachment) {
+        progress.attachment.path = config.cdn + "/" + progress.attachment.path;
+      }
+
+      if (progress.candidateAttachment) {
+        progress.candidateAttachment.path = config.cdn + "/" + progress.candidateAttachment.path;
+      }
+
+      if (progress.event) {
+        let event = _.find(events, {eventId: progress.event});
+        if(event){
+          event.eventTopic = null;
+          event.meta = null;
+          progress.event = event;
+        }
+
+      }
+
+
+      hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
+      progress.stage.tasks.forEach(function (task) {
+        if (task.type === taskType.EMAIL) {
+          task.isCompleted = progress.emails.length ? true : false;
+          task.required = (!progress.emails.length) ? true : false;
+        }
+
+        if (task.type === taskType.EVENT) {
+          task.isCompleted = progress.event ? true : false;
+          task.required = (!progress.event) ? true : false;
+        }
+
+        if (task.type === taskType.EVALUATION) {
+          task.isCompleted = hasEvaluated;
+          task.required = (!hasEvaluated) ? true : false;
         }
       });
 
 
-      if(progress){
-        application.currentProgress = progress;
-        newStage = progress.stage;
-        await application.save();
-
-      } else {
-        let pipeline = await pipelineService.findById(job.pipeline);
-        if(pipeline) {
-          foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
-          if(foundStage) {
-            progress = await  applicationProgressService.addApplicationProgress({
-              applicationId: application.applicationId,
-              stage: foundStage
-            });
-
-            newStage = foundStage;
-            let taskMeta = {applicationId: application._id, applicationProgressId: application.currentProgress._id};
-            await stageService.createTasksForStage(foundStage, '', taskMeta);
-
-            application.currentProgress = progress;
-            application.progress.push(progress);
-            application.progress = _.orderBy(application.progress, ['stageId'], []);
-            await application.save();
-
-          }
-        }
-      }
-
-
-      let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
+      progress.noOfEvaluations = progress.evaluations.length;
+      progress.noOfEmails = progress.emails.length;
+      progress.stage.members = [];
+      progress.evaluations = [];
+      progress.emails = [];
     }
 
   } catch (error) {

@@ -54,7 +54,15 @@ const ApplicationProgressSchema = new mongoose.Schema({
     required: false
   },
   noOfEvaluations: {
-    type: Object,
+    type: Number,
+    required: false
+  },
+  noOfEmails: {
+    type: Number,
+    required: false
+  },
+  noOfEvents: {
+    type: Number,
     required: false
   },
   rating: {

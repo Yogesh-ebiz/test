@@ -703,7 +703,7 @@ async function updateApplicationProgress(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
-  let applicationId = req.params.applicationId;
+  let applicationId = ObjectID(req.params.applicationId);
   let newStage = req.body.newStage;
 
   let data = await talentCtrl.updateApplicationProgress(companyId, currentUserId, applicationId, newStage);
@@ -717,8 +717,8 @@ async function getApplicationProgress(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
-  let applicationId = req.params.applicationId;
-  let progressId = req.params.progressId;
+  let applicationId = ObjectID(req.params.applicationId);
+  let progressId = ObjectID(req.params.progressId);
 
 
   let data = await talentCtrl.getApplicationProgress(companyId, currentUserId, applicationId, progressId);
