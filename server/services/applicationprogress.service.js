@@ -6,6 +6,31 @@ const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
 
 
+
+function findById(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  return ApplicationProgress.findById(id).populate([
+    {
+      path: 'stage',
+      model: 'Stage',
+      populate: {
+        path: 'tasks',
+        model: 'Task',
+        populate: {
+          path: 'members',
+          model: 'Member'
+        }
+      }
+    }
+  ]);
+}
+
+
 function findApplicationProgresssById(applicationProgressId) {
   let data = null;
 

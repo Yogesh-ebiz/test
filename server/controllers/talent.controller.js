@@ -159,6 +159,7 @@ module.exports = {
   acceptApplication,
   rejectApplication,
   updateApplicationProgress,
+  getApplicationProgress,
   getApplicationQuestions,
   getApplicationLabels,
   addApplicationLabel,
@@ -1904,12 +1905,12 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         progress.stage.tasks.forEach(function (task) {
           if (task.type === taskType.EMAIL) {
             task.isCompleted = progress.emails.length ? true : false;
-            task.required = (!progress.emails.length && task.required) ? true : false;
+            task.required = (!progress.emails.length) ? true : false;
           }
 
           if (task.type === taskType.EVENT) {
             task.isCompleted = progress.event ? true : false;
-            task.required = (!progress.event && task.required) ? true : false;
+            task.required = (!progress.event) ? true : false;
           }
 
           if (task.type === taskType.EVALUATION) {
@@ -2099,6 +2100,94 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
   return progress;
 }
 
+async function getApplicationProgress(companyId, currentUserId, applicationId, progressId) {
+
+  if(!companyId || !currentUserId || !applicationId || !progressId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let progress;
+  try {
+
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'currentProgress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
+      },
+      {
+        path: 'progress',
+        model: 'ApplicationProgress',
+        populate: {
+          path: 'stage',
+          model: 'Stage'
+        }
+      },
+      {
+        path: 'user',
+        model: 'Candidate'
+      }
+    ]);
+
+
+    if(application) {
+      let job = await jobService.findJob_Id(application.jobId);
+
+      let previousProgress = application.currentProgress;
+      _.forEach(application.progress, function(item){
+        if(item.stage._id.equals(ObjectID(newStage))){
+          progress = item;
+        }
+      });
+
+
+      if(progress){
+        application.currentProgress = progress;
+        newStage = progress.stage;
+        await application.save();
+
+      } else {
+        let pipeline = await pipelineService.findById(job.pipeline);
+        if(pipeline) {
+          foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
+          if(foundStage) {
+            progress = await  applicationProgressService.addApplicationProgress({
+              applicationId: application.applicationId,
+              stage: foundStage
+            });
+
+            newStage = foundStage;
+            let taskMeta = {applicationId: application._id, applicationProgressId: application.currentProgress._id};
+            await stageService.createTasksForStage(foundStage, '', taskMeta);
+
+            application.currentProgress = progress;
+            application.progress.push(progress);
+            application.progress = _.orderBy(application.progress, ['stageId'], []);
+            await application.save();
+
+          }
+        }
+      }
+
+
+      let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return progress;
+}
 
 async function getApplicationQuestions(companyId, currentUserId, applicationId) {
 

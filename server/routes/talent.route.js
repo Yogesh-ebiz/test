@@ -74,6 +74,8 @@ router.route('/company/:id/applications').post(asyncHandler(addApplication));
 router.route('/company/:id/applications/endingsoon').get(asyncHandler(getAllApplicationsEndingSoon));
 router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
 router.route('/company/:id/applications/:applicationId/progress').post(asyncHandler(updateApplicationProgress));
+router.route('/company/:id/applications/:applicationId/progress/:progressId').get(asyncHandler(getApplicationProgress));
+
 router.route('/company/:id/applications/:applicationId/questions').get(asyncHandler(getApplicationQuestions));
 router.route('/company/:id/applications/:applicationId/evaluations').get(asyncHandler(getApplicationEvaluations));
 router.route('/company/:id/applications/:applicationId/emails').get(asyncHandler(searchApplicationEmails));
@@ -705,6 +707,21 @@ async function updateApplicationProgress(req, res) {
   let newStage = req.body.newStage;
 
   let data = await talentCtrl.updateApplicationProgress(companyId, currentUserId, applicationId, newStage);
+
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getApplicationProgress(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let applicationId = req.params.applicationId;
+  let progressId = req.params.progressId;
+
+
+  let data = await talentCtrl.getApplicationProgress(companyId, currentUserId, applicationId, progressId);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
