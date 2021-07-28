@@ -1914,7 +1914,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
           if (task.type === taskType.EVALUATION) {
             task.isCompleted = hasEvaluated;
-            task.required = (!hasEvaluated && task.required) ? true : false;
+            task.required = (!hasEvaluated) ? true : false;
           }
         });
 
