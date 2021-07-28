@@ -1876,10 +1876,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
         // application.progress = _.reduce(application.progress, function (res, progress) {
 
-          // progress.stage.evaluations = [];
-          progress.stage.members = [];
-          // progress.stage.tasks = [];
-          progress.evaluations = [];
 
 
           if (progress.attachment) {
@@ -1906,7 +1902,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
 
         hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
-
         progress.stage.tasks.forEach(function (task) {
           if (task.type === taskType.EMAIL) {
             task.isCompleted = progress.emails.length ? true : false;
@@ -1927,6 +1922,13 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         if (progress._id.equals(application.currentProgress)) {
           application.currentProgress = progress
         }
+
+
+        // progress.stage.evaluations = [];
+        progress.stage.members = [];
+        // progress.stage.tasks = [];
+        progress.evaluations = [];
+
       }
 
       application.progress = _.orderBy(application.progress, p => { return p.stage.stageId; }, ['asc']);
