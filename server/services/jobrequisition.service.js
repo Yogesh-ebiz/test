@@ -359,9 +359,15 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
       } else if(job.status == statusEnum.DRAFT) {
         for(let [i, stages] in job.pipeline.stages.entries()){
-          await stages.delete();
+          if(!stage.default){
+            await stages.delete();
+          }
         }
-        job.pipeline.delete();
+
+        if(!job.pipeline.default){
+          job.pipeline.delete();
+        }
+
 
         form.createdBy = currentUserId
         form.jobId = job._id;
