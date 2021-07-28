@@ -1142,14 +1142,31 @@ async function search(jobId, filter, sort) {
 
   aList.push({ $match: {jobId: jobId, status: {$in: filter.status} } });
   aList.push(
-    {
-      $lookup: {
-        from: 'applicationprogresses',
-        localField: 'currentProgress',
-        foreignField: '_id',
-        as: 'currentProgress',
-      },
-    },
+    // {
+    //   $lookup: {
+    //     from: 'applicationprogresses',
+    //     localField: 'currentProgress',
+    //     foreignField: '_id',
+    //     as: 'currentProgress',
+    //   },
+    // },
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{currentProgress:"$currentProgress"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+          {
+            $lookup: {
+              from: 'stages',
+              localField: 'stage',
+              foreignField: '_id',
+              as: 'stage',
+            },
+          },
+          {$unwind: '$stage'}
+        ],
+        as: 'currentProgress'
+      }},
     {$unwind: '$currentProgress'}
   );
 
