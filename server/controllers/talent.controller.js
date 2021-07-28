@@ -1928,6 +1928,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         progress.stage.members = [];
         // progress.stage.tasks = [];
         progress.evaluations = [];
+        progress.emails = [];
 
       }
 
