@@ -182,16 +182,11 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
         partySkills = await findUserSkillsById(currentParty.id);
         partySkills = _.map(partySkills, "id");
 
-        // await addJobViewByUserId(currentParty.id, job.company, job._id);
-        // job.noOfViews++;
-        // await job.save();
       }
 
 
-
-
-      // let company = await findCompanyById(job.company, currentUserId);
-      job.company = convertToCompany(job.company);
+      let company = await feedService.lookupCompaniesIds([job.company.companyId]);
+      job.company = convertToCompany(company[0]);
 
       if(!isMinimal) {
           // let hiringManager = await findByUserId(job.createdBy.userId);

@@ -168,6 +168,7 @@ const convertToCompany = (company) => {
     primaryAddress: primaryAddress,
     hasFollowed:company.hasFollowed,
     images: company.images,
+    video: company.video,
     rating: company.rating,
     noOfFollowers: company.noOfFollowers
   };
