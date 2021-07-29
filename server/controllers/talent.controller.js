@@ -290,6 +290,7 @@ async function getUserSession(currentUserId, preferredCompany) {
   companies = _.reduce(companies, function(res, item){
     let found = _.find(allAccounts, {company: item.companyId});
     // item = convertToCompany(item);
+    item.avatar = buildCompanyUrl(item);
     item.role = roleMinimal(found.role);
     item.memberId = found._id
     res.push(item)

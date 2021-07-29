@@ -266,7 +266,7 @@ const skillMinimal = (job) => {
 
 
 const buildCompanyUrl = (company) => {
-  let id = company.id;
+  let id = company._id?company.companyId:company.id;
   let avatar = company.avatar?company.avatar:'';
   return avatar?config.cdn + '/company/' + id + '/images/' + avatar:'';
 }
