@@ -435,10 +435,9 @@ async function findJobSubscriptions(memberId, sort) {
     page: page
   };
 
-  console.log(memberId, subjectType.JOB)
   const aggregate = MemberSubscribe.aggregate([{
     $match: {
-      memberId: memberId,
+      member: memberId,
       subjectType: subjectType.JOB
     }
   },
@@ -453,9 +452,9 @@ async function findJobSubscriptions(memberId, sort) {
     // { $unwind: '$subject'}
     {$lookup:{
         from:"jobrequisitions",
-        let:{subjectId: '$subjectId'},
+        let:{subject: '$subject'},
         pipeline:[
-          {$match:{$expr:{$eq:["$$subjectId","$_id"]}}},
+          {$match:{$expr:{$eq:["$$subject","$_id"]}}},
           // {
           //   $lookup: {
           //     from: 'departments',
@@ -464,7 +463,7 @@ async function findJobSubscriptions(memberId, sort) {
           //     as: "department"
           //   }
           // },
-          { $unwind: '$department'},
+          // { $unwind: '$department', preserveNullAndEmptyArrays: true},
           {
             $lookup: {
               from: 'members',
@@ -509,7 +508,7 @@ async function findApplicationSubscriptions(memberId, sort) {
 
   const aggregate = MemberSubscribe.aggregate([{
     $match: {
-      memberId: memberId,
+      member: memberId,
       subjectType: subjectType.APPLICATION
     }
   },
@@ -524,9 +523,9 @@ async function findApplicationSubscriptions(memberId, sort) {
     // { $unwind: '$subject'}
     {$lookup:{
         from:"applications",
-        let:{subjectId: '$subjectId'},
+        let:{subject: '$subject'},
         pipeline:[
-          {$match:{$expr:{$eq:["$$subjectId","$_id"]}}},
+          {$match:{$expr:{$eq:["$$subject","$_id"]}}},
           {$lookup:{
               from:"candidates",
               let:{user:"$user"},
