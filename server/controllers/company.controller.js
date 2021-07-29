@@ -179,10 +179,11 @@ async function sync(form) {
   try {
     let company = await companyService.findByCompanyId(form.id);
 
-    console.log(company)
     if(company){
       company.avatar = form.avatar;
       company.name = form.name;
+      company.primaryAddress = company.primaryAddress;
+      await company.save();
     } else {
       let user = await feedService.lookupPeopleIds([form.createdBy]);
       let role = await roleService.getAdminRole();
