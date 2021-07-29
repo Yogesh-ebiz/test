@@ -584,8 +584,7 @@ async function closeJob(jobId, member) {
     return;
   }
 
-  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: currentUserId, updatedDate: Date.now()}});
-  let user = await feedService.lookupUserIds([currentUserId]);
+  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: member.userId, updatedDate: Date.now()}});
   await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.CLOSED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: result.title, jobId: ObjectID(jobId)}});
   return result;
 
@@ -597,7 +596,7 @@ async function archiveJob(jobId, member) {
     return;
   }
 
-  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: member.userId, updatedDate: Date.now()}});
   await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.ARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: result.title, jobId: ObjectID(jobId)}});
 
   return result;
@@ -611,7 +610,7 @@ async function unarchiveJob(jobId, member) {
     return;
   }
 
-  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: currentUserId, updatedDate: Date.now()}});
+  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: member.userId, updatedDate: Date.now()}});
   await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.UNARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: result.title, jobId: ObjectID(jobId)}});
 
   return result;
