@@ -20,7 +20,7 @@ const stageType = require('../const/stageType');
 const jobType = require('../const/jobType');
 
 const awsService = require('../services/aws.service');
-const {buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
 const companyService = require('../services/company.service');
@@ -707,6 +707,9 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
     result.docs.map(job => {
       job.department = _.find(departments, {_id: job.department});
       job.hasSaved = _.find(jobSubscribed, {subject: job._id})?true:false;
+      job.createdBy.avatar = buildUserUrl(job.createdBy);
+      job.company.avatar = buildCompanyUrl(job.company);
+
 
       return job;
     });
