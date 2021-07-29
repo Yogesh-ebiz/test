@@ -3,16 +3,13 @@ const Schema = mongoose.Schema;
 
 const RoleSchema = new mongoose.Schema({
   default: {
-    type: Boolean,
-    default: false
+    type: Boolean
   },
   createdBy: {
-    type: Number,
-    required:true
+    type: Number
   },
   company: {
-    type: Number,
-    required:true
+    type: Number
   },
   status: {
     type: String
@@ -21,16 +18,12 @@ const RoleSchema = new mongoose.Schema({
     type: String,
     required:true
   },
-  roleName: {
-    type: String
-  },
   privileges: {
     type: Array,
-      required:true
+    required:true
   },
   description: {
-    type: Object,
-    required:false
+    type: Object
   }
 }, {
   versionKey: false

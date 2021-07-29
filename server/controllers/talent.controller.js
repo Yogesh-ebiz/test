@@ -4179,7 +4179,7 @@ async function updateCompanyRole(companyId, roleId, currentUserId, form) {
   }
 
   let result = null;
-
+  console.log(member)
   try {
       let role = await Role.findById(roleId);
       if(role){
