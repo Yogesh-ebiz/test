@@ -5546,7 +5546,6 @@ async function getEvaluationFilters(companyId, currentUserId) {
   }
 
   let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-
   if(!member){
     return null;
   }

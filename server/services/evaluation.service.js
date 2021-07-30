@@ -583,16 +583,12 @@ async function getFilters(companyId) {
         as: 'applicationId',
       }
     },
-    { $unwind: '$applicationId' }
-  ]);
+    { $unwind: '$applicationId' },
+    {$group:{_id:{applicationId:'$applicationId._id', jobTitle: '$applicationId.jobTitle'}}},
+    {$project: {_id: '$_id.applicationId', jobTitle: '$_id.jobTitle'} }
+  ])
 
-  result.applications = _.reduce(applications, function(res, item){
-    let exists = _.find(result.applications, {_id: item._id});
-    if(!exists) {
-      res.push({_id: item.applicationId._id, jobTitle: item.applicationId.jobTitle});
-    }
-    return res;
-    }, []);
+  result.applications = applications;
 
   return result;
 

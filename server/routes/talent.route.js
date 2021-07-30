@@ -1980,7 +1980,6 @@ async function deleteCompanyEvaluationTemplate(req, res) {
 async function getEvaluationFilters(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let templateId = req.params.templateId;
 
   let data = await talentCtrl.getEvaluationFilters(company, currentUserId);
   res.json(new Response(data, data?'filters_retrieved_successful':'not_found', res));
