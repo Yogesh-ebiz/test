@@ -35,6 +35,16 @@ const subscriptionSchema = Joi.object({
 
 
 
+async function sync(user) {
+  let data = null;
+
+  if(!user){
+    return;
+  }
+
+  await Member.update({userId: user.id}, {$set: {firstName: user.firstName, lastName: user.lastName, avatar: user.avatar, primaryAddress: user.primaryAddress}});
+}
+
 async function findById(id) {
   let data = null;
 
@@ -620,6 +630,7 @@ async function searchCompanyByUserId(userId, filter, sort) {
 
 
 module.exports = {
+  sync:sync,
   findById:findById,
   findByUserId:findByUserId,
   inviteMembers:inviteMembers,

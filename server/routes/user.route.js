@@ -10,6 +10,7 @@ module.exports = router;
 //router.use(passport.authenticate('jwt', { session: false }))
 
 router.route('/search/all').get(asyncHandler(searchUsers));
+router.route('/:userId/sync').post(asyncHandler(sync));
 router.route('/:userId/detail').get(asyncHandler(getUserDetail));
 router.route('/:userId/resumes/upload').post(asyncHandler(uploadResume));
 router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
@@ -66,6 +67,13 @@ router.route('/:userId/certifications').get(asyncHandler(getPartyCertifications)
 router.route('/:userId/certifications').post(asyncHandler(addPartyCertification));
 router.route('/:userId/certifications').put(asyncHandler(updatePartyCertifications));
 
+
+
+async function sync(req, res) {
+  let user = req.body;
+  let data = await userCtl.sync(user);
+  res.json(new Response(data, data?'user_synced_successful':'not_found', res));
+}
 
 async function getUserDetail(req, res) {
 

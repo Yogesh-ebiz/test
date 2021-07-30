@@ -28,6 +28,7 @@ const alertEnum = require('../const/alertEnum');
 
 const {upload} = require('../services/aws.service');
 const feedService = require('../services/api/feed.service.api');
+const memberService = require('../services/member.service');
 
 const {addCompany} = require('../services/api/party.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
@@ -149,6 +150,7 @@ const partyCertificationSchema = Joi.object({
 
 
 module.exports = {
+  sync,
   getUserDetail,
   uploadResume,
   getPartyExperiences,
@@ -185,6 +187,26 @@ module.exports = {
   getUserEmployersJobs
 }
 
+
+
+
+async function sync(user) {
+  if(!user){
+    return null;
+  }
+
+  let result;
+  try {
+    await memberService.sync(user);
+
+  } catch(e){
+    console.log('sync: Error', e);
+  }
+
+
+  return result;
+
+}
 
 
 async function getUserDetail(currentUserId, userId, locale) {
