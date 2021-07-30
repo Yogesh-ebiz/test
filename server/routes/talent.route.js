@@ -57,7 +57,7 @@ router.route('/company/:id/jobs/:jobId/members').post(asyncHandler(updateJobMemb
 router.route('/company/:id/jobs/:jobId/subscribe').post(asyncHandler(subscribeJob));
 router.route('/company/:id/jobs/:jobId/subscribe').delete(asyncHandler(unsubscribeJob));
 router.route('/company/:id/jobs/:jobId/applicationform').post(asyncHandler(updateJobApplicationForm));
-router.route('/company/:id/jobs/:id/board').get(asyncHandler(getBoard));
+router.route('/company/:id/jobs/:jobId/board').get(asyncHandler(getBoard));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId/reject').post(asyncHandler(rejectApplication));
 router.route('/company/:id/jobs/:jobId/applications/:applicationId').post(asyncHandler(updateApplication));
 
@@ -1075,11 +1075,11 @@ async function updateJobApplicationForm(req, res) {
 
 
 async function getBoard(req, res) {
+  let companyId = parseInt(req.params.id);
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-
   let filter = req.query;
-  let jobId = ObjectID(req.params.id);
-  let data = await talentCtrl.getBoard(currentUserId, jobId, filter, res.locale);
+  let jobId = ObjectID(req.params.jobId);
+  let data = await talentCtrl.getBoard(currentUserId, companyId, jobId, filter, res.locale);
   res.json(new Response(data, data?'board_retrieved_successful':'not_found', res));
 }
 

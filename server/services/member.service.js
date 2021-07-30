@@ -42,7 +42,19 @@ async function sync(user) {
     return;
   }
 
-  await Member.update({userId: user.id}, {$set: {firstName: user.firstName, lastName: user.lastName, avatar: user.avatar, primaryAddress: user.primaryAddress}});
+  let form = {firstName: user.firstName, lastName: user.lastName, avatar: user.avatar};
+  if(user.primaryAddress){
+    form.primaryAddress= user.primaryAddress;
+  }
+
+  if(user.primaryEmail){
+    form.email= user.primaryEmail.value;
+  }
+  if(user.primaryPhone){
+    form.phone= user.primaryPhone.value;
+  }
+
+  await Member.updateMany({userId: user.id}, {$set: form});
 }
 
 async function findById(id) {
