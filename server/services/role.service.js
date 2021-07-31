@@ -53,7 +53,7 @@ function getRoles(company) {
   }
 
 
-  return Role.find({company:company});
+  return Role.find({$or: [{company:company}, {default: true}]});
 
 }
 

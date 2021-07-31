@@ -3283,7 +3283,6 @@ async function removeCandidateById(currentUserId, companyId, candidateId) {
 
 
 async function getCandidateEvaluations(companyId, currentUserId, candidateId, filter, sort) {
-
   if(!companyId || !currentUserId || !candidateId || !filter || !sort){
     return null;
   }
@@ -3295,7 +3294,6 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
 
   let result;
   try {
-
 
     if(filter.companyId) {
       result = await evaluationService.findByCandidateAndCompany(candidateId, filter, sort);
