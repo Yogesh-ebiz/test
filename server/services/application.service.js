@@ -1218,7 +1218,7 @@ async function search(jobId, filter, sort) {
 
     if(pipeline){
       result.docs.forEach(function(app){
-        let stage = _.find(pipeline.stages, {_id: app.currentProgress.stage});
+        let stage = _.find(pipeline.stages, {_id: app.currentProgress.stage._id});
         if(stage) {
           stage.members = [];
           stage.tasks = [];
