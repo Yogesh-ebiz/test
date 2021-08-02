@@ -3323,8 +3323,8 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
 }
 
 
-async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages, applicationId) {
-  if(!companyId || !currentUserId || !candidateId || !type || !stages){
+async function getCandidateEvaluationsStats(companyId, currentUserId, candidateId, filter) {
+  if(!companyId || !currentUserId || !candidateId || !filter){
     return null;
   }
 
@@ -3335,7 +3335,7 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
 
   let result;
   try {
-    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, type, stages, applicationId);
+    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, filter);
 
 
   } catch (error) {

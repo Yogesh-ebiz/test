@@ -122,7 +122,7 @@ router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(a
 router.route('/company/:id/candidates/:candidateId/sources/:sourceId').delete(asyncHandler(removeCandidateSource));
 router.route('/company/:id/candidates/:candidateId/pools').post(asyncHandler(updateCandidatePool));
 router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getCandidateEvaluations));
-router.route('/company/:id/candidates/:candidateId/evaluations/stats').get(asyncHandler(getCandidateEvaluationsStats));
+router.route('/company/:id/candidates/:candidateId/evaluations/stats').post(asyncHandler(getCandidateEvaluationsStats));
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
@@ -1266,11 +1266,9 @@ async function getCandidateEvaluationsStats(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let candidateId = parseInt(req.params.candidateId);
-  let type = req.query.type;
-  let stages = req.query.stage?req.query.stage.split(','):[]
-  let applicationId = req.query.applicationId?ObjectID(req.query.applicationId):null;
+  let filter = req.body;
 
-  let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, type, stages, applicationId);
+  let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, filter);
 
   res.json(new Response(data, data?'evaluationstats_retrieved_successful':'not_found', res));
 }

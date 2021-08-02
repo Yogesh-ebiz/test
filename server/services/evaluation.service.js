@@ -429,24 +429,23 @@ async function findByCandidateAndApplicationId(userId, filter, sort) {
 }
 
 
-async function getCandidateEvaluationsStats(userId, companyId, type, stages, applicationId) {
-  if(!userId || !companyId || !type || !stages){
+async function getCandidateEvaluationsStats(userId, companyId, filter) {
+  if(!userId || !companyId || !filter){
     return;
   }
 
   let result = {internal: {}, external: {}};
   let $match = {partyId: userId};
-  if(type==='INTERNAL'){
+  if(filter.type==='INTERNAL'){
     $match.companyId = companyId;
-  } else if(type==='EXTERNAL'){
+  } else if(filter.type==='EXTERNAL'){
     $match.companyId = {$ne: companyId };
   }
 
-  if(applicationId){
-    $match.applicationId = applicationId;
+  if(filter.applicationId){
+    $match.applicationId = filter.applicationId;
   }
 
-  console.log($match)
   let aggregate = [{
     $match: $match
   },
@@ -479,8 +478,8 @@ async function getCandidateEvaluationsStats(userId, companyId, type, stages, app
     { $unwind: '$applicationProgressId' }
   ];
 
-  if(stages.length){
-    aggregate.push({ $match: {'applicationProgressId.stage.type': {$in: stages} } });
+  if(filter.stages.length){
+    aggregate.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
   }
   let evaluations = await Evaluation.aggregate(aggregate);
 
@@ -532,9 +531,9 @@ async function getCandidateEvaluationsStats(userId, companyId, type, stages, app
 
       }
 
-      if (type==='INTERNAL') {
+      if (filter.type==='INTERNAL') {
         result.external = null;
-      } else if (type==='EXTERNAL'){
+      } else if (filter.type==='EXTERNAL'){
         result.internal = null;
       }
     }
