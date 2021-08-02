@@ -3131,6 +3131,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
   }
 
   result = await candidateService.search(filter, sort);
+
   result.docs = _.reduce(result.docs, function(res, candidate){
     candidate.avatar = buildCandidateUrl(candidate);
     res.push(convertToCandidate(candidate));

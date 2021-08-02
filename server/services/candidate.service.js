@@ -241,11 +241,11 @@ async function search(filter, sort) {
         as: 'applications'
       },
     },
-    {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
+    {$lookup: {from: 'evaluations', localField: 'user._id', foreignField: 'candidateId ', as: 'evaluations' } },
     { $addFields:
         {
           rating: {$avg: "$evaluations.rating"},
-          evaluations: []
+          // evaluations: []
         }
     },
   );
