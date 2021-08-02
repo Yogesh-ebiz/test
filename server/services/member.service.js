@@ -196,7 +196,6 @@ async function addMember(member) {
 
 
   let result;
-  console.log(member)
   member = await Joi.validate(member, memberSchema, {abortEarly: false});
 
   result = new Member(member).save();
@@ -205,8 +204,8 @@ async function addMember(member) {
 }
 
 
-async function addMemberFromInvitation(member, role, invitationId) {
-  if(!member || !role || !invitationId){
+async function addMemberFromInvitation(member, invitationId) {
+  if(!member || !invitationId){
     return;
   }
 
@@ -214,6 +213,7 @@ async function addMemberFromInvitation(member, role, invitationId) {
   let result;
   let invitation = await MemberInvitation.findById(invitationId);
   if(invitation) {
+    member.role = ObjectID(member.role);
     member.createdBy = invitation.createdBy;
     member = await Joi.validate(member, memberSchema, {abortEarly: false});
 
@@ -221,8 +221,6 @@ async function addMemberFromInvitation(member, role, invitationId) {
 
     if(user) {
       member.userId = user.id;
-      member.role = role;
-
       result = new Member(member).save();
       if (result) {
         await invitation.delete();

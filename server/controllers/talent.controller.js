@@ -4441,17 +4441,10 @@ async function addCompanyMember(companyId, form, invitationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
-    return null;
-  }
-
   let result = null;
   try {
-      let role = form.role;
-      delete form.role
 
-      result = await memberService.addMemberFromInvitation(form, role, invitationId);
+      result = await memberService.addMemberFromInvitation(form, invitationId);
 
   } catch(e){
     console.log('addCompanyMember: Error', e);
