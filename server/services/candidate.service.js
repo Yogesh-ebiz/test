@@ -244,7 +244,7 @@ async function search(filter, sort) {
     {$lookup: {from: 'evaluations', localField: 'userId', foreignField: 'partyId', as: 'evaluations' } },
     { $addFields:
         {
-          rating: {$avg: "$evaluations.rating"},
+          rating: {$round: [{$avg: "$evaluations.rating"}, 1]},
           evaluations: []
         }
     },

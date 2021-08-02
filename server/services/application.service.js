@@ -1194,7 +1194,7 @@ async function search(jobId, filter, sort) {
           },
           { $addFields:
               {
-                rating: {$round: [{$avg: "$evaluations.rating"}, 2]},
+                rating: {$round: [{$avg: "$evaluations.rating"}, 1]},
                 evaluations: [],
                 applications: []
               }

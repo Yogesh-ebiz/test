@@ -1921,7 +1921,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         // progress.stage.tasks = [];
         progress.evaluations = [];
         // progress.emails = [];
-  
+
       }
 
       application.progress = _.orderBy(application.progress, p => { return p.stage.stageId; }, ['asc']);
@@ -2952,7 +2952,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
             },
             { $addFields:
                 {
-                  rating: {$avg: "$evaluations.rating"},
+                  rating: {$round: [{$avg: "$evaluations.rating"}, 1] },
                   evaluations: [],
                   applications: []
                 }

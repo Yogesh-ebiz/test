@@ -561,7 +561,7 @@ async function findApplicationSubscriptions(memberId, sort) {
                 },
                 { $addFields:
                     {
-                      rating: {$avg: "$evaluations.rating"},
+                      rating: {$round: [{$avg: "$evaluations.rating"}, 1] },
                       evaluations: [],
                       applications: []
                     }
