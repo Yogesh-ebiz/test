@@ -1187,15 +1187,15 @@ async function search(jobId, filter, sort) {
           {
             $lookup: {
               from: 'evaluations',
-              localField: 'evaluations',
-              foreignField: '_id',
+              localField: 'user._id',
+              foreignField: 'candidateId',
               as: 'evaluations',
             },
           },
           { $addFields:
               {
                 rating: {$avg: "$evaluations.rating"},
-                evaluations: [],
+                // evaluations: [],
                 applications: []
               }
           },

@@ -1920,8 +1920,8 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         progress.stage.members = [];
         // progress.stage.tasks = [];
         progress.evaluations = [];
-        progress.emails = [];
-
+        // progress.emails = [];
+  
       }
 
       application.progress = _.orderBy(application.progress, p => { return p.stage.stageId; }, ['asc']);
