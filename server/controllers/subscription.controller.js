@@ -83,22 +83,10 @@ async function getSubscriptionById(currentUserId, id) {
   let subscription = null;
   try {
     subscription = await paymentService.getSubscriptionById(id);
-    console.log(subscription)
     if(subscription){
-      let company = await companyService.findByCompanyId(parseInt(subscription.company));
-      company.subscription.status = subscription.status;
-      company.subscription.cancelAt = subscription.cancelAt;
-      company.subscription.canceledAt = subscription.canceledAt;
-      company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
-      company.subscription.plan.id = subscription.plan.id;
-      company.subscription.plan.name = subscription.plan.name;
-      company.subscription.plan.price = subscription.price;
-      await company.subscription.save();
-      subscription.plan.price = subscription.price;
       subscription.customer = null;
       subscription.plan.prices  = [];
       subscription.plan.features = [];
-      subscription.price = null;
       subscription.defaultSource = null;
       subscription.invoice = null;
     }
