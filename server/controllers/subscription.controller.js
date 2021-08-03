@@ -82,8 +82,8 @@ async function getSubscriptionById(currentUserId, id) {
 
   let subscription = null;
   try {
-    subscription = await paymentService.getSubscription(id);
-
+    subscription = await paymentService.getSubscriptionById(id);
+    console.log(subscription)
     if(subscription){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
       company.subscription.status = subscription.status;
