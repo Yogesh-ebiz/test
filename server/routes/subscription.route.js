@@ -12,7 +12,7 @@ module.exports = router;
 router.route('').post(asyncHandler(addSubscription));
 router.route('/plans').get(asyncHandler(getPlans));
 
-router.route('/:id').get(asyncHandler(getSubscription));
+router.route('/:id').get(asyncHandler(getSubscriptionById));
 router.route('/:id').put(asyncHandler(updateSubscription));
 router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
 
@@ -37,11 +37,11 @@ async function addSubscription(req, res) {
 }
 
 
-async function getSubscription(req, res) {
+async function getSubscriptionById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let id = req.params.id;
-  let data = await subscriptionCtl.getSubscription(currentUserId, id);
+  let data = await subscriptionCtl.getSubscriptionById(currentUserId, id);
 
   res.json(new Response(data, data?'subscription_retrieved_successful':'not_found', res));
 }
