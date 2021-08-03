@@ -610,7 +610,7 @@ async function apply(application) {
       companyId: job.company.companyId,
       jobId: job.jobId,
       jobTitle: job.title,
-      applicationId: savedApplication.applicationId,
+      applicationId: savedApplication._id,
       applicantId: candidate.userId,
       createdBy: job.createdBy.userId
     };
