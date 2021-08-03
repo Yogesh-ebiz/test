@@ -14,7 +14,7 @@ const subscriptionService = require('../services/subscription.service');
 module.exports = {
   getPlans,
   addSubscription,
-  getSubscription,
+  getSubscriptionById,
   updateSubscription,
   cancelSubscription
 }
@@ -75,8 +75,24 @@ async function addSubscription(currentUserId, form) {
 }
 
 
+async function getAllSubscriptions(currentUserId, customerId) {
+  if(!currentUserId || !customerId){
+    return null;
+  }
 
-async function getSubscription(currentUserId, id) {
+  let subscription = null;
+  try {
+    subscriptions = await paymentService.getSubscriptions(id);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return subscription;
+}
+
+
+async function getSubscriptionById(currentUserId, id) {
   if(!currentUserId || !id){
     return null;
   }
