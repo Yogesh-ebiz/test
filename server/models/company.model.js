@@ -42,7 +42,12 @@ const CompanySchema = new mongoose.Schema({
   memberId: {
     type: Object
   },
-  subscription: { type: Schema.Types.ObjectId, ref: 'Subscription' }
+  talentSubscription: {
+    type: Object
+  },
+  subscriptions: {
+    type: Array
+  }
 
 }, {
   versionKey: false

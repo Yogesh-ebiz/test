@@ -287,6 +287,9 @@ async function getUserSession(currentUserId, preferredCompany) {
   // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
   let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
 
+  user = convertToTalentUser(user);
+  user.currentCompanyId = preferredCompany? _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length?companies[0].company:null:companies.length?companies[0].company:null;
+
   companies = _.reduce(companies, function(res, item){
     let found = _.find(allAccounts, {company: item.companyId});
     // item = convertToCompany(item);
@@ -296,9 +299,11 @@ async function getUserSession(currentUserId, preferredCompany) {
     res.push(item)
     return res;
   }, [])
-  user = convertToTalentUser(user);
+
   user.company = companies;
-  user.currentCompanyId = preferredCompany? _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length?companies[0].company:null:companies.length?companies[0].company:null;
+
+  console.log(user.currentCompanyId)
+
 
   return user;
 

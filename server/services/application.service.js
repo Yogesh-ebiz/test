@@ -605,7 +605,6 @@ async function apply(application) {
 
 
     //Create Notification
-    console.log(job.company.companyId)
     let meta = {
       companyId: job.company.companyId,
       jobId: job.jobId,

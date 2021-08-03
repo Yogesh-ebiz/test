@@ -49,16 +49,14 @@ async function addSubscription(currentUserId, form) {
   let subscription = null;
   try {
     let company = await companyService.findByCompanyId(parseInt(form.company));
-    if(company.subscription){
-      throw new SubscriptionExist(400, "Subscription Exists ");
-    }
 
     form.createdBy = currentUserId;
     subscription = await paymentService.addSubscription(form);
     if(subscription){
-      let newSubscription = {subscriptionId: subscription.id, category: subscription.category, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
-      subscription = await subscriptionService.add(newSubscription);
-      company.subscription = subscription;
+      // let newSubscription = {subscriptionId: subscription.id, category: subscription.category, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
+      // subscription = await subscriptionService.add(newSubscription);
+      company.talentSubscription = subscription.id;
+      company.subscriptions.push(subscription.id);
 
       if(subscription.plan.tier==1){
         company.credit = 30;
@@ -86,6 +84,7 @@ async function getSubscription(currentUserId, id) {
   let subscription = null;
   try {
     subscription = await paymentService.getSubscription(id);
+
     if(subscription){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
       company.subscription.status = subscription.status;
