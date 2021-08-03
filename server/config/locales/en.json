@@ -224,5 +224,6 @@
 	"card_removed_successful": "card_removed_successful",
 	"insight_retrieved_successful": "insight_retrieved_successful",
 	"companies_retrieved_successful": "companies_retrieved_successful",
-	"avatar_uploaded_successful": "avatar_uploaded_successful"
+	"avatar_uploaded_successful": "avatar_uploaded_successful",
+	"get_subscriptions_successful": "get_subscriptions_successful"
 }

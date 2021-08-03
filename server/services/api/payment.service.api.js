@@ -375,6 +375,24 @@ async function cancelSubscription(id, form) {
 };
 
 
+async function lookupSubscriptions(filter) {
+
+  let response = await client.post(`/subscriptions/lookup`, filter, null).catch(function (error) {
+    if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data.data;
+};
+
+
 async function getPlans() {
 
   let response = await client.get(`/plans/list?category=TALENT&type=MEMBERSHIP`, null, null).catch(function (error) {
@@ -413,5 +431,6 @@ module.exports = {
   getSubscriptionById:getSubscriptionById,
   updateSubscription:updateSubscription,
   cancelSubscription:cancelSubscription,
-  getPlans:getPlans
+  getPlans:getPlans,
+  lookupSubscriptions:lookupSubscriptions
 }

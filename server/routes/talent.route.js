@@ -13,9 +13,11 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('/session').get(asyncHandler(getUserSession));
+
 router.route('/market/salary').get(asyncHandler(getMarketSalary));
 
 router.route('/company/search').post(asyncHandler(searchCompany));
+router.route('/company/:id/subscriptions').get(asyncHandler(getSubscriptions));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
 router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
@@ -235,6 +237,16 @@ async function getUserSession(req, res) {
 
   let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
   res.json(new Response(data, data?'get_session_successful':'not_found', res));
+}
+
+
+
+async function getSubscriptions(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+
+  let data = await talentCtrl.getSubscriptions(companyId, currentUserId);
+  res.json(new Response(data, data?'get_subscriptions_successful':'not_found', res));
 }
 
 

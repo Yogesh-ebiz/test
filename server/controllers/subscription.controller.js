@@ -75,23 +75,6 @@ async function addSubscription(currentUserId, form) {
 }
 
 
-async function getAllSubscriptions(currentUserId, customerId) {
-  if(!currentUserId || !customerId){
-    return null;
-  }
-
-  let subscription = null;
-  try {
-    subscriptions = await paymentService.getSubscriptions(id);
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  return subscription;
-}
-
-
 async function getSubscriptionById(currentUserId, id) {
   if(!currentUserId || !id){
     return null;

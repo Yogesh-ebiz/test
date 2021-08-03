@@ -112,6 +112,7 @@ const labelSchema = Joi.object({
 
 module.exports = {
   getUserSession,
+  getSubscriptions,
   getMarketSalary,
   getCompanyInsights,
   getInmailCredits,
@@ -309,6 +310,35 @@ async function getUserSession(currentUserId, preferredCompany) {
 
 }
 
+
+async function getSubscriptions(companyId, currentUserId) {
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let subscriptions = [];
+  try {
+    let company = await companyService.findByCompanyId(companyId);
+    console.log(company.subscriptions)
+    if(company.subscriptions && company.subscriptions.length){
+      let filter = {ids: company.subscriptions};
+      console.log('calling')
+      subscriptions = await paymentService.lookupSubscriptions(filter);
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return subscriptions;
+}
 
 async function getMarketSalary(jobTitle) {
 
