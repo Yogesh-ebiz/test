@@ -13,7 +13,7 @@ router.route('').post(asyncHandler(addSubscription));
 router.route('/plans').get(asyncHandler(getPlans));
 
 router.route('/:id').get(asyncHandler(getSubscriptionById));
-router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
+router.route('/:id').put(asyncHandler(updateSubscription));
 router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
 router.route('/:id').delete(asyncHandler(deleteSubscription));
 
