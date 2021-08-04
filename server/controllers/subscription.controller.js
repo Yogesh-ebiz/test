@@ -115,24 +115,7 @@ async function updateSubscription(currentUserId, id, form) {
     subscription = await paymentService.updateSubscription(id, form);
     if(subscription){
       let company = await companyService.findByCompanyId(parseInt(subscription.company));
-
-
-      if(company.subscription.plan.id!=subscription.plan.id) {
-        if (subscription.plan.tier == 1) {
-          company.credit = 30;
-        } else if (subscription.plan.tier == 2) {
-          company.credit = 150;
-        }
-      }
-
-      company.subscription.status = subscription.status;
-      company.subscription.cancelAt = subscription.cancelAt;
-      company.subscription.canceledAt = subscription.canceledAt;
-      company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
-      company.subscription.currentPeriodEnd = subscription.currentPeriodEnd;
-      company.subscription.plan = {id: subscription.plan.id, name: subscription.plan.name, tier: subscription.plan.tier, price: subscription.price.id};
-
-      subscription = await company.subscription.save();
+      company.talentSubscription = subscription.id;
       await company.save();
     }
   } catch (error) {
