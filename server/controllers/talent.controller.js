@@ -120,7 +120,7 @@ module.exports = {
   getImpressionCandidates,
   getStats,
   searchCompany,
-  updateCard,
+  addPaymentMethod,
   getCards,
   removeCard,
   verifyCard,
@@ -303,7 +303,6 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   user.company = companies;
 
-  console.log(user.currentCompanyId)
 
 
   return user;
@@ -755,7 +754,7 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
 }
 
 
-async function updateCard(companyId, currentUserId, card) {
+async function addPaymentMethod(companyId, currentUserId, card) {
 
   if(!companyId || !currentUserId || !card){
     return null;
@@ -792,7 +791,7 @@ async function updateCard(companyId, currentUserId, card) {
     }
   }
 
-  let result = await cardService.updatePaymentMethod(company.customerId, card);
+  let result = await paymentProvider.addPaymentMethod(company.customerId, card);
   return result;
 }
 

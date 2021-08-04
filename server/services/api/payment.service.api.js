@@ -160,10 +160,10 @@ async function getAdroducts() {
 };
 
 
-async function updatePaymentMethod(customerId, form) {
+async function addPaymentMethod(customerId, form) {
 
 
-  let response = await client.post(`/customers/${customerId}/payment/method`, form, options).catch(function (error) {
+  let response = await client.post(`/customers/${customerId}/paymentmethod`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.status, error.response.data.message);
@@ -442,7 +442,7 @@ module.exports = {
   charge:charge,
   addProduct:addProduct,
   getAdroducts:getAdroducts,
-  updatePaymentMethod:updatePaymentMethod,
+  addPaymentMethod:addPaymentMethod,
   getPaymentMethod:getPaymentMethod,
   getDefaultCard:getDefaultCard,
   removeDefaultCard:removeDefaultCard,

@@ -160,7 +160,6 @@ async function deleteSubscription(currentUserId, companyId, id) {
   let subscription = null;
   try {
     subscription = await paymentService.deleteSubscription(id);
-    console.log(subscription)
     let company = await companyService.findByCompanyId(companyId);
     let index = _.findIndex(company.subscriptions, function(o) { return o == id; });
     company.subscriptions.splice(index, 1);
