@@ -13,8 +13,9 @@ router.route('').post(asyncHandler(addSubscription));
 router.route('/plans').get(asyncHandler(getPlans));
 
 router.route('/:id').get(asyncHandler(getSubscriptionById));
-router.route('/:id').put(asyncHandler(updateSubscription));
 router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
+router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
+router.route('/:id').delete(asyncHandler(deleteSubscription));
 
 
 
@@ -67,4 +68,13 @@ async function cancelSubscription(req, res) {
   res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
 
+async function deleteSubscription(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let companyId = parseInt(req.query.company);
+  let data = await subscriptionCtl.deleteSubscription(currentUserId, companyId, id);
+
+  res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
+}
 

@@ -5,8 +5,8 @@ const { PaymentError } = require('../../middleware/baseError');
 
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:5001/api');
+// let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:5001/api');
 
 
 async function addCustomer(form) {
@@ -375,6 +375,27 @@ async function cancelSubscription(id, form) {
 };
 
 
+async function deleteSubscription(id) {
+
+  let response = await client.delete(`/subscriptions/${id}`, null, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+  return response.data.data;
+};
+
+
 async function lookupSubscriptions(filter) {
 
   let response = await client.post(`/subscriptions/lookup`, filter, null).catch(function (error) {
@@ -431,6 +452,7 @@ module.exports = {
   getSubscriptionById:getSubscriptionById,
   updateSubscription:updateSubscription,
   cancelSubscription:cancelSubscription,
+  deleteSubscription:deleteSubscription,
   getPlans:getPlans,
   lookupSubscriptions:lookupSubscriptions
 }

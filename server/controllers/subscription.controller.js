@@ -16,7 +16,8 @@ module.exports = {
   addSubscription,
   getSubscriptionById,
   updateSubscription,
-  cancelSubscription
+  cancelSubscription,
+  deleteSubscription
 }
 
 
@@ -97,8 +98,6 @@ async function getSubscriptionById(currentUserId, id) {
   return subscription;
 }
 
-
-
 async function updateSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
@@ -143,8 +142,6 @@ async function updateSubscription(currentUserId, id, form) {
     return subscription;
 }
 
-
-
 async function cancelSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
@@ -158,18 +155,8 @@ async function cancelSubscription(currentUserId, id, form) {
   let subscription = null;
   try {
     let company = await companyService.findByCompanyId(parseInt(form.company));
-    if(company.subscription.subscriptionId===id) {
-      form.updatedBy = currentUserId;
+    if(company && company.talentSubscription==id) {
       subscription = await paymentService.cancelSubscription(id, form);
-      if (subscription) {
-        company.subscription.status = subscription.status;
-        company.subscription.cancelAt = subscription.cancelAt;
-        company.subscription.canceledAt = subscription.canceledAt;
-        company.subscription.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
-        company.subscription.currentPeriodEnd = subscription.currentPeriodEnd;
-        company.subscription.plan.price = subscription.plan.priceId;
-        subscription = await company.subscription.save();
-      }
     }
   } catch (error) {
     console.log(error);
@@ -178,4 +165,25 @@ async function cancelSubscription(currentUserId, id, form) {
   return subscription;
 }
 
+
+async function deleteSubscription(currentUserId, companyId, id) {
+  if(!currentUserId || !companyId || !id){
+    return null;
+  }
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+
+  let subscription = null;
+  try {
+    subscription = await paymentService.deleteSubscription(id);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return subscription;
+}
 
