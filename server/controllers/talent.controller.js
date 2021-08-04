@@ -325,7 +325,6 @@ async function getSubscriptions(companyId, currentUserId) {
   let subscriptions = [];
   try {
     let company = await companyService.findByCompanyId(companyId);
-    console.log(company.subscriptions)
     if(company.subscriptions && company.subscriptions.length){
       let filter = {ids: company.subscriptions};
       console.log('calling')

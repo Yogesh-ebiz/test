@@ -54,8 +54,6 @@ async function addSubscription(currentUserId, form) {
     form.createdBy = currentUserId;
     subscription = await paymentService.addSubscription(form);
     if(subscription){
-      // let newSubscription = {subscriptionId: subscription.id, category: subscription.category, createdDate: subscription.createdDate, startDate: subscription.startDate, status: subscription.status, plan: {id: subscription.plan.id, name: subscription.plan.name, price: subscription.price.id, tier: subscription.plan.tier}}
-      // subscription = await subscriptionService.add(newSubscription);
       company.talentSubscription = subscription.id;
       company.subscriptions.push(subscription.id);
 
@@ -162,6 +160,11 @@ async function deleteSubscription(currentUserId, companyId, id) {
   let subscription = null;
   try {
     subscription = await paymentService.deleteSubscription(id);
+    console.log(subscription)
+    let company = await companyService.findByCompanyId(companyId);
+    let index = _.findIndex(company.subscriptions, function(o) { return o == id; });
+    company.subscriptions.splice(index, 1);
+    await company.save();
 
   } catch (error) {
     console.log(error);
