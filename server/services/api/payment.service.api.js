@@ -375,6 +375,28 @@ async function cancelSubscription(id, form) {
 };
 
 
+async function activateSubscription(id) {
+
+
+  let response = await client.post(`/subscriptions/${id}/activate`, null, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+  return response.data.data;
+};
+
+
 async function deleteSubscription(id) {
 
   let response = await client.delete(`/subscriptions/${id}`, null, null).catch(function (error) {
@@ -452,6 +474,7 @@ module.exports = {
   getSubscriptionById:getSubscriptionById,
   updateSubscription:updateSubscription,
   cancelSubscription:cancelSubscription,
+  activateSubscription:activateSubscription,
   deleteSubscription:deleteSubscription,
   getPlans:getPlans,
   lookupSubscriptions:lookupSubscriptions

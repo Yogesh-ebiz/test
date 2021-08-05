@@ -68,6 +68,18 @@ async function cancelSubscription(req, res) {
   res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
 
+
+
+async function activateSubscription(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let subscription = req.body;
+  let data = await subscriptionCtl.activateSubscription(currentUserId, id, subscription);
+
+  res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
+}
+
 async function deleteSubscription(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
