@@ -377,7 +377,6 @@ async function cancelSubscription(id, form) {
 
 async function activateSubscription(id) {
 
-
   let response = await client.post(`/subscriptions/${id}/activate`, null, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
