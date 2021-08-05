@@ -7,6 +7,14 @@ let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 
 
 const EmailSchema = new mongoose.Schema({
+  createdDate: {
+    type: Number,
+    required: false,
+    default: Date.now
+  },
+  sentDate: {
+    type: Number
+  },
   status: {
     type: String,
     default: emailType.DEFAULT
@@ -48,11 +56,6 @@ const EmailSchema = new mongoose.Schema({
   hasRead: {
     type: Boolean,
     default: false
-  },
-  createdDate: {
-    type: Number,
-    required: false,
-    default: Date.now
   },
   meta: {
     type: Object

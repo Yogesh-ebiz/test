@@ -72,6 +72,7 @@ async function compose(form, companyId) {
 
   // let company = await companyService.findByCompanyId(companyId)
 
+  let sentDate = Date.now();
   let threadId = new ObjectID;
   form.threadId = threadId;
   result.threadId = threadId;
@@ -85,6 +86,7 @@ async function compose(form, companyId) {
         if (!contact.email) {
 
         }
+        nMail.sentDate = sentDate;
         nMail.to = [contact];
         let token;
         if (jobLink) {
@@ -208,6 +210,7 @@ async function compose(form, companyId) {
       }
     }
   } else{
+    form.sentDate = sentDate;
     email = await new Email(form).save();
     if(email) {
       result.emails.push(email._id);
