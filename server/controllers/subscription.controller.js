@@ -18,6 +18,7 @@ module.exports = {
   updateSubscription,
   cancelSubscription,
   activateSubscription,
+  updateSubscriptionPaymentMethod,
   deleteSubscription
 }
 
@@ -198,3 +199,26 @@ async function deleteSubscription(currentUserId, companyId, id) {
   return subscription;
 }
 
+
+
+async function updateSubscriptionPaymentMethod(currentUserId, id, form) {
+  if(!currentUserId || !id || !form){
+    return null;
+  }
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
+  if(!member){
+    return null;
+  }
+
+  let subscription = null;
+  try {
+    let company = await companyService.findByCompanyId(parseInt(form.company));
+    if(company && company.talentSubscription==id) {
+      await paymentService.updateSubscriptionPaymentMethod(id, form);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return subscription;
+}

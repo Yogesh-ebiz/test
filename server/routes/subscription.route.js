@@ -16,6 +16,7 @@ router.route('/:id').get(asyncHandler(getSubscriptionById));
 router.route('/:id').put(asyncHandler(updateSubscription));
 router.route('/:id/cancel').post(asyncHandler(cancelSubscription));
 router.route('/:id').delete(asyncHandler(deleteSubscription));
+router.route('/:id/payment/update').post(asyncHandler(updateSubscriptionPaymentMethod));
 
 
 
@@ -90,3 +91,13 @@ async function deleteSubscription(req, res) {
   res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
 }
 
+
+async function updateSubscriptionPaymentMethod(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let subscription = req.body;
+  let data = await subscriptionCtl.updateSubscriptionPaymentMethod(currentUserId, id, subscription);
+
+  res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
+}
