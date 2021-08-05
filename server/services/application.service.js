@@ -1301,7 +1301,8 @@ async function searchEmails(applicationId, sort) {
         // body: '$emails.body',
         status: '$emails.status',
         hasSent: '$emails.hasSent',
-        hasRead: '$emails.hasRend'
+        hasRead: '$emails.hasRend',
+        sentDate: '$emails.sentDate'
       }
     }
   );
