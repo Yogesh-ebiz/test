@@ -52,6 +52,7 @@ async function addSubscription(currentUserId, form) {
   try {
     let company = await companyService.findByCompanyId(parseInt(form.company));
 
+    form.defaultPaymentMethod = form.payment.paymentMethodId;
     form.createdBy = currentUserId;
     subscription = await paymentService.addSubscription(form);
     if(subscription){
