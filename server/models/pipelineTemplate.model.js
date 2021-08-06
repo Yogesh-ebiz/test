@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 const Schema = mongoose.Schema;
+const statusEnum = require('../const/statusEnum');
+
 
 const PipelineTemplateSchema = new mongoose.Schema({
   createdAt: {
@@ -17,7 +19,11 @@ const PipelineTemplateSchema = new mongoose.Schema({
     default: Date.now
   },
   updatedBy: {
-    type: Number
+    type: Object
+  },
+  status: {
+    type: String,
+    default: statusEnum.ACTIVE
   },
   custom: {
     type: Boolean,
@@ -38,6 +44,9 @@ const PipelineTemplateSchema = new mongoose.Schema({
     type: Number
   },
   company: {
+    type: Object
+  },
+  noOfJobs: {
     type: Number
   },
   /*

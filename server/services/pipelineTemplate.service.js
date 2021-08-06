@@ -1,10 +1,13 @@
 const _ = require('lodash');
 const Joi = require('joi');
+const ObjectID = require('mongodb').ObjectID;
+
 const statusEnum = require('../const/statusEnum');
 const PipelineTemplate = require('../models/pipelineTemplate.model');
 const Stage = require('../models/stage.model');
 const {addStage} = require('../services/stage.service');
-const ObjectID = require('mongodb').ObjectID;
+const companyService = require('../services/company.service');
+
 
 const pipelineSchema = Joi.object({
   name: Joi.string().required(),
@@ -36,7 +39,9 @@ function getPipelineTemplates(company) {
     return;
   }
 
-  return PipelineTemplate.find({$or: [{company: company}, {default: true}]}).sort({default: -1});
+  return PipelineTemplate.aggregate([
+    {$match: {$or: [{company: company, status: {$ne: statusEnum.DISABLED}}, {default: true, status: {$ne: statusEnum.DISABLED}}]}}
+    ]);
 }
 
 
@@ -60,8 +65,8 @@ async function add(newPipeline) {
 
 }
 
-async function update(id, form) {
-  if(!id || !form){
+async function update(id, form, member) {
+  if(!id || !form || !member){
     return;
   }
 
@@ -75,6 +80,8 @@ async function update(id, form) {
     pipeline.stages=form.stages;
     pipeline.category=form.category;
     pipeline.department=form.department;
+    pipeline.updatedBy = member._id;
+    pipeline.updatedDate = Date.now();
     result = await pipeline.save();
   }
 
@@ -82,6 +89,32 @@ async function update(id, form) {
 
 }
 
+
+
+async function deactivate(id, member) {
+  if(!id || !member){
+    return;
+  }
+  let result = null;
+  result = await PipelineTemplate.update({_id: id}, {$set: {status: statusEnum.DISABLED, updatedBy: member._id, updatedAt: Date.now()}});
+  return {success: true};
+
+}
+
+
+async function activate(id, member) {
+  if(!id ||  !member){
+    return;
+  }
+  console.log(id)
+  let result = await PipelineTemplate.update({_id: id}, {$set: {status: statusEnum.ACTIVE, updatedBy: member._id, updatedAt: Date.now()}});
+  if(result){
+
+  }
+
+  return {success: true};
+
+}
 
 async function remove(id) {
 
@@ -114,5 +147,7 @@ module.exports = {
   add:add,
   remove:remove,
   update:update,
+  deactivate:deactivate,
+  activate:activate,
   getDefaultTemplate: getDefaultTemplate
 }

@@ -214,6 +214,8 @@ module.exports = {
   updateCompanyPipelineTemplate,
   deleteCompanyPipelineTemplate,
   getCompanyPipelineTemplate,
+  deactivateCompanyPipelineTemplate,
+  activateCompanyPipelineTemplate,
   getCompanyPipelineTemplates,
   addCompanyRole,
   getCompanyRoles,
@@ -4123,7 +4125,7 @@ async function updateCompanyPipelineTemplate(companyId, pipelineId, currentUserI
   }
   let result = null;
   try {
-    result = await pipelineTemplateService.update(pipelineId, form);
+    result = await pipelineTemplateService.update(pipelineId, form, member);
 
 
   } catch(e){
@@ -4175,6 +4177,52 @@ async function getCompanyPipelineTemplate(companyId, pipelineId, currentUserId, 
 
 }
 
+
+async function deactivateCompanyPipelineTemplate(companyId, pipelineId, currentUserId) {
+  if(!companyId || !currentUserId || !pipelineId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  let result = null;
+  try {
+    result = await pipelineTemplateService.deactivate(pipelineId, member);
+
+
+  } catch(e){
+    console.log('updateCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function activateCompanyPipelineTemplate(companyId, pipelineId, currentUserId) {
+  if(!companyId || !currentUserId || !pipelineId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  let result = null;
+  try {
+    result = await pipelineTemplateService.activate(pipelineId, member);
+
+
+  } catch(e){
+    console.log('updateCompanyPipeline: Error', e);
+  }
+
+
+  return result
+}
+
 async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
 
   if(!companyId || !currentUserId){
@@ -4186,8 +4234,11 @@ async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
     return null;
   }
 
-  let result = await pipelineTemplateService.getPipelineTemplates(companyId);
-
+  let result = [];
+  let company = await companyService.findByCompanyId(companyId);
+  if(company) {
+    result = await pipelineTemplateService.getPipelineTemplates(company._id);
+  }
   return result;
 
 }

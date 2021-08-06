@@ -153,6 +153,8 @@ router.route('/company/:id/pipelines').post(asyncHandler(addCompanyPipelineTempl
 router.route('/company/:id/pipelines/:pipelineId').put(asyncHandler(updateCompanyPipelineTemplate));
 router.route('/company/:id/pipelines/:pipelineId').delete(asyncHandler(deleteCompanyPipelineTemplate));
 router.route('/company/:id/pipelines/:pipelineId').get(asyncHandler(getCompanyPipelineTemplate));
+router.route('/company/:id/pipelines/:pipelineId/disable').post(asyncHandler(deactivateCompanyPipelineTemplate));
+router.route('/company/:id/pipelines/:pipelineId/enable').post(asyncHandler(activateCompanyPipelineTemplate));
 router.route('/company/:id/pipelines').get(asyncHandler(getCompanyPipelineTemplates));
 
 router.route('/company/:id/roles').post(asyncHandler(addCompanyRole));
@@ -1437,6 +1439,25 @@ async function getCompanyPipelineTemplate(req, res) {
   res.json(new Response(data, data?'pipeline_retrieved_successful':'not_found', res));
 }
 
+
+async function deactivateCompanyPipelineTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let pipelineId = ObjectID(req.params.pipelineId);
+
+  let data = await talentCtrl.deactivateCompanyPipelineTemplate(company, pipelineId, currentUserId);
+  res.json(new Response(data, data?'pipeline_updated_successful':'not_found', res));
+}
+
+
+async function activateCompanyPipelineTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let pipelineId = ObjectID(req.params.pipelineId);
+
+  let data = await talentCtrl.activateCompanyPipelineTemplate(company, pipelineId, currentUserId);
+  res.json(new Response(data, data?'pipeline_updated_successful':'not_found', res));
+}
 
 async function getCompanyPipelineTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
