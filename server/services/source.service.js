@@ -61,6 +61,7 @@ async function addSources(candidate, jobIds, member) {
   let sources = [];
   let jobs = await jobService.findJob_Ids(jobIds);
 
+  console.log(jobs)
   for(const [i, job] of jobs.entries()){
     let source = {
       job: job._id,
@@ -71,8 +72,8 @@ async function addSources(candidate, jobIds, member) {
 
     sources.push(source);
     let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.title, jobId: job._id};
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
-
+    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
+    console.log(activity)
   }
 
   await Source.insertMany(sources);

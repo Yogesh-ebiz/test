@@ -132,7 +132,6 @@ router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler
 router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
 
 router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
-router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
 
 
 router.route('/company/:id/filter/skills').get(asyncHandler(getAllCandidatesSkills));

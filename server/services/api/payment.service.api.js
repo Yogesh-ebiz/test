@@ -86,6 +86,44 @@ async function charge(userId, form) {
   return response.data;
 };
 
+async function pay(userId, form) {
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+  let response = await client.post(`/payment/pay`, form, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      let status;
+      switch (error.response.status){
+        case 400:
+          status = 400;
+          break;
+        case 500:
+          status = 500;
+          break;
+        case 502:
+          status = 500;
+          break;
+      }
+      console.log(error)
+      throw new PaymentError(status, error.response.data.message);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data;
+};
+
 async function addProduct(userId, form) {
 
   const options = {
@@ -482,6 +520,7 @@ async function getPlans() {
 module.exports = {
   addCustomer:addCustomer,
   charge:charge,
+  pay:pay,
   addProduct:addProduct,
   getAdroducts:getAdroducts,
   addPaymentMethod:addPaymentMethod,

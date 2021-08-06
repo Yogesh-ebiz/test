@@ -41,38 +41,38 @@ async function charge(member, cart) {
 
   cart = await Joi.validate(cart, cartSchema, {abortEarly: false});
 
-  let paid = await paymentApi.charge(member.userId, cart);
+  let paid = await paymentApi.pay(member.userId, cart);
   let payment;
   if(paid){
 
     let paymentMethod;
 
-    if(paid.payment_method_details.card){
-      paymentMethod = {
-        last4: paid.payment_method_details.card.last4,
-        brand: paid.payment_method_details.card.brand,
-        expMonth: paid.payment_method_details.card.exp_month,
-        expYear: paid.payment_method_details.card.exp_year,
-      }
-    }
+    // if(paid.payment_method_details.card){
+    //   paymentMethod = {
+    //     last4: paid.payment_method_details.card.last4,
+    //     brand: paid.payment_method_details.card.brand,
+    //     expMonth: paid.payment_method_details.card.exp_month,
+    //     expYear: paid.payment_method_details.card.exp_year,
+    //   }
+    // }
 
-    payment = {
-      amount: paid.amount,
-      currency: paid.currency,
-      description: paid.description?paid.description:'',
-      chargeId: paid.id,
-      meta: paid.metadata,
-      type: 'PROMOTEJOB',
-      isPaid: paid.paid,
-      receiptUrl: paid.receipt_url,
-      userId: member.userId,
-      member: member._id,
-      paymentType: paid.payment_method_details.type,
-      paymentMethod: paymentMethod,
+    // payment = {
+    //   amount: paid.amount,
+    //   currency: paid.currency,
+    //   description: paid.description?paid.description:'',
+    //   chargeId: paid.id,
+    //   meta: paid.metadata,
+    //   type: 'PROMOTEJOB',
+    //   isPaid: paid.paid,
+    //   receiptUrl: paid.receipt_url,
+    //   userId: member.userId,
+    //   member: member._id,
+    //   paymentType: paid.payment_method_details.type,
+    //   paymentMethod: paymentMethod,
+    //
+    // };
 
-    };
-
-    payment = await log(payment);
+    // payment = await log(payment);
 
   }
   return payment;
