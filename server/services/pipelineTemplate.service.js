@@ -40,7 +40,7 @@ function getPipelineTemplates(company) {
   }
 
   return PipelineTemplate.aggregate([
-    {$match: {$or: [{company: company, status: {$ne: statusEnum.DISABLED}}, {default: true, status: {$ne: statusEnum.DISABLED}}]}}
+    {$match: {$or: [{company: company}, {default: true, status: {$ne: statusEnum.DISABLED}}]}}
     ]);
 }
 
