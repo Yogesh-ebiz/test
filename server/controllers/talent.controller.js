@@ -4108,6 +4108,8 @@ async function addCompanyPipelineTemplate(companyId, currentUserId, form) {
 
   let result = null;
   try {
+    let company = await companyService.findByCompanyId(companyId);
+    form.company = company._id;
     result = await pipelineTemplateService.add(form);
 
   } catch(e){
