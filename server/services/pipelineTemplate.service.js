@@ -61,7 +61,6 @@ async function add(newPipeline) {
 }
 
 async function update(id, form) {
-
   if(!id || !form){
     return;
   }

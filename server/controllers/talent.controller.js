@@ -4121,7 +4121,6 @@ async function updateCompanyPipelineTemplate(companyId, pipelineId, currentUserI
   if(!member){
     return null;
   }
-
   let result = null;
   try {
     result = await pipelineTemplateService.update(pipelineId, form);
@@ -4165,6 +4164,11 @@ async function getCompanyPipelineTemplate(companyId, pipelineId, currentUserId, 
     return null;
   }
 
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
   let result = await pipelineTemplateService.findById(pipelineId);
 
   return result;
@@ -4174,6 +4178,11 @@ async function getCompanyPipelineTemplate(companyId, pipelineId, currentUserId, 
 async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
 
   if(!companyId || !currentUserId){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
