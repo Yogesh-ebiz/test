@@ -363,13 +363,13 @@ async function findMemberSubscribed(userId, subjectType, subjectId) {
 }
 
 
-async function findMemberSubscribedToSubjectType(userId, subjectType) {
+async function findMemberSubscribedToSubjectType(memberId, subjectType) {
 
-  if(!userId || !subjectType){
+  if(!memberId || !subjectType){
     return;
   }
 
-  let result = await MemberSubscribe.find({createdBy: userId, subjectType: subjectType});
+  let result = await MemberSubscribe.find({member: memberId, subjectType: subjectType});
   return result;
 
 }

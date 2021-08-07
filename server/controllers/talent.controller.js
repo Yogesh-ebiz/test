@@ -1606,8 +1606,13 @@ async function searchPeopleSuggestions(companyId, currentUserId, jobId, filter, 
 
 
 
-async function searchApplications(currentUserId, jobId, filter, sort, locale) {
-  if(!currentUserId || !jobId || !filter){
+async function searchApplications(companyId, currentUserId, jobId, filter, sort, locale) {
+  if(!companyId || !currentUserId || !jobId || !filter){
+    return null;
+  }
+
+  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -1615,15 +1620,16 @@ async function searchApplications(currentUserId, jobId, filter, sort, locale) {
     // let userIds = _.map(result.docs, 'user');
     // let users = await feedService.lookupUserIds(userIds);
 
-  let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
-
+  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
+  console.log(applicationSubscribed)
   result.docs.forEach(function(app){
     app.labels = [];
     app.note = [];
     app.comments = [];
-    if(_.some(subscriptions, {subjectId: ObjectID(app._id)})){
+    if(_.some(applicationSubscribed, {subjectId: ObjectID(app._id)})){
       app.hasFollowed = true;
     }
+    app.hasFollowed = _.some(applicationSubscribed, {subject: ObjectID(app._id)});
     app.user.avatar = buildCandidateUrl(app.user);
   })
 
@@ -2922,7 +2928,6 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
 
 
 async function getBoard(currentUserId, companyId, jobId, locale) {
-  console.log(currentUserId, companyId, jobId, locale)
   if(!currentUserId || !companyId || !jobId){
     return null;
   }
@@ -2934,7 +2939,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
   }
   let boardStages = [];
   let pipelineStages;
-  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
+  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
   let job = await jobService.findJob_Id(jobId, locale);
 
   let pipeline = await pipelineService.findById(job.pipeline);

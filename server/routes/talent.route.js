@@ -564,11 +564,12 @@ async function searchPeopleSuggestions(req, res) {
 
 
 async function searchApplications(req, res) {
+  let companyId = parseInt(req.params.id);
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let filter = req.body;
   let sort = req.query;
   let jobId = ObjectID(req.params.jobId);
-  let data = await talentCtrl.searchApplications(currentUserId, jobId, filter, sort, res.locale);
+  let data = await talentCtrl.searchApplications(companyId, currentUserId, jobId, filter, sort, res.locale);
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
 //
