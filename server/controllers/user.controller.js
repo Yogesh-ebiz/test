@@ -29,6 +29,9 @@ const alertEnum = require('../const/alertEnum');
 const {upload} = require('../services/aws.service');
 const feedService = require('../services/api/feed.service.api');
 const memberService = require('../services/member.service');
+const companyService = require('../services/company.service');
+const roleService = require('../services/role.service');
+
 
 const {addCompany} = require('../services/api/party.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
@@ -151,6 +154,7 @@ const partyCertificationSchema = Joi.object({
 
 module.exports = {
   sync,
+  syncCompanies,
   getUserDetail,
   uploadResume,
   getPartyExperiences,
@@ -203,6 +207,61 @@ async function sync(user) {
     console.log('sync: Error', e);
   }
 
+
+  return result;
+
+}
+
+async function syncCompanies(userId) {
+  if(!userId){
+    return null;
+  }
+
+  let result;
+  try {
+    let user = await feedService.getCurrentUser(userId);
+    let userCompanies = await feedService.syncUserCompanies(userId);
+    if(user && userCompanies.length) {
+      let companies = await companyService.findByCompanyIds(_.map(userCompanies, 'id'), false);
+      let members = await memberService.findAllByUserId(userId);
+      let role = await roleService.getAdminRole();
+      for (const [i, comp] of userCompanies.entries()) {
+        let company = _.find(companies, {companyId: comp.id});
+        if(!company){
+          let newCompany = {
+            name: comp.name,
+            companyId: comp.id,
+            createdBy: currentParty.id,
+            email:currentParty.primaryEmail?user.primaryEmail.value:'',
+            primaryAddress: {address1: comp.primaryAddress.address1, address2: comp.primaryAddress.address2, district: comp.primaryAddress.district, city: comp.primaryAddress.city, state: comp.primaryAddress.state, country: comp.primaryAddress.country }
+          }
+          company = await companyService.add(newCompany);
+        }
+
+        let member = _.find(members, {company: comp.id, userId: userId});
+        if(!member){
+          member = await memberService.addMember({
+            createdBy: user.id,
+            company: comp.id,
+            userId: user.id,
+            firstName: user.firstName,
+            middleName: user.middleName,
+            lastName: user.lastName,
+            email: user.primaryEmail.value,
+            phone: user.primaryPhone?user.primaryPhone.value:'',
+            role: role
+          });
+
+          console.log(member)
+
+        }
+
+      }
+    }
+
+  } catch(e){
+    console.log('syncCompanies: Error', e);
+  }
 
   return result;
 

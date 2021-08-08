@@ -22,8 +22,9 @@ const memberSchema = Joi.object({
   timezone: Joi.string().allow('').optional(),
   preferTimeFormat: Joi.string().allow('').optional(),
   currency: Joi.string().allow('').optional(),
-  userId: Joi.number(),
-  role: Joi.object().optional()
+  userId: Joi.number().required(),
+  role: Joi.object().required(),
+  avatar: Joi.string().optional()
 });
 
 const subscriptionSchema = Joi.object({
@@ -54,6 +55,7 @@ async function sync(user) {
     form.phone= user.primaryPhone.value;
   }
 
+  console.log(form)
   await Member.updateMany({userId: user.id}, {$set: form});
 }
 
@@ -68,14 +70,24 @@ async function findById(id) {
 }
 
 
-async function findByUserId(company, id) {
+async function findByUserId(userId) {
   let data = null;
 
-  if(!company || !id){
+  if(!userId){
     return;
   }
 
-  return Member.findOne({company: company, userId: id}).populate('role');
+  return Member.findOne({userId: userId}).populate('role');
+}
+
+async function findAllByUserId(userId) {
+  let data = null;
+
+  if(!userId){
+    return;
+  }
+
+  return Member.find({userId: userId}).populate('role');
 }
 
 async function inviteMembers(company, currentUserId, emails, role) {
@@ -177,7 +189,7 @@ async function findMemberByUserId(userId) {
 }
 
 
-async function findMemberByUserIdAndCompany(userId, company) {
+async function findByUserIdAndCompany(userId, company) {
   let data = null;
 
   if(!userId || !company){
@@ -641,8 +653,8 @@ async function searchCompanyByUserId(userId, filter, sort) {
 
 module.exports = {
   sync:sync,
-  findById:findById,
   findByUserId:findByUserId,
+  findAllByUserId:findAllByUserId,
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   cancelMemberInvitation:cancelMemberInvitation,
@@ -650,7 +662,7 @@ module.exports = {
   searchMembers:searchMembers,
   findMemberBy_Id:findMemberBy_Id,
   findMemberByUserId:findMemberByUserId,
-  findMemberByUserIdAndCompany:findMemberByUserIdAndCompany,
+  findByUserIdAndCompany:findByUserIdAndCompany,
   addMember:addMember,
   addMemberFromInvitation:addMemberFromInvitation,
   updateMember:updateMember,

@@ -91,7 +91,7 @@ async function addPeopleToBlacklist(currentUserId, flag) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, flag.companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, flag.companyId);
 
   if(!member){
     return null;
@@ -126,7 +126,7 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -156,7 +156,7 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;

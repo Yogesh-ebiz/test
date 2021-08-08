@@ -321,7 +321,7 @@ async function getSubscriptions(companyId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -363,7 +363,7 @@ async function getInmailCredits(companyId, currentUserId) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -382,7 +382,7 @@ async function getTaxAndFee(companyId, currentUserId) {
   }
 
 
-  // let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  // let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   //
   // if(!member){
   //   return null;
@@ -619,7 +619,7 @@ async function getStats(currentUserId, companyId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -727,7 +727,7 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -766,7 +766,7 @@ async function addPaymentMethod(companyId, currentUserId, card) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -808,7 +808,7 @@ async function getCards(companyId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -829,7 +829,7 @@ async function removeCard(companyId, currentUserId, cardId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -898,7 +898,7 @@ async function createJob(companyId, currentUserId, job) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return;
   }
@@ -921,7 +921,7 @@ async function updateJob(companyId, currentUserId, jobId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -939,7 +939,7 @@ async function closeJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -957,7 +957,7 @@ async function archiveJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -975,7 +975,7 @@ async function unarchiveJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -992,7 +992,7 @@ async function deleteJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1041,7 +1041,7 @@ async function addJobComment(currentUserId, jobId, comment) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1075,7 +1075,7 @@ async function deleteJobComment(currentUserId, jobId, commentId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1103,7 +1103,7 @@ async function updateJobComment(currentUserId, jobId, commentId, comment) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1137,7 +1137,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1209,7 +1209,7 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
 
   form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1235,7 +1235,7 @@ async function getJobPipeline(companyId, jobId, currentUserId) {
 
   let result = null;
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1272,7 +1272,7 @@ async function updateJobMembers(companyId, currentUserId, jobId, members) {
   }
 
   let result = null;
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1296,7 +1296,7 @@ async function updateJobApplicationForm(companyId, currentUserId, jobId, form) {
   }
 
   let result = null;
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1337,7 +1337,7 @@ async function publishJob(companyId, currentUserId, jobId, type) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1365,7 +1365,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1545,7 +1545,7 @@ async function getJobActivities(companyId, currentUserId, jobId, filter) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1578,7 +1578,7 @@ async function searchPeopleSuggestions(companyId, currentUserId, jobId, filter, 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1611,7 +1611,7 @@ async function searchApplications(companyId, currentUserId, jobId, filter, sort,
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1646,7 +1646,7 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1676,7 +1676,7 @@ async function removeSources(companyId, currentUserId, sourceIds) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1698,7 +1698,7 @@ async function addSourceApplication(companyId, currentUserId, jobId, sourceId, a
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1737,7 +1737,7 @@ async function searchCampaigns(companyId, currentUserId, jobId, filter, sort, lo
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1781,7 +1781,7 @@ async function addApplication(companyId, currentUserId, application ) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -1829,7 +1829,7 @@ async function getAllApplicationsEndingSoon(companyId, currentUserId, sort, loca
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1849,7 +1849,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -1989,7 +1989,7 @@ async function rejectApplication(companyId, currentUserId, jobId, applicationId,
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2022,7 +2022,7 @@ async function updateApplication(companyId, currentUserId, jobId, applicationId,
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2054,7 +2054,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2143,7 +2143,7 @@ async function getApplicationProgress(companyId, currentUserId, applicationId, p
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2247,7 +2247,7 @@ async function getApplicationQuestions(companyId, currentUserId, applicationId) 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2296,7 +2296,7 @@ async function getApplicationLabels(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2330,7 +2330,7 @@ async function addApplicationLabel(companyId, currentUserId, applicationId, labe
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2370,7 +2370,7 @@ async function deleteApplicationLabel(companyId, currentUserId, applicationId, l
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2404,7 +2404,7 @@ async function getApplicationComments(companyId, currentUserId, applicationId, f
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2438,7 +2438,7 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2466,7 +2466,7 @@ async function deleteApplicationComment(companyId, currentUserId, applicationId,
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2521,7 +2521,7 @@ async function getEvaluationById(companyId, currentUserId, evaluationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2544,7 +2544,7 @@ async function getApplicationEvaluations(companyId, currentUserId, candidateId, 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2577,7 +2577,7 @@ async function searchApplicationEmails(currentUserId, companyId, applicationId, 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -2598,7 +2598,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2661,7 +2661,7 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2684,7 +2684,7 @@ async function updateApplicationProgressEvent(companyId, currentUserId, applicat
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2706,7 +2706,7 @@ async function removeApplicationProgressEvent(companyId, currentUserId, applicat
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2728,7 +2728,7 @@ async function disqualifyApplication(companyId, currentUserId, applicationId, di
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2752,7 +2752,7 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2777,7 +2777,7 @@ async function deleteApplication(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2802,7 +2802,7 @@ async function acceptApplication(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2826,7 +2826,7 @@ async function rejectApplication(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2850,7 +2850,7 @@ async function subscribeApplication(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2876,7 +2876,7 @@ async function unsubscribeApplication(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2900,7 +2900,7 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -2933,7 +2933,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3168,7 +3168,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -3193,7 +3193,7 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -3266,7 +3266,7 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -3310,7 +3310,7 @@ async function removeCandidateById(currentUserId, companyId, candidateId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -3332,7 +3332,7 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3373,7 +3373,7 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3396,7 +3396,7 @@ async function getCandidateEvaluationById(companyId, currentUserId, evaluationId
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3419,7 +3419,7 @@ async function getCandidatesSimilar(companyId, currentUserId, candidateId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3443,7 +3443,7 @@ async function getCandidateActivities(companyId, currentUserId, userId, sort) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3469,7 +3469,7 @@ async function uploadAvatar(companyId, currentUserId, candidateId, files) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3524,7 +3524,7 @@ async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3580,7 +3580,7 @@ async function getAllCandidatesSkills(companyId, currentUserId, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3606,7 +3606,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3651,7 +3651,7 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3682,7 +3682,7 @@ async function addCandidateSource(companyId, currentUserId, userId, sources) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3728,7 +3728,7 @@ async function removeCandidateSource(companyId, currentUserId, candidateId, sour
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3759,7 +3759,7 @@ async function updateCandidatePool(companyId, currentUserId, candidateId, poolId
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -3818,7 +3818,7 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -3890,7 +3890,7 @@ async function getPeopleFlagged(companyId, currentUserId, sort) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   let result;
   if(!member){
@@ -3917,7 +3917,7 @@ async function addCompanyDepartment(companyId, currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3942,7 +3942,7 @@ async function updateCompanyDepartment(companyId, departmentId, currentUserId, f
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -3973,7 +3973,7 @@ async function deleteCompanyDepartment(companyId, departmentId, currentUserId) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4019,7 +4019,7 @@ async function addCompanyQuestionTemplate(companyId, currentUserId, form) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4044,7 +4044,7 @@ async function updateCompanyQuestionTemplate(companyId, questionId, currentUserI
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4067,7 +4067,7 @@ async function deleteCompanyQuestionTemplate(companyId, questionId, currentUserI
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4106,7 +4106,7 @@ async function addCompanyPipelineTemplate(companyId, currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4130,7 +4130,7 @@ async function updateCompanyPipelineTemplate(companyId, pipelineId, currentUserI
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4152,7 +4152,7 @@ async function deleteCompanyPipelineTemplate(companyId, pipelineId, currentUserI
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4177,7 +4177,7 @@ async function getCompanyPipelineTemplate(companyId, pipelineId, currentUserId, 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4194,7 +4194,7 @@ async function deactivateCompanyPipelineTemplate(companyId, pipelineId, currentU
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4217,7 +4217,7 @@ async function activateCompanyPipelineTemplate(companyId, pipelineId, currentUse
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4240,7 +4240,7 @@ async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4263,7 +4263,7 @@ async function addCompanyRole(companyId, currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4286,7 +4286,7 @@ async function updateCompanyRole(companyId, roleId, currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4316,7 +4316,7 @@ async function deleteCompanyRole(companyId, roleId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4349,7 +4349,7 @@ async function getCompanyRoles(companyId, currentUserId, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4368,7 +4368,7 @@ async function addCompanyLabel(companyId, currentUserId, form) {
   if(!companyId || !currentUserId || !form){
     return null;
   }
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4394,7 +4394,7 @@ async function updateCompanyLabel(companyId, labelId, currentUserId, form) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4422,7 +4422,7 @@ async function deleteCompanyLabel(companyId, labelId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4477,7 +4477,7 @@ async function getCompanyMemberInvitations(companyId, currentUserId, query) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4498,7 +4498,7 @@ async function cancelMemberInvitation(companyId, currentUserId, invitationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4517,7 +4517,7 @@ async function getCompanyMembers(companyId, query, currentUserId, locale) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4565,7 +4565,7 @@ async function getCompanyMember(companyId, memberId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4573,18 +4573,15 @@ async function getCompanyMember(companyId, memberId, currentUserId) {
   let result = null;
   try {
     if(isNaN(memberId)){
-      result = await memberService.findById(memberId);
-    } else {
-      result = await memberService.findByUserId(companyId, parseInt(memberId));
+      member = await memberService.findById(memberId);
     }
-
 
   } catch(e){
     console.log('updateCompanyMember: Error', e);
   }
 
 
-  return result
+  return member
 }
 
 
@@ -4594,7 +4591,7 @@ async function updateCompanyMember(companyId, memberId, currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4616,7 +4613,7 @@ async function updateCompanyMemberRole(companyId, memberId, currentUserId, role)
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4640,7 +4637,7 @@ async function deleteCompanyMember(companyId, memberId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4668,7 +4665,7 @@ async function getJobsSubscribed(companyId, currentUserId, sort) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4702,7 +4699,7 @@ async function getApplicationsSubscribed(companyId, currentUserId, sort) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4731,7 +4728,7 @@ async function searchTasks(companyId, currentUserId, filter, sort, query) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4781,7 +4778,7 @@ async function addCompanyPool(companyId, form, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4805,7 +4802,7 @@ async function updateCompanyPool(companyId, poolId, currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -4830,7 +4827,7 @@ async function deleteCompanyPool(companyId, poolId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -4864,7 +4861,7 @@ async function getPoolCandidates(companyId, currentUserId, poolId, query, sort) 
   }
 
   let result;
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -4912,7 +4909,7 @@ async function addPoolCandidates(companyId, currentUserId, poolId, candidateIds)
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -4944,7 +4941,7 @@ async function removePoolCandidate(companyId, poolId, candidateId, currentUserId
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -4978,7 +4975,7 @@ async function removePoolCandidates(companyId, poolId, candidateIds, currentUser
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5033,7 +5030,7 @@ async function addCompanyProject(companyId, form, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5057,7 +5054,7 @@ async function updateCompanyProject(companyId, projectId, currentUserId, form) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5082,7 +5079,7 @@ async function deleteCompanyProject(companyId, projectId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5115,7 +5112,7 @@ async function getProjectCandidates(companyId, projectId, currentUserId, sort) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5171,7 +5168,7 @@ async function addProjectCandidates(companyId, projectId, candidateIds, currentU
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5214,7 +5211,7 @@ async function removeProjectCandidate(company, projectId, candidateId, currentUs
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, company);
 
   if(!member){
     return null;
@@ -5248,7 +5245,7 @@ async function removeProjectCandidates(company, projectId, candidateIds, current
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, company);
 
   if(!member){
     return null;
@@ -5285,7 +5282,7 @@ async function updateCandidateProject(company, currentUserId, candidateId, proje
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, company);
 
   if(!member){
     return null;
@@ -5345,7 +5342,7 @@ async function subscribeJob(currentUserId, companyId, jobId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5367,7 +5364,7 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5391,7 +5388,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   console.log(member)
   if(!member){
     return null;
@@ -5488,7 +5485,7 @@ async function getFiles(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5536,7 +5533,7 @@ async function addCompanyEvaluationTemplate(companyId, form, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5563,7 +5560,7 @@ async function getCompanyEvaluationTemplate(companyId, templateId, currentUserId
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5589,7 +5586,7 @@ async function updateCompanyEvaluationTemplate(companyId, templateId, currentUse
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5614,7 +5611,7 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5648,7 +5645,7 @@ async function deactivateCompanyEvaluationTemplate(companyId, templateId, curren
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5671,7 +5668,7 @@ async function activateCompanyEvaluationTemplate(companyId, templateId, currentU
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5694,7 +5691,7 @@ async function getEvaluationFilters(companyId, currentUserId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5737,7 +5734,7 @@ async function addCompanyEmailTemplate(companyId, form, currentUserId) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5763,7 +5760,7 @@ async function updateCompanyEmailTemplate(companyId, templateId, currentUserId, 
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5788,7 +5785,7 @@ async function deleteCompanyEmailTemplate(companyId, templateId, currentUserId) 
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
     return null;
@@ -5818,7 +5815,7 @@ async function deactivateCompanyEmailTemplate(companyId, templateId, currentUser
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5841,7 +5838,7 @@ async function activateCompanyEmailTemplate(companyId, templateId, currentUserId
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -5863,7 +5860,7 @@ async function searchContacts(companyId, currentUserId, query) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }

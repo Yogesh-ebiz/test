@@ -44,13 +44,39 @@ async function registerCompany(userId, company){
   return response.data.data;
 };
 
-async function getUserCompaniesCreated(userId){
+
+
+async function syncUserCompanies(userId){
+  if(!userId){
+    return null;
+  }
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.get(`/user/${userId}/company/managed?roles=ROLE_OWNER,ROLE_ADMIN`, null, options);
+  return response.data.data;
+};
+
+async function getUserCompaniesOwned(userId){
   if(!userId){
     return null;
   }
 
 
-  let response = await client.get(`/user/${userId}/company/created`, null, null);
+  let response = await client.get(`/user/${userId}/company/owned`, null, null);
+  return response.data.data;
+};
+
+async function getUserCompaniesHasAdminRole(userId){
+  if(!userId){
+    return null;
+  }
+
+
+  let response = await client.get(`/user/${userId}/company/hasAdminRole`, null, null);
   return response.data.data;
 };
 
@@ -61,6 +87,23 @@ async function findUserById(id) {
     user = response.data.data;
   } catch(error) {
     console.log("findUserById: error", error);
+  }
+  return user;
+};
+
+
+async function getCurrentUser(id) {
+  let user = null;
+
+  const options = {
+    headers: {'userId': id}
+  };
+
+  try {
+    let response = await client.get(`/user/current`, options);
+    user = response.data.data;
+  } catch(error) {
+    console.log("findUserByIdFull: error", error);
   }
   return user;
 };
@@ -420,9 +463,11 @@ async function updateResumeDefault(userId, id) {
 
 module.exports = {
   register:register,
+  syncUserCompanies:syncUserCompanies,
   registerCompany:registerCompany,
   createNotification:createNotification,
   createMessageThread:createMessageThread,
+  getCurrentUser:getCurrentUser,
   findByUserId: findUserById,
   findUserByIdFull:findUserByIdFull,
   findCompanyById: findCompanyById,
@@ -449,6 +494,7 @@ module.exports = {
   lookupCandidateIds:lookupCandidateIds,
   lookupContacts:lookupContacts,
   lookupCompaniesIds:lookupCompaniesIds,
+  getUserCompaniesHasAdminRole:getUserCompaniesHasAdminRole,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,
   findCategoryById:findCategoryById,

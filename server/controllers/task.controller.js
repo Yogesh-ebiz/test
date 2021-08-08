@@ -32,7 +32,7 @@ async function addTask(companyId, currentUserId, task) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -51,7 +51,7 @@ async function getTask(companyId, currentUserId, taskId) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -68,7 +68,7 @@ async function updateTask(companyId, currentUserId, taskId, task) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -86,7 +86,7 @@ async function markComplete(companyId, currentUserId, taskId) {
   }
 
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -110,7 +110,7 @@ async function removeTask(companyId, currentUserId, taskId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }

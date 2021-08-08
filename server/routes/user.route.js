@@ -11,6 +11,8 @@ module.exports = router;
 
 router.route('/search/all').get(asyncHandler(searchUsers));
 router.route('/:userId/sync').post(asyncHandler(sync));
+router.route('/:userId/company/sync').post(asyncHandler(syncCompanies));
+
 router.route('/:userId/detail').get(asyncHandler(getUserDetail));
 router.route('/:userId/resumes/upload').post(asyncHandler(uploadResume));
 router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
@@ -74,6 +76,14 @@ async function sync(req, res) {
   let data = await userCtl.sync(user);
   res.json(new Response(data, data?'user_synced_successful':'not_found', res));
 }
+
+
+async function syncCompanies(req, res) {
+  let userId = parseInt(req.params.userId);
+  let data = await userCtl.syncCompanies(userId);
+  res.json(new Response(data, data?'user_synced_successful':'not_found', res));
+}
+
 
 async function getUserDetail(req, res) {
 

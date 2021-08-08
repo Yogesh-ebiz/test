@@ -22,6 +22,14 @@ const roleService = require('../services/role.service');
 
 const companySchema = Joi.object({
   name: Joi.string(),
+  companyId: Joi.number(),
+  createdBy: Joi.number(),
+  email: Joi.string(),
+  primaryAddress: Joi.object()
+});
+
+const feedCompanySchema = Joi.object({
+  name: Joi.string(),
   legalName: Joi.string(),
   about: Joi.string().allow(''),
   mission: Joi.string().allow(''),
@@ -34,7 +42,23 @@ const companySchema = Joi.object({
   primaryAddress: Joi.object()
 });
 
+async function add(newCompany) {
 
+  if(!newCompany){
+    return;
+  }
+  let company = null;
+  try{
+    newCompany = await Joi.validate(newCompany, companySchema, {abortEarly: false});
+    company = await new Company(newCompany).save();
+  } catch (error) {
+    console.log(error);
+  }
+
+
+  return company;
+
+}
 
 async function register(currentParty, form) {
 
@@ -42,7 +66,7 @@ async function register(currentParty, form) {
     return;
   }
 
-  form = await Joi.validate(form, companySchema, {abortEarly: false});
+  form = await Joi.validate(form, feedCompanySchema, {abortEarly: false});
   let company = await feedService.registerCompany(currentParty.id, form);
   let savedCompany;
   if(company){
@@ -55,9 +79,7 @@ async function register(currentParty, form) {
       primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
     }).save();
 
-    console.log('new', savedCompany)
     let role = await roleService.getRoleByRole(roleType.ADMIN);
-    console.log('role', role)
 
     let member = {
       createdBy: currentParty.id,
@@ -717,6 +739,7 @@ function addCompanyReviewReport(report) {
 
 
 module.exports = {
+  add:add,
   register:register,
   findById:findById,
   findByCompanyId:findByCompanyId,

@@ -43,7 +43,7 @@ async function addSubscription(currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
 
   if(!member){
     return null;
@@ -104,7 +104,7 @@ async function updateSubscription(currentUserId, id, form) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
 
   if(!member){
     return null;
@@ -130,7 +130,7 @@ async function cancelSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
   if(!member){
     return null;
   }
@@ -154,7 +154,7 @@ async function activateSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
   if(!member){
     return null;
   }
@@ -178,7 +178,7 @@ async function deleteSubscription(currentUserId, companyId, id) {
   if(!currentUserId || !companyId || !id){
     return null;
   }
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
@@ -205,7 +205,7 @@ async function updateSubscriptionPaymentMethod(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
   if(!member){
     return null;
   }
