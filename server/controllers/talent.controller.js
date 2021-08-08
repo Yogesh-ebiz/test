@@ -370,8 +370,9 @@ async function getInmailCredits(companyId, currentUserId) {
     return null;
   }
 
+  let company = await companyService.findByCompanyId(companyId);
 
-  return {credit: 25};
+  return {credit: company.credit};
 
 }
 
