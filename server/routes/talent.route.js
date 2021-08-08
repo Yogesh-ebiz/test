@@ -1019,6 +1019,7 @@ async function updateJobPipeline(req, res) {
   let companyId = parseInt(req.params.id);
   let jobId = ObjectID(req.params.jobId);
   let pipeline = req.body;
+  pipeline.pipelineTemplateId = ObjectID(pipeline.pipelineTemplateId);
 
   let data = await talentCtrl.updateJobPipeline(companyId, jobId, currentUserId, pipeline);
   res.json(new Response(data, data?'job_pipeline_updated_successful':'not_found', res));

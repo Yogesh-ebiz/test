@@ -8,7 +8,7 @@ const PipelineSchema = new mongoose.Schema({
     type: Number
   },
   pipelineTemplateId: {
-    type: String,
+    type: Object,
     required: true
   },
   jobId: {

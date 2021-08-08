@@ -13,7 +13,7 @@ const pipelineSchema = Joi.object({
   name: Joi.string().allow('').optional(),
   createdBy: Joi.number().required(),
   jobId: Joi.object().optional(),
-  pipelineTemplateId: Joi.string().required(),
+  pipelineTemplateId: Joi.object().required(),
   stages: Joi.array().required(),
   autoRejectBlackList: Joi.boolean().optional(),
   custom: Joi.boolean().optional(),

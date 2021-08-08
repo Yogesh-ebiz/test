@@ -21,29 +21,6 @@ const pipelineSchema = Joi.object({
   custom: Joi.boolean().optional()
 });
 
-function findById(id) {
-  let data = null;
-
-  if(!id){
-    return;
-  }
-
-  return PipelineTemplate.findById(id);
-}
-
-
-function getPipelineTemplates(company) {
-  let data = null;
-
-  if(!company){
-    return;
-  }
-
-  return PipelineTemplate.aggregate([
-    {$match: {$or: [{company: company}, {default: true, status: {$ne: statusEnum.DISABLED}}]}}
-    ]);
-}
-
 
 async function add(newPipeline) {
   let data = null;
@@ -64,6 +41,52 @@ async function add(newPipeline) {
   return newPipeline;
 
 }
+
+function findById(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  return PipelineTemplate.findById(id);
+}
+
+
+function getPipelineTemplates(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  return PipelineTemplate.aggregate([
+    {$match: {$or: [{company: company}, {default: true, status: {$ne: statusEnum.DISABLED}}]}},
+    // {$lookup:{
+    //     from:"pipelines",
+    //     let:{pipelineTemplateId: '$_id', company: '$company'},
+    //     pipeline:[
+    //       {$match:{$expr:{$eq:["$$pipelineTemplateId","$pipelineTemplateId"]}}},
+    //       {$lookup:{
+    //           from:"jobrequisitions",
+    //           let:{pipeline: '$_id'},
+    //           pipeline:[
+    //             {$match:{$expr:{$eq:["$$ROOT.company","$company"]}}},
+    //           ],
+    //           as: 'jobs'
+    //         }},
+    //     ],
+    //     as: 'pipeline'
+    //   }
+    // },
+    // {
+    //   // $addFields: { pipeline: '$pipeline'}
+    //   $addFields: { jobs: '$pipeline.jobs'}
+    // }
+    ]);
+}
+
+
 
 async function update(id, form, member) {
   if(!id || !form || !member){
@@ -142,9 +165,9 @@ async function getDefaultTemplate() {
 
 
 module.exports = {
+  add:add,
   findById:findById,
   getPipelineTemplates:getPipelineTemplates,
-  add:add,
   remove:remove,
   update:update,
   deactivate:deactivate,

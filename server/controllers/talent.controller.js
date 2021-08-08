@@ -89,9 +89,10 @@ const departmentSchema = Joi.object({
 });
 
 const pipelineSchema = Joi.object({
-  pipelineTemplateId: Joi.string().required(),
+  pipelineTemplateId: Joi.object().required(),
   stages: Joi.array().required(),
-  autoRejectBlackList: Joi.boolean().optional()
+  autoRejectBlackList: Joi.boolean().optional(),
+  stageMigration: Joi.array()
 });
 
 const roleSchema = Joi.object({
@@ -1209,6 +1210,7 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
 
   form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
 
+
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
   if(!member){
@@ -1217,6 +1219,7 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
 
   let result = null;
   try {
+
     result = await jobService.updateJobPipeline(jobId, form, currentUserId);
 
   } catch(e){

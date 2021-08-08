@@ -21,6 +21,7 @@ const feedService = require('../services/api/feed.service.api');
 const activityService = require('../services/activity.service');
 const labelService = require('../services/label.service');
 const companyService = require('../services/company.service');
+const applicationProgressService = require('../services/applicationprogress.service');
 
 let SearchParam = require('../const/searchParam');
 
@@ -333,13 +334,16 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
       }
     } else {
 
-      if(job.pipeline.pipelineTemplateId===form.pipelineTemplateId){
-        for([i, stage] of job.pipeline.stages.entries()){
+      let stageMigration = form.stageMigration;
+      delete form.stageMigration;
+
+      if(job.pipeline.pipelineTemplateId.equals(form.pipelineTemplateId)) {
+        for ([i, stage] of job.pipeline.stages.entries()) {
 
           let foundStage = _.find(form.stages, {_id: stage._id.toString()});
-          if(foundStage){
+          if (foundStage) {
             stage.timeLimit = foundStage.timeLimit;
-            if(foundStage.tasks.length){
+            if (foundStage.tasks.length) {
               // for([j, task] of stage.tasks.entries()){
               //   let foundTask = _.find(foundStage.tasks, {type: task.type});
               //   if(foundTask){
@@ -357,7 +361,8 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
         job.pipeline.autoRejectBlackList = form.autoRejectBlackList;
         pipeline = job.pipeline.save();
 
-      } else if(job.status == statusEnum.DRAFT) {
+        // } else if(job.status == statusEnum.DRAFT) {
+      } else {
         for(let [i, stages] in job.pipeline.stages.entries()){
           if(!stage.default){
             await stages.delete();
@@ -368,14 +373,18 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
           job.pipeline.delete();
         }
 
-
         form.createdBy = currentUserId
         form.jobId = job._id;
         pipeline = await pipelineService.addPipeline(jobId, form);
+        let oldPipeline = job.pipeline;
 
         if (pipeline) {
           job.pipeline = pipeline._id;
           await job.save();
+        }
+
+        for(let [i, stage] of stageMigration.entries()){
+          await applicationProgressService.updateApplicationProgressStage(oldPipeline.stages[stage.old]._id, pipeline.stages[stage.new]);
         }
       }
 

@@ -117,6 +117,17 @@ function removeApplicationProgressEvent(applicationProgress_Id) {
 }
 
 
+function updateApplicationProgressStage(oldStage, newStage) {
+  let data = null;
+
+  if(!oldStage || !newStage){
+    return;
+  }
+
+  return ApplicationProgress.updateMany({stage: oldStage}, { $set: {stage: newStage} });
+}
+
+
 module.exports = {
   findById:findById,
   findApplicationProgresssById: findApplicationProgresssById,
@@ -126,6 +137,6 @@ module.exports = {
   getApplicationProgressEvaluations:getApplicationProgressEvaluations,
   addApplicationProgressEvaluation:addApplicationProgressEvaluation,
   updateApplicationProgressEvent:updateApplicationProgressEvent,
-  removeApplicationProgressEvent:removeApplicationProgressEvent
-
+  removeApplicationProgressEvent:removeApplicationProgressEvent,
+  updateApplicationProgressStage:updateApplicationProgressStage
 }
