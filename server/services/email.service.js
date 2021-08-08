@@ -13,6 +13,7 @@ const sourceService = require('../services/source.service');
 const activityService = require('../services/activity.service');
 const jobService = require('../services/jobrequisition.service');
 const candidateService = require('../services/candidate.service');
+const companyService = require('../services/company.service');
 
 const feedService = require('../services/api/feed.service.api');
 
@@ -48,12 +49,19 @@ async function compose(form, companyId) {
   let email, inmailCredit = 0;
   let result = {threadId: null, emails: []};
 
+  let company = await companyService.findByCompanyId(companyId);
+
   let contacts = _.reduce(form.to, function(res, contact){
     if(!contact.email){
       res.push(contact.id)
+      inmailCredit++;
     }
     return res;
   }, []);
+
+  if(inmailCredit>company.credit){
+    result = {success: false, message: "Only " + company.credit + " remains"}
+  }
 
   contacts = await feedService.lookupContacts(contacts, 'EMAIL_ADDRESS');
 
@@ -63,15 +71,12 @@ async function compose(form, companyId) {
       let found = _.find(contacts, {id: contact.id});
       if(found){
         contact.email = found.value;
-        inmailCredit++;
       }
     }
     res.push(contact);
     return res;
   }, []);
-
-  // let company = await companyService.findByCompanyId(companyId)
-
+  
   let sentDate = Date.now();
   let threadId = new ObjectID;
   form.threadId = threadId;
@@ -105,7 +110,7 @@ async function compose(form, companyId) {
 
               if (contact.id && !contact.candidateId) {
                 candidate = await candidateService.findByUserIdAndCompanyId(contact.id, companyId);
-                console.log(contact.id, companyId, candidate);
+                // console.log(contact.id, companyId, candidate);
                 if (!candidate) {
                   let user = await feedService.findCandidateById(contact.id);
                   if (user) {
@@ -143,7 +148,6 @@ async function compose(form, companyId) {
               campaign.userId = candidate.userId;
               campaign = await emailCampaignService.add(campaign);
 
-              console.log('source', source)
               if (!source) {
                 source = {
                   job: ObjectID(form.meta.jobId),
@@ -227,6 +231,8 @@ async function compose(form, companyId) {
     }
   }
 
+  company.credit = company.credit - inmailCredit;
+  await company.save();
 
   return result;
 
