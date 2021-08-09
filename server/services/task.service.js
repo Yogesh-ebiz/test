@@ -116,8 +116,9 @@ async function getTasksDueSoon(member) {
     return;
   }
 
+  let today = Date.now();
   let tasks = await Task.aggregate([
-    {$match: {members: member._id} },
+    {$match: {members: member._id, status: {$ne: statusEnum.COMPLETED}, endDate: {$gt: today}} },
     {$sort: {endDate: 1}},
     {$limit: 5}
   ]);
