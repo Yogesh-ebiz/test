@@ -125,19 +125,21 @@ async function update(id, form, member) {
       for (let [i, stage] of pipeline.stages.entries()) {
         let existStage = _.find(template.stages, {type: stage.type});
         if (!existStage) {
-          await existStage.delete();
-          pipeline.stages.split(i, 1);
+          await stage.delete();
+          pipeline.stages.splice(i, 1);
         }
       }
 
       for (let [i, stage] of template.stages.entries()) {
-        let currentStage = _.find(pipeline.stages, {type: stage.type});
-        if (currentStage) {
-          newStages.push(currentStage._id)
-          console.log(i, 'exist', currentStage.name, stage.type);
+        let existStage = _.find(pipeline.stages, {type: stage.type});
+        if (existStage) {
+          newStages.push(existStage._id)
+          console.log(i, 'exist', stage.name, stage.type);
         } else {
           console.log(i, 'not exist', stage.name, stage.type)
-          let newStage = await stageService.addStage()
+          stage._id = new ObjectID();
+          let newStage = await stageService.addStage(stage);
+          newStages.push(newStage._id);
         }
       }
     }

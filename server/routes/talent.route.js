@@ -1960,10 +1960,10 @@ async function getFiles(req, res) {
 async function getCompanyEvaluationTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let query = req.query.query;
+  let filter = req.query;
+  filter.all = filter.all=='true'?true:false;
 
-
-  let data = await talentCtrl.getCompanyEvaluationTemplates(company, query, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyEvaluationTemplates(company, filter, currentUserId, res.locale);
   res.json(new Response(data, data?'evaluations_retrieved_successful':'not_found', res));
 }
 

@@ -36,19 +36,38 @@ function findById(id) {
     return;
   }
 
-  console.log(id)
   return EvaluationTemplate.findById(id).populate('questions');
 }
 
 
-function search(company, query) {
+function search(company, filter) {
   let data = null;
 
-  if(company==null){
+  if(!company || !filter){
     return;
   }
+  let $or = [];
+  console.log(filter)
 
-  return EvaluationTemplate.find({company: company}).populate('questions');
+  if(filter.all){
+    $or.push({company: company}, {default: true, status: {$ne: statusEnum.DISABLED}});
+  } else {
+    $or.push({company: company,  status: {$ne: statusEnum.DISABLED}}, {default: true, status: {$ne: statusEnum.DISABLED}});
+  }
+
+  return EvaluationTemplate.aggregate([
+    {$match: {$or: $or}},
+    {
+      $lookup: {
+        from: 'questions',
+        localField: 'questions',
+        foreignField: '_id',
+        as: 'questions',
+      },
+    },
+    {$sort: {name: 1}}
+  ]);
+  // return EvaluationTemplate.find({company: company}).populate('questions');
 }
 
 

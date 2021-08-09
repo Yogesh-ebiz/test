@@ -135,6 +135,16 @@ async function findByPipelineTemplateId(templateId) {
   return data;
 }
 
+async function findAllByPipelineTemplateId(templateId) {
+  let data = null;
+
+  if(!templateId){
+    return;
+  }
+
+  return Pipeline.find({pipelineTemplateId: templateId}).populate('stages');;
+}
+
 
 function findByCompany(company) {
   let data = null;
@@ -246,6 +256,7 @@ module.exports = {
   findById:findById,
   findByJobId:findByJobId,
   findByPipelineTemplateId:findByPipelineTemplateId,
+  findAllByPipelineTemplateId:findAllByPipelineTemplateId,
   findByCompany:findByCompany,
   getPipelines:getPipelines,
   addPipeline:addPipeline,

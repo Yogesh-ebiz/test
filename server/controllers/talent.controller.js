@@ -5526,14 +5526,14 @@ async function getFiles(companyId, currentUserId, applicationId) {
 
 /************************** EVALUATIONTEMPLATES *****************************/
 
-async function getCompanyEvaluationTemplates(companyId, query, currentUserId, locale) {
+async function getCompanyEvaluationTemplates(companyId, filter, currentUserId, locale) {
 
-  if(!companyId || !currentUserId){
+  if(!companyId || !currentUserId || !filter){
     return null;
   }
 
   let company = await companyService.findByCompanyId(companyId);
-  let result = await evaluationTemplateService.search(company._id);
+  let result = await evaluationTemplateService.search(company._id, filter);
 
   return result;
 
@@ -5638,7 +5638,6 @@ async function deleteCompanyEvaluationTemplate(companyId, templateId, currentUse
       if(result){
         result = {success: true};
       }
-
     }
 
 
