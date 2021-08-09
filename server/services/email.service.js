@@ -76,7 +76,7 @@ async function compose(form, companyId) {
     res.push(contact);
     return res;
   }, []);
-  
+
   let sentDate = Date.now();
   let threadId = new ObjectID;
   form.threadId = threadId;

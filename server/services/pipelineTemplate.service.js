@@ -62,27 +62,34 @@ function getPipelineTemplates(company) {
 
   return PipelineTemplate.aggregate([
     {$match: {$or: [{company: company}, {default: true, status: {$ne: statusEnum.DISABLED}}]}},
-    // {$lookup:{
-    //     from:"pipelines",
-    //     let:{pipelineTemplateId: '$_id', company: '$company'},
-    //     pipeline:[
-    //       {$match:{$expr:{$eq:["$$pipelineTemplateId","$pipelineTemplateId"]}}},
-    //       {$lookup:{
-    //           from:"jobrequisitions",
-    //           let:{pipeline: '$_id'},
-    //           pipeline:[
-    //             {$match:{$expr:{$eq:["$$ROOT.company","$company"]}}},
-    //           ],
-    //           as: 'jobs'
-    //         }},
-    //     ],
-    //     as: 'pipeline'
-    //   }
-    // },
-    // {
-    //   // $addFields: { pipeline: '$pipeline'}
-    //   $addFields: { jobs: '$pipeline.jobs'}
-    // }
+    {$lookup:{
+        from:"pipelines",
+        let:{pipelineTemplateId: '$_id', company: '$company'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$pipelineTemplateId","$pipelineTemplateId"]}}},
+          {$lookup:{
+              from:"jobrequisitions",
+              let:{pipelineId: '$_id'},
+              pipeline:[
+                {$match:
+                    {$and: [
+                        {$expr:{$eq:["$$pipelineId","$pipeline"]}},
+                        {$expr:{$eq:[company,"$company"]}}
+                      ]}
+                },
+              ],
+              as: 'noOfJobs'
+            }},
+          {
+            $addFields: {noOfJobs: {$size: '$noOfJobs'} }
+          }
+        ],
+        as: 'noOfJobs'
+      }
+    },
+    {
+      $addFields: {noOfJobs: {$sum: '$noOfJobs.noOfJobs'} }
+    }
     ]);
 }
 
