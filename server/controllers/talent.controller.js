@@ -5727,13 +5727,13 @@ async function getEvaluationFilters(companyId, currentUserId) {
 
 /************************** EMAILTEMPLATES *****************************/
 
-async function getCompanyEmailTemplates(companyId, currentUserId, query, locale)  {
+async function getCompanyEmailTemplates(companyId, currentUserId, filter, locale)  {
 
-  if(!companyId || !currentUserId){
+  if(!companyId || !currentUserId || !filter){
     return null;
   }
   let company = await companyService.findByCompanyId(companyId);
-  let result = await emailTemplateService.search(company._id);
+  let result = await emailTemplateService.search(company._id, filter);
 
   return result;
 

@@ -2051,9 +2051,9 @@ async function getEvaluationFilters(req, res) {
 async function getCompanyEmailTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let query = req.query.query;
-
-  let data = await talentCtrl.getCompanyEmailTemplates(company, currentUserId,  query, res.locale);
+  let filter = req.query;
+  filter.all = filter.all=='true'?true:false;
+  let data = await talentCtrl.getCompanyEmailTemplates(company, currentUserId,  filter, res.locale);
   res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
 }
 

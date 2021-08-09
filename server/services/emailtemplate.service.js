@@ -39,15 +39,23 @@ function findById(id) {
 }
 
 
-function search(company, query) {
+function search(company, filter) {
   let data = null;
 
-  if(company==null){
+  if(!company || !filter){
     return;
   }
+  let $or = [];
+
+  if(filter.all){
+    $or.push({company: company}, {default: true, status: {$ne: statusEnum.DISABLED}});
+  } else {
+    $or.push({company: company,  status: {$ne: statusEnum.DISABLED}}, {default: true, status: {$ne: statusEnum.DISABLED}});
+  }
+
 
   return EmailTemplate.aggregate([
-    {$match: {$or: [{company: company}, {default: true, status: {$ne: statusEnum.DISABLED}}]}},
+    {$match: {$or: $or}},
     {$sort: {name: 1}}
   ]);
 }
