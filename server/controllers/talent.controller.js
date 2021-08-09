@@ -4231,7 +4231,7 @@ async function activateCompanyPipelineTemplate(companyId, pipelineId, currentUse
 
 
   } catch(e){
-    console.log('updateCompanyPipeline: Error', e);
+    console.log('activateCompanyPipelineTemplate: Error', e);
   }
 
 

@@ -89,26 +89,26 @@ async function addJob(companyId, member, form) {
   let company = await companyService.findByCompanyId(companyId);
 
   let pipeline = await pipelineService.getDefaultTemplate();
-  console.log(pipeline);
   form.pipeline = pipeline._id;
   form.company = company._id;
   form.members = [member._id];
   form.createdBy = member._id;
 
 
-
-
+  let tags = [];
   for (let tag of form.tags) {
-    if(tag instanceof Object) {
-      tag._id = new ObjectID();
+    if(!tag._id) {
       tag.company = companyId;
       tag.type = labelType.KEYWORD;
-      tag = await labelService.addLabel(tag)
+      tag = await labelService.addLabel(tag);
+      tags.push(tag._id);
     } else {
 
-      tag = ObjectID(tag);
+      tags.push(ObjectID(tag._id));
     }
   }
+  form.tags = tags;
+
   result = await new JobRequisition(form).save();
   let subscription = {member: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subject: result._id};
   await memberService.subscribe(subscription);
@@ -159,32 +159,19 @@ async function updateJob(jobId, member, form) {
     job.allowRemote=form.allowRemote;
 
 
+    let tags = [];
     for (let tag of form.tags) {
-      if(tag instanceof Object) {
-        tag._id = new ObjectID();
-        tag.company = job.company;
+      if(!tag._id) {
+        tag.company = companyId;
         tag.type = labelType.KEYWORD;
-        tag = await labelService.addLabel(tag)
+        tag = await labelService.addLabel(tag);
+        tags.push(tag._id);
       } else {
 
-        tag = ObjectID(tag);
+        tags.push(ObjectID(tag._id));
       }
     }
-    //
-    // for(index in form.tags){
-    //   if(tag instanceof Object) {
-    //     tag._id = new ObjectID();
-    //     tag.company = companyId;
-    //     tag.type = labelType.KEYWORD;
-    //     tag = await labelService.addLabel(tag)
-    //   } else {
-    //
-    //     tag = ObjectID(form.tags[i]);
-    //   }
-    //
-    // };
-    // let tagIds = _.reduce(form.tags, function(res, tag){res.push(tag._id); return res;}, []);
-    job.tags = form.tags;
+    job.tags = tags;
 
 
 

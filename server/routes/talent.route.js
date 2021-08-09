@@ -1417,8 +1417,6 @@ async function updateCompanyPipelineTemplate(req, res) {
   let company = parseInt(req.params.id);
   let pipelineId = ObjectID(req.params.pipelineId);
   let pipeline = req.body;
-  pipeline.company = company;
-  pipeline.createdBy = currentUserId;
 
   let data = await talentCtrl.updateCompanyPipelineTemplate(company, pipelineId, currentUserId, pipeline);
   res.json(new Response(data, data?'pipeline_updated_successful':'not_found', res));

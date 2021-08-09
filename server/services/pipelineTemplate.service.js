@@ -13,10 +13,10 @@ const pipelineSchema = Joi.object({
   name: Joi.string().required(),
   department: Joi.number().optional(),
   category: Joi.string().optional(),
-  company: Joi.object(),
+  company: Joi.object().optional(),
   stages: Joi.array().required(),
-  createdBy: Joi.number(),
-  updatedBy: Joi.number(),
+  createdBy: Joi.number().optional(),
+  updatedBy: Joi.number().optional(),
   default: Joi.boolean().optional(),
   custom: Joi.boolean().optional()
 });
