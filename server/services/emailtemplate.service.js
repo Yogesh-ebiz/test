@@ -46,7 +46,10 @@ function search(company, query) {
     return;
   }
 
-  return EmailTemplate.find({company: company});
+  return EmailTemplate.aggregate([
+    {$match: {$or: [{company: company}, {default: true, status: {$ne: statusEnum.DISABLED}}]}},
+    {$sort: {name: 1}}
+  ]);
 }
 
 

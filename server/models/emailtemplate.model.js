@@ -23,6 +23,10 @@ const EmailSchema = new mongoose.Schema({
   updatedBy: {
     type: Object
   },
+  default: {
+    type: Boolean,
+    default: false
+  },
   name: {
     type: String
   },
