@@ -162,7 +162,7 @@ async function updateJob(jobId, member, form) {
     let tags = [];
     for (let tag of form.tags) {
       if(!tag._id) {
-        tag.company = companyId;
+        tag.company = member.company;
         tag.type = labelType.KEYWORD;
         tag = await labelService.addLabel(tag);
         tags.push(tag._id);
