@@ -118,29 +118,36 @@ async function update(id, form, member) {
     result = await template.save();
 
 
-    let newStages = [];
-    let pipeline = await pipelineService.findByPipelineTemplateId(result._id);
 
-    if(pipeline) {
-      for (let [i, stage] of pipeline.stages.entries()) {
-        let existStage = _.find(template.stages, {type: stage.type});
-        if (!existStage) {
-          await stage.delete();
-          pipeline.stages.splice(i, 1);
-        }
-      }
+    let allPipelines = await pipelineService.findAllByPipelineTemplateId(result._id);
+    console.log(result._id, allPipelines.length)
+    if(allPipelines.length) {
 
-      for (let [i, stage] of template.stages.entries()) {
-        let existStage = _.find(pipeline.stages, {type: stage.type});
-        if (existStage) {
-          newStages.push(existStage._id)
-          console.log(i, 'exist', stage.name, stage.type);
-        } else {
-          console.log(i, 'not exist', stage.name, stage.type)
-          stage._id = new ObjectID();
-          let newStage = await stageService.addStage(stage);
-          newStages.push(newStage._id);
+      for (let [i, pipeline] of allPipelines.entries()) {
+        let newStages = [];
+        for (let [i, stage] of pipeline.stages.entries()) {
+          let existStage = _.find(template.stages, {type: stage.type});
+          if (!existStage) {
+            await stage.delete();
+            pipeline.stages.splice(i, 1);
+          }
         }
+
+        for (let [i, stage] of template.stages.entries()) {
+          let existStage = _.find(pipeline.stages, {type: stage.type});
+          if (existStage) {
+            newStages.push(existStage._id)
+            console.log(i, 'exist', stage.name, stage.type);
+          } else {
+            console.log(i, 'not exist', stage.name, stage.type)
+            stage._id = new ObjectID();
+            let newStage = await stageService.addStage(stage);
+            newStages.push(newStage._id);
+          }
+        }
+        pipeline.stages = newStages;
+        await pipeline.save();
+
       }
     }
   }
