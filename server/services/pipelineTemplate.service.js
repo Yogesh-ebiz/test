@@ -18,7 +18,8 @@ const pipelineSchema = Joi.object({
   createdBy: Joi.number().optional(),
   updatedBy: Joi.number().optional(),
   default: Joi.boolean().optional(),
-  custom: Joi.boolean().optional()
+  custom: Joi.boolean().optional(),
+  stageMigration: Joi.array().optional()
 });
 
 
