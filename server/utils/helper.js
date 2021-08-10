@@ -55,7 +55,7 @@ const convertToTalentUser = (user) => {
     firstName: user.firstName,
     middleName: user.middleName,
     lastName: user.lastName,
-    avatar: user.avatar,
+    avatar: buildUserUrl(user),
     isOnline: user.isOnline,
     primaryEmail: primaryEmail,
     primaryPhone: primaryPhone
@@ -266,7 +266,7 @@ const skillMinimal = (job) => {
 
 
 const buildFileUrl = (file) => {
-  return config.cdn + file;
+  return config.cdn + "/" + file;
 }
 
 const buildCompanyUrl = (company) => {
@@ -276,8 +276,10 @@ const buildCompanyUrl = (company) => {
 }
 
 const buildUserUrl = (user) => {
+
   let id = user.id?user.id:user._id?user.userId:null;
   let avatar = user.avatar?user.avatar:'';
+  console.log(avatar)
   return avatar?config.cdn + '/user/' + id + '/images/' + avatar:'';
 }
 
