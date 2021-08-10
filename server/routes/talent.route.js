@@ -146,6 +146,8 @@ router.route('/company/:id/departments').get(asyncHandler(getCompanyDepartments)
 router.route('/company/:id/questions/templates').post(asyncHandler(addCompanyQuestionTemplate));
 router.route('/company/:id/questions/templates/:questionTemplateId').put(asyncHandler(updateCompanyQuestionTemplate));
 router.route('/company/:id/questions/templates/:questionTemplateId').delete(asyncHandler(deleteCompanyQuestionTemplate));
+router.route('/company/:id/questions/templates/:questionTemplateId/disable').post(asyncHandler(deactivateCompanyQuestionTemplate));
+router.route('/company/:id/questions/templates/:questionTemplateId/enable').post(asyncHandler(activateCompanyQuestionTemplate));
 router.route('/company/:id/questions/templates').get(asyncHandler(getCompanyQuestionTemplates));
 
 router.route('/company/:id/pipelines').post(asyncHandler(addCompanyPipelineTemplate));
@@ -1388,6 +1390,26 @@ async function deleteCompanyQuestionTemplate(req, res) {
 
   let data = await talentCtrl.deleteCompanyQuestionTemplate(company, questionTemplateId, currentUserId);
   res.json(new Response(data, data?'question_deleted_successful':'not_found', res));
+}
+
+
+async function deactivateCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionTemplateId = ObjectID(req.params.questionTemplateId);
+
+  let data = await talentCtrl.deactivateCompanyQuestionTemplate(company, questionTemplateId, currentUserId);
+  res.json(new Response(data, data?'question_deactivated_successful':'not_found', res));
+}
+
+
+async function activateCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionTemplateId = ObjectID(req.params.questionTemplateId);
+
+  let data = await talentCtrl.activateCompanyQuestionTemplate(company, questionTemplateId, currentUserId);
+  res.json(new Response(data, data?'question_activated_successful':'not_found', res));
 }
 
 async function getCompanyQuestionTemplates(req, res) {

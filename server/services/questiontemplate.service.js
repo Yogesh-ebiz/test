@@ -146,9 +146,39 @@ async function deleteQuestionTemplate(questionTemplateId) {
 
 }
 
+
+async function deactivate(id, member) {
+  if(!id || !member){
+    return;
+  }
+
+  let result = null;
+
+  result = await QuestionTemplate.update({_id: id}, {$set: {status: statusEnum.DISABLED, updatedBy: member._id, updatedAt: Date.now()}});
+  return {success: true};
+
+}
+
+
+async function activate(id, member) {
+  if(!id ||  !member){
+    return;
+  }
+  console.log(id)
+  let result = await QuestionTemplate.update({_id: id}, {$set: {status: statusEnum.ACTIVE, updatedBy: member._id, updatedAt: Date.now()}});
+  if(result){
+
+  }
+
+  return {success: true};
+
+}
+
 module.exports = {
   addQuestionTemplate:addQuestionTemplate,
   updateQuestionTemplate:updateQuestionTemplate,
   deleteQuestionTemplate:deleteQuestionTemplate,
-  getQuestionTemplates: getQuestionTemplates
+  getQuestionTemplates: getQuestionTemplates,
+  deactivate:deactivate,
+  activate:activate
 }

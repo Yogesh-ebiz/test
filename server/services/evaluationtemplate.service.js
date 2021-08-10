@@ -181,7 +181,7 @@ async function activate(id, member) {
   if(!id ||  !member){
     return;
   }
-  console.log(id)
+
   let result = await EvaluationTemplate.update({_id: id}, {$set: {status: statusEnum.ACTIVE, updatedBy: member._id, updatedAt: Date.now()}});
   if(result){
 

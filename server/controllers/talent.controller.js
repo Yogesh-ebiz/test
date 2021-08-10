@@ -32,7 +32,6 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getDepartments, addDepartment} = require('../services/department.service');
-const {getQuestionTemplates, addQuestionTemplate, updateQuestionTemplate, deleteQuestionTemplate} = require('../services/questiontemplate.service');
 const pipelineTemplateService = require('../services/pipelineTemplate.service');
 
 const pipelineService = require('../services/pipeline.service');
@@ -48,6 +47,7 @@ const evaluationService = require('../services/evaluation.service');
 const evaluationTemplateService = require('../services/evaluationtemplate.service');
 const emailService = require('../services/email.service');
 const emailTemplateService = require('../services/emailtemplate.service');
+const questionTemplateService= require('../services/questiontemplate.service');
 const candidateService = require('../services/candidate.service');
 const jobViewService = require('../services/jobview.service');
 const bookmarkService = require('../services/bookmark.service');
@@ -210,6 +210,8 @@ module.exports = {
   addCompanyQuestionTemplate,
   updateCompanyQuestionTemplate,
   deleteCompanyQuestionTemplate,
+  deactivateCompanyQuestionTemplate,
+  activateCompanyQuestionTemplate,
   getCompanyQuestionTemplates,
   addCompanyPipelineTemplate,
   updateCompanyPipelineTemplate,
@@ -4033,7 +4035,7 @@ async function addCompanyQuestionTemplate(companyId, currentUserId, form) {
   try {
     form.createdBy = currentUserId;
     form.company = companyId;
-    result = await addQuestionTemplate(form);
+    result = await questionTemplateService.addQuestionTemplate(form);
 
   } catch(e){
     console.log('addCompanyQuestionTemplate: Error', e);
@@ -4056,7 +4058,7 @@ async function updateCompanyQuestionTemplate(companyId, questionId, currentUserI
   let result = null;
 
   try {
-    result = await updateQuestionTemplate(questionId, form);
+    result = await questionTemplateService.updateQuestionTemplate(questionId, form);
 
   } catch(e){
     console.log('updateCompanyQuestionTemplate: Error', e);
@@ -4081,9 +4083,56 @@ async function deleteCompanyQuestionTemplate(companyId, questionId, currentUserI
 
 
   try {
-    result = await deleteQuestionTemplate(questionId);
+    result = await questionTemplateService.deleteQuestionTemplate(questionId);
   } catch(e){
     console.log('deleteCompanyQuestionTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function deactivateCompanyQuestionTemplate(companyId, questionId, currentUserId) {
+  if(!companyId || !currentUserId || !questionId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+  try {
+    result = await questionTemplateService.deactivate(questionId, member);
+
+  } catch(e){
+    console.log('deactivateCompanyQuestionTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+async function activateCompanyQuestionTemplate(companyId, questionId, currentUserId) {
+  if(!companyId || !currentUserId || !questionId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+  try {
+
+    result = await questionTemplateService.activate(questionId, member);
+
+  } catch(e){
+    console.log('activateCompanyQuestionTemplate: Error', e);
   }
 
 
@@ -4096,7 +4145,7 @@ async function getCompanyQuestionTemplates(companyId, query, currentUserId, loca
     return null;
   }
 
-  let result = await getQuestionTemplates(companyId, query);
+  let result = await questionTemplateService.getQuestionTemplates(companyId, query);
 
   return result;
 
