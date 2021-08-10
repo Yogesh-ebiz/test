@@ -59,7 +59,7 @@ async function createTasksForStage(stage, jobTitle, meta) {
     for(let member of task.members){
       let newTask = {};
       newTask.members = [ObjectID(member)];
-      newTask.required = task.required;
+      newTask.required = task.required?task.required:false;
       newTask.type = task.type;
       newTask.meta = meta;
       let startDate = new Date();

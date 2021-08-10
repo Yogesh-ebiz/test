@@ -2055,6 +2055,7 @@ async function updateApplication(companyId, currentUserId, jobId, applicationId,
 }
 
 async function updateApplicationProgress(companyId, currentUserId, applicationId, newStage) {
+  console.log(companyId, currentUserId, applicationId, newStage)
 
   if(!companyId || !currentUserId || !applicationId || !newStage){
     return null;
@@ -2112,7 +2113,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
       } else {
         let pipeline = await pipelineService.findById(job.pipeline);
         if(pipeline) {
-          foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)})
+          foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)});
           if(foundStage) {
             progress = await  applicationProgressService.addApplicationProgress({
               applicationId: application.applicationId,
@@ -2122,7 +2123,6 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
             newStage = foundStage;
             let taskMeta = {applicationId: application._id, applicationProgressId: application.currentProgress._id};
             await stageService.createTasksForStage(foundStage, '', taskMeta);
-
             application.currentProgress = progress;
             application.progress.push(progress);
             application.progress = _.orderBy(application.progress, ['stageId'], []);
