@@ -265,6 +265,10 @@ const skillMinimal = (job) => {
 }
 
 
+const buildFileUrl = (file) => {
+  return config.cdn + file;
+}
+
 const buildCompanyUrl = (company) => {
   let id = company._id?company.companyId:company.id;
   let avatar = company.avatar?company.avatar:'';
@@ -292,6 +296,7 @@ module.exports = {
   convertToCandidate:convertToCandidate,
   roleMinimal:roleMinimal,
   jobMinimal:jobMinimal,
+  buildFileUrl:buildFileUrl,
   buildCompanyUrl:buildCompanyUrl,
   buildUserUrl:buildUserUrl,
   buildCandidateUrl:buildCandidateUrl,

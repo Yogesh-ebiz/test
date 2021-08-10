@@ -20,7 +20,7 @@ const stageType = require('../const/stageType');
 const jobType = require('../const/jobType');
 
 const awsService = require('../services/aws.service');
-const {buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
+const {buildFileUrl, buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
 const companyService = require('../services/company.service');
@@ -5512,7 +5512,11 @@ async function getFiles(companyId, currentUserId, applicationId) {
     ]);
 
     if (application) {
-      result = application.files;
+      result = _.reduce(application.files, function(res, file){
+        file.path = buildFileUrl(file.path);
+        res.push(file);
+        return res;
+      }, []);
     }
 
   } catch(e){

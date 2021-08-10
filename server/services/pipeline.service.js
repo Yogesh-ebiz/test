@@ -57,7 +57,6 @@ async function update(id, form) {
   form = await Joi.validate(form, pipelineSchema, {abortEarly: false});
 
   let pipeline = await findById(id);
-  console.log(pipeline)
   if(pipeline){
     pipeline.name = form.name;
     pipeline.category=form.category;
