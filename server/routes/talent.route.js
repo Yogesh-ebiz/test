@@ -435,24 +435,24 @@ async function deleteJob(req, res) {
 
 
 async function getJobComments(req, res) {
-
+  let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = req.params.jobId;
   let filter = req.query;
 
-  let data = await talentCtrl.getJobComments(currentUserId, jobId, filter);
+  let data = await talentCtrl.getJobComments(companyId, currentUserId, jobId, filter);
 
   res.json(new Response(data, data?'comment_retrieved_successful':'not_found', res));
 }
 
 
 async function addJobComment(req, res) {
-
+  let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = req.params.jobId;
   let comment = req.body;
 
-  let data = await talentCtrl.addJobComment(currentUserId, jobId, comment);
+  let data = await talentCtrl.addJobComment(companyId, currentUserId, jobId, comment);
 
   res.json(new Response(data, data?'comment_added_successful':'not_found', res));
 }
@@ -460,12 +460,12 @@ async function addJobComment(req, res) {
 
 
 async function deleteJobComment(req, res) {
-
+  let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = req.params.jobId;
   let commentId = req.params.commentId;
 
-  let data = await talentCtrl.deleteJobComment(currentUserId, jobId, commentId);
+  let data = await talentCtrl.deleteJobComment(companyId, currentUserId, jobId, commentId);
 
   res.json(new Response(data, data?'comment_deleted_successful':'not_found', res));
 }

@@ -1011,12 +1011,17 @@ async function deleteJob(companyId, currentUserId, jobId) {
 }
 
 
-async function getJobComments(currentUserId, jobId, filter) {
+async function getJobComments(companyId, currentUserId, jobId, filter) {
 
   if(!currentUserId || !jobId || !filter){
     return null;
   }
 
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+  
   let result;
   try {
 
@@ -1039,7 +1044,7 @@ async function getJobComments(currentUserId, jobId, filter) {
   return new Pagination(result);
 }
 
-async function addJobComment(currentUserId, jobId, comment) {
+async function addJobComment(companyId, currentUserId, jobId, comment) {
 
   if(!currentUserId || !jobId || !comment){
     return null;
@@ -1073,7 +1078,7 @@ async function addJobComment(currentUserId, jobId, comment) {
 }
 
 
-async function deleteJobComment(currentUserId, jobId, commentId) {
+async function deleteJobComment(companyId, currentUserId, jobId, commentId) {
 
   if(!currentUserId || !jobId || !commentId){
     return null;
@@ -2949,7 +2954,6 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
   let job = await jobService.findJob_Id(jobId, locale);
   if(job.pipeline) {
     let pipeline = await pipelineService.findById(job.pipeline);
-
     if (pipeline.stages) {
 
       let pipelineStages = pipeline.stages;
