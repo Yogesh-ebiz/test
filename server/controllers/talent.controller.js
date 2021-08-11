@@ -2947,123 +2947,153 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
   let pipelineStages;
   let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
   let job = await jobService.findJob_Id(jobId, locale);
+  if(job.pipeline) {
+    let pipeline = await pipelineService.findById(job.pipeline);
 
-  let pipeline = await pipelineService.findById(job.pipeline);
-  if(pipeline.stages) {
+    if (pipeline.stages) {
 
-    let pipelineStages = pipeline.stages;
-    let applicationsGroupByStage = await Application.aggregate([
-      {$match: {job: job._id, status: {$in: ['ACTIVE', 'ACCEPTED']}}},
-      // {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
-      {$lookup:{
-          from:"applicationprogresses",
-          let:{currentProgress:"$currentProgress"},
-          pipeline:[
-            {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-            { $addFields:
-                {
-                  noOfEvaluations: {$size: "$evaluations"},
-                  noOfEmails: {$size: '$emails'}
-                }
-            },
-            {
-              $lookup: {
-                from: 'evaluations',
-                localField: 'evaluations',
-                foreignField: '_id',
-                as: 'evaluations',
+      let pipelineStages = pipeline.stages;
+      let applicationsGroupByStage = await Application.aggregate([
+        {$match: {job: job._id, status: {$in: ['ACTIVE', 'ACCEPTED']}}},
+        // {$lookup: {from: 'applicationprogresses', localField: 'currentProgress', foreignField: '_id', as: 'currentProgress' } },
+        {
+          $lookup: {
+            from: "applicationprogresses",
+            let: {currentProgress: "$currentProgress"},
+            pipeline: [
+              {$match: {$expr: {$eq: ["$_id", "$$currentProgress"]}}},
+              {
+                $addFields:
+                  {
+                    noOfEvaluations: {$size: "$evaluations"},
+                    noOfEmails: {$size: '$emails'}
+                  }
               },
-            },
-
-          ],
-          as: 'currentProgress'
-        }},
-      {$unwind: '$currentProgress'},
-      {$lookup:{
-          from:"candidates",
-          let:{user:"$user"},
-          pipeline:[
-            {$match:{$expr:{$eq:["$_id","$$user"]}}},
-            {
-              $lookup: {
-                from: 'labels',
-                localField: 'sources',
-                foreignField: '_id',
-                as: 'sources',
+              {
+                $lookup: {
+                  from: 'evaluations',
+                  localField: 'evaluations',
+                  foreignField: '_id',
+                  as: 'evaluations',
+                },
               },
-            },
-            {
-              $lookup: {
-                from: 'evaluations',
-                localField: 'evaluations',
-                foreignField: '_id',
-                as: 'evaluations',
+
+            ],
+            as: 'currentProgress'
+          }
+        },
+        {$unwind: '$currentProgress'},
+        {
+          $lookup: {
+            from: "candidates",
+            let: {user: "$user"},
+            pipeline: [
+              {$match: {$expr: {$eq: ["$_id", "$$user"]}}},
+              {
+                $lookup: {
+                  from: 'labels',
+                  localField: 'sources',
+                  foreignField: '_id',
+                  as: 'sources',
+                },
               },
-            },
-            { $addFields:
-                {
-                  rating: {$round: [{$avg: "$evaluations.rating"}, 1] },
-                  evaluations: [],
-                  applications: []
+              {
+                $lookup: {
+                  from: 'evaluations',
+                  localField: 'evaluations',
+                  foreignField: '_id',
+                  as: 'evaluations',
+                },
+              },
+              {
+                $addFields:
+                  {
+                    rating: {$round: [{$avg: "$evaluations.rating"}, 1]},
+                    evaluations: [],
+                    applications: []
+                  }
+              },
+            ],
+            as: 'user'
+          }
+        },
+        {$unwind: '$user'},
+        {
+          $project: {
+            createdDate: 1,
+            user: 1,
+            email: 1,
+            phoneNumber: 1,
+            photo: 1,
+            availableDate: 1,
+            status: 1,
+            hasFollowed: 1,
+            sources: 1,
+            note: 1,
+            user: 1,
+            jobTitle: 1,
+            currentProgress: 1
+          }
+        },
+        {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
+      ]);
+
+      pipelineStages.forEach(function (item) {
+
+        let stage = {
+          _id: item._id,
+          type: item.type,
+          name: item.name,
+          timeLimit: item.timeLimit,
+          tasks: item.tasks,
+          applications: []
+        }
+        let found = _.find(applicationsGroupByStage, {'_id': item._id});
+        if (found) {
+
+          stage.applications = found.applications;
+          for (let [i, item] of stage.applications.entries()) {
+            item.hasFollowed = _.find(applicationSubscribed, {subject: item._id}) ? true : false;
+            item.user.avatar = buildCandidateUrl(item.user);
+            if (item.currentProgress) {
+              let completed = _.reduce(stage.tasks, function (res, item) {
+                res.push(false);
+                return res;
+              }, []);
+              for (const [j, task] of stage.tasks.entries()) {
+                if (task.type === taskType.EVALUATION && task.required) {
+                  let noOfCompletedEvaluation = 0;
+                  if (task.members.length) {
+                    let createdBy = _.sortedUniq(_.reduce(item.currentProgress.evaluations, function (res, item) {
+                      res.push(item.createdBy.toString());
+                      return res;
+                    }, []));
+                    let members = _.sortedUniq(_.reduce(task.members, function (res, item) {
+                      res.push(item.toString());
+                      return res;
+                    }, []));
+                    completed[j] = (!_.difference(createdBy, members).length) ? true : false;
+                  } else {
+                    completed[j] = true;
+                  }
+                } else if (task.type === taskType.EMAIL) {
+                  completed[j] = (task.required && item.currentProgress.emails.length) ? true : false;
+                } else if (task.type === taskType.EVENT) {
+                  completed[j] = (task.required && item.currentProgress.event) ? true : false;
                 }
-            },
-          ],
-          as: 'user'
-        }},
-      {$unwind: '$user'},
-      {$project: {createdDate: 1, user: 1, email: 1, phoneNumber: 1, photo: 1, availableDate: 1, status: 1, hasFollowed: 1, sources: 1, note: 1, user: 1, jobTitle: 1, currentProgress: 1 }},
-      {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
-    ]);
 
-    pipelineStages.forEach(function(item){
-
-      let stage = {_id: item._id, type: item.type, name: item.name, timeLimit: item.timeLimit, tasks: item.tasks, applications: []}
-      let found = _.find(applicationsGroupByStage, {'_id': item._id});
-      if(found){
-
-        stage.applications = found.applications;
-        for (let [i, item] of stage.applications.entries()) {
-          item.hasFollowed = _.find(applicationSubscribed, {subject: item._id})?true:false;
-          item.user.avatar = buildCandidateUrl(item.user);
-          if (item.currentProgress) {
-            let completed = _.reduce(stage.tasks, function (res, item) {
-              res.push(false);
-              return res;
-            }, []);
-            for (const [j, task] of stage.tasks.entries()) {
-              if (task.type === taskType.EVALUATION && task.required) {
-                let noOfCompletedEvaluation = 0;
-                if (task.members.length) {
-                  let createdBy = _.sortedUniq(_.reduce(item.currentProgress.evaluations, function (res, item) {
-                    res.push(item.createdBy.toString());
-                    return res;
-                  }, []));
-                  let members = _.sortedUniq(_.reduce(task.members, function (res, item) {
-                    res.push(item.toString());
-                    return res;
-                  }, []));
-                  completed[j] = (!_.difference(createdBy, members).length) ? true : false;
-                } else {
-                  completed[j] = true;
-                }
-              } else if (task.type === taskType.EMAIL) {
-                completed[j] = (task.required && item.currentProgress.emails.length) ? true : false;
-              } else if (task.type === taskType.EVENT) {
-                completed[j] = (task.required && item.currentProgress.event) ? true : false;
               }
 
+              item.isCompleted = (!_.includes(completed, false)) ? true : false;
             }
-
-            item.isCompleted = (!_.includes(completed, false)) ? true : false;
           }
         }
-      }
 
 
+        boardStages.push(stage);
 
-      boardStages.push(stage);
-
-    });
+      });
+    }
   }
   return boardStages;
 

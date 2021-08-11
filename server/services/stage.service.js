@@ -56,37 +56,39 @@ async function createTasksForStage(stage, jobTitle, meta) {
   }
   for (let task of stage.tasks) {
     task.tasks = [];
-    for(let member of task.members){
-      let newTask = {};
-      newTask.members = [ObjectID(member)];
-      newTask.required = task.required?task.required:false;
-      newTask.type = task.type;
-      newTask.meta = meta;
-      let startDate = new Date();
-      let endDate = new Date();
-      endDate.setDate(endDate.getDate()+stage.timeLimit);
-      endDate.setMinutes(59);
-      endDate.setHours(23)
-      newTask.startDate = startDate.getTime();
-      newTask.endDate = endDate.getTime();
-      newTask.reminders = ['D1'];
+    if(task.members && task.members.lenth) {
+      for (let member of task.members) {
+        let newTask = {};
+        newTask.members = [ObjectID(member)];
+        newTask.required = task.required ? task.required : false;
+        newTask.type = task.type;
+        newTask.meta = meta;
+        let startDate = new Date();
+        let endDate = new Date();
+        endDate.setDate(endDate.getDate() + stage.timeLimit);
+        endDate.setMinutes(59);
+        endDate.setHours(23)
+        newTask.startDate = startDate.getTime();
+        newTask.endDate = endDate.getTime();
+        newTask.reminders = ['D1'];
 
-      switch(task.type){
-        case 'EMAIL':
-          newTask.name = '['+stage.name+'] ' + 'Send Email';
-          break;
-        case 'EVALUATION':
-          newTask.name = '['+stage.name+'] ' + 'Give Evaluation';
-          break;
-        case 'EVENT':
-          newTask.name = '['+stage.name+'] ' + 'Set-up Event';
-          break;
+        switch (task.type) {
+          case 'EMAIL':
+            newTask.name = '[' + stage.name + '] ' + 'Send Email';
+            break;
+          case 'EVALUATION':
+            newTask.name = '[' + stage.name + '] ' + 'Give Evaluation';
+            break;
+          case 'EVENT':
+            newTask.name = '[' + stage.name + '] ' + 'Set-up Event';
+            break;
+        }
+
+        // await add(newTask)
+        newTask = await add(newTask);
       }
 
-      // await add(newTask)
-      newTask = await add(newTask);
     }
-
   }
 
   // stage = new Stage(stage).save();

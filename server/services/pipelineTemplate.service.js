@@ -8,6 +8,7 @@ const Stage = require('../models/stage.model');
 const stageService = require('../services/stage.service');
 const companyService = require('../services/company.service');
 const pipelineService = require('../services/pipeline.service');
+const applicationProgressService = require('../services/applicationprogress.service');
 
 
 const pipelineSchema = Joi.object({
@@ -118,13 +119,15 @@ async function update(id, form, member) {
     result = await template.save();
 
 
-
+    let stageMigration = form.stageMigration;
     let allPipelines = await pipelineService.findAllByPipelineTemplateId(result._id);
-    console.log(result._id, allPipelines.length)
+
     if(allPipelines.length) {
 
       for (let [i, pipeline] of allPipelines.entries()) {
+        let oldStages = _.clone(pipeline.stages);
         let newStages = [];
+
         for (let [i, stage] of pipeline.stages.entries()) {
           let existStage = _.find(template.stages, {type: stage.type});
           if (!existStage) {
@@ -137,14 +140,21 @@ async function update(id, form, member) {
           let existStage = _.find(pipeline.stages, {type: stage.type});
           if (existStage) {
             newStages.push(existStage._id)
-            console.log(i, 'exist', stage.name, stage.type);
+            // console.log(i, 'exist', stage.name, stage.type);
           } else {
-            console.log(i, 'not exist', stage.name, stage.type)
+            // console.log(i, 'not exist', stage.name, stage.type)
             stage._id = new ObjectID();
             let newStage = await stageService.addStage(stage);
             newStages.push(newStage._id);
           }
         }
+
+        if(stageMigration) {
+          for (let [i, stage] of stageMigration.entries()) {
+            await applicationProgressService.updateApplicationProgressStage(oldStages[stage.old]._id, newStages[stage.new]._id);
+          }
+        }
+
         pipeline.stages = newStages;
         await pipeline.save();
 

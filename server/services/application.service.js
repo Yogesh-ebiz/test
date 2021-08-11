@@ -543,10 +543,10 @@ async function apply(application) {
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
     let jobPipeline = await pipelineService.findById(job.pipeline);
-
     if (jobPipeline) {
 
       let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
+      console.log(applyStage)
       let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
       job.noOfApplied+=1;
       // progress.stage = applyStage._id;
