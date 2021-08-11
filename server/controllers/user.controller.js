@@ -231,8 +231,8 @@ async function syncCompanies(userId) {
           let newCompany = {
             name: comp.name,
             companyId: comp.id,
-            createdBy: currentParty.id,
-            email:currentParty.primaryEmail?user.primaryEmail.value:'',
+            createdBy: user.id,
+            email:user.primaryEmail?user.primaryEmail.value:'',
             primaryAddress: {address1: comp.primaryAddress.address1, address2: comp.primaryAddress.address2, district: comp.primaryAddress.district, city: comp.primaryAddress.city, state: comp.primaryAddress.state, country: comp.primaryAddress.country }
           }
           company = await companyService.add(newCompany);
@@ -252,8 +252,6 @@ async function syncCompanies(userId) {
             role: role
           });
 
-          console.log(member)
-
         }
 
       }
@@ -263,7 +261,7 @@ async function syncCompanies(userId) {
     console.log('syncCompanies: Error', e);
   }
 
-  return result;
+  return {success: true};
 
 }
 

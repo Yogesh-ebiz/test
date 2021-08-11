@@ -227,5 +227,6 @@
 	"avatar_uploaded_successful": "avatar_uploaded_successful",
 	"get_subscriptions_successful": "get_subscriptions_successful",
 	"question_deactivated_successful": "question_deactivated_successful",
-	"question_activated_successful": "question_activated_successful"
+	"question_activated_successful": "question_activated_successful",
+	"user_synced_successful": "user_synced_successful"
 }
