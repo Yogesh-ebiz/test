@@ -43,7 +43,7 @@ async function addSubscription(currentUserId, form) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
 
   if(!member){
     return null;
