@@ -1021,7 +1021,7 @@ async function getJobComments(companyId, currentUserId, jobId, filter) {
   if(!member){
     return null;
   }
-  
+
   let result;
   try {
 

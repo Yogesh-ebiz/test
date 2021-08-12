@@ -55,6 +55,7 @@ async function addSubscription(currentUserId, form) {
 
     form.defaultPaymentMethod = form.payment.paymentMethodId;
     form.createdBy = currentUserId;
+    form.trialDays = company.talentSubscription?0:14;
     subscription = await paymentService.addSubscription(form);
     if(subscription){
       company.talentSubscription = subscription.id;
