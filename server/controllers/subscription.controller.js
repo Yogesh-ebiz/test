@@ -42,16 +42,14 @@ async function addSubscription(currentUserId, form) {
   if(!currentUserId || !form){
     return null;
   }
-
   let member = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
-
   if(!member){
     return null;
   }
 
   let subscription = null;
   try {
-    let company = await companyService.findByCompanyId(parseInt(form.company));
+    let company = await companyService.findByCompanyId(parseInt(form.customer.partyId));
 
     form.defaultPaymentMethod = form.payment.paymentMethodId;
     form.createdBy = currentUserId;

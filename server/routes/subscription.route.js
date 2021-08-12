@@ -34,6 +34,7 @@ async function addSubscription(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let subscription = req.body;
+  subscription.customer.partyId = parseInt(subscription.customer.partyId);
   let data = await subscriptionCtl.addSubscription(currentUserId, subscription);
 
   res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
