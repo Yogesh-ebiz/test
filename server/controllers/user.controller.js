@@ -231,6 +231,7 @@ async function syncCompanies(userId) {
           let newCompany = {
             name: comp.name,
             companyId: comp.id,
+            partyType: comp.partyType,
             createdBy: user.id,
             email:user.primaryEmail?user.primaryEmail.value:'',
             primaryAddress: {address1: comp.primaryAddress.address1, address2: comp.primaryAddress.address2, district: comp.primaryAddress.district, city: comp.primaryAddress.city, state: comp.primaryAddress.state, country: comp.primaryAddress.country }

@@ -23,6 +23,7 @@ const roleService = require('../services/role.service');
 const companySchema = Joi.object({
   name: Joi.string(),
   companyId: Joi.number(),
+  partyType: Joi.string(),
   createdBy: Joi.number(),
   email: Joi.string(),
   primaryAddress: Joi.object()
@@ -74,6 +75,7 @@ async function register(currentParty, form) {
     savedCompany = await new Company({
       name: company.name,
       companyId: company.id,
+      partyType: company.partyType,
       createdBy: currentParty.id,
       email:currentParty.primaryEmail?currentParty.primaryEmail.value:'',
       primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }

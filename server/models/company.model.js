@@ -10,6 +10,9 @@ const CompanySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  paryType: {
+    type: String
+  },
   customerId: {
     type: String
   },
