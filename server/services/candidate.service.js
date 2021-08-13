@@ -119,13 +119,13 @@ async function addCandidateByResume(companyId, member, file) {
 
 }
 
-async function findById(id) {
+function findById(id) {
 
   if(!id){
     return;
   }
 
-  return await Candidate.findById(id);
+  return Candidate.findById(id);
 }
 
 
