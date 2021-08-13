@@ -1284,7 +1284,7 @@ async function getCandidateActivities(req, res) {
 async function uploadAvatar(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = ObjectID(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId)  ;
   let data = await talentCtrl.uploadAvatar(companyId, currentUserId, candidateId, req.files);
 
   res.json(new Response(data, data?'avatar_uploaded_successful':'not_found', res));

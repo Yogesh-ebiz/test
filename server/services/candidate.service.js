@@ -2,6 +2,7 @@ const _ = require('lodash');
 const Joi = require('joi');
 const fs = require('fs');
 const ObjectID = require('mongodb').ObjectID;
+// const md5File = require('md5-file')
 
 let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');

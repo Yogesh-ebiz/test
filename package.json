@@ -51,7 +51,6 @@
     "jsonwebtoken": "^8.2.1",
     "locale": "^0.1.0",
     "lodash": "^4.17.15",
-    "md5-file": "~5.0.0",
     "method-override": "^2.3.10",
     "mongoose": "^5.7.5",
     "mongoose-aggregate-paginate-v2": "^1.0.42",
