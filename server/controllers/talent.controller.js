@@ -185,6 +185,7 @@ module.exports = {
   unsubscribeApplication,
   getApplicationActivities,
   addCandidate,
+  importCandidates,
   searchCandidates,
   getCandidateById,
   updateCandidateById,
@@ -3217,6 +3218,60 @@ async function addCandidate(currentUserId, companyId, form) {
 }
 
 
+async function importCandidates(companyId, currentUserId, files) {
+  if(!companyId || !currentUserId || !files){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'candidates/';
+  try {
+
+    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+
+    if (candidate) {
+      let type, name;
+      if(files.file) {
+        let cv = files.file[0];
+        let fileName = cv.originalname.split('.');
+        let fileExt = fileName[fileName.length - 1];
+        let timestamp = Date.now();
+        name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
+        let path = basePath + candidate._id + '/images/' + name;
+        let response = await awsService.upload(path, cv);
+        switch (fileExt) {
+          case 'png':
+            type = 'PNG';
+            break;
+          case 'jpeg':
+            type = 'JPG';
+            break;
+          case 'jpg':
+            type = 'JPG';
+            break;
+
+        }
+
+        candidate.avatar = name;
+        result = await candidate.save();
+      }
+    }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
 async function searchCandidates(currentUserId, companyId, filter, sort, locale) {
 
   if(!currentUserId || !companyId || !filter || !sort){
@@ -3341,15 +3396,7 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
     candidate.maritalStatus = form.maritalStatus;
     candidate.dob = form.dob;
     candidate.links = form.links;
-    candidate.primaryAddress = {
-      address1: form.address1,
-      address2: form.address2,
-      district: form.district,
-      city: form.city,
-      state: form.state,
-      country:form.country,
-      postalCode: form.postalCode
-    };
+    candidate.primaryAddress = form.primaryAddress;
 
     result = await candidate.save();
   }

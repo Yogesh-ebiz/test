@@ -114,6 +114,7 @@ router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(
 
 
 router.route('/company/:id/candidates').post(asyncHandler(addCandidate));
+router.route('/company/:id/candidates/import').post(asyncHandler(importCandidates));
 router.route('/company/:id/candidates/search').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
@@ -1114,6 +1115,15 @@ async function addCandidate(req, res) {
   res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
 }
 
+
+
+async function importCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await talentCtrl.importCandidates(companyId, currentUserId, req.files);
+  res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
+}
 
 async function searchCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

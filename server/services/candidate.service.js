@@ -39,17 +39,13 @@ async function addCandidate(companyId, user) {
     return;
   }
 
-  let address1 = user.address1 && user.primaryAddress.address1?user.primaryAddress.address1:'';
-  let district = user.district && user.primaryAddress.district?user.primaryAddress.district:'';
-  let city = user.primary && user.primaryAddress.city?user.primaryAddress.city:'';
-  let state = user.primary && user.primaryAddress.state?user.primaryAddress.state:'';
-  let country = user.primary && user.primaryAddress.country?user.primaryAddress.country:'';
+
   email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
   phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
 
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
-    primaryAddress: {address1: address1, district: district, city: city, state: state, country: country},
+    primaryAddress: user.primaryAddress,
     skills: _.map(user.skills, 'id'), url: user.shareUrl, links: user.links,
     about: user.about, gender: user.gender, marital: user.marital
   }
