@@ -140,6 +140,7 @@ const CandidateSchema = new mongoose.Schema({
     type: Array,
     required:false
   },
+  resume: { type: Schema.Types.ObjectId, ref: 'File' },
   flag: { type: Schema.Types.ObjectId, ref: 'Flag' },
   tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   sources: [{ type: Schema.Types.ObjectId, ref: 'Label' }],

@@ -274,6 +274,8 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           if(file){
             application.resume = file._id;
             application.files.push(file._id);
+
+
           }
         }
 

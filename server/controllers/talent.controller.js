@@ -3233,7 +3233,6 @@ async function importCandidates(companyId, currentUserId, files) {
   try {
 
     let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
-
     if (candidate) {
       let type, name;
       if(files.file) {

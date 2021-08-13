@@ -23,7 +23,10 @@ const FileSchema = new mongoose.Schema({
   path: {
     type: String,
     required: true
-  }
+  },
+  hash: {
+    type: String
+  },
 }, {
   versionKey: false
 });
