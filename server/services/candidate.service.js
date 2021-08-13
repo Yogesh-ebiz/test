@@ -77,11 +77,8 @@ async function addCandidateByResume(companyId, member, file) {
 
 
     console.log(file)
-    fs.stat(file.path, function(err, stats){
-      var mtime = stats.mtime;
-      console.log(file.originalname, mtime)
-    });
-
+    const hash = md5File.sync('LICENSE.md')
+    console.log(file.originalname, hash)
 
 
     // let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);

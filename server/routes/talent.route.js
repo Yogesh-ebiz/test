@@ -1142,7 +1142,7 @@ async function getCandidateById(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let data;
   let company = parseInt(req.params.id);
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = req.params.candidateId;
 
 
   data = await talentCtrl.getCandidateById(currentUserId, company, candidateId, res.locale);

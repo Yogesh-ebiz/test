@@ -3289,24 +3289,47 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
   let result;
 
-  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId).populate([
-    {
-      path: 'applications',
-      model: 'Application'
-    },
-    {
-      path: 'tags',
-      model: 'Label'
-    },
-    {
-      path: 'sources',
-      model: 'Label'
-    },
-    {
-      path: 'flag',
-      model: 'Flag'
-    }
-  ]);
+  let candidate = null;
+
+  if(isNaN(candidateId)) {
+    candidate = await candidateService.findById(ObjectID(candidateId)).populate([
+      {
+        path: 'applications',
+        model: 'Application'
+      },
+      {
+        path: 'tags',
+        model: 'Label'
+      },
+      {
+        path: 'sources',
+        model: 'Label'
+      },
+      {
+        path: 'flag',
+        model: 'Flag'
+      }
+    ]);
+  } else {
+    candidate = await candidateService.findByUserIdAndCompanyId(parseInt(candidateId), companyId).populate([
+      {
+        path: 'applications',
+        model: 'Application'
+      },
+      {
+        path: 'tags',
+        model: 'Label'
+      },
+      {
+        path: 'sources',
+        model: 'Label'
+      },
+      {
+        path: 'flag',
+        model: 'Flag'
+      }
+    ]);
+  }
 
 
 
