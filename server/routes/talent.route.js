@@ -1166,7 +1166,7 @@ async function removeCandidateById(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let data;
   let company = parseInt(req.params.id);
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId);
 
   data = await talentCtrl.removeCandidateById(currentUserId, company, candidateId);
   res.json(new Response(data, data ? 'candidate_removed_successful' : 'not_found', res));
@@ -1176,7 +1176,7 @@ async function removeCandidateById(req, res) {
 async function addCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId);
   let tags = req.body.tags;
 
   let data = await talentCtrl.addCandidateTag(companyId, currentUserId, candidateId, tags);
@@ -1189,7 +1189,7 @@ async function addCandidateTag(req, res) {
 async function removeCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId);
   let tagId = req.params.tagId;
 
   let data = await talentCtrl.removeCandidateTag(companyId, currentUserId, candidateId, tagId);
@@ -1202,7 +1202,7 @@ async function removeCandidateTag(req, res) {
 async function addCandidateSource(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId);
   let sources = req.body.sources;
 
   let data = await talentCtrl.addCandidateSource(companyId, currentUserId, candidateId, sources);

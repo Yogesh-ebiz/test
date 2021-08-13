@@ -3213,7 +3213,7 @@ async function addCandidate(currentUserId, companyId, form) {
     return null;
   }
 
-  let candidate = await candidateService.addCandidate(companyId, form);
+  let candidate = await candidateService.addCandidate(companyId, form, true);
   return candidate
 }
 
@@ -3421,7 +3421,7 @@ async function removeCandidateById(currentUserId, companyId, candidateId) {
 
   let result;
 
-  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+  let candidate = await candidateService.findById(candidateId, companyId);
   await candidate.delete();
 
   return {success: true};
@@ -3716,7 +3716,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
 
   let result;
   try {
-    let candidate = await candidateService.findByUserId(candidateId);
+    let candidate = await candidateService.findById(candidateId);
 
 
     if(candidate) {
@@ -3761,7 +3761,7 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
 
   let result;
   try {
-    let candidate = await candidateService.findByUserId(candidateId);
+    let candidate = await candidateService.findById(candidateId);
 
     for(const [i, tag] of candidate.tags.entries()){
       if(tag==tagId){
@@ -3792,8 +3792,7 @@ async function addCandidateSource(companyId, currentUserId, userId, sources) {
 
   let result;
   try {
-    let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
-    console.log(candidate)
+    let candidate = await candidateService.findById(userId, companyId);
 
 
     if(candidate) {
