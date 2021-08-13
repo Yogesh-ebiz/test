@@ -185,7 +185,7 @@ module.exports = {
   unsubscribeApplication,
   getApplicationActivities,
   addCandidate,
-  importCandidates,
+  importCandidateResumes,
   searchCandidates,
   getCandidateById,
   updateCandidateById,
@@ -3218,7 +3218,7 @@ async function addCandidate(currentUserId, companyId, form) {
 }
 
 
-async function importCandidates(companyId, currentUserId, files) {
+async function importCandidateResumes(companyId, currentUserId, files) {
   if(!companyId || !currentUserId || !files){
     return null;
   }
@@ -3228,39 +3228,18 @@ async function importCandidates(companyId, currentUserId, files) {
     return null;
   }
 
-  let result = null;
+  let result = [];
   let basePath = 'candidates/';
   try {
 
-    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
-    if (candidate) {
-      let type, name;
-      if(files.file) {
-        let cv = files.file[0];
-        let fileName = cv.originalname.split('.');
-        let fileExt = fileName[fileName.length - 1];
-        let timestamp = Date.now();
-        name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
-        let path = basePath + candidate._id + '/images/' + name;
-        let response = await awsService.upload(path, cv);
-        switch (fileExt) {
-          case 'png':
-            type = 'PNG';
-            break;
-          case 'jpeg':
-            type = 'JPG';
-            break;
-          case 'jpg':
-            type = 'JPG';
-            break;
+    let candidates = [];
+    for(let [i, file] of files.file.entries()){
 
-        }
-
-        candidate.avatar = name;
-        result = await candidate.save();
-      }
+      let candidate = await candidateService.addCandidateByResume(companyId, member, file);
+      candidates.push(candidate);
     }
 
+    result = candidates;
 
   } catch (error) {
     console.log(error);
@@ -3383,7 +3362,7 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
 
   let result;
 
-  let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+  let candidate = await candidateService.findById(candidateId);
 
   if(candidate) {
     candidate.firstName = form.firstName;

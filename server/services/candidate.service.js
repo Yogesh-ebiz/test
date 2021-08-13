@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const Joi = require('joi');
+const fs = require('fs');
 const ObjectID = require('mongodb').ObjectID;
 
 let CandidateParam = require('../const/candidateParam');
@@ -63,6 +64,63 @@ async function addCandidate(companyId, user) {
 
 }
 
+
+async function addCandidateByResume(companyId, member, file) {
+  if(!companyId || !member || !file){
+    return null;
+  }
+
+
+  let result = null;
+  let basePath = 'candidates/';
+  try {
+
+
+    console.log(file)
+    fs.stat(file.path, function(err, stats){
+      var mtime = stats.mtime;
+      console.log(file.originalname, mtime)
+    });
+
+
+
+    // let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+    // if (candidate) {
+    //   let type, name;
+    //   if(files.file) {
+    //     let cv = files.file[0];
+    //     let fileName = cv.originalname.split('.');
+    //     let fileExt = fileName[fileName.length - 1];
+    //     let timestamp = Date.now();
+    //     name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
+    //     let path = basePath + candidate._id + '/images/' + name;
+    //     let response = await awsService.upload(path, cv);
+    //     switch (fileExt) {
+    //       case 'png':
+    //         type = 'PNG';
+    //         break;
+    //       case 'jpeg':
+    //         type = 'JPG';
+    //         break;
+    //       case 'jpg':
+    //         type = 'JPG';
+    //         break;
+    //
+    //     }
+    //
+    //     candidate.avatar = name;
+    //     result = await candidate.save();
+    //   }
+    // }
+
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
 
 async function findById(id) {
 
@@ -376,8 +434,11 @@ async function getCompanyBlacklisted(company, sort) {
 
 
 
+
+
 module.exports = {
   addCandidate:addCandidate,
+  addCandidateByResume:addCandidateByResume,
   findById:findById,
   findByIds:findByIds,
   findByUserId:findByUserId,

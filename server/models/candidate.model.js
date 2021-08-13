@@ -16,6 +16,7 @@ const CandidateSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },
   status: {
     type: String,
     default: statusEnum.ACTIVE
