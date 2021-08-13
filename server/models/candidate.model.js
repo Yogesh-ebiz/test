@@ -7,8 +7,7 @@ const statusEnum = require('../const/statusEnum');
 
 const CandidateSchema = new mongoose.Schema({
   userId: {
-    type: Number,
-    required: true
+    type: Number
   },
   company: {
     type: Number,

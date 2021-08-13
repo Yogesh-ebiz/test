@@ -113,8 +113,8 @@ router.route('/company/:id/applications/:applicationId/upload').post(asyncHandle
 router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(getFiles));
 
 
-
-router.route('/company/:id/candidates').post(asyncHandler(searchCandidates));
+router.route('/company/:id/candidates').post(asyncHandler(addCandidate));
+router.route('/company/:id/candidates/search').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
 router.route('/company/:id/candidates/:candidateId').delete(asyncHandler(removeCandidateById));
@@ -1104,16 +1104,26 @@ async function getBoard(req, res) {
 }
 
 
+async function addCandidate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let form = req.body;
+
+
+  let data = await talentCtrl.addCandidate(currentUserId, company, form);
+  res.json(new Response(data, data?'candidate_added_successful':'not_found', res));
+}
+
+
 async function searchCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let data;
   let company = parseInt(req.params.id);
   let filter = req.body;
   let sort = req.query;
   filter.query = req.query.query;
 
 
-  data = await talentCtrl.searchCandidates(currentUserId, company, filter, sort, res.locale);
+  let data = await talentCtrl.searchCandidates(currentUserId, company, filter, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 

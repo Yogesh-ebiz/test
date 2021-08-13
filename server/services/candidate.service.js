@@ -13,7 +13,7 @@ const {convertToCandidate} = require('../utils/helper');
 
 
 const candidateSchema = Joi.object({
-  userId: Joi.number().optional(),
+  userId: Joi.number().allow('', null).optional(),
   company: Joi.number(),
   about: Joi.string().allow('').optional(),
   avatar: Joi.string().allow('').optional(),
@@ -27,26 +27,33 @@ const candidateSchema = Joi.object({
   email: Joi.string().allow('').optional(),
   applications: Joi.array().optional(),
   url: Joi.string().allow('').optional(),
-  hasApplied: Joi.boolean().optional()
+  hasApplied: Joi.boolean().optional(),
+  gender: Joi.string().allow('').optional(),
+  marital: Joi.string().allow('').optional(),
+  links: Joi.array().optional()
 });
 
 
-async function addCandidate(companyId, user, email, phone) {
+async function addCandidate(companyId, user) {
   if(!companyId || !user){
     return;
   }
 
+  let address1 = user.address1 && user.primaryAddress.address1?user.primaryAddress.address1:'';
+  let district = user.district && user.primaryAddress.district?user.primaryAddress.district:'';
   let city = user.primary && user.primaryAddress.city?user.primaryAddress.city:'';
   let state = user.primary && user.primaryAddress.state?user.primaryAddress.state:'';
   let country = user.primary && user.primaryAddress.country?user.primaryAddress.country:'';
-  email = email?email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
-  phone = phone?phone:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
+  email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
+  phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
 
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
-    primaryAddress: {city: city, state: state, country: country},
-    skills: _.map(user.skills, 'id'), url: user.shareUrl
+    primaryAddress: {address1: address1, district: district, city: city, state: state, country: country},
+    skills: _.map(user.skills, 'id'), url: user.shareUrl, links: user.links,
+    about: user.about, gender: user.gender, marital: user.marital
   }
+
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
   candidate = await new Candidate(candidate).save();
 

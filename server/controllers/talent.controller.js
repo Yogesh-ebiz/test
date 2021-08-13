@@ -184,6 +184,7 @@ module.exports = {
   subscribeApplication,
   unsubscribeApplication,
   getApplicationActivities,
+  addCandidate,
   searchCandidates,
   getCandidateById,
   updateCandidateById,
@@ -3200,6 +3201,20 @@ async function searchCandidates(currentUserId, company, filter, locale) {
 */
 
 
+async function addCandidate(currentUserId, companyId, form) {
+  if(!currentUserId || !companyId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let candidate = await candidateService.addCandidate(companyId, form);
+  return candidate
+}
 
 
 async function searchCandidates(currentUserId, companyId, filter, sort, locale) {

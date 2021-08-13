@@ -859,7 +859,9 @@ async function applyJobById(currentUserId, jobId, application ) {
       if(job) {
         let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company.companyId);
         if(!candidate){
-          candidate = await candidateService.addCandidate(job.company.companyId, currentParty, application.email, application.phoneNumber);
+          candidate.email = application.email;
+          candidate.phoneNumber = application.phoneNumber;
+          candidate = await candidateService.addCandidate(job.company.companyId, currentParty);
         } else {
           candidate.email = application.email;
           candidate.phoneNumber = application.phoneNumber;
