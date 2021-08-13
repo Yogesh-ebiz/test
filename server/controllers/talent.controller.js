@@ -3581,7 +3581,7 @@ async function uploadAvatar(companyId, currentUserId, candidateId, files) {
   let basePath = 'candidates/';
   try {
 
-    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+    let candidate = await candidateService.findById(candidateId);
 
     if (candidate) {
       let type, name;
@@ -3837,7 +3837,7 @@ async function removeCandidateSource(companyId, currentUserId, candidateId, sour
 
   let result;
   try {
-    let candidate = await candidateService.findByUserId(candidateId);
+    let candidate = await candidateService.findById(candidateId);
 
     for(const [i, source] of candidate.sources.entries()){
       if(source==sourceId){

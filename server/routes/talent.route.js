@@ -1215,7 +1215,7 @@ async function addCandidateSource(req, res) {
 async function removeCandidateSource(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId);
   let sourceId = req.params.sourceId;
 
   let data = await talentCtrl.removeCandidateSource(companyId, currentUserId, candidateId, sourceId);
@@ -1263,7 +1263,7 @@ async function getCandidateEvaluationById(req, res) {
 async function getCandidatesSimilar(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let candidateId = req.params.candidateId;
+  let candidateId = ObjectID(req.params.candidateId);
 
 
   let data = await talentCtrl.getCandidatesSimilar(company, currentUserId, candidateId, res.locale);
@@ -1273,7 +1273,7 @@ async function getCandidatesSimilar(req, res) {
 async function getCandidateActivities(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = ObjectID(req.params.candidateId);
   let sort = req.query;
 
   let data = await talentCtrl.getCandidateActivities(company, currentUserId, candidateId, sort);
@@ -1284,7 +1284,7 @@ async function getCandidateActivities(req, res) {
 async function uploadAvatar(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = req.params.candidateId;
+  let candidateId = ObjectID(req.params.candidateId);
   let data = await talentCtrl.uploadAvatar(companyId, currentUserId, candidateId, req.files);
 
   res.json(new Response(data, data?'avatar_uploaded_successful':'not_found', res));
