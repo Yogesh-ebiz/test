@@ -101,7 +101,7 @@ const convertToCandidate = (user) => {
 
   return {
     id: user.id?user.id:user._id,
-    userId: user.userId?user.userId:user.id,
+    userId: user.userId?user.userId:null,
     createdDate: user.createdDate,
     company: user.company,
     name: user.name,
