@@ -103,7 +103,7 @@ async function updateSubscription(currentUserId, id, form) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
 
   if(!member){
     return null;
@@ -114,7 +114,7 @@ async function updateSubscription(currentUserId, id, form) {
     form.updatedBy = currentUserId;
     subscription = await paymentService.updateSubscription(id, form);
     if(subscription){
-      let company = await companyService.findByCompanyId(parseInt(subscription.company));
+      let company = await companyService.findByCompanyId(parseInt(form.customer.partyId));
       company.talentSubscription = subscription.id;
       await company.save();
     }
