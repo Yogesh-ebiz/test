@@ -1263,7 +1263,7 @@ async function getCandidateEvaluationById(req, res) {
 async function getCandidatesSimilar(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let candidateId = ObjectID(req.params.candidateId);
+  let candidateId = req.params.candidateId;
 
 
   let data = await talentCtrl.getCandidatesSimilar(company, currentUserId, candidateId, res.locale);

@@ -174,7 +174,6 @@ async function getByApplicationId(currentUserId, applicationId) {
 
     if(isPartyActive(currentParty)) {
       application = await findByApplicationId(applicationId).populate([
-
         {
           path: 'progress',
           model: 'ApplicationProgress',
@@ -274,8 +273,6 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           if(file){
             application.resume = file._id;
             application.files.push(file._id);
-
-
           }
         }
 

@@ -3527,9 +3527,17 @@ async function getCandidatesSimilar(companyId, currentUserId, candidateId) {
     return null;
   }
 
-  let result;
+  let result = [];
   try {
-    result = await candidateService.getCandidatesSimilar(candidateId);
+    let userId = null;
+    if(isNaN(candidateId)) {
+      let candidate = await candidateService.findById(candidateId);
+      userId = candidate.userId?candidate.userId:null;
+    } else {
+      userId = candidateId;
+    }
+
+    result = await candidateService.getCandidatesSimilar(userId);
 
 
   } catch (error) {

@@ -2,7 +2,7 @@ const _ = require('lodash');
 const Joi = require('joi');
 const fs = require('fs');
 const ObjectID = require('mongodb').ObjectID;
-// const md5File = require('md5-file')
+const md5File = require('md5-file')
 
 let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');
@@ -79,7 +79,7 @@ async function addCandidateByResume(companyId, member, file) {
 
 
     console.log(file)
-    const hash = md5File.sync('LICENSE.md')
+    const hash = md5File.sync(file.path)
     console.log(file.originalname, hash)
 
 

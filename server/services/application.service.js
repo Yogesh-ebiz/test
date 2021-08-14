@@ -1,5 +1,8 @@
 const _ = require('lodash');
 const Joi = require('joi');
+const fs = require('fs').promises;
+const {upload} = require('../services/aws.service');
+
 const ObjectID = require('mongodb').ObjectID;
 
 let ApplicationSearchParam = require('../const/applicationSearchParam');
@@ -25,7 +28,7 @@ const emailCampaignStageService = require('../services/emailcampaignstage.servic
 const feedService = require('../services/api/feed.service.api');
 const calendarService = require('../services/api/calendar.service.api');
 
-const {convertToAvatar} = require('../utils/helper');
+const {base64Decode, base64Encode, convertToAvatar} = require('../utils/helper');
 
 
 
@@ -52,6 +55,156 @@ const applicationSchema = Joi.object({
   company: Joi.number(),
   token: Joi.string().allow('').optional()
 });
+
+async function uploadBase64(base64Str, src, dest){
+  let file = await base64Decode(base64Str, src);
+
+
+
+  // await fs.readFileSync(src);
+  console.log(dest)
+  console.log(file);
+  // let fileName = file.originalname.split('.');
+  // let fileExt = fileName[fileName.length - 1];
+  // // let date = new Date();
+  // let timestamp = Date.now();
+  // let newName = fileName[0] + '_' + timestamp + '.' + fileExt;
+  // let path = dest + newName;
+  let response = await upload(dest, src);
+  switch (fileExt) {
+    case 'pdf':
+      type = 'PDF';
+      break;
+    case 'doc':
+      type = 'WORD';
+      break;
+    case 'docx':
+      type = 'WORD';
+      break;
+
+  }
+
+
+  // let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+  // application.resume = {filename: name, type: type};
+
+  // if(file){
+  //   application.resume = file._id;
+  //   application.files.push(file._id);
+  //
+  //
+  // }
+}
+
+
+
+async function apply(application) {
+  let data = null;
+
+  if(!application){
+    return;
+  }
+
+
+  let job = application.job;
+  let candidate = application.user;
+  application.job = job._id;
+  application.user = candidate._id;
+
+  let resume = application.resume;
+  delete application.resume;
+
+  application = await Joi.validate(application, applicationSchema, {abortEarly: false});
+
+  let savedApplication = await new Application(application).save();
+  if (savedApplication) {
+
+    uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
+
+
+    let jobPipeline = await pipelineService.findById(job.pipeline);
+    if (jobPipeline) {
+
+      let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
+      let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
+      job.noOfApplied+=1;
+      // progress.stage = applyStage._id;
+
+      if(jobPipeline.autoRejectBlackList && candidate.flag){
+        savedApplication.status = applicationEnum.REJECTED;
+      }
+
+      savedApplication.progress.push(progress._id);
+      savedApplication.allProgress.push(progress._id)
+      savedApplication.currentProgress = progress._id;
+
+      if(application.applicationQuestions) {
+        application.applicationQuestions.createdBy = candidate.userId;
+        let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
+
+        if (questionSubmission) {
+          savedApplication.questionSubmission = questionSubmission._id;
+          savedApplication.hasSubmittedQuestion = true;
+        }
+      }
+
+      let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
+
+      candidate.applications.push(savedApplication._id);
+      await candidate.save();
+      await job.save();
+
+      await stageService.createTasksForStage(applyStage, job.title, taskMeta);
+
+      let campaign;
+      if(application.token){
+        campaign = await emailCampaignService.findByToken(application.token);
+      } else {
+        campaign = await emailCampaignService.findByEmailAddressAndJobId(application.email, job._id);
+      }
+
+      savedApplication = await savedApplication.save();
+
+      if(campaign) {
+        let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
+
+        if (!exists) {
+          let organic = campaign.token===application.token?false:true;
+          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: organic});
+          campaign.stages.push(campaign);
+          campaign.currentStage = stage;
+          campaign.application = savedApplication;
+          await campaign.save();
+        }
+      }
+
+    }
+
+    let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobId: job._id, jobTitle: job.title}});
+
+    //Create Notification
+    let meta = {
+      companyId: job.company.companyId,
+      jobId: job.jobId,
+      jobTitle: job.title,
+      applicationId: savedApplication._id,
+      applicantId: candidate.userId,
+      createdBy: job.createdBy.userId
+    };
+
+    await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+
+    if (application.follow) {
+      await feedService.followCompany(application.company, candidate.userId);
+    }
+
+  }
+
+
+  return savedApplication;
+
+}
+
 
 
 function add(application) {
@@ -521,110 +674,6 @@ async function getApplicationActivities(applicationId) {
   result = activityService.findBySubjectTypeAndSubjectId(subjectType.APPLICATION, applicationId);
 
   return result;
-}
-
-
-
-async function apply(application) {
-  let data = null;
-
-  if(!application){
-    return;
-  }
-
-
-  let job = application.job;
-  let candidate = application.user;
-  application.job = job._id;
-  application.user = candidate._id;
-  application = await Joi.validate(application, applicationSchema, {abortEarly: false});
-
-
-  let savedApplication = await new Application(application).save();
-  if (savedApplication) {
-    let jobPipeline = await pipelineService.findById(job.pipeline);
-    if (jobPipeline) {
-
-      let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
-      console.log(applyStage)
-      let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
-      job.noOfApplied+=1;
-      // progress.stage = applyStage._id;
-
-      if(jobPipeline.autoRejectBlackList && candidate.flag){
-        savedApplication.status = applicationEnum.REJECTED;
-      }
-
-      savedApplication.progress.push(progress._id);
-      savedApplication.allProgress.push(progress._id)
-      savedApplication.currentProgress = progress._id;
-
-      if(application.applicationQuestions) {
-        application.applicationQuestions.createdBy = candidate.userId;
-        let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
-
-        if (questionSubmission) {
-          savedApplication.questionSubmission = questionSubmission._id;
-          savedApplication.hasSubmittedQuestion = true;
-        }
-      }
-
-      let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
-
-      candidate.applications.push(savedApplication._id);
-      await candidate.save();
-      await job.save();
-
-      await stageService.createTasksForStage(applyStage, job.title, taskMeta);
-
-      let campaign;
-      if(application.token){
-        campaign = await emailCampaignService.findByToken(application.token);
-      } else {
-        campaign = await emailCampaignService.findByEmailAddressAndJobId(application.email, job._id);
-      }
-
-      savedApplication = await savedApplication.save();
-
-      if(campaign) {
-        let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
-
-        if (!exists) {
-          let organic = campaign.token===application.token?false:true;
-          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: organic});
-          campaign.stages.push(campaign);
-          campaign.currentStage = stage;
-          campaign.application = savedApplication;
-          await campaign.save();
-        }
-      }
-
-    }
-
-    let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobId: job._id, jobTitle: job.title}});
-
-
-    //Create Notification
-    let meta = {
-      companyId: job.company.companyId,
-      jobId: job.jobId,
-      jobTitle: job.title,
-      applicationId: savedApplication._id,
-      applicantId: candidate.userId,
-      createdBy: job.createdBy.userId
-    };
-
-    await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
-
-    if (application.follow) {
-      await feedService.followCompany(application.company, candidate.userId);
-    }
-
-  }
-
-
-  return savedApplication;
-
 }
 
 
