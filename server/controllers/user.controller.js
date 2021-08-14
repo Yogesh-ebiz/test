@@ -414,7 +414,7 @@ async function uploadResume(currentUserId, file) {
       let path = 'user/' + currentParty.id + '/resumes/' + name;
 
 
-      result = await upload(path, file);
+      result = await upload(path, file.path);
 
       result = {
         employments: [
@@ -520,7 +520,7 @@ async function uploadResume(currentUserId, files, name) {
       name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : name + '-' + timestamp + '.' + fileExt;
       let path = basePath + currentUserId + '/_resumes/' + name;
 
-      let response = await upload(path, file);
+      let response = await upload(path, file.path);
       let type;
       switch(fileExt){
         case 'pdf':

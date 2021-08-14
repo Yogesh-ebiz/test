@@ -253,7 +253,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           let timestamp = Date.now();
           name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt : fileName[0] + '-' + timestamp + '.' + fileExt;
           let path = basePath + currentUserId + '/_resumes/' + name;
-          let response = await upload(path, cv);
+          let response = await upload(path, cv.path);
           switch (fileExt) {
             case 'pdf':
               type = 'PDF';
@@ -286,7 +286,7 @@ async function uploadCV(currentUserId, applicationId, files, name) {
           timestamp = Date.now();
           name = currentParty.firstName + '_' + currentParty.lastName + '_' + application.user._id + '_' + applicationId + '-' + timestamp + '.' + fileExt;
           path = applicationBasePath + applicationId + '/photos/' + name;
-          response = await upload(path, photo);
+          response = await upload(path, photo.path);
           switch (fileExt) {
             case 'png':
               type = 'PNG';
@@ -351,7 +351,7 @@ async function uploadOffer(currentUserId, applicationId, files) {
           let timestamp = Date.now();
           let name = 'Offer_' + application.applicationId + '_' + application.partyId + '_' + timestamp + '.' + fileExt;
           let path = basePath + application.applicationId + '/' + 'JOB_' + application.jobId + '/offers/' + name;
-          let response = await upload(path, offerLetter);
+          let response = await upload(path, offerLetter.path);
           switch (fileExt) {
             case 'pdf':
               type = 'PDF';

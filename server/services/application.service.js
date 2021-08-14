@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const Joi = require('joi');
 const fs = require('fs').promises;
-const {upload} = require('../services/aws.service');
+const {upload, uploadFromBuffer} = require('../services/aws.service');
 
 const ObjectID = require('mongodb').ObjectID;
 
@@ -24,6 +24,7 @@ const activityService = require('../services/activity.service');
 const pipelineService = require('../services/pipeline.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignStageService = require('../services/emailcampaignstage.service');
+const fileService = require('../services/file.service');
 
 const feedService = require('../services/api/feed.service.api');
 const calendarService = require('../services/api/calendar.service.api');
@@ -57,20 +58,17 @@ const applicationSchema = Joi.object({
 });
 
 async function uploadBase64(base64Str, src, dest){
-  let file = await base64Decode(base64Str, src);
+  await base64Decode(base64Str, src);
 
-
-
-  // await fs.readFileSync(src);
-  console.log(dest)
-  console.log(file);
-  // let fileName = file.originalname.split('.');
-  // let fileExt = fileName[fileName.length - 1];
+  // let file = await fs.readFile(src);
+  let file= src.split('/');
+  let fileName = file[file.length-1].split('.');
+  let fileExt = fileName[fileName.length - 1];
   // // let date = new Date();
-  // let timestamp = Date.now();
-  // let newName = fileName[0] + '_' + timestamp + '.' + fileExt;
-  // let path = dest + newName;
-  let response = await upload(dest, src);
+  let timestamp = Date.now();
+  let newName = fileName[0] + '_' + timestamp + '.' + fileExt;
+  let path = dest + newName;
+  let response = await upload(path, src);
   switch (fileExt) {
     case 'pdf':
       type = 'PDF';
@@ -83,6 +81,8 @@ async function uploadBase64(base64Str, src, dest){
       break;
 
   }
+
+  return {filename: newName, fileType: type, path: path};
 
 
   // let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
@@ -114,13 +114,41 @@ async function apply(application) {
   let resume = application.resume;
   delete application.resume;
 
+  let photo = application.photo;
+  delete application.photo;
+
   application = await Joi.validate(application, applicationSchema, {abortEarly: false});
 
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
 
-    uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
+    if(resume) {
+      let uploaded = await uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
+      let file = await fileService.addFile({
+        filename: uploaded.filename,
+        fileType: uploaded.fileType,
+        path: uploaded.path,
+        createdBy: candidate.userId
+      });
+      if (file) {
+        savedApplication.resume = file._id;
+        savedApplication.files.push(file._id);
+      }
+    }
 
+    if(photo) {
+      let uploaded = await uploadBase64(photo.base64, "/tmp/" + resume.name, 'applications/' + '/photos/');
+      let file = await fileService.addFile({
+        filename: uploaded.filename,
+        fileType: uploaded.fileType,
+        path: uploaded.path,
+        createdBy: candidate.userId
+      });
+      if (file) {
+        savedApplication.resume = file._id;
+        savedApplication.files.push(file._id);
+      }
+    }
 
     let jobPipeline = await pipelineService.findById(job.pipeline);
     if (jobPipeline) {

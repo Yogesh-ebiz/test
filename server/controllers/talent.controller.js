@@ -3600,7 +3600,7 @@ async function uploadAvatar(companyId, currentUserId, candidateId, files) {
         let timestamp = Date.now();
         name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
         let path = basePath + candidate._id + '/images/' + name;
-        let response = await awsService.upload(path, cv);
+        let response = await awsService.upload(path, cv.path);
         switch (fileExt) {
           case 'png':
             type = 'PNG';
@@ -5578,7 +5578,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
         let timestamp = Date.now();
         name = application.user.firstName + '_' + application.user.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt;
         let path = basePath + application.applicationId + '/' + name;
-        let response = await awsService.upload(path, cv);
+        let response = await awsService.upload(path, cv.path);
         switch (fileExt) {
           case 'pdf':
             type = 'PDF';
@@ -5609,7 +5609,7 @@ async function uploadApplication(companyId, currentUserId, applicationId, files)
         timestamp = Date.now();
         name = application.user.firstName + '_' + application.user.lastName + '_' + application.user._id + '_' + application.applicationId + '-' + timestamp + '.' + fileExt;
         path = basePath + application.applicationId + '/photos/' + name;
-        response = await awsService.upload(path, photo);
+        response = await awsService.upload(path, photo.path);
         switch (fileExt) {
           case 'png':
             type = 'PNG';

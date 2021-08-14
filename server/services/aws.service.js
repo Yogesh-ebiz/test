@@ -52,10 +52,42 @@ const s3bucket = new AWS.S3({
 //   });
 // }
 
+exports.uploadFromBuffer = function(path, file){
+  console.log(path)
+  let data = fs.readFileSync(file);
+  console.log('data', data)
 
-exports.upload = function(path, file){
-  console.log('file', file)
-  let data = fs.readFileSync(file.path);
+  var params = {
+    Key: path,
+    Body: data,
+    ACL:'public-read'
+  };
+  return s3bucket.upload(params, function (err, data) {
+
+    // console.log("PRINT FILE:", data);
+    if (err) {
+      console.log('ERROR MSG: ', err);
+    }
+
+
+    // Whether there is an error or not, delete the temp file
+    fs.unlink(file.path, function (err) {
+      if (err) {
+        console.error(err);
+      }
+      console.log('Temp File Delete');
+    });
+
+
+    return data;
+
+  });
+
+}
+
+exports.upload = function(path, src){
+
+  let data = fs.readFileSync(src);
 
   var params = {
     Key: path,
@@ -71,19 +103,14 @@ exports.upload = function(path, file){
 
 
     // Whether there is an error or not, delete the temp file
-    fs.unlink(file.path, function (err) {
+    fs.unlink(src, function (err) {
       if (err) {
         console.error(err);
       }
       console.log('Temp File Delete');
     });
 
-
-
     return data;
-
-
-
   });
 
 }

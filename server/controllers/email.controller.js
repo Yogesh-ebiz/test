@@ -116,7 +116,7 @@ async function uploadEmailAttachmentById(currentUserId, threadId, files)  {
         // let date = new Date();
         let name = Date.now() + '.' + fileExt;
         let path = basePath + email.threadId + '/files/' + name;
-        let response = await upload(path, file);
+        let response = await upload(path, file.path);
         switch (fileExt.toLowerCase()) {
           case 'pdf':
             type = 'PDF';

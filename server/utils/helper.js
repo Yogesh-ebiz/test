@@ -1,25 +1,24 @@
 const _ = require('lodash');
-const fs = require('fs');
+const fs = require('fs').promises;
 const AWS = require('aws-sdk');
 const config = require('../config/config');
 
 
 // function to encode file data to base64 encoded string
-const  base64Encode = (file) => {
+const  base64Encode = async (file) => {
   // read binary data
-  var bitmap = fs.readFileSync(file);
+  var bitmap = await fs.readFile(file);
   // convert binary data to base64 encoded string
-  return new fs.readFileSync(file, {encoding: 'base64'});
-  // return new Buffer(bitmap).toString('base64');
+  return new Buffer(bitmap).toString('base64');
 }
 
 // function to create file from base64 encoded string
-const  base64Decode = (base64str, file) => {
+const base64Decode = async (base64str, file) => {
   // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
-  var buffer = new Buffer(base64str, 'base64');
+  var bitmap = new Buffer(base64str, 'base64');
   // write buffer to file
-  var newFile = fs.writeFileSync(file, buffer);
-  return newFile;
+  let newFile = await fs.writeFile(file, bitmap);
+  console.log('******** File created from base64 encoded string ********');
 }
 
 const timestamp = () => {
