@@ -122,7 +122,7 @@ async function apply(application) {
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
 
-    if(resume) {
+    if(resume && resume.base64) {
       let uploaded = await uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
       let file = await fileService.addFile({
         filename: uploaded.filename,
@@ -136,7 +136,7 @@ async function apply(application) {
       }
     }
 
-    if(photo) {
+    if(photo && photo.base64) {
       let uploaded = await uploadBase64(photo.base64, "/tmp/" + resume.name, 'applications/' + '/photos/');
       let file = await fileService.addFile({
         filename: uploaded.filename,
