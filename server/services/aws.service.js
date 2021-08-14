@@ -53,9 +53,7 @@ const s3bucket = new AWS.S3({
 // }
 
 exports.uploadFromBuffer = function(path, file){
-  console.log(path)
-  let data = fs.readFileSync(file);
-  console.log('data', data)
+  console.log('file', file)
 
   var params = {
     Key: path,
