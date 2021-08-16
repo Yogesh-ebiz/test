@@ -2,6 +2,15 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
+const fs = require('fs');
+const ejs = require('ejs');
+const pdf = require('html-pdf');
+var path = require('path');
+var async = require("async");
+var Promise = require('promise');
+
+
+
 const config = require('../config/config');
 
 let CustomPagination = require('../utils/custompagination');
@@ -63,6 +72,7 @@ const adService = require('../services/ad.service');
 const checkoutService = require('../services/checkout.service');
 const paymentProvider = require('../services/api/payment.service.api');
 const calendarService = require('../services/api/calendar.service.api');
+const parserService = require('../services/api/sovren.service.api');
 
 
 const {findCurrencyRate} = require('../services/currency.service');
@@ -1345,7 +1355,6 @@ async function getJobAds(companyId, currentuserId, jobId) {
 
 
 async function publishJob(companyId, currentUserId, jobId, type) {
-
   if(!companyId  || !currentUserId || !jobId || !type){
     return null;
   }
@@ -1356,8 +1365,8 @@ async function publishJob(companyId, currentUserId, jobId, type) {
     return null;
   }
 
+  let result = null;
   let job = await jobService.findJob_Id(jobId);
-
   if(job){
     job.type = type;
     job.status = statusEnum.ACTIVE;
@@ -1366,9 +1375,43 @@ async function publishJob(companyId, currentUserId, jobId, type) {
     job.originalPublishedDate = !job.originalPublishedDate?publishedDate:job.originalPublishedDate;
     job.publishedDate = publishedDate;
     job = await job.save();
+
+    job.skills = await feedService.findSkillsById(job.skills);
+
+    const data = {
+      font: {
+        "color" : "green",
+        "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
+      },
+      job: job
+    };
+
+    const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
+    const htmlString = fs.readFileSync(filePathName).toString();
+    let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
+    const ejsData = ejs.render(htmlString, data);
+
+
+    var promise = new Promise(function (resolve, reject) {
+      pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
+        if (err) reject(err);
+        resolve(response);
+      });
+    }).then(function(res){
+      parserService.uploadJob(res.filename);
+    }).then(function(res){
+      console.log('finally')
+      result = res;
+    });
+
+    console.log(result)
+
+    // job = await parserService.uploadJob(filePath);
+
+
   }
 
-  return job;
+  return result;
 }
 
 

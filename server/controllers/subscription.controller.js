@@ -219,5 +219,5 @@ async function updateSubscriptionPaymentMethod(currentUserId, id, form) {
     console.log(error);
   }
 
-  return subscription;
+  return {success: true};
 }

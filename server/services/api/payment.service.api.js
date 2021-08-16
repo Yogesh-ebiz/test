@@ -328,7 +328,6 @@ async function lookupProducts(ids) {
 
 
 async function addSubscription(form) {
-
   let response = await client.post(`/subscriptions`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
@@ -458,7 +457,7 @@ async function deleteSubscription(id) {
 
 async function updateSubscriptionPaymentMethod(id, form) {
 
-  let response = await client.post(`/subscriptions/${id}/payment/update`, form, options).catch(function (error) {
+  let response = await client.put(`/subscriptions/${id}/payment`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       throw new PaymentError(error.response.data.status, error.response.data.message);

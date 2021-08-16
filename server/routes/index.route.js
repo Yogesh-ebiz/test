@@ -20,10 +20,11 @@ const peopleRoutes = require('./people.route');
 const emailRoutes = require('./email.route');
 const taskRoutes = require('./task.route');
 const adRoutes = require('./ad.route');
-const subscriptionRoutes = require('./subscription.route');
+const parserRoutes = require('./parser.route');
 
 const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
+const subscriptionRoutes = require('./subscription.route');
 
 
 
@@ -39,27 +40,27 @@ router.use('/ads', adRoutes);
 router.use('/admin', adminRoutes);
 
 router.use('/applications', applicationRoutes);
+router.use('/categories', categoryRoutes);
+router.use('/company', companyRoutes);
+router.use('/emails', emailRoutes);
 router.use('/employmenttypes', employmentTypeRoutes);
 router.use('/experiencelevels', experienceLevelRoutes);
 router.use('/filters', filterRoutes);
 router.use('/industries', industryRoutes);
-router.use('/categories', categoryRoutes);
 router.use('/jobs', jobRequisitionRoutes);
 router.use('/jobfunctions', jobFunctionsRoutes);
 router.use('/promotion', promotionRoutes);
 router.use('/skilltypes', skillTypeRoutes);
 router.use('/suggestions', suggestionRoutes);
-router.use('/users', userRoutes);
-router.use('/workflows', workflowRoutes);
-router.use('/company', companyRoutes);
-router.use('/talent', talentRoutes);
+router.use('/parser', parserRoutes);
 router.use('/policies', policyRoutes);
 router.use('/products', productRoutes);
 router.use('/people', peopleRoutes);
-router.use('/emails', emailRoutes);
+
 router.use('/subscriptions', subscriptionRoutes);
-
+router.use('/talent', talentRoutes);
 router.use('/tasks', taskRoutes);
-
+router.use('/users', userRoutes);
+router.use('/workflows', workflowRoutes);
 
 module.exports = router;

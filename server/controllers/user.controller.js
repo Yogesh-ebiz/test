@@ -25,7 +25,7 @@ const partyEnum = require('../const/partyEnum');
 const statusEnum = require('../const/statusEnum');
 const alertEnum = require('../const/alertEnum');
 
-
+const parserService = require('../services/api/sovren.service.api');
 const {upload} = require('../services/aws.service');
 const feedService = require('../services/api/feed.service.api');
 const memberService = require('../services/member.service');
@@ -511,100 +511,102 @@ async function uploadResume(currentUserId, files, name) {
   try {
     let currentParty = await feedService.findByUserId(currentUserId);
     if (isPartyActive(currentParty)) {
+      if(files.file) {
+        let type;
+        let cv = files.file[0];
+        let originalname = cv.originalname.split('.');
+        let fileName = name ? name.split('.') : cv.originalname.split('.');
+        let fileExt = originalname[originalname.length - 1];
+        // let date = new Date();
+        let timestamp = Date.now();
+        name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt : name + '-' + timestamp + '.' + fileExt;
+        let path = basePath + currentUserId + '/_resumes/' + name;
+        // let response = await upload(path, cv.path);
+        switch (fileExt) {
+          case 'pdf':
+            type = 'PDF';
+            break;
+          case 'doc':
+            type = 'WORD';
+            break;
+          case 'docx':
+            type = 'WORD';
+            break;
 
-      let file = files.file;
-      let fileName = file.originalFilename.split('.');
-      let fileExt = fileName[fileName.length - 1];
-      // let date = new Date();
-      let timestamp = Date.now();
-      name = (!name)? currentParty.firstName + '_' + currentParty.lastName + '_' + currentUserId + '-' + timestamp + '.' + fileExt : name + '-' + timestamp + '.' + fileExt;
-      let path = basePath + currentUserId + '/_resumes/' + name;
+        }
 
-      let response = await upload(path, file.path);
-      let type;
-      switch(fileExt){
-        case 'pdf':
-          type='PDF';
-          break;
-        case 'doc':
-          type='WORD';
-          break;
-        case 'docx':
-          type='WORD';
-          break;
+        await feedService.addUserResume(currentUserId, name, type);
+
+        // result = {
+        //   employments: [
+        //     {
+        //       "employmentTitle": "Sr. Android Developer",
+        //       "fromDate": 1554080400000,
+        //       "description": "Lead a team of 5 mobile developers",
+        //       "isCurrent": false,
+        //       "terminationReason": '',
+        //       "terminationType": '',
+        //       "company": {
+        //         "id": 15,
+        //         "partyType": "ORGANIZATION",
+        //         "groupName": "eBay"
+        //       },
+        //       "city": "San Jose",
+        //       "state": "California",
+        //       "country": "US"
+        //     },
+        //     {
+        //       "employmentTitle": "Android Developer",
+        //       "fromDate": 1483232400000,
+        //       "thruDate": 1554080400000,
+        //       "description": "Developed first app",
+        //       "isCurrent": false,
+        //       "terminationReason": '',
+        //       "terminationType": '',
+        //       "company": {
+        //         "partyType": "ORGANIZATION",
+        //         "groupName": "FPT"
+        //       },
+        //       "city": "Seattle",
+        //       "state": "Washington",
+        //       "country": "US"
+        //     }
+        //
+        //   ],
+        //   educations: [
+        //     {
+        //       "typeOfDegree": "Bachelor of Science",
+        //       "major": "CIS",
+        //       "fromDate": 1320123740000,
+        //       "thruDate": 1398920540000,
+        //       "hasGraduated": true,
+        //       "isCurrent": false,
+        //       "school": {
+        //         "id": 27,
+        //         "partyType": "INSTITUTE",
+        //         "groupName": "Temple University"
+        //       },
+        //     },
+        //     {
+        //       "typeOfDegree": "Bachelor of Science",
+        //       "major": "MIS",
+        //       "fromDate": 1320123740000,
+        //       "thruDate": 1398920540000,
+        //       "hasGraduated": true,
+        //       "isCurrent": false,
+        //       "school": {
+        //         "partyType": "INSTITUTE",
+        //         "groupName": "Ohio University"
+        //       },
+        //
+        //     },
+        //   ]
+        //
+        // }
+
+        result = await parserService.uploadJob(cv.path);
 
       }
-      console.log('fileExt', fileExt, type)
-
-      await feedService.addUserResume(currentUserId, name, type);
-
-      result = {
-        employments: [
-          {
-            "employmentTitle": "Sr. Android Developer",
-            "fromDate": 1554080400000,
-            "description": "Lead a team of 5 mobile developers",
-            "isCurrent": false,
-            "terminationReason": '',
-            "terminationType": '',
-            "company": {
-              "id": 15,
-              "partyType": "ORGANIZATION",
-              "groupName": "eBay"
-            },
-            "city": "San Jose",
-            "state": "California",
-            "country": "US"
-          },
-          {
-            "employmentTitle": "Android Developer",
-            "fromDate": 1483232400000,
-            "thruDate": 1554080400000,
-            "description": "Developed first app",
-            "isCurrent": false,
-            "terminationReason": '',
-            "terminationType": '',
-            "company": {
-              "partyType": "ORGANIZATION",
-              "groupName": "FPT"
-            },
-            "city": "Seattle",
-            "state": "Washington",
-            "country": "US"
-          }
-
-        ],
-        educations: [
-          {
-            "typeOfDegree": "Bachelor of Science",
-            "major": "CIS",
-            "fromDate": 1320123740000,
-            "thruDate": 1398920540000,
-            "hasGraduated": true,
-            "isCurrent": false,
-            "school": {
-              "id": 27,
-              "partyType": "INSTITUTE",
-              "groupName": "Temple University"
-            },
-          },
-          {
-            "typeOfDegree": "Bachelor of Science",
-            "major": "MIS",
-            "fromDate": 1320123740000,
-            "thruDate": 1398920540000,
-            "hasGraduated": true,
-            "isCurrent": false,
-            "school": {
-              "partyType": "INSTITUTE",
-              "groupName": "Ohio University"
-            },
-
-          },
-        ]
-
-      }
-
 
     }
 
