@@ -41,15 +41,15 @@ async function addCandidate(companyId, user, hasImported) {
     return;
   }
 
-
-  email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
-  phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
+  let about = user.about?user.about:'';
+  let email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
+  let phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
 
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
     primaryAddress: user.primaryAddress,
     skills: _.map(user.skills, 'id'), url: user.shareUrl, links: user.links,
-    about: user.about, gender: user.gender, marital: user.marital
+    about: about, gender: user.gender, marital: user.marital
   }
 
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
