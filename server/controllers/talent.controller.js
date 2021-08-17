@@ -345,13 +345,9 @@ async function getSubscriptions(companyId, currentUserId) {
   let subscriptions = [];
   try {
     let company = await companyService.findByCompanyId(companyId);
-    if(company.subscriptions && company.subscriptions.length){
-      let filter = {ids: company.subscriptions};
-      console.log('calling')
-      subscriptions = await paymentService.lookupSubscriptions(filter);
-    }
-
-
+    let filter = {customerId: company.customerId};
+    subscriptions = await paymentService.lookupSubscriptions(filter);
+    
   } catch (error) {
     console.log(error);
   }
@@ -1378,21 +1374,24 @@ async function publishJob(companyId, currentUserId, jobId, type) {
 
     job.skills = await feedService.findSkillsById(job.skills);
 
-    const data = {
-      font: {
-        "color" : "green",
-        "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
-      },
-      job: job
-    };
-
-    const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
-    const htmlString = fs.readFileSync(filePathName).toString();
-    let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
-    const ejsData = ejs.render(htmlString, data);
 
 
     var promise = new Promise(function (resolve, reject) {
+
+      const data = {
+        font: {
+          "color" : "green",
+          "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
+        },
+        job: job
+      };
+
+      const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
+      const htmlString = fs.readFileSync(filePathName).toString();
+      let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
+      const ejsData = ejs.render(htmlString, data);
+
+
       pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
         if (err) reject(err);
         resolve(response);
@@ -1404,7 +1403,6 @@ async function publishJob(companyId, currentUserId, jobId, type) {
       result = res;
     });
 
-    console.log(result)
 
     // job = await parserService.uploadJob(filePath);
 

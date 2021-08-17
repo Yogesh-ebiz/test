@@ -20,7 +20,6 @@ let client = new ApiClient('https://rest.resumeparsing.com');
 
 async function uploadResume(filePath) {
 
-  console.log(filePath)
   var buffer = fs.readFileSync(filePath);
   var base64Doc = buffer.toString('base64');
 
@@ -56,9 +55,9 @@ async function uploadResume(filePath) {
 };
 
 async function uploadJob(filePath) {
-  console.log(filePath)
   var buffer = fs.readFileSync(filePath);
   var base64Doc = buffer.toString('base64');
+
 
   var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
 
@@ -72,23 +71,23 @@ async function uploadJob(filePath) {
 
   options.headers['Content-Length'] =  Buffer.byteLength(data);
 
-  let response = await client.post(`/v10/parser/joborder`, data, options).catch(function (error) {
-    if (error.response) {
-      // Request made and server responded
-      console.log(error.response);
+  // let response = await client.post(`/v10/parser/joborder`, data, options).catch(function (error) {
+  //   if (error.response) {
+  //     // Request made and server responded
+  //     console.log(error.response);
+  //
+  //   } else if (error.request) {
+  //     // The request was made but no response was received
+  //     console.log(error.request);
+  //   } else {
+  //     // Something happened in setting up the request that triggered an Error
+  //     console.log('Error', error.message);
+  //   }
+  //
+  // });
 
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.log(error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message);
-    }
 
-  });
-
-
-  return response.data;
+  // return response.data;
 };
 
 

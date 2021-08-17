@@ -57,7 +57,7 @@ async function addSubscription(currentUserId, form) {
     subscription = await paymentService.addSubscription(form);
     if(subscription){
       company.talentSubscription = subscription.id;
-      company.subscriptions.push(subscription.id);
+      // company.subscriptions.push(subscription.id);
 
       if(subscription.plan.tier==1){
         company.credit = 30;

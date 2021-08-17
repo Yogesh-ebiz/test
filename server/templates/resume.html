@@ -11,7 +11,18 @@
   <title>*|MC:SUBJECT|*</title>
 
   <link rel="stylesheet" href="resume.css">
-  <style type="text/css" sr>
+  <style type="text/css">
+    @media print {
+      *:before,
+      *:after {
+        color: #333 !important;
+        text-shadow: none !important;
+        background: transparent !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+      }
+    }
+
     .name{
       font-weight: bold
     }
@@ -29,6 +40,7 @@
       <div id="SECTION_NAME764112009" class="section" style="padding-top:0px;">
         <div id="PARAGRAPH_764112009_1_495256499" class="paragraph PARAGRAPH_NAME firstparagraph">
           <div class="name" itemprop="name" style="font-weight: bold"><span class="field" id="764112009FNAM1"></span><span></span><span class="field" id="764112009LNAM1">John Smith</span></div>
+          <div class="name" itemprop="name" style="font-weight: bold"><span class="field" id="position"></span><span></span><span class="field" id="764112009LNAM1">Senior Android Developer</span></div>
           <div class="lowerborder"></div>
         </div>
       </div>

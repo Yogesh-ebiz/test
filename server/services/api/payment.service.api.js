@@ -475,6 +475,7 @@ async function updateSubscriptionPaymentMethod(id, form) {
   return response.data.data;
 };
 
+
 async function lookupSubscriptions(filter) {
 
   let response = await client.post(`/subscriptions/lookup`, filter, null).catch(function (error) {
