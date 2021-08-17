@@ -60,15 +60,18 @@ const MemberSchema = new mongoose.Schema({
   },
   timezone: {
     type: String,
-    required:false
+    required:false,
+    default: 'America/Los_Angeles'
   },
   currency: {
     type: String,
-    required:false
+    required:false,
+    default: 'USD'
   },
   preferTimeFormat: {
     type: String,
-    required:false
+    required:false,
+    default: '24'
   },
   id: {
     type: Number
