@@ -131,8 +131,8 @@ router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(ge
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
-router.route('/company/:id/candidates/:candidateId/resume/upload').post(asyncHandler(uploadCandidateResume));
-router.route('/company/:id/candidates/:candidateId/resumes').get(asyncHandler(uploadCandidateResume));
+router.route('/company/:id/candidates/:candidateId/resumes/upload').post(asyncHandler(uploadCandidateResume));
+router.route('/company/:id/candidates/:candidateId/resumes').get(asyncHandler(getCandidateResumes));
 
 router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
 
@@ -1298,6 +1298,17 @@ async function uploadCandidateResume(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let candidateId = ObjectID(req.params.candidateId)  ;
   let data = await talentCtrl.uploadCandidateResume(companyId, currentUserId, candidateId, req.files);
+
+  res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
+}
+
+
+
+async function getCandidateResumes(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = ObjectID(req.params.candidateId)  ;
+  let data = await talentCtrl.getCandidateResumes(companyId, currentUserId, candidateId);
 
   res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
 }

@@ -208,6 +208,7 @@ module.exports = {
   getCandidateActivities,
   uploadAvatar,
   uploadCandidateResume,
+  getCandidateResumes,
   assignCandidatesJobs,
   getAllCandidatesSkills,
   addCandidateTag,
@@ -3738,6 +3739,35 @@ async function uploadCandidateResume(companyId, currentUserId, candidateId, file
 
       }
     }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
+
+
+async function getCandidateResumes(companyId, currentUserId, candidateId, files) {
+  if(!companyId || !currentUserId || !candidateId || !files){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'candidates/';
+  try {
+
+    let candidate = await candidateService.findById(candidateId).populate('resumes');
+    result = _.reduce(candidate.resumes, function(res, item){
+      res.push(config.cdn + "/" + item.path);
+      return res;
+    }, []);
 
   } catch (error) {
     console.log(error);
