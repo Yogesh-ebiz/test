@@ -22,8 +22,8 @@ const memberSchema = Joi.object({
   timezone: Joi.string().allow('').optional(),
   preferTimeFormat: Joi.string().allow('').optional(),
   currency: Joi.string().allow('').optional(),
-  userId: Joi.number().required(),
-  role: Joi.object().required(),
+  userId: Joi.number().optional(),
+  role: Joi.object().optional(),
   avatar: Joi.string().optional()
 });
 

@@ -79,6 +79,15 @@ async function uploadBase64(base64Str, src, dest){
     case 'docx':
       type = 'WORD';
       break;
+    case 'jpg':
+      type = 'JPG';
+      break;
+    case 'jpeg':
+      type = 'JPG';
+      break;
+    case 'png':
+      type = 'PNG';
+      break;
 
   }
 
@@ -137,7 +146,7 @@ async function apply(application) {
     }
 
     if(photo && photo.base64) {
-      let uploaded = await uploadBase64(photo.base64, "/tmp/" + resume.name, 'applications/' + '/photos/');
+      let uploaded = await uploadBase64(photo.base64, "/tmp/" + photo.name, 'applications/' + '/photos/');
       let file = await fileService.addFile({
         filename: uploaded.filename,
         fileType: uploaded.fileType,
