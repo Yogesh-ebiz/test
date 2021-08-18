@@ -191,6 +191,7 @@ async function sync(form) {
         let company = await new Company({
           name: form.name,
           companyId: form.id,
+          partyType: form.partyType,
           createdBy: form.createdBy,
           email: user[0].primaryEmail ? user[0].primaryEmail.value : '',
           primaryAddress: {

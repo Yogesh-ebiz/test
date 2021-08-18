@@ -56,7 +56,7 @@ async function syncUserCompanies(userId){
   };
 
 
-  let response = await client.get(`/user/${userId}/company/managed?roles=ROLE_OWNER,ROLE_ADMIN`, null, options);
+  let response = await client.get(`/user/${userId}/party/managed?types=COMPANY,INSTITUTE&roles=ROLE_OWNER,ROLE_ADMIN`, null, options);
   return response.data.data;
 };
 
