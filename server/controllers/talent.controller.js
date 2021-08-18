@@ -3749,8 +3749,8 @@ async function uploadCandidateResume(companyId, currentUserId, candidateId, file
 }
 
 
-async function getCandidateResumes(companyId, currentUserId, candidateId, files) {
-  if(!companyId || !currentUserId || !candidateId || !files){
+async function getCandidateResumes(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
     return null;
   }
 
@@ -3765,7 +3765,8 @@ async function getCandidateResumes(companyId, currentUserId, candidateId, files)
 
     let candidate = await candidateService.findById(candidateId).populate('resumes');
     result = _.reduce(candidate.resumes, function(res, item){
-      res.push(config.cdn + "/" + item.path);
+      item.path = config.cdn + "/" + item.path;
+      res.push(item);
       return res;
     }, []);
 
