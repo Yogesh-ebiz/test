@@ -176,7 +176,6 @@ async function sync(form) {
     return null;
   }
 
-  let result;
   try {
     let company = await companyService.findByCompanyId(form.id);
     if(company){
@@ -184,48 +183,10 @@ async function sync(form) {
       company.name = form.name;
       company.primaryAddress = company.primaryAddress;
       await company.save();
-    } else {
-      let user = await feedService.lookupPeopleIds([form.createdBy]);
-
-      let role = await roleService.getAdminRole();
-      if(user && form && role) {
-        user = user[0];
-
-        let company = await new Company({
-          name: form.name,
-          companyId: form.id,
-          partyType: form.partyType,
-          createdBy: form.createdBy,
-          email: user[0].primaryEmail ? user[0].primaryEmail.value : '',
-          primaryAddress: {
-            address1: form.primaryAddress.address1,
-            address2: form.primaryAddress.address2,
-            district: form.primaryAddress.district,
-            city: form.primaryAddress.city,
-            state: form.primaryAddress.state,
-            country: form.primaryAddress.country
-          }
-        }).save();
-
-        let member = memberService.addMember({
-          company: form.id,
-          userId: user.id,
-          firstName: user.firstName,
-          middleName: user.middleName,
-          lastName: user.lastName,
-          email: user.primaryEmail.value,
-          phone: user.primaryPhone?user.primaryPhone.value:'',
-          role: role
-        });
-
-      }
     }
   } catch(e){
     console.log('sync: Error', e);
   }
-
-
-  return result;
 
 }
 

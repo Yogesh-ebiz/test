@@ -220,6 +220,7 @@ async function syncCompanies(userId) {
   let result;
   try {
     let user = await feedService.getCurrentUser(userId);
+
     let userCompanies = await feedService.syncUserCompanies(userId);
     if(user && userCompanies.length) {
       let companies = await companyService.findByCompanyIds(_.map(userCompanies, 'id'), false);
@@ -227,6 +228,7 @@ async function syncCompanies(userId) {
       let role = await roleService.getAdminRole();
       for (const [i, comp] of userCompanies.entries()) {
         let company = _.find(companies, {companyId: comp.id});
+
         if(!company){
           let newCompany = {
             name: comp.name,
@@ -237,23 +239,25 @@ async function syncCompanies(userId) {
             primaryAddress: {address1: comp.primaryAddress.address1, address2: comp.primaryAddress.address2, district: comp.primaryAddress.district, city: comp.primaryAddress.city, state: comp.primaryAddress.state, country: comp.primaryAddress.country }
           }
           company = await companyService.add(newCompany);
+          let member = _.find(members, {company: comp.id, userId: userId});
+
+          if(!member){
+            member = await memberService.addMember({
+              createdBy: user.id,
+              company: comp.id,
+              userId: user.id,
+              firstName: user.firstName,
+              middleName: user.middleName,
+              lastName: user.lastName,
+              email: user.primaryEmail.value,
+              phone: user.primaryPhone?user.primaryPhone.value:'',
+              role: role
+            });
+
+          }
         }
 
-        let member = _.find(members, {company: comp.id, userId: userId});
-        if(!member){
-          member = await memberService.addMember({
-            createdBy: user.id,
-            company: comp.id,
-            userId: user.id,
-            firstName: user.firstName,
-            middleName: user.middleName,
-            lastName: user.lastName,
-            email: user.primaryEmail.value,
-            phone: user.primaryPhone?user.primaryPhone.value:'',
-            role: role
-          });
 
-        }
 
       }
     }
