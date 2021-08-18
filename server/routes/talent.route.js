@@ -131,7 +131,8 @@ router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(ge
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
-router.route('/company/:id/candidates/:candidateId/upload/resume').post(asyncHandler(uploadCandidateResume));
+router.route('/company/:id/candidates/:candidateId/resume/upload').post(asyncHandler(uploadCandidateResume));
+router.route('/company/:id/candidates/:candidateId/resumes').get(asyncHandler(uploadCandidateResume));
 
 router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
 
