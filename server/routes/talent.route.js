@@ -131,6 +131,7 @@ router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(ge
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
+router.route('/company/:id/candidates/:candidateId/upload/resume').post(asyncHandler(uploadCandidateResume));
 
 router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
 
@@ -1291,6 +1292,16 @@ async function uploadAvatar(req, res) {
 }
 
 
+async function uploadCandidateResume(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = ObjectID(req.params.candidateId)  ;
+  let data = await talentCtrl.uploadCandidateResume(companyId, currentUserId, candidateId, req.files);
+
+  res.json(new Response(data, data?'resume_uploaded_successful':'not_found', res));
+}
+
+
 async function assignCandidatesJobs(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -1981,7 +1992,6 @@ async function uploadApplication(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let applicationId = req.params.applicationId;
-  console.log(companyId, currentUserId, applicationId, req.files)
   let data = await talentCtrl.uploadApplication(companyId, currentUserId, applicationId, req.files);
 
   res.json(new Response(data, data?'files_retrieved_successful':'not_found', res));

@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
+const md5File = require('md5-file');
 const fs = require('fs');
 const ejs = require('ejs');
 const pdf = require('html-pdf');
@@ -206,6 +207,7 @@ module.exports = {
   getCandidatesSimilar,
   getCandidateActivities,
   uploadAvatar,
+  uploadCandidateResume,
   assignCandidatesJobs,
   getAllCandidatesSkills,
   addCandidateTag,
@@ -1389,8 +1391,35 @@ async function publishJob(companyId, currentUserId, jobId, type) {
     job.skills = await feedService.findSkillsById(job.skills);
 
 
-    await parserService.uploadJob(job);
+    var promise = new Promise(function (resolve, reject) {
 
+      const data = {
+        font: {
+          "color" : "green",
+          "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
+        },
+        job: job
+      };
+
+      const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
+      const htmlString = fs.readFileSync(filePathName).toString();
+      let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
+      const ejsData = ejs.render(htmlString, data);
+
+
+      pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
+        if (err) reject(err);
+        resolve(response);
+      });
+    }).then(function(res){
+      parserService.uploadJob(res.filename);
+    }).then(function(res){
+      console.log('finally')
+      result = res;
+    });
+
+
+// job = await parserService.uploadJob(filePath);
 
   }
 
@@ -3655,6 +3684,68 @@ async function uploadAvatar(companyId, currentUserId, candidateId, files) {
 }
 
 
+async function uploadCandidateResume(companyId, currentUserId, candidateId, files) {
+  if(!companyId || !currentUserId || !candidateId || !files){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+  let basePath = 'candidates/';
+  try {
+
+    let candidate = await candidateService.findById(candidateId).populate('resumes');
+
+    if (candidate) {
+      let type, name;
+      //------------Upload CV----------------
+
+      if(files.file) {
+
+        let cv = files.file[0];
+        const hash = md5File.sync(cv.path)
+
+        let fileName = cv.originalname.split('.');
+        let fileExt = fileName[fileName.length - 1];
+        // let date = new Date();
+        let timestamp = Date.now();
+        name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
+        let path = basePath + candidate._id + '/' + name;
+        let response = await awsService.upload(path, cv.path);
+        switch (fileExt) {
+          case 'pdf':
+            type = 'PDF';
+            break;
+          case 'doc':
+            type = 'WORD';
+            break;
+          case 'docx':
+            type = 'WORD';
+            break;
+
+        }
+
+        let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId, hash: hash});
+        if(file){
+          candidate.resumes.push(file._id);
+          await candidate.save();
+          result = file;
+        }
+
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+
+}
 
 async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) {
   if(!companyId || !currentUserId || !candidates || !jobs){
@@ -5573,7 +5664,6 @@ async function unsubscribeJob(currentUserId, companyId, jobId) {
 
 
 async function uploadApplication(companyId, currentUserId, applicationId, files) {
-  console.log(companyId, currentUserId, applicationId, files)
   if(!companyId || !currentUserId || !applicationId || !files){
     return null;
   }

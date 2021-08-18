@@ -142,6 +142,7 @@ async function apply(application) {
       if (file) {
         savedApplication.resume = file._id;
         savedApplication.files.push(file._id);
+
       }
     }
 

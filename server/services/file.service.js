@@ -11,6 +11,7 @@ const fileSchema = Joi.object({
   filename: Joi.string().required(),
   createdBy: Joi.number(),
   path: Joi.string(),
+  hash: Joi.string()
 });
 
 

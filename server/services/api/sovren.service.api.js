@@ -18,7 +18,7 @@ const options = {
 let client = new ApiClient('https://rest.resumeparsing.com');
 
 
-async function uploadResume(filePath) {
+async function uploadResume(filePath, documentId) {
 
   var buffer = fs.readFileSync(filePath);
   var base64Doc = buffer.toString('base64');
@@ -29,7 +29,11 @@ async function uploadResume(filePath) {
   var data = JSON.stringify({
     'DocumentAsBase64String': base64Doc,
     'DocumentLastModified': modifiedDate,
-    'OutputCandidateImage':true
+    'OutputCandidateImage':true,
+    'IndexingOptions': {
+      'IndexId': 'accessed',
+      'DocumentId': documentId
+    }
   });
 
 
@@ -54,62 +58,75 @@ async function uploadResume(filePath) {
   return response.data;
 };
 
-async function uploadJob(job) {
-  var promise = new Promise(function (resolve, reject) {
-    console.log('start')
-    const data = {
-      font: {
-        "color" : "green",
-        "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
-      },
-      job: job
-    };
-
-    const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
-    const htmlString = fs.readFileSync(filePathName).toString();
-    let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
-    const ejsData = ejs.render(htmlString, data);
-
-    console.log(ejsData)
-    pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
-      if (err) reject(err);
-      console.log(response)
-      resolve(response);
-    });
-  }).then(function(res){
-
-    console.log(res);
-    var buffer = fs.readFileSync(filePath);
-    var base64Doc = buffer.toString('base64');
-    var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
-    var data = JSON.stringify({
-      'DocumentAsBase64String': base64Doc,
-      'DocumentLastModified': modifiedDate,
-      'OutputCandidateImage':true
-    });
+async function uploadJob(filePath, documentId) {
+  var buffer = fs.readFileSync(filePath);
+  var base64Doc = buffer.toString('base64');
 
 
-    options.headers['Content-Length'] =  Buffer.byteLength(data);
-
-    // let response = client.post(`/v10/parser/joborder`, data, options).catch(function (error) {
-    //   if (error.response) {
-    //     // Request made and server responded
-    //     console.log(error.response);
-    //
-    //   } else if (error.request) {
-    //     // The request was made but no response was received
-    //     console.log(error.request);
-    //   } else {
-    //     // Something happened in setting up the request that triggered an Error
-    //     console.log('Error', error.message);
-    //   }
-    //
-    // });
-
-  })
+  var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
 
 
+  var data = JSON.stringify({
+    'DocumentAsBase64String': base64Doc,
+    'DocumentLastModified': modifiedDate,
+    'IndexingOptions': {
+      'IndexId': 'accessed',
+      'DocumentId': documentId
+    }
+  });
 
+
+  options.headers['Content-Length'] =  Buffer.byteLength(data);
+
+  let response = await client.post(`/v10/parser/joborder`, data, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  // return response.data;
+};
+
+async function matchResume(filePath) {
+
+  var buffer = fs.readFileSync(filePath);
+  var base64Doc = buffer.toString('base64');
+
+  var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
+
+
+  var data = JSON.stringify({
+    'ResumeData': base64Doc,
+    'IndexIdsToSearchInto': ['accessed']
+  });
+
+
+  options.headers['Content-Length'] =  Buffer.byteLength(data);
+
+  let response = await client.post(`/v10/matcher/resume`, data, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
 
 
   // return response.data;
@@ -161,6 +178,7 @@ async function listAllSkills() {
 module.exports = {
   uploadResume:uploadResume,
   uploadJob:uploadJob,
+  matchResume:matchResume,
   addSkills:addSkills,
   listAllSkills:listAllSkills
 }

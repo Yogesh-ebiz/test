@@ -9,6 +9,8 @@ const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
 const evaluationService = require('../services/evaluation.service');
 const feedService = require('../services/api/feed.service.api');
+const sovrenService = require('../services/api/sovren.service.api');
+
 const awsService = require('../services/aws.service');
 
 const {convertToCandidate} = require('../utils/helper');
@@ -79,9 +81,7 @@ async function addCandidateByResume(companyId, member, file) {
   try {
 
 
-    console.log(file)
     const hash = md5File.sync(file.path)
-    console.log(file.originalname, hash)
 
 
     // let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
@@ -365,24 +365,25 @@ async function getCandidatesSimilar(userId) {
   if(!userId){
     return;
   }
-  // let candidates = await Candidate.find({userId: {$ne: userId}}).limit(10);
-  // let candidateIds = _.map(candidates, 'userId');
-  let filter = {
-    "jobTitles": ["Sr. Manager"],
-    "locations": ["US"],
-    "skills": [],
-    "companies": [""],
-    "schools": [],
-    "industries": [],
-    "employmentTypes": []
-  }
-  let result = await feedService.searchPeople(filter, {});
-  let people = _.reduce(result.content, function(res, p){
-    res.push(p);
-    return res;
-  }, []);
+  let list = [];
+  //
+  // let filter = {
+  //   "jobTitles": ["Sr. Manager"],
+  //   "locations": ["US"],
+  //   "skills": [],
+  //   "companies": [""],
+  //   "schools": [],
+  //   "industries": [],
+  //   "employmentTypes": []
+  // }
+  // let result = await feedService.searchPeople(filter, {});
+  // list = _.reduce(result.content, function(res, p){
+  //   res.push(p);
+  //   return res;
+  // }, []);
 
-  return people;
+
+  return list;
 }
 
 
