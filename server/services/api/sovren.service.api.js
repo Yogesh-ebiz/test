@@ -19,7 +19,7 @@ let client = new ApiClient('https://rest.resumeparsing.com');
 
 
 async function uploadResume(filePath, documentId) {
-
+  console.log('uploading', filePath, documentId)
   var buffer = fs.readFileSync(filePath);
   var base64Doc = buffer.toString('base64');
 

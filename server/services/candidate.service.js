@@ -433,6 +433,16 @@ async function getCompanyBlacklisted(company, sort) {
 
 
 
+async function checkEmail(company, email) {
+
+  if(!company || !email){
+    return;
+  }
+
+  let candidate = await Candidate.findOne({company: company, email: email});
+  return candidate;
+}
+
 
 
 
@@ -451,5 +461,6 @@ module.exports = {
   search:search,
   getAllCandidatesSkills:getAllCandidatesSkills,
   getCandidatesSimilar:getCandidatesSimilar,
-  getCompanyBlacklisted:getCompanyBlacklisted
+  getCompanyBlacklisted:getCompanyBlacklisted,
+  checkEmail:checkEmail
 }

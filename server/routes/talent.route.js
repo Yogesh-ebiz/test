@@ -135,6 +135,7 @@ router.route('/company/:id/candidates/:candidateId/resumes/upload').post(asyncHa
 router.route('/company/:id/candidates/:candidateId/resumes').get(asyncHandler(getCandidateResumes));
 
 router.route('/company/:id/candidates/assignjobs').post(asyncHandler(assignCandidatesJobs));
+router.route('/company/:id/candidates/email/check').post(asyncHandler(checkCandidateEmail));
 
 
 router.route('/company/:id/filter/skills').get(asyncHandler(getAllCandidatesSkills));
@@ -1322,6 +1323,16 @@ async function assignCandidatesJobs(req, res) {
 
   let data = await talentCtrl.assignCandidatesJobs(company, currentUserId, candidates, jobs);
   res.json(new Response(data, data?'activities_retrieved_successful':'not_found', res));
+}
+
+
+async function checkCandidateEmail(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let email = req.query.email;
+
+  let data = await talentCtrl.checkCandidateEmail(company, currentUserId, email);
+  res.json(new Response(data, data?'email_retrieved_successful':'not_found', res));
 }
 
 

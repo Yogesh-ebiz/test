@@ -33,9 +33,9 @@ const awsService = require('../services/aws.service');
 const {buildFileUrl, buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
-const companyService = require('../services/company.service');
+const sovrenService = require('../services/api/sovren.service.api');
 
-const {getPartyById, getPersonById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populatePerson} = require('../services/party.service');
+const companyService = require('../services/company.service');
 const jobService = require('../services/jobrequisition.service');
 const applicationService = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
@@ -210,6 +210,7 @@ module.exports = {
   uploadCandidateResume,
   getCandidateResumes,
   assignCandidatesJobs,
+  checkCandidateEmail,
   getAllCandidatesSkills,
   addCandidateTag,
   removeCandidateTag,
@@ -3716,7 +3717,13 @@ async function uploadCandidateResume(companyId, currentUserId, candidateId, file
         let timestamp = Date.now();
         name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
         let path = basePath + candidate._id + '/' + name;
-        let response = await awsService.upload(path, cv.path);
+
+        // console.log(hash, _.map(candidate.resumes, 'hash'), _.some(candidate.resumes, {hash: hash}))
+        // if(!_.some(candidate.resumes, {hash: hash})){
+        //   await sovrenService.uploadResume(cv.path, candidate._id);
+        // }
+
+        await awsService.upload(path, cv.path);
         switch (fileExt) {
           case 'pdf':
             type = 'PDF';
@@ -3734,6 +3741,8 @@ async function uploadCandidateResume(companyId, currentUserId, candidateId, file
         if(file){
           candidate.resumes.push(file._id);
           await candidate.save();
+
+
           result = file;
         }
 
@@ -3830,6 +3839,29 @@ async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) 
   }
 
   return {success: true}
+}
+
+
+async function checkCandidateEmail(companyId, currentUserId, email) {
+  if(!companyId || !currentUserId || !email){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    result = await candidateService.checkEmail(companyId, email);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
 }
 
 
