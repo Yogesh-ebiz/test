@@ -302,28 +302,29 @@ async function getUserSession(currentUserId, preferredCompany) {
   if(!currentUserId){
     return null;
   }
-
+  
   let result;
   let user = await feedService.findUserByIdFull(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
   let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
+  preferredCompany = preferredCompany? _.some(companies, {companyId: preferredCompany}) ? preferredCompany:companies.length?companies[0].company:null:companies.length?companies[0].company:null;
 
-  user = convertToTalentUser(user);
-  user.currentCompanyId = preferredCompany? _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length?companies[0].company:null:companies.length?companies[0].company:null;
+  let member = _.find(allAccounts, {company: preferredCompany});
+  user = convertToTalentUser(member);
 
   companies = _.reduce(companies, function(res, item){
     let found = _.find(allAccounts, {company: item.companyId});
     // item = convertToCompany(item);
     item.avatar = buildCompanyUrl(item);
     item.role = roleMinimal(found.role);
-    item.memberId = found._id
+    item.memberId = found._id;
     res.push(item)
     return res;
   }, [])
 
   user.company = companies;
-
+  user.preferredCompany = preferredCompany;
 
 
   return user;
@@ -347,7 +348,7 @@ async function getSubscriptions(companyId, currentUserId) {
     let company = await companyService.findByCompanyId(companyId);
     let filter = {customerId: company.customerId};
     subscriptions = await paymentService.lookupSubscriptions(filter);
-    
+
   } catch (error) {
     console.log(error);
   }
@@ -1375,41 +1376,12 @@ async function publishJob(companyId, currentUserId, jobId, type) {
     job.skills = await feedService.findSkillsById(job.skills);
 
 
-
-    var promise = new Promise(function (resolve, reject) {
-
-      const data = {
-        font: {
-          "color" : "green",
-          "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
-        },
-        job: job
-      };
-
-      const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
-      const htmlString = fs.readFileSync(filePathName).toString();
-      let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
-      const ejsData = ejs.render(htmlString, data);
-
-
-      pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
-        if (err) reject(err);
-        resolve(response);
-      });
-    }).then(function(res){
-      parserService.uploadJob(res.filename);
-    }).then(function(res){
-      console.log('finally')
-      result = res;
-    });
-
-
-    // job = await parserService.uploadJob(filePath);
+    await parserService.uploadJob(job);
 
 
   }
 
-  return result;
+  return job;
 }
 
 

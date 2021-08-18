@@ -240,7 +240,7 @@ router.route('/company/:id/sources').delete(asyncHandler(removeSources));
 
 async function getUserSession(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let preferredCompany = req.query.company?req.query.company:null;
+  let preferredCompany = req.query.company?parseInt(req.query.company):null;
 
   let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
   res.json(new Response(data, data?'get_session_successful':'not_found', res));

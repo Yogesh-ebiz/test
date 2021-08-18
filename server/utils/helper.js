@@ -56,14 +56,12 @@ const convertToTalentUser = (user) => {
     return;
   }
 
-  let primaryEmail = (user.primaryEmail)?{
-    type: user.primaryEmail.name,
-    value: user.primaryEmail.value
+  let primaryEmail = (user.email)?{
+    value: user.email
   }: null;
 
-  let primaryPhone = (user.primaryPhone)?{
-    type: user.primaryPhone.name,
-    value: user.primaryPhone.value
+  let primaryPhone = (user.phone)?{
+    value: user.phone
   }: null;
 
   return {
@@ -75,7 +73,11 @@ const convertToTalentUser = (user) => {
     avatar: buildUserUrl(user),
     isOnline: user.isOnline,
     primaryEmail: primaryEmail,
-    primaryPhone: primaryPhone
+    primaryPhone: primaryPhone,
+    currency: user.currency,
+    timezone: user.timezone,
+    language: user.language,
+    preferredCompany: user.preferredCompany
   };
 }
 
