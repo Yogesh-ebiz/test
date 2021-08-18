@@ -302,15 +302,28 @@ async function getUserSession(currentUserId, preferredCompany) {
   if(!currentUserId){
     return null;
   }
-  
+
   let result;
-  let user = await feedService.findUserByIdFull(currentUserId);
+  // let user = await feedService.findUserByIdFull(currentUserId);
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
   let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
-  preferredCompany = preferredCompany? _.some(companies, {companyId: preferredCompany}) ? preferredCompany:companies.length?companies[0].company:null:companies.length?companies[0].company:null;
 
-  let member = _.find(allAccounts, {company: preferredCompany});
+  let member;
+  if(allAccounts.length>1) {
+    if (preferredCompany) {
+      preferredCompany = _.some(companies, {companyId: preferredCompany}) ? preferredCompany : companies.length ? companies[0].companyId : null;
+      member = _.find(allAccounts, {company: preferredCompany});
+    } else {
+      member = allAccounts[0];
+      preferredCompany = companies[0].companyId;
+    }
+  } else {
+    member = allAccounts[0];
+    preferredCompany = companies[0].companyId;
+  }
+
+
   user = convertToTalentUser(member);
 
   companies = _.reduce(companies, function(res, item){
