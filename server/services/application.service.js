@@ -641,7 +641,7 @@ async function deleteByList(ids) {
   }
 
   let applications = await Application.find({_id: {$in: ids}});
-  await applicationProgressService.deleteByList(progresses);
+  await applicationProgressService.deleteByList(application.progress);
   await Application.updateMany({_id: {$in: ids}}, {$set: {status: statusEnum.DELETED}});
 
 }
