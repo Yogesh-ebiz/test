@@ -1280,6 +1280,20 @@ async function getJobPipeline(companyId, jobId, currentUserId) {
 
   try {
     result = await jobService.getJobPipeline(jobId);
+    result.stages = _.reduce(result.stages, function(res, stage){
+      stage.tasks = _.reduce(stage.tasks, function(res, task){
+        task.members = _.reduce(task.members, function(res, member){
+          member.avatar = buildUserUrl(member);
+          res.push(member);
+          return res;
+        }, []);
+
+        res.push(task);
+        return res;
+      }, []);
+      res.push(stage);
+      return res;
+    }, []);
 
   } catch(e){
     console.log('getJobPipeline: Error', e);

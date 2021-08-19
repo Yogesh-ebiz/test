@@ -299,7 +299,6 @@ const buildUserUrl = (user) => {
 
   let id = user.id?user.id:user._id?user.userId:null;
   let avatar = user.avatar?user.avatar:'';
-  console.log(avatar)
   return avatar?config.cdn + '/user/' + id + '/images/' + avatar:'';
 }
 
