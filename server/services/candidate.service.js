@@ -144,7 +144,6 @@ async function removeCandidate(id) {
   } catch (error) {
     console.log(error);
   }
-
 }
 
 function findById(id) {

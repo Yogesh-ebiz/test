@@ -61,6 +61,14 @@ function findApplicationByCurrentStatus(applicationId) {
 }
 
 
+function deleteByList(ids) {
+
+  if(!ids){
+    return;
+  }
+
+  return ApplicationProgress.update({_id: {$in: ids}}, {$set: {status: statusEnum.DELETED}});
+}
 
 function removeByList(ids) {
 
@@ -146,6 +154,7 @@ module.exports = {
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationProgresssByIds:findApplicationProgresssByIds,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,
+  deleteByList:deleteByList,
   removeByList:removeByList,
   getApplicationProgressEvaluations:getApplicationProgressEvaluations,
   addApplicationProgressEvaluation:addApplicationProgressEvaluation,

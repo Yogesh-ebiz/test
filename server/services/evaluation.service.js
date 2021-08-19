@@ -330,7 +330,7 @@ async function findByCandidateAndCompany(userId, filter, sort) {
         from:"applicationprogresses",
         let:{applicationProgressId:"$applicationProgressId"},
         pipeline:[
-          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}, status: statusEnum.ACTIVE}},
           {$lookup:{
               from:"stages",
               let:{stage:"$stage"},
@@ -402,7 +402,7 @@ async function findByCandidateAndApplicationId(userId, filter, sort) {
         from:"applicationprogresses",
         let:{applicationProgressId:"$applicationProgressId"},
         pipeline:[
-          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}, status: statusEnum.ACTIVE}},
           {$lookup:{
               from:"stages",
               let:{stage:"$stage"},

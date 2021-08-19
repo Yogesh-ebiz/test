@@ -633,6 +633,19 @@ async function deleteById(id, member) {
 }
 
 
+async function deleteByList(ids) {
+  let result = null;
+
+  if(!ids){
+    return;
+  }
+
+  let applications = await Application.find({_id: {$in: ids}});
+  await applicationProgressService.deleteByList(progresses);
+  await Application.updateMany({_id: {$in: ids}}, {$set: {status: statusEnum.DELETED}});
+
+}
+
 async function removeByList(ids) {
   let result = null;
 
@@ -1446,6 +1459,7 @@ module.exports = {
   disqualify:disqualify,
   revert:revert,
   deleteById:deleteById,
+  deleteByList:deleteByList,
   removeByList:removeByList,
   accept:accept,
   reject:reject,

@@ -120,11 +120,12 @@ async function compose(form, companyId) {
               } else {
                 candidate = await candidateService.findByEmailAndCompanyId(contact.email, companyId);
                 if(!candidate) {
+                  console.log('syncing people', contact.email)
                   //Sync: Create new User or Return if exist by email
                   let user = await feedService.syncPeople({
                     email: contact.email,
                     primaryAddress: {city: job.city, state: job.state, country: job.country}
-                  });
+                  });2
                   if (user) {
                     candidate = await candidateService.addCandidate(companyId, user, contact.email);
                   }

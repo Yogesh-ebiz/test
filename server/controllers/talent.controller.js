@@ -6013,7 +6013,7 @@ async function deactivateCompanyEvaluationTemplate(companyId, templateId, curren
 
 
   } catch(e){
-    console.log('updateTemplate: Error', e);
+    console.log('deactivateCompanyEvaluationTemplate: Error', e);
   }
 
 
@@ -6036,7 +6036,7 @@ async function activateCompanyEvaluationTemplate(companyId, templateId, currentU
 
 
   } catch(e){
-    console.log('updateTemplate: Error', e);
+    console.log('activateCompanyEvaluationTemplate: Error', e);
   }
 
 
@@ -6061,7 +6061,7 @@ async function getEvaluationFilters(companyId, currentUserId) {
     result = await evaluationService.getFilters(companyId);
 
   } catch(e){
-    console.log('deleteCompanyEvaluationTemplate: Error', e);
+    console.log('getEvaluationFilters: Error', e);
   }
 
 
