@@ -863,6 +863,7 @@ async function applyJobById(currentUserId, jobId, application ) {
           currentParty.primaryPhone = {value: application.phoneNumber};
           candidate = await candidateService.addCandidate(job.company.companyId, currentParty);
         } else {
+          candidate.status = statusEnum.ACTIVE;
           candidate.email = application.email;
           candidate.phoneNumber = application.phoneNumber;
           candidate.avatar = currentParty.avatar;
