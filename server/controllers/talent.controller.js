@@ -3334,8 +3334,25 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
   }
 
   result = await candidateService.search(filter, sort);
+  let pools = await poolService.findByCompany(companyId);
 
   result.docs = _.reduce(result.docs, function(res, candidate){
+    let hasSaved = false;
+    for (let pool of pools) {
+      let found = _.includes(pool.candidates, candidate._id);
+      for (let c of pool.candidates) {
+        if(candidate._id.equals(c)){
+          hasSaved=true;
+        }
+      }
+      if (found) {
+        hasSaved = true;
+      }
+    }
+
+
+
+    candidate.hasSaved=hasSaved;
     candidate.avatar = buildCandidateUrl(candidate);
     res.push(convertToCandidate(candidate));
     return res;
@@ -4056,7 +4073,6 @@ async function removeCandidateSource(companyId, currentUserId, candidateId, sour
 
 
 async function updateCandidatePool(companyId, currentUserId, candidateId, poolIds) {
-  console.log(companyId, currentUserId, candidateId, poolIds)
   if(!companyId || !currentUserId || !candidateId || !poolIds){
     return null;
   }
