@@ -3270,7 +3270,7 @@ async function addCandidate(currentUserId, companyId, form) {
     return null;
   }
 
-  let candidate = await candidateService.addCandidate(companyId, form, true);
+  let candidate = await candidateService.addCandidate(companyId, form);
   return candidate
 }
 
