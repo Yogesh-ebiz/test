@@ -50,7 +50,6 @@ async function compose(form, companyId) {
   let result = {threadId: null, emails: []};
 
   let company = await companyService.findByCompanyId(companyId);
-
   let contacts = _.reduce(form.to, function(res, contact){
     if(!contact.email){
       res.push(contact.id)
@@ -84,7 +83,6 @@ async function compose(form, companyId) {
   if(form.type===emailType.JOB_INVITE) {
     let jobLink = _.find(form.attachments, {type: 'JOBLINK'});
     let job = await jobService.findJob_Id(form.meta.jobId);
-
     if(job) {
       for (let [i, contact] of form.to.entries()) {
         let nMail = _.clone(form);
@@ -120,14 +118,13 @@ async function compose(form, companyId) {
               } else {
                 candidate = await candidateService.findByEmailAndCompanyId(contact.email, companyId);
                 if(!candidate) {
-                  console.log('syncing people', contact.email)
                   //Sync: Create new User or Return if exist by email
                   let user = await feedService.syncPeople({
                     email: contact.email,
                     primaryAddress: {city: job.city, state: job.state, country: job.country}
                   });2
                   if (user) {
-                    candidate = await candidateService.addCandidate(companyId, user, contact.email);
+                    candidate = await candidateService.addCandidate(companyId, user);
                   }
                 }
               }

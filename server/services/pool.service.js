@@ -119,7 +119,7 @@ async function updatePool(poolId, form) {
   if(!poolId || !form){
     return;
   }
-  getPoolCandidates
+
 
   form = await Joi.validate(form, poolSchema, {abortEarly: false});
   let pool = await findPoolBy_Id(poolId);
@@ -135,11 +135,21 @@ async function updatePool(poolId, form) {
 
 }
 
+async function removeCandidate(candidateId) {
+  if(!candidateId){
+    return;
+  }
+
+  await  Pool.update({candidates: candidateId}, {$pull: { candidates: { $in: [candidateId] } } }, { multi: true });
+
+}
+
 
 module.exports = {
   add:add,
   findByCompany:findByCompany,
   findPoolBy_Id:findPoolBy_Id,
   getPoolCandidates: getPoolCandidates,
-  updatePool:updatePool
+  updatePool:updatePool,
+  removeCandidate:removeCandidate
 }

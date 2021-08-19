@@ -3,19 +3,21 @@ const Joi = require('joi');
 const fs = require('fs');
 const ObjectID = require('mongodb').ObjectID;
 const md5File = require('md5-file')
+const {convertToCandidate} = require('../utils/helper');
 
 let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
+
 const evaluationService = require('../services/evaluation.service');
 const applicationService = require('../services/application.service');
+const poolService = require('../services/pool.service');
 
 const feedService = require('../services/api/feed.service.api');
 const sovrenService = require('../services/api/sovren.service.api');
-
 const awsService = require('../services/aws.service');
 
-const {convertToCandidate} = require('../utils/helper');
+
 
 
 const candidateSchema = Joi.object({
@@ -45,14 +47,18 @@ async function addCandidate(companyId, user, isApplied) {
     return;
   }
 
+  let firstName = user.firstName?user.firstName:'';
+  let lastName = user.lastName?user.lastName:'';
+  let middleName = user.middleName?user.middleName:'';
   let gender = user.gender?user.gender:'';
   let about = user.about?user.about:'';
   let email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
   let phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
+  let primaryAddress = user.primaryAddress?{address1: user.primaryAddress.address1, address2: user.primaryAddress.address2, district: user.primaryAddress.district, city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country}:null
 
-  let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName,
+  let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
-    primaryAddress: user.primaryAddress,
+    primaryAddress: primaryAddress,
     skills: _.map(user.skills, 'id'), url: user.shareUrl, links: user.links,
     about: about, gender: gender, marital: user.marital
   }
@@ -138,6 +144,7 @@ async function removeCandidate(id) {
     candidate.tags = [];
     candidate.sources = [];
     candidate.status = statusEnum.DELETED;
+    await poolService.removeCandidate(id);
     await candidate.save();
 
   } catch (error) {

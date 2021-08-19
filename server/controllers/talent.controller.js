@@ -5122,7 +5122,7 @@ async function getCompanyPools(company, currentUserId, query, candidateId, userI
 
   let result = await poolService.findByCompany(company, query);
   result.forEach(function(pool){
-    pool.isIn = _.some(pool.candidates, candidateId)
+    // pool.isIn = _.some(pool.candidates, candidateId)
   });
 
   return result;
