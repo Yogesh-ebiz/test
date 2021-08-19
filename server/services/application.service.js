@@ -646,7 +646,7 @@ async function deleteByList(ids) {
     let progresses = _.reduce(applications, function(res, app){
       let list = res.concat(app.progress);
       return list;
-    }, {});
+    }, []);
     await applicationProgressService.deleteByList(progresses);
     await Application.updateMany({_id: {$in: ids}}, {$set: {status: statusEnum.DELETED}});
   }
