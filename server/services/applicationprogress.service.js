@@ -7,6 +7,16 @@ const ApplicationProgress = require('../models/applicationprogress.model');
 
 
 
+function addApplicationProgress(applicationProgress) {
+
+  if(!applicationProgress){
+    return;
+  }
+
+  return new ApplicationProgress(applicationProgress).save();
+}
+
+
 function findById(id) {
   let data = null;
 
@@ -50,13 +60,15 @@ function findApplicationByCurrentStatus(applicationId) {
   return ApplicationProgress.findOne({application: applicationId}).sort({createdDate: -1}).limit(1);
 }
 
-function addApplicationProgress(applicationProgress) {
 
-  if(!applicationProgress){
+
+function removeByList(ids) {
+
+  if(!ids){
     return;
   }
 
-  return new ApplicationProgress(applicationProgress).save();
+  return ApplicationProgress.remove({_id: {$in: ids}});
 }
 
 
@@ -129,11 +141,12 @@ function updateApplicationProgressStage(oldStage, newStage) {
 
 
 module.exports = {
+  addApplicationProgress: addApplicationProgress,
   findById:findById,
   findApplicationProgresssById: findApplicationProgresssById,
   findApplicationProgresssByIds:findApplicationProgresssByIds,
   findApplicationByCurrentStatus: findApplicationByCurrentStatus,
-  addApplicationProgress: addApplicationProgress,
+  removeByList:removeByList,
   getApplicationProgressEvaluations:getApplicationProgressEvaluations,
   addApplicationProgressEvaluation:addApplicationProgressEvaluation,
   updateApplicationProgressEvent:updateApplicationProgressEvent,

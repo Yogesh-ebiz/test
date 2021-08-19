@@ -613,15 +613,15 @@ async function revert(applicationId, member) {
 
 
 
-async function remove(applicationId, member) {
+async function deleteById(id, member) {
   let result = null;
 
-  if(!applicationId || !member){
+  if(!id || !member){
     return;
   }
 
 
-  let application = await Application.findById(applicationId).populate('user');
+  let application = await Application.findById(id).populate('user');
   if(application){
     application.status = statusEnum.DELETED;
     application = await application.save();
@@ -630,6 +630,21 @@ async function remove(applicationId, member) {
     result = {status: statusEnum.DELETED};
   }
   return result;
+}
+
+
+async function removeByList(ids) {
+  let result = null;
+
+  if(!ids){
+    return;
+  }
+
+  let applications = await Application.find({_id: {$in: ids}});
+  let progresses = _.reduce(applications, function(res, item){return res.concat(item.progress);}, []);
+  await applicationProgressService.removeByList(progresses);
+  await Application.remove({_id: {$in: ids}});
+
 }
 
 
@@ -1228,14 +1243,7 @@ async function search(jobId, filter, sort) {
 
   aList.push({ $match: {jobId: jobId, status: {$in: filter.status} } });
   aList.push(
-    // {
-    //   $lookup: {
-    //     from: 'applicationprogresses',
-    //     localField: 'currentProgress',
-    //     foreignField: '_id',
-    //     as: 'currentProgress',
-    //   },
-    // },
+    {$match: {status: statusEnum.ACTIVE}},
     {$lookup:{
         from:"applicationprogresses",
         let:{currentProgress:"$currentProgress"},
@@ -1437,7 +1445,8 @@ module.exports = {
   getLatestCandidates:getLatestCandidates,
   disqualify:disqualify,
   revert:revert,
-  remove:remove,
+  deleteById:deleteById,
+  removeByList:removeByList,
   accept:accept,
   reject:reject,
   getApplicationActivities:getApplicationActivities,

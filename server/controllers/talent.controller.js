@@ -130,7 +130,7 @@ module.exports = {
   getInmailCredits,
   getTaxAndFee,
   getImpressionCandidates,
-  getStats,
+  getDashboard,
   searchCompany,
   addPaymentMethod,
   getCards,
@@ -642,7 +642,7 @@ async function getImpressionCandidates(company, currentUserId, type, timeframe, 
 
 }
 
-async function getStats(currentUserId, companyId) {
+async function getDashboard(currentUserId, companyId) {
 
 
   if(!currentUserId || !companyId){
@@ -662,7 +662,7 @@ async function getStats(currentUserId, companyId) {
 
   newApplications.forEach(function(app){
     app.progress=[];
-    app.user.avatar = buildCandidateUrl(app.user);
+    // app.user.avatar = buildCandidateUrl(app.user);
   });
 
   let mostViewed = await jobViewService.findMostViewedByCompany(company._id);
@@ -2855,7 +2855,7 @@ async function deleteApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await applicationService.remove(applicationId, member);
+    result = await applicationService.deleteById(applicationId, member);
 
   } catch (error) {
     console.log(error);
@@ -3477,9 +3477,7 @@ async function removeCandidateById(currentUserId, companyId, candidateId) {
   }
 
   let result;
-
-  let candidate = await candidateService.findById(candidateId, companyId);
-  await candidate.delete();
+  await candidateService.removeCandidate(candidateId);
 
   return {success: true};
 

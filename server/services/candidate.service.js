@@ -8,6 +8,8 @@ let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
 const evaluationService = require('../services/evaluation.service');
+const applicationService = require('../services/application.service');
+
 const feedService = require('../services/api/feed.service.api');
 const sovrenService = require('../services/api/sovren.service.api');
 
@@ -119,6 +121,28 @@ async function addCandidateByResume(companyId, member, file) {
   }
 
   return result;
+
+}
+
+
+async function removeCandidate(id) {
+  if(!id){
+    return null;
+  }
+
+  try {
+    let candidate = await Candidate.findById(id);
+
+    await applicationService.removeByList(candidate.applications);
+    candidate.applications = [];
+    candidate.tags = [];
+    candidate.sources = [];
+    candidate.status = statusEnum.DELETED;
+    await candidate.save();
+
+  } catch (error) {
+    console.log(error);
+  }
 
 }
 
@@ -273,6 +297,7 @@ async function search(filter, sort) {
   aList.push(aMatch);
 
   aList.push(
+    {$match: {status: statusEnum.ACTIVE}},
     {$lookup:{
         from:"applications",
         let:{user:"$_id"},
@@ -450,6 +475,7 @@ async function checkEmail(company, email) {
 module.exports = {
   addCandidate:addCandidate,
   addCandidateByResume:addCandidateByResume,
+  removeCandidate:removeCandidate,
   findById:findById,
   findByIds:findByIds,
   findByUserId:findByUserId,

@@ -23,7 +23,7 @@ router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
 router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
 
 router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
-router.route('/company/:id/stats').get(asyncHandler(getStats));
+router.route('/company/:id/dashboard').get(asyncHandler(getDashboard));
 
 router.route('/company/:id/paymentmethod').post(asyncHandler(addPaymentMethod));
 router.route('/company/:id/payment/cards').get(asyncHandler(getCards));
@@ -314,12 +314,12 @@ async function getImpressionCandidates(req, res) {
 
 
 
-async function getStats(req, res) {
+async function getDashboard(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
 
-  let data = await talentCtrl.getStats(currentUserId, companyId);
-  res.json(new Response(data, data?'get_stats_successful':'not_found', res));
+  let data = await talentCtrl.getDashboard(currentUserId, companyId);
+  res.json(new Response(data, data?'get_dashboard_successful':'not_found', res));
 }
 
 

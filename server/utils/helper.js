@@ -122,6 +122,7 @@ const convertToCandidate = (user) => {
     id: user.id?user.id:user._id,
     userId: user.userId?user.userId:null,
     createdDate: user.createdDate,
+    status: user.status,
     company: user.company,
     name: user.name,
     firstName: user.firstName,
