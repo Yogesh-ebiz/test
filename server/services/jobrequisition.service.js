@@ -330,6 +330,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
           let foundStage = _.find(form.stages, {_id: stage._id.toString()});
           if (foundStage) {
             stage.timeLimit = foundStage.timeLimit;
+            stage.tasks=foundStage.tasks;
             if (foundStage.tasks.length) {
               // for([j, task] of stage.tasks.entries()){
               //   let foundTask = _.find(foundStage.tasks, {type: task.type});
@@ -339,8 +340,9 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
               //     await task.save();
               //   }
               // }
-              await stage.save();
+
             }
+            await stage.save();
 
           }
 
