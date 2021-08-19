@@ -32,15 +32,14 @@ async function add(pool) {
 }
 
 
-async function findByCompany(company, query) {
+function findByCompany(company, query) {
   let data = null;
 
   if(company==null){
     return;
   }
 
-  let pools = Pool.find({company: company});
-  return pools
+  return Pool.find({company: company});
 }
 
 function findPoolBy_Id(poolId) {

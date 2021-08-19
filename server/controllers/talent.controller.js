@@ -5120,11 +5120,23 @@ async function getCompanyPools(company, currentUserId, query, candidateId, userI
     }
   }
 
-  let result = await poolService.findByCompany(company, query);
-  result.forEach(function(pool){
-    // pool.isIn = _.some(pool.candidates, candidateId)
-  });
+  let result = await poolService.findByCompany(company, query).populate('candidates');
+  if(candidateId || userId) {
+    result.forEach(function (pool) {
+      let isIn = false;
+      if(candidateId){
+        isIn = _.some(pool.candidates, {_id: candidateId});
+      }
 
+      if(userId){
+        isIn = _.some(pool.candidates,{userId: userId});
+      }
+
+      pool.isIn = isIn;
+      pool.candidates = [];
+    });
+
+  }
   return result;
 
 }
