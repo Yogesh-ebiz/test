@@ -2034,11 +2034,11 @@ async function getFiles(req, res) {
 
 async function getCompanyEvaluationTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let filter = req.query;
   filter.all = filter.all=='true'?true:false;
 
-  let data = await talentCtrl.getCompanyEvaluationTemplates(company, filter, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyEvaluationTemplates(companyId, filter, currentUserId, res.locale);
   res.json(new Response(data, data?'evaluations_retrieved_successful':'not_found', res));
 }
 
@@ -2058,10 +2058,10 @@ async function addCompanyEvaluationTemplate(req, res) {
 
 async function getCompanyEvaluationTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = req.params.templateId;
 
-  let data = await talentCtrl.getCompanyEvaluationTemplate(company, templateId, currentUserId);
+  let data = await talentCtrl.getCompanyEvaluationTemplate(companyId, templateId, currentUserId);
   res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
 }
 
@@ -2078,80 +2078,79 @@ async function updateCompanyEvaluationTemplate(req, res) {
 
 async function deleteCompanyEvaluationTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = req.params.templateId;
 
-  let data = await talentCtrl.deleteCompanyEvaluationTemplate(company, templateId, currentUserId);
+  let data = await talentCtrl.deleteCompanyEvaluationTemplate(companyId, templateId, currentUserId);
   res.json(new Response(data, data?'evlaluation_deleted_successful':'not_found', res));
 }
 
 
 async function deactivateCompanyEvaluationTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = ObjectID(req.params.templateId);
 
-  let data = await talentCtrl.deactivateCompanyEvaluationTemplate(company, templateId, currentUserId);
+  let data = await talentCtrl.deactivateCompanyEvaluationTemplate(companyId, templateId, currentUserId);
   res.json(new Response(data, data?'template_updated_successful':'not_found', res));
 }
 
 
 async function activateCompanyEvaluationTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = ObjectID(req.params.templateId);
 
-  let data = await talentCtrl.activateCompanyEvaluationTemplate(company, templateId, currentUserId);
+  let data = await talentCtrl.activateCompanyEvaluationTemplate(companyId, templateId, currentUserId);
   res.json(new Response(data, data?'template_updated_successful':'not_found', res));
 }
 
 async function getEvaluationFilters(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
 
-  let data = await talentCtrl.getEvaluationFilters(company, currentUserId);
+  let data = await talentCtrl.getEvaluationFilters(companyId, currentUserId);
   res.json(new Response(data, data?'filters_retrieved_successful':'not_found', res));
 }
 
 
 async function getEvaluationFilters(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
 
-  let data = await talentCtrl.getEvaluationFilters(company, currentUserId);
+  let data = await talentCtrl.getEvaluationFilters(companyId, currentUserId);
   res.json(new Response(data, data?'filters_retrieved_successful':'not_found', res));
 }
 
 
 async function getCompanyEmailTemplates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let filter = req.query;
   filter.all = filter.all=='true'?true:false;
-  let data = await talentCtrl.getCompanyEmailTemplates(company, currentUserId,  filter, res.locale);
+  let data = await talentCtrl.getCompanyEmailTemplates(companyId, currentUserId,  filter, res.locale);
   res.json(new Response(data, data?'emails_retrieved_successful':'not_found', res));
 }
 
 
 async function addCompanyEmailTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let evlaluation = req.body;
   evlaluation.company = company;
 
 
-  let data = await talentCtrl.addCompanyEmailTemplate(company, evlaluation, currentUserId);
+  let data = await talentCtrl.addCompanyEmailTemplate(companyId, evlaluation, currentUserId);
   res.json(new Response(data, data?'email_added_successful':'not_found', res));
 }
 
 async function updateCompanyEmailTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = req.params.templateId;
   let template = req.body;
-  template.company = company;
 
-  let data = await talentCtrl.updateCompanyEmailTemplate(company, templateId, currentUserId, template);
+  let data = await talentCtrl.updateCompanyEmailTemplate(companyId, templateId, currentUserId, template);
   res.json(new Response(data, data?'email_updated_successful':'not_found', res));
 }
 
@@ -2167,28 +2166,28 @@ async function deleteCompanyEmailTemplate(req, res) {
 
 async function deactivateCompanyEmailTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = ObjectID(req.params.templateId);
 
-  let data = await talentCtrl.deactivateCompanyEmailTemplate(company, templateId, currentUserId);
+  let data = await talentCtrl.deactivateCompanyEmailTemplate(companyId, templateId, currentUserId);
   res.json(new Response(data, data?'template_updated_successful':'not_found', res));
 }
 
 
 async function activateCompanyEmailTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let templateId = ObjectID(req.params.templateId);
 
-  let data = await talentCtrl.activateCompanyEmailTemplate(company, templateId, currentUserId);
+  let data = await talentCtrl.activateCompanyEmailTemplate(companyId, templateId, currentUserId);
   res.json(new Response(data, data?'template_updated_successful':'not_found', res));
 }
 
 async function searchContacts(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let query = req.query.query?req.query.query:'';
-  let data = await talentCtrl.searchContacts(company, currentUserId, query);
+  let data = await talentCtrl.searchContacts(companyId, currentUserId, query);
   res.json(new Response(data, data?'contacts_retrieved_successful':'not_found', res));
 }
 

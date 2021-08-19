@@ -21,7 +21,7 @@ const questionSchema = Joi.object({
 const emailTemplateSchema = Joi.object({
   name: Joi.string().required(),
   bodyHtml: Joi.string().required(),
-  company: Joi.object().required(),
+  company: Joi.object().optional(),
   createdBy: Joi.number().optional(),
   updatedBy: Joi.number().optional()
 });
@@ -82,7 +82,6 @@ async function update(id, form) {
     return;
   }
 
-  console.log(id, form)
   form = await Joi.validate(form, emailTemplateSchema, { abortEarly: false });
   let template = await findById(id);
 
