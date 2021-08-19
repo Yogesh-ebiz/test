@@ -2136,11 +2136,11 @@ async function getCompanyEmailTemplates(req, res) {
 async function addCompanyEmailTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let evlaluation = req.body;
-  evlaluation.company = company;
+  let email = req.body;
+  email.company = companyId;
 
 
-  let data = await talentCtrl.addCompanyEmailTemplate(companyId, evlaluation, currentUserId);
+  let data = await talentCtrl.addCompanyEmailTemplate(companyId, email, currentUserId);
   res.json(new Response(data, data?'email_added_successful':'not_found', res));
 }
 
