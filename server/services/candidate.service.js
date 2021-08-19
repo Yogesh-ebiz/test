@@ -134,8 +134,7 @@ async function removeCandidate(id) {
   try {
     let candidate = await Candidate.findById(id);
 
-    await applicationService.removeByList(candidate.applications);
-    candidate.applications = [];
+    await applicationService.deleteByList(candidate.applications);
     candidate.tags = [];
     candidate.sources = [];
     candidate.status = statusEnum.DELETED;
