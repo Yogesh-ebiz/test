@@ -22,7 +22,7 @@ const questionSchema = Joi.object({
 const evaluationTemplateSchema = Joi.object({
   name: Joi.string().required(),
   questions: Joi.array().required(),
-  company: Joi.object().required(),
+  company: Joi.object().optional(),
   createdBy: Joi.number().optional(),
   updatedBy: Joi.number().optional()
 });

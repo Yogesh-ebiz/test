@@ -2070,7 +2070,6 @@ async function updateCompanyEvaluationTemplate(req, res) {
   let company = parseInt(req.params.id);
   let templateId = req.params.templateId;
   let template = req.body;
-  template.company = company;
 
   let data = await talentCtrl.updateCompanyEvaluationTemplate(company, templateId, currentUserId, template);
   res.json(new Response(data, data?'evaluation_updated_successful':'not_found', res));

@@ -641,8 +641,7 @@ async function deleteByList(ids) {
   }
 
   let applications = await Application.find({_id: {$in: ids}});
-  i(applications)
-  {
+  if(applications) {
     let progresses = _.reduce(applications, function(res, app){
       let list = res.concat(app.progress);
       return list;

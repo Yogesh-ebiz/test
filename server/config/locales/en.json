@@ -229,5 +229,6 @@
 	"question_deactivated_successful": "question_deactivated_successful",
 	"question_activated_successful": "question_activated_successful",
 	"user_synced_successful": "user_synced_successful",
-	"email_retrieved_successful": "email_retrieved_successful"
+	"email_retrieved_successful": "email_retrieved_successful",
+	"evaluation_updated_successful": "evaluation_updated_successful"
 }
