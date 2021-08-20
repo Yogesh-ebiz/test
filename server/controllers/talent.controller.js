@@ -1742,6 +1742,7 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
   result.docs.forEach(function(source){
+    source.candidate.firstName = source.candidate.firstName?source.candidate.firstName:source.candidate.email;
     source.candidate.avatar = buildCandidateUrl(source.candidate);
     source.candidate = convertToCandidate(source.candidate);
   })
@@ -3436,6 +3437,8 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
       }, 0) / evaluations.length * 100) / 100;
 
     }
+
+    candidate.firstName = candidate.firstName?candidate.firstName:candidate.email
     candidate.match = 78;
     // let partyLink = await feedService.getUserLinks(candidate.userId);
     // if (partyLink) {

@@ -624,6 +624,7 @@ async function searchSources(req, res) {
   filter.jobs = _.reduce(filter.jobs, function(res, job){res.push(ObjectID(job)); return res;}, []);
 
   data = await talentCtrl.searchSources(companyId, currentUserId, filter, sort, res.locale);
+
   res.json(new Response(data, data?'sources_retrieved_successful':'not_found', res));
 }
 
