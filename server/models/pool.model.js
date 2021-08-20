@@ -25,6 +25,9 @@ const PoolSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  noOfCandidates: {
+    type: Number
+  },
   candidates: [{ type: Schema.Types.ObjectId, ref: 'Candidate' }],
   department: { type: Schema.Types.ObjectId, ref: 'Department' },
   description: {

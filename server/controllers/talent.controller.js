@@ -5151,6 +5151,7 @@ async function getCompanyPools(company, currentUserId, query, candidateId, userI
       }
 
       pool.isIn = isIn;
+      pool.noOfCandidates = pool.candidates.length;
       pool.candidates = [];
     });
 
