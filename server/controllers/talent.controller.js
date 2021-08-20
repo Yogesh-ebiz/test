@@ -3350,8 +3350,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
       }
     }
 
-
-
+    candidate.firstName = candidate.firstName?candidate.firstName:candidate.email;
     candidate.hasSaved=hasSaved;
     candidate.avatar = buildCandidateUrl(candidate);
     res.push(convertToCandidate(candidate));

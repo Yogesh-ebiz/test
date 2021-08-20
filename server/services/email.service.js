@@ -105,7 +105,6 @@ async function compose(form, companyId) {
             if (contact.candidateId) {
               candidate = await candidateService.findById(ObjectID(contact.candidateId));
             } else {
-
               if (contact.id && !contact.candidateId) {
                 candidate = await candidateService.findByUserIdAndCompanyId(contact.id, companyId);
                 // console.log(contact.id, companyId, candidate);
@@ -122,7 +121,7 @@ async function compose(form, companyId) {
                   let user = await feedService.syncPeople({
                     email: contact.email,
                     primaryAddress: {city: job.city, state: job.state, country: job.country}
-                  });2
+                  });
                   if (user) {
                     candidate = await candidateService.addCandidate(companyId, user);
                   }
