@@ -2669,7 +2669,7 @@ async function searchApplicationEmails(currentUserId, companyId, applicationId, 
   }
 
 
-  let result = await applicationService.searchEmails(applicationId, sort);
+  let result = await applicationService.searchEmails(companyId, applicationId, sort);
 
   return new Pagination(result);
 

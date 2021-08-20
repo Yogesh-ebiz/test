@@ -25,6 +25,7 @@ const pipelineService = require('../services/pipeline.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignStageService = require('../services/emailcampaignstage.service');
 const fileService = require('../services/file.service');
+const memberService = require('../services/member.service');
 
 const feedService = require('../services/api/feed.service.api');
 const calendarService = require('../services/api/calendar.service.api');
@@ -1349,11 +1350,11 @@ async function search(jobId, filter, sort) {
 }
 
 
-async function searchEmails(applicationId, sort) {
+async function searchEmails(companyId, applicationId, sort) {
   let data = null;
 
 
-  if(applicationId==null || !sort){
+  if(!companyId || applicationId==null || !sort){
     return;
   }
 
@@ -1423,17 +1424,17 @@ async function searchEmails(applicationId, sort) {
   const aggregate = Application.aggregate(aList);
 
   result = await Application.aggregatePaginate(aggregate, options);
-  let userIds = _.reduce(result.docs, function (res, email) {
-    if(email.from && email.from.id) {
-      res.push(email.from.id);
-    }
-    return res;
-  }, []);
 
-  let users = await feedService.lookupPeopleIds(userIds);
+
+  let members = [];
+  if(result.docs.length){
+    members = await memberService.getMembers(companyId);
+  }
+
   result.docs = _.reduce(result.docs, function(res, email){
     email.hasRead = email.hasRead?email.hasRead:false;
-    email.from = convertToAvatar(_.find(users, {id: email.from.id}));
+    let member = _.find(members, {_id: ObjectID(email.from.memberId)});
+    email.from = convertToAvatar(member);
     res.push(email);
     return res;
   }, []);

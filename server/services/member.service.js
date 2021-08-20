@@ -150,7 +150,6 @@ async function getMembers(company) {
   }
 
   let members = Member.find({company: company}).populate('role');
-  console.log(members)
   return members
 }
 
@@ -161,6 +160,8 @@ async function searchMembers(company, query) {
   if(!company){
     return;
   }
+
+  query = query?query:'';
 
   let result = Member.find({company: company, $or: [{firstName: { $regex: query.toLowerCase(), $options: 'i' }}, {lastName: { $regex: query, $options: 'i' }}]});
   return result
