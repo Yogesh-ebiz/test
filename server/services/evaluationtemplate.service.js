@@ -47,7 +47,6 @@ function search(company, filter) {
     return;
   }
   let $or = [];
-  console.log(filter)
 
   if(filter.all){
     $or.push({company: company}, {default: true, status: {$ne: statusEnum.DISABLED}});
@@ -107,7 +106,6 @@ async function update(id, form) {
   form = await Joi.validate(form, evaluationTemplateSchema, { abortEarly: false });
   let template = await findById(id);
 
-  console.log(template)
   if(template){
     let questions = [];
     template.name = form.name;

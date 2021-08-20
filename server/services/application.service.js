@@ -439,7 +439,7 @@ async function getLatestCandidates(company) {
   from.setHours(0)
   let now = Date.now();
 
-  let result = await Application.find({$and: [ {company: company}, {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] }).populate('user').sort({createdDate: -1});
+  let result = await Application.find({$and: [ {company: company}, {status:statusEnum.ACTIVE}, {createdDate: {$gte: from.getTime()}}, {createdDate: {$lte: now}}] }).populate('user').sort({createdDate: -1});
   return result;
 
 }
