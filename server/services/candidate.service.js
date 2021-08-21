@@ -414,7 +414,8 @@ async function getCandidatesSimilar(userId) {
   //   return res;
   // }, []);
 
-
+  let candidate = await Can
+  list = sovrenService.matchResume();
   return list;
 }
 

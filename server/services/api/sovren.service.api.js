@@ -5,7 +5,7 @@ var Promise = require('promise');
 const ApiClient = require('../apiManager');
 
 
-
+const defaultIndex = 'accessed-resume';
 const options = {
   headers: {
     'Sovren-AccountId': '35186509',
@@ -17,29 +17,56 @@ const options = {
 
 let client = new ApiClient('https://rest.resumeparsing.com');
 
+async function createIndex(form) {
+  console.log('createIndex', form)
+  let data = {
+    "IndexType": form.indexType
+  };
 
-async function uploadResume(filePath, documentId) {
-  console.log('uploading', filePath, documentId)
-  var buffer = fs.readFileSync(filePath);
-  var base64Doc = buffer.toString('base64');
+  let response = await client.post(`/v10/index/${form.name}`, data, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
 
-  var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
-
-
-  var data = JSON.stringify({
-    'DocumentAsBase64String': base64Doc,
-    'DocumentLastModified': modifiedDate,
-    'OutputCandidateImage':true,
-    'IndexingOptions': {
-      'IndexId': 'accessed',
-      'DocumentId': documentId
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
     }
+
   });
 
+  return response.data;
+};
 
-  options.headers['Content-Length'] =  Buffer.byteLength(data);
+async function deleteIndex(index) {
+  console.log('deleteIndex', index)
 
-  let response = await client.post(`/v10/parser/resume`, data, options).catch(function (error) {
+
+  let response = await client.delete(`/v10/index/${index}`, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
+      return error.response;
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+  return response.data;
+};
+
+async function getResume(index, documentId) {
+  console.log('getResume', index, documentId)
+
+  let response = await client.get(`/v10/index/${index}/resume/${documentId}`, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
       console.log(error.response);
@@ -58,23 +85,56 @@ async function uploadResume(filePath, documentId) {
   return response.data;
 };
 
-async function uploadJob(filePath, documentId) {
+async function uploadResume(filePath, index, documentId) {
   var buffer = fs.readFileSync(filePath);
   var base64Doc = buffer.toString('base64');
 
-
   var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
 
+  var data = JSON.stringify({
+    'DocumentAsBase64String': base64Doc,
+    'DocumentLastModified': modifiedDate,
+    'OutputCandidateImage':true,
+    'IndexingOptions': {
+      'IndexId': index,
+      'DocumentId': documentId
+    }
+  });
+
+  options.headers['Content-Length'] =  Buffer.byteLength(data);
+
+  let response = await client.post(`/v10/parser/resume`, data, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+  return response.data;
+};
+
+async function uploadJob(filePath, index, documentId) {
+  var buffer = fs.readFileSync(filePath);
+  var base64Doc = buffer.toString('base64');
+
+  var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
 
   var data = JSON.stringify({
     'DocumentAsBase64String': base64Doc,
     'DocumentLastModified': modifiedDate,
     'IndexingOptions': {
-      'IndexId': 'accessed',
+      'IndexId': index,
       'DocumentId': documentId
     }
   });
-
 
   options.headers['Content-Length'] =  Buffer.byteLength(data);
 
@@ -93,25 +153,11 @@ async function uploadJob(filePath, documentId) {
 
   });
 
-
-  // return response.data;
+  return response.data;
 };
 
-async function matchResume(filePath) {
+async function matchResume(data) {
 
-  var buffer = fs.readFileSync(filePath);
-  var base64Doc = buffer.toString('base64');
-
-  var modifiedDate = (new Date(fs.statSync(filePath).mtimeMs)).toISOString().substring(0, 10);
-
-
-  var data = JSON.stringify({
-    'ResumeData': base64Doc,
-    'IndexIdsToSearchInto': ['accessed']
-  });
-
-
-  options.headers['Content-Length'] =  Buffer.byteLength(data);
 
   let response = await client.post(`/v10/matcher/resume`, data, options).catch(function (error) {
     if (error.response) {
@@ -129,7 +175,30 @@ async function matchResume(filePath) {
   });
 
 
-  // return response.data;
+  return response.data;
+};
+
+
+async function matchResumeByDocument(index, documentId, data) {
+
+
+  let response = await client.post(`/v10/matcher/indexes/${index}/documents/${documentId}`, data, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+
+  return response.data;
 };
 
 
@@ -176,9 +245,13 @@ async function listAllSkills() {
 
 
 module.exports = {
+  createIndex:createIndex,
+  deleteIndex:deleteIndex,
+  getResume:getResume,
   uploadResume:uploadResume,
   uploadJob:uploadJob,
   matchResume:matchResume,
+  matchResumeByDocument:matchResumeByDocument,
   addSkills:addSkills,
   listAllSkills:listAllSkills
 }

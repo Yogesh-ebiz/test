@@ -11,35 +11,20 @@ var path = require('path');
 const parserService = require('../services/api/sovren.service.api');
 
 module.exports = {
+  deleteIndex,
+  createIndex,
+  getResume,
+  uploadResume,
+  matchResume,
+  matchResumeByDocument,
   uploadJob,
   getAllSkillLists
 }
 
-async function uploadJob(form) {
-
-
+async function createIndex(form) {
   let result;
   try {
-
-    const data = {
-      font: {
-        "color" : "green",
-        "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
-      },
-      testData: [
-        {
-          "name": "<p><span class=\"T1\" style=\"font-family:'DevLys 010'; margin: 0;\">0-06537 esa 5 dk LFkuh; eku gS&</span></p>"
-        } ]
-    };
-
-        const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
-        const htmlString = fs.readFileSync(filePathName).toString();
-        let  options = { format: 'Letter' };
-        const ejsData = ejs.render(htmlString, data);
-        await pdf.create(ejsData, options).toFile('generatedfile.pdf',(err, response) => {
-          if (err) return console.log(err);
-
-        });
+    result = await parserService.createIndex(form);
 
   } catch (error) {
     console.log(error);
@@ -47,6 +32,93 @@ async function uploadJob(form) {
 
   return result;
 }
+
+
+async function deleteIndex(index) {
+  let result;
+  try {
+    result = await parserService.deleteIndex(index);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function getResume(index, documentId) {
+  let result;
+  try {
+    result = await parserService.getResume(index, documentId);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function matchResume(form) {
+  let result;
+  try {
+    result = await parserService.matchResume(form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function matchResumeByDocument(index, document, form) {
+  let result;
+  try {
+    result = await parserService.matchResumeByDocument(index, document, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function uploadResume(index, documentId, file) {
+  let result;
+  try {
+
+    if(!index || !documentId || file) {
+
+      result = await parserService.uploadResume(file.path, index, documentId);
+
+
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function uploadJob(index, documentId, file) {
+  let result;
+  try {
+
+    if(!index || !documentId || file) {
+
+      result = await parserService.uploadJob(file.path, index, documentId);
+
+
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 
 
 

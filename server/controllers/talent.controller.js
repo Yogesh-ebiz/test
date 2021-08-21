@@ -3749,10 +3749,10 @@ async function uploadCandidateResume(companyId, currentUserId, candidateId, file
         name = candidate.firstName + '_' + candidate.lastName + '_' + candidate._id + '-' + timestamp + '.' + fileExt;
         let path = basePath + candidate._id + '/' + name;
 
-        // console.log(hash, _.map(candidate.resumes, 'hash'), _.some(candidate.resumes, {hash: hash}))
-        // if(!_.some(candidate.resumes, {hash: hash})){
-        //   await sovrenService.uploadResume(cv.path, candidate._id);
-        // }
+        console.log(hash, _.map(candidate.resumes, 'hash'), _.some(candidate.resumes, {hash: hash}))
+        if(!_.some(candidate.resumes, {hash: hash})){
+          await sovrenService.uploadResume(cv.path, candidate._id);
+        }
 
         await awsService.upload(path, cv.path);
         switch (fileExt) {

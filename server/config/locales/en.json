@@ -231,5 +231,8 @@
 	"user_synced_successful": "user_synced_successful",
 	"email_retrieved_successful": "email_retrieved_successful",
 	"evaluation_updated_successful": "evaluation_updated_successful",
-	"get_dashboard_successful": "get_dashboard_successful"
+	"get_dashboard_successful": "get_dashboard_successful",
+	"index_created_successful": "index_created_successful",
+	"index_deleted_successful": "index_deleted_successful",
+	"resume_matched_successful": "resume_matched_successful"
 }

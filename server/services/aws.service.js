@@ -82,12 +82,12 @@ exports.uploadFromBuffer = function(path, file){
 
 }
 
-exports.upload = function(path, src){
+exports.upload = function(dest, src){
 
   let data = fs.readFileSync(src);
 
   var params = {
-    Key: path,
+    Key: dest,
     Body: data,
     ACL:'public-read'
   };
@@ -135,6 +135,56 @@ exports.uploadToS3 = async function(path, fileName) {
   });
 }
 
+
+
+
+async function uploadBase64(dest, src){
+  await base64Decode(base64Str, src);
+
+  // let file = await fs.readFile(src);
+  let file= src.split('/');
+  let fileName = file[file.length-1].split('.');
+  let fileExt = fileName[fileName.length - 1];
+  // // let date = new Date();
+  let timestamp = Date.now();
+  let newName = fileName[0] + '_' + timestamp + '.' + fileExt;
+  let path = dest + newName;
+  let response = await upload(path, src);
+  switch (fileExt) {
+    case 'pdf':
+      type = 'PDF';
+      break;
+    case 'doc':
+      type = 'WORD';
+      break;
+    case 'docx':
+      type = 'WORD';
+      break;
+    case 'jpg':
+      type = 'JPG';
+      break;
+    case 'jpeg':
+      type = 'JPG';
+      break;
+    case 'png':
+      type = 'PNG';
+      break;
+
+  }
+
+  return {filename: newName, fileType: type, path: path};
+
+
+  // let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+  // application.resume = {filename: name, type: type};
+
+  // if(file){
+  //   application.resume = file._id;
+  //   application.files.push(file._id);
+  //
+  //
+  // }
+}
 
 
 exports.copy = function(source, path, file){
