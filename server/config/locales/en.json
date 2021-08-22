@@ -236,5 +236,6 @@
 	"index_deleted_successful": "index_deleted_successful",
 	"resume_matched_successful": "resume_matched_successful",
 	"experiences_added_successful": "experiences_added_successful",
-	"educations_added_successful": "educations_added_successful"
+	"educations_added_successful": "educations_added_successful",
+	"skills_added_successful": "skills_added_successful"
 }

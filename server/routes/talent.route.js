@@ -133,6 +133,8 @@ router.route('/company/:id/candidates/:candidateId/experiences').post(asyncHandl
 router.route('/company/:id/candidates/:candidateId/experiences').get(asyncHandler(getCandidateExperiences));
 router.route('/company/:id/candidates/:candidateId/educations').post(asyncHandler(addCandidateEducations));
 router.route('/company/:id/candidates/:candidateId/educations').get(asyncHandler(getCandidateEducations));
+router.route('/company/:id/candidates/:candidateId/skills').post(asyncHandler(addCandidateSkills));
+router.route('/company/:id/candidates/:candidateId/skills').get(asyncHandler(getCandidateSkills));
 
 router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
 router.route('/company/:id/candidates/:candidateId/resumes/upload').post(asyncHandler(uploadCandidateResume));
@@ -1330,6 +1332,18 @@ async function getCandidateEducations(req, res) {
   let data = await talentCtrl.getCandidateEducations(company, currentUserId, candidateId);
   res.json(new Response(data, data?'educations_retrieved_successful':'not_found', res));
 }
+
+
+async function addCandidateSkills(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = ObjectID(req.params.candidateId);
+  let form = req.body;
+
+  let data = await talentCtrl.addCandidateSkills(company, currentUserId, candidateId, form);
+  res.json(new Response(data, data?'skills_added_successful':'not_found', res));
+}
+
 
 async function getCandidateSkills(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

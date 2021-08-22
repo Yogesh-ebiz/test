@@ -210,6 +210,7 @@ module.exports = {
   getCandidateExperiences,
   addCandidateEducations,
   getCandidateEducations,
+  addCandidateSkills,
   getCandidateSkills,
   uploadAvatar,
   uploadCandidateResume,
@@ -3760,6 +3761,29 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
 }
 
 
+
+async function addCandidateSkills(companyId, currentUserId, candidateId, form) {
+  if(!companyId || !currentUserId || !candidateId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await candidateService.addSkills(candidateId, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 async function getCandidateSkills(companyId, currentUserId, candidateId) {
   if(!companyId || !currentUserId || !candidateId){
     return null;
@@ -3772,16 +3796,14 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
 
   let result;
   try {
-    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
-    if(candidate) {
-      result = await activityService.findByCandidateId(companyId, candidate._id, sort);
-    }
+    let educations = await candidateService.getSkills(candidateId);
+    result = educations;
 
   } catch (error) {
     console.log(error);
   }
 
-  return new Pagination(result);
+  return result;
 }
 
 

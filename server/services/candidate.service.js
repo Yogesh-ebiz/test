@@ -526,6 +526,33 @@ async function getEducations(id) {
 }
 
 
+
+async function addSkills(id, form) {
+
+  if(!id || !form){
+    return;
+  }
+
+  console.log(id, form)
+  let candidate = await Candidate.findById(id);
+  console.log(candidate)
+  candidate.skills = form;
+
+  candidate = await candidate.save();
+  return candidate;
+}
+
+async function getSkills(id) {
+
+  if(!id){
+    return;
+  }
+
+  let candidate = await Candidate.findById(id);
+  return candidate.skills;
+}
+
+
 async function checkEmail(company, email) {
 
   if(!company || !email){
@@ -560,5 +587,7 @@ module.exports = {
   getExperiences:getExperiences,
   addEducations:addEducations,
   getEducations:getEducations,
+  addSkills:addSkills,
+  getSkills:getSkills,
   checkEmail:checkEmail
 }
