@@ -3749,16 +3749,14 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
 
   let result;
   try {
-    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
-    if(candidate) {
-      result = await activityService.findByCandidateId(companyId, candidate._id, sort);
-    }
+    let educations = await candidateService.getEducations(candidateId);
+    result = educations;
 
   } catch (error) {
     console.log(error);
   }
 
-  return new Pagination(result);
+  return result;
 }
 
 
