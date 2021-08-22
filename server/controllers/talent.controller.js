@@ -206,6 +206,11 @@ module.exports = {
   getCandidateEvaluationById,
   getCandidatesSimilar,
   getCandidateActivities,
+  addCandidateExperiences,
+  getCandidateExperiences,
+  addCandidateEducations,
+  getCandidateEducations,
+  getCandidateSkills,
   uploadAvatar,
   uploadCandidateResume,
   getCandidateResumes,
@@ -3422,6 +3427,8 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
 
   if(candidate) {
+    candidate.transform();
+
     let evaluations = await evaluationService.getCandidateEvaluations(candidate.userId);
     if (evaluations) {
       let companyEvaluations = _.filter(evaluations, {companyId: companyId});
@@ -3660,6 +3667,127 @@ async function getCandidateActivities(companyId, currentUserId, userId, sort) {
 
   return new Pagination(result);
 }
+
+
+async function addCandidateExperiences(companyId, currentUserId, candidateId, form) {
+  if(!companyId || !currentUserId || !candidateId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await candidateService.addExperiences(candidateId, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function getCandidateExperiences(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let experiences = await candidateService.getExperiences(candidateId);
+    result = experiences;
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function addCandidateEducations(companyId, currentUserId, candidateId, form) {
+  if(!companyId || !currentUserId || !candidateId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await candidateService.addEducations(candidateId, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function getCandidateEducations(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+    if(candidate) {
+      result = await activityService.findByCandidateId(companyId, candidate._id, sort);
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+}
+
+
+async function getCandidateSkills(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let candidate = await candidateService.findByUserIdAndCompanyId(candidateId, companyId);
+    if(candidate) {
+      result = await activityService.findByCandidateId(companyId, candidate._id, sort);
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+}
+
+
+
 
 
 

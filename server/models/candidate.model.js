@@ -133,14 +133,12 @@ const CandidateSchema = new mongoose.Schema({
     type: Array,
     required:false
   },
-  experiences: {
-    type: Array,
-    required:false
-  },
   educations: {
     type: Array,
     required:false
   },
+  experiences: [{ type: Schema.Types.ObjectId, ref: 'Experience' }],
+  educations: [{ type: Schema.Types.ObjectId, ref: 'Education' }],
   resumes: [{ type: Schema.Types.ObjectId, ref: 'File' }],
   flag: { type: Schema.Types.ObjectId, ref: 'Flag' },
   tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
@@ -150,6 +148,24 @@ const CandidateSchema = new mongoose.Schema({
 }, {
   versionKey: false
 });
+
+/**
+ * Methods
+ */
+CandidateSchema.method({
+  transform() {
+    const transformed = {};
+    const fields = ['id', 'name', 'email', 'picture', 'role', 'createdAt'];
+
+    fields.forEach((field) => {
+      transformed[field] = this[field];
+    });
+
+    return transformed;
+  }
+});
+
+
 CandidateSchema.plugin(mongoosePaginate);
 
 

@@ -121,6 +121,27 @@ async function uploadResume(filePath, index, documentId) {
   return response.data;
 };
 
+async function addResume(form, index, documentId) {
+
+  console.log(form)
+  let response = await client.post(`/v10/index/${index}/resume/${documentId}`, form, options).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      console.log(error.response);
+
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
+  });
+
+  return response.data;
+};
+
 async function uploadJob(filePath, index, documentId) {
   var buffer = fs.readFileSync(filePath);
   var base64Doc = buffer.toString('base64');
@@ -249,6 +270,7 @@ module.exports = {
   deleteIndex:deleteIndex,
   getResume:getResume,
   uploadResume:uploadResume,
+  addResume:addResume,
   uploadJob:uploadJob,
   matchResume:matchResume,
   matchResumeByDocument:matchResumeByDocument,

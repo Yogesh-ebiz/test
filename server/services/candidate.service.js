@@ -12,6 +12,8 @@ const Candidate = require('../models/candidate.model');
 const evaluationService = require('../services/evaluation.service');
 const applicationService = require('../services/application.service');
 const poolService = require('../services/pool.service');
+const experienceService = require('../services/experience.service');
+const educationService = require('../services/education.service');
 
 const feedService = require('../services/api/feed.service.api');
 const sovrenService = require('../services/api/sovren.service.api');
@@ -56,7 +58,6 @@ async function addCandidate(companyId, user, isApplied) {
   let phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
   let primaryAddress = user.primaryAddress?{address1: user.primaryAddress.address1, address2: user.primaryAddress.address2, district: user.primaryAddress.district, city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country}:null
 
-  console.log(email, user.primaryEmail)
   let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
     primaryAddress: primaryAddress,
@@ -70,7 +71,7 @@ async function addCandidate(companyId, user, isApplied) {
   candidate = await new Candidate(candidate).save();
 
   if(user.avatar){
-    await awsService.copy("/user/" + user.id + "/images/" + user.avatar, "candidates/" + candidate._id + "/images", user.avatar)
+    await awsService.copy("/user/" + user.id + "/avatar/" + user.avatar, "candidates/" + candidate._id + "/images", user.avatar)
   }
 
 
@@ -466,6 +467,65 @@ async function getCompanyBlacklisted(company, sort) {
 
 
 
+async function addExperiences(id, form) {
+
+  if(!id || !form){
+    return;
+  }
+
+  let candidate = await Candidate.findById(id);
+  for(let [i, exp] of form.entries()){
+    let experience = await experienceService.add(exp);
+    if(experience) {
+      candidate.experiences.push(experience._id);
+    }
+  }
+
+  candidate = await candidate.save();
+  return candidate;
+}
+
+async function getExperiences(id) {
+
+  if(!id){
+    return;
+  }
+
+  let candidate = await Candidate.findById(id).populate('experiences').select('experiences');
+  return candidate.experiences;
+}
+
+
+
+async function addEducations(id, form) {
+
+  if(!id || !form){
+    return;
+  }
+
+  let candidate = await Candidate.findById(id);
+  for(let [i, ed] of form.entries()){
+    let education = await educationService.add(ed);
+    if(education) {
+      candidate.educations.push(education._id);
+    }
+  }
+
+  candidate = await candidate.save();
+  return candidate;
+}
+
+async function getEducations(id) {
+
+  if(!id){
+    return;
+  }
+
+  let candidate = await Candidate.findById(id).select('educations');
+  return candidate.educations;
+}
+
+
 async function checkEmail(company, email) {
 
   if(!company || !email){
@@ -496,5 +556,9 @@ module.exports = {
   getAllCandidatesSkills:getAllCandidatesSkills,
   getCandidatesSimilar:getCandidatesSimilar,
   getCompanyBlacklisted:getCompanyBlacklisted,
+  addExperiences:addExperiences,
+  getExperiences:getExperiences,
+  addEducations:addEducations,
+  getEducations:getEducations,
   checkEmail:checkEmail
 }

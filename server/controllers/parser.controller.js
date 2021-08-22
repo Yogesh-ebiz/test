@@ -15,6 +15,7 @@ module.exports = {
   createIndex,
   getResume,
   uploadResume,
+  addResume,
   matchResume,
   matchResumeByDocument,
   uploadJob,
@@ -101,6 +102,23 @@ async function uploadResume(index, documentId, file) {
   return result;
 }
 
+async function addResume(index, documentId, form) {
+  let result;
+  try {
+
+    if(!index || !documentId || form) {
+
+      result = await parserService.addResume(form, index, documentId);
+
+
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 
 async function uploadJob(index, documentId, file) {
   let result;
@@ -137,7 +155,6 @@ async function addSkillList(form) {
 
 
 async function getAllSkillLists(locale) {
-
 
   let result;
   try {

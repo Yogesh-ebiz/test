@@ -234,5 +234,7 @@
 	"get_dashboard_successful": "get_dashboard_successful",
 	"index_created_successful": "index_created_successful",
 	"index_deleted_successful": "index_deleted_successful",
-	"resume_matched_successful": "resume_matched_successful"
+	"resume_matched_successful": "resume_matched_successful",
+	"experiences_added_successful": "experiences_added_successful",
+	"educations_added_successful": "educations_added_successful"
 }
