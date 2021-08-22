@@ -521,7 +521,7 @@ async function getEducations(id) {
     return;
   }
 
-  let candidate = await Candidate.findById(id).select('educations');
+  let candidate = await Candidate.findById(id).populate('educations').select('educations');
   return candidate.educations;
 }
 
