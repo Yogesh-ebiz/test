@@ -6,6 +6,7 @@ const Experience = require('../models/experience.model');
 const feedService = require('../services/api/feed.service.api');
 
 const experienceSchema = Joi.object({
+  _id: Joi.string().allow('').optional(),
   city: Joi.string().allow('').optional(),
   state: Joi.string().allow('').optional(),
   country: Joi.string().allow('').optional(),
@@ -28,9 +29,9 @@ async function add(experience) {
   }
 
   experience = await Joi.validate(experience, experienceSchema, {abortEarly: false});
-  if(!experience.id){
-    let company = await feedService.createCompany(experience.employer);
-    experience.employer.id=company.id;
+  if(!experience.employer.id){
+    // let company = await feedService.createCompany(experience.employer);
+    // experience.employer.id=company.id;
   }
   experience = await new Experience(experience).save();
   return experience;

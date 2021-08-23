@@ -5,6 +5,7 @@ const statusEnum = require('../const/statusEnum');
 const Education = require('../models/education.model');
 
 const educationSchema = Joi.object({
+  _id: Joi.string().allow('').optional(),
   city: Joi.string().allow('').optional(),
   state: Joi.string().allow('').optional(),
   country: Joi.string().allow('').optional(),
