@@ -526,8 +526,7 @@ async function getEducations(id) {
   }
 
   let candidate = await Candidate.findById(id).populate('educations').select('educations');
-  let institutes = await feedService.lookupCompaniesIds(_.map(candidate.educations, 'institute.id'))
-
+  let institutes = await feedService.lookupInstituteIds(_.map(candidate.educations, 'institute.id'));
   candidate.educations = _.reduce(candidate.educations, function(res, edu){
     let institute = _.find(institutes, {id: edu.institute.id});
     edu.institute = convertToCompany(institute);
