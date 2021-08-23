@@ -3,7 +3,7 @@ const Joi = require('joi');
 const fs = require('fs');
 const ObjectID = require('mongodb').ObjectID;
 const md5File = require('md5-file')
-const {convertToCandidate} = require('../utils/helper');
+const {convertToCandidate, convertToCompany} = require('../utils/helper');
 
 let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');
@@ -474,15 +474,13 @@ async function addExperiences(id, form) {
   }
 
   let candidate = await Candidate.findById(id);
-  for(let [i, exp] of form.entries()){
-    let experience = await experienceService.add(exp);
-    if(experience) {
-      candidate.experiences.push(experience._id);
-    }
+  let experience = await experienceService.add(form);
+  if(experience) {
+    candidate.experiences.push(experience._id);
   }
 
   candidate = await candidate.save();
-  return candidate;
+  return experience;
 }
 
 async function getExperiences(id) {
@@ -492,6 +490,14 @@ async function getExperiences(id) {
   }
 
   let candidate = await Candidate.findById(id).populate('experiences').select('experiences');
+  let companies = await feedService.lookupCompaniesIds(_.map(candidate.experiences, 'employer.id'))
+
+  candidate.experiences = _.reduce(candidate.experiences, function(res, exp){
+    let employer = _.find(companies, {id: exp.employer.id});
+    exp.employer = convertToCompany(employer);
+    res.push(exp);
+    return res;
+  }, []);
   return candidate.experiences;
 }
 
@@ -504,15 +510,13 @@ async function addEducations(id, form) {
   }
 
   let candidate = await Candidate.findById(id);
-  for(let [i, ed] of form.entries()){
-    let education = await educationService.add(ed);
-    if(education) {
-      candidate.educations.push(education._id);
-    }
+  let education = await educationService.add(form);
+  if(education) {
+    candidate.educations.push(education._id);
   }
 
   candidate = await candidate.save();
-  return candidate;
+  return education;
 }
 
 async function getEducations(id) {

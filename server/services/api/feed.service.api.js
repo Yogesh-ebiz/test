@@ -44,6 +44,7 @@ async function registerCompany(userId, company){
   return response.data.data;
 };
 
+
 async function createCompany(company){
   if(!company){
     return null;
@@ -54,6 +55,14 @@ async function createCompany(company){
 };
 
 
+async function createInstitute(institute){
+  if(!institute){
+    return null;
+  }
+
+  let response = await client.post(`/institute/create`, institute, null);
+  return response.data.data;
+};
 
 async function syncUserCompanies(userId){
   if(!userId){
@@ -355,16 +364,23 @@ async function lookupContacts(ids, type) {
 };
 
 
+async function lookupCompaniesIds(ids) {
+  let response = await client.get(`/search/company/lookup?ids=${ids}`, null, options);
+  return response.data.data;
+};
+
+
+async function lookupInstituteIds(ids) {
+  let response = await client.get(`/search/institute/lookup?ids=${ids}`, null, options);
+  return response.data.data;
+};
+
 async function findCandidateById(id) {
   let response = await client.get(`/people/candidates/${id}`, null, options);
   return response.data.data;
 };
 
 
-async function lookupCompaniesIds(ids) {
-  let response = await client.get(`/search/company/lookup?ids=${ids}`, null, options);
-  return response.data.data;
-};
 
 async function syncExperiences(id, experiences){
 
@@ -473,6 +489,7 @@ async function updateResumeDefault(userId, id) {
 module.exports = {
   register:register,
   syncUserCompanies:syncUserCompanies,
+  createInstitute:createInstitute,
   createCompany:createCompany,
   registerCompany:registerCompany,
   createNotification:createNotification,
@@ -504,6 +521,7 @@ module.exports = {
   lookupCandidateIds:lookupCandidateIds,
   lookupContacts:lookupContacts,
   lookupCompaniesIds:lookupCompaniesIds,
+  lookupInstituteIds:lookupInstituteIds,
   getUserCompaniesHasAdminRole:getUserCompaniesHasAdminRole,
   syncExperiences:syncExperiences,
   getUserEmployers:getUserEmployers,

@@ -3,6 +3,8 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const Education = require('../models/education.model');
+const feedService = require('../services/api/feed.service.api');
+
 
 const educationSchema = Joi.object({
   _id: Joi.string().allow('').optional(),
@@ -20,14 +22,44 @@ const educationSchema = Joi.object({
 });
 
 
-async function add(education) {
+async function add(form) {
 
-  if(!education){
+  if(!form){
     return;
   }
 
-  education = await Joi.validate(education, educationSchema, {abortEarly: false});
-  education = await new Education(education).save();
+  form = await Joi.validate(form, educationSchema, {abortEarly: false});
+
+  let education;
+
+  if(!form.institute.id){
+    let institute = {name: form.institute.name, primaryAddress: {name: '', address1: '', address2: '', city: form.city, state: form.state, country: form.country, postalCode: ''} };
+    institute = await feedService.createInstitute(institute);
+    form.institute.id=institute.id;
+  }
+
+  if(form._id){
+    education = await Education.findById(ObjectID(form._id));
+    if(education){
+      education.city = form.city;
+      education.state = form.state;
+      education.country = form.country
+      education.institute = form.institute
+      education.description = form.description;
+      education.employmentTitle = form.employmentTitle
+      education.employmentType = form.employmentType;
+      education.fromDate = form.fromDate;
+      education.thruDate = form.thruDate;
+      education.isCurrent = form.isCurrent;
+      education.terminationReason = form.terminationReason;
+      education.terminationType = form.terminationType;
+      await education.save();
+    }
+  } else {
+    education = await new Education(form).save();
+  }
+
+
   return education;
 
 }

@@ -22,26 +22,42 @@ const experienceSchema = Joi.object({
 });
 
 
-async function add(experience) {
+async function add(form) {
 
-  if(!experience){
+  if(!form){
     return;
   }
 
-  experience = await Joi.validate(experience, experienceSchema, {abortEarly: false});
+  form = await Joi.validate(form, experienceSchema, {abortEarly: false});
 
-  if(!experience.employer.id){
-    // let company = await feedService.createCompany(experience.employer);
-    // experience.employer.id=company.id;
+  let experience;
+
+  if(!form.employer.id){
+    let company = {name: form.employer.name, primaryAddress: {name: '', address1: '', address2: '', city: form.city, state: form.state, country: form.country, postalCode: ''} };
+    company = await feedService.createCompany(company);
+    form.employer.id=company.id;
   }
 
-  if(experience._id){
-    experience = await Experience.findById(ObjectID(experience._id));
+  if(form._id){
+    let experience = await Experience.findById(ObjectID(form._id));
     if(experience){
-      await  experience.save();
+      experience.city = form.city;
+      experience.state = form.state;
+      experience.country = form.country
+      experience.employer = form.employer
+      experience.description = form.description;
+      experience.employmentTitle = form.employmentTitle
+      experience.employmentType = form.employmentType;
+      experience.fromDate = form.fromDate;
+      experience.thruDate = form.thruDate;
+      experience.isCurrent = form.isCurrent;
+      experience.terminationReason = form.terminationReason;
+      experience.terminationType = form.terminationType;
+      await experience.save();
     }
   } else {
-    experience = await new Experience(experience).save();
+    console.log('not found')
+    experience = await new Experience(form).save();
   }
 
 
