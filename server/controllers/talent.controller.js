@@ -1413,32 +1413,32 @@ async function publishJob(companyId, currentUserId, jobId, type) {
     job.skills = await feedService.findSkillsById(job.skills);
 
 
-    var promise = new Promise(function (resolve, reject) {
-
-      const data = {
-        font: {
-          "color" : "green",
-          "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
-        },
-        job: job
-      };
-
-      const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
-      const htmlString = fs.readFileSync(filePathName).toString();
-      let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
-      const ejsData = ejs.render(htmlString, data);
-
-
-      pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
-        if (err) reject(err);
-        resolve(response);
-      });
-    }).then(function(res){
-      parserService.uploadJob(res.filename);
-    }).then(function(res){
-      console.log('finally')
-      result = res;
-    });
+    // var promise = new Promise(function (resolve, reject) {
+    //
+    //   const data = {
+    //     font: {
+    //       "color" : "green",
+    //       "include": "https://api.****.com/parser/v3/css/combined?face=Kruti%20Dev%20010,Calibri,DevLys%20010,Arial,Times%20New%20Roman"
+    //     },
+    //     job: job
+    //   };
+    //
+    //   const filePathName = path.resolve(__dirname, '../templates/jobtopdf.ejs');
+    //   const htmlString = fs.readFileSync(filePathName).toString();
+    //   let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
+    //   const ejsData = ejs.render(htmlString, data);
+    //
+    //
+    //   pdf.create(ejsData, options).toFile('job_' + job.jobId +' .pdf',(err, response) => {
+    //     if (err) reject(err);
+    //     resolve(response);
+    //   });
+    // }).then(function(res){
+    //   parserService.uploadJob(res.filename);
+    // }).then(function(res){
+    //   console.log('finally')
+    //   result = res;
+    // });
 
 
 // job = await parserService.uploadJob(filePath);

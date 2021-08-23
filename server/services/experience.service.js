@@ -3,6 +3,7 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const Experience = require('../models/experience.model');
+const feedService = require('../services/api/feed.service.api');
 
 const experienceSchema = Joi.object({
   city: Joi.string().allow('').optional(),
@@ -27,6 +28,10 @@ async function add(experience) {
   }
 
   experience = await Joi.validate(experience, experienceSchema, {abortEarly: false});
+  if(!experience.id){
+    let company = await feedService.createCompany(experience.employer);
+    experience.employer.id=company.id;
+  }
   experience = await new Experience(experience).save();
   return experience;
 

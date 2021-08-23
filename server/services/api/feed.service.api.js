@@ -44,6 +44,15 @@ async function registerCompany(userId, company){
   return response.data.data;
 };
 
+async function createCompany(company){
+  if(!company){
+    return null;
+  }
+
+  let response = await client.post(`/company/create`, company, null);
+  return response.data.data;
+};
+
 
 
 async function syncUserCompanies(userId){
@@ -464,6 +473,7 @@ async function updateResumeDefault(userId, id) {
 module.exports = {
   register:register,
   syncUserCompanies:syncUserCompanies,
+  createCompany:createCompany,
   registerCompany:registerCompany,
   createNotification:createNotification,
   createMessageThread:createMessageThread,
