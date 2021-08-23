@@ -20,6 +20,7 @@ const questionSchema = Joi.object({
 
 const emailTemplateSchema = Joi.object({
   name: Joi.string().required(),
+  subject: Joi.string().optional(),
   bodyHtml: Joi.string().required(),
   company: Joi.object().optional(),
   createdBy: Joi.number().optional(),
@@ -88,6 +89,7 @@ async function update(id, form) {
   if(template){
     let questions = [];
     template.name = form.name;
+    template.subject = form.subject;
     template.bodyHtml = form.bodyHtml;
     template = await template.save();
   }
