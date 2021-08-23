@@ -3496,7 +3496,7 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
     candidate.dob = form.dob;
     candidate.links = form.links;
     candidate.primaryAddress = form.primaryAddress;
-
+    candidate.jobTitle = form.jobTitle;
     result = await candidate.save();
   }
 
