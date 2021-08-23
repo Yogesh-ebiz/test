@@ -30,6 +30,9 @@ const EmailSchema = new mongoose.Schema({
   name: {
     type: String
   },
+  subject: {
+    type: String
+  },
   bodyHtml: {
     type: String,
     required: true
