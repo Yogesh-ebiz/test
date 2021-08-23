@@ -29,11 +29,22 @@ async function add(experience) {
   }
 
   experience = await Joi.validate(experience, experienceSchema, {abortEarly: false});
+
   if(!experience.employer.id){
     // let company = await feedService.createCompany(experience.employer);
     // experience.employer.id=company.id;
   }
-  experience = await new Experience(experience).save();
+
+  if(experience._id){
+    experience = await Experience.findById(ObjectID(experience._id));
+    if(experience){
+      await  experience.save();
+    }
+  } else {
+    experience = await new Experience(experience).save();
+  }
+
+
   return experience;
 
 }
