@@ -1361,6 +1361,13 @@ async function addCandidateSkills(req, res) {
   let company = parseInt(req.params.id);
   let candidateId = ObjectID(req.params.candidateId);
   let form = req.body;
+  form = _.reduce(form, function(res, skill){
+    if(skill._id){
+      skill._id=ObjectID(skill._id);
+    }
+    res.push(skill);
+    return res;
+  }, []);
 
   let data = await talentCtrl.addCandidateSkills(company, currentUserId, candidateId, form);
   res.json(new Response(data, data?'skills_added_successful':'not_found', res));

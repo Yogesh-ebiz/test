@@ -127,6 +127,7 @@ app.use((err, req, res, next) => {
 
   // customize Joi validation errors
   if (err.isJoi) {
+    console.log('hello')
     err.message = err.details.map(e => e.message).join("; ");
     err.status = 400;
 

@@ -21,6 +21,11 @@ const awsService = require('../services/aws.service');
 
 
 
+const skillSchema = Joi.object({
+  id: Joi.number().required(),
+  noOfMonths: Joi.number().optional(),
+  rating: Joi.number().optional()
+});
 
 const candidateSchema = Joi.object({
   userId: Joi.number().allow('', null).optional(),
@@ -576,8 +581,12 @@ async function addSkills(id, form) {
   }
 
   let candidate = await Candidate.findById(id);
-  candidate.skills = form;
+  for(let [i, skill] of form.entries()){
+      skill = await Joi.validate(skill, skillSchema, {abortEarly: false});
+  }
 
+
+  candidate.skills = form;
   candidate = await candidate.save();
   return candidate;
 }

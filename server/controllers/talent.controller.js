@@ -3749,12 +3749,7 @@ async function addCandidateEducation(companyId, currentUserId, candidateId, form
   }
 
   let result;
-  try {
-    result = await candidateService.addEducation(candidateId, form);
-
-  } catch (error) {
-    console.log(error);
-  }
+  result = await candidateService.addEducation(candidateId, form);
 
   return result;
 }
@@ -3793,13 +3788,8 @@ async function removeCandidateEducation(companyId, currentUserId, candidateId, e
   }
 
   let result;
-  try {
-    let educations = await candidateService.removeEducation(candidateId, educationId);
-    result = educations;
-
-  } catch (error) {
-    console.log(error);
-  }
+  let educations = await candidateService.removeEducation(candidateId, educationId);
+  result = educations;
 
   return {success: true};
 }
@@ -3817,12 +3807,7 @@ async function addCandidateSkills(companyId, currentUserId, candidateId, form) {
   }
 
   let result;
-  try {
-    result = await candidateService.addSkills(candidateId, form);
-
-  } catch (error) {
-    console.log(error);
-  }
+  result = await candidateService.addSkills(candidateId, form);
 
   return result;
 }
