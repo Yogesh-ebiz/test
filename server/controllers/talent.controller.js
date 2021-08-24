@@ -373,8 +373,7 @@ async function getSubscriptions(companyId, currentUserId) {
   let subscriptions = [];
   try {
     let company = await companyService.findByCompanyId(companyId);
-    let filter = {customerId: company.customerId};
-    subscriptions = await paymentService.lookupSubscriptions(filter);
+    subscriptions = await paymentService.getCustomerSubscriptions(company.customerId);
 
   } catch (error) {
     console.log(error);

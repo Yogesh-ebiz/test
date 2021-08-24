@@ -475,9 +475,9 @@ async function updateSubscriptionPaymentMethod(id, form) {
 };
 
 
-async function lookupSubscriptions(filter) {
+async function getCustomerSubscriptions(customerId) {
 
-  let response = await client.post(`/subscriptions/lookup`, filter, null).catch(function (error) {
+  let response = await client.get(`/customer/${customerId}/subscriptions?category=`, null).catch(function (error) {
     if (error.request) {
       // The request was made but no response was received
       console.log(error.request);
@@ -536,5 +536,5 @@ module.exports = {
   deleteSubscription:deleteSubscription,
   updateSubscriptionPaymentMethod:updateSubscriptionPaymentMethod,
   getPlans:getPlans,
-  lookupSubscriptions:lookupSubscriptions
+  getCustomerSubscriptions:getCustomerSubscriptions
 }
