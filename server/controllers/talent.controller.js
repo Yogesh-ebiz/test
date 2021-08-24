@@ -214,6 +214,8 @@ module.exports = {
   removeCandidateEducation,
   addCandidateSkills,
   getCandidateSkills,
+  getCandidateAccomplishments,
+  addCandidateLanguages,
   uploadAvatar,
   uploadCandidateResume,
   getCandidateResumes,
@@ -3846,6 +3848,49 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
 }
 
 
+async function getCandidateAccomplishments(companyId, currentUserId, candidateId) {
+  if(!companyId || !currentUserId || !candidateId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let candidate = await candidateService.findById(candidateId);
+
+    let languages = candidate.languages;
+    let publications = candidate.publications;
+    let certifications = candidate.certifications
+    result = {languages: languages, publications:publications, certifications:certifications}
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function addCandidateLanguages(companyId, currentUserId, candidateId, form) {
+  if(!companyId || !currentUserId || !candidateId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  let candidate = await candidateService.findById(candidateId);
+  candidate.languages = form.languages;
+  result = await candidate.save();
+
+  return result;
+}
 
 
 
