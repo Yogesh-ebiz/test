@@ -3704,7 +3704,7 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
     return null;
   }
 
-  let result;
+  let result=[];
   try {
     let experiences = await candidateService.getExperiences(candidateId);
     result = experiences;
@@ -3772,7 +3772,7 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
 
   let result;
   try {
-    await candidateService.getEducations(candidateId);
+    result = await candidateService.getEducations(candidateId);
 
   } catch (error) {
     console.log(error);
