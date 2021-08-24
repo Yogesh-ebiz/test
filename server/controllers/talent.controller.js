@@ -3825,8 +3825,18 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
 
   let result;
   try {
-    let educations = await candidateService.getSkills(candidateId);
-    result = educations;
+    let skills = await candidateService.getSkills(candidateId);
+    let foundSkills = await feedService.findSkillsById(_.map(skills, 'id'));
+
+    result = _.reduce(skills, function(res, skill){
+      let found = _.find(foundSkills, {id: skill.id})
+      if(found){
+        skill.name = found.name;
+      }
+      res.push(skill);
+      return res;
+
+    }, []);
 
   } catch (error) {
     console.log(error);
