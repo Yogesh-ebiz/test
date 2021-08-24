@@ -44,6 +44,9 @@ const ExperienceSchema = new mongoose.Schema({
   terminationType: {
     type: String,
     required: false
+  },
+  jobFunction: {
+    type: String
   }
 }, {
   versionKey: false

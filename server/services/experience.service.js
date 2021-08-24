@@ -18,7 +18,8 @@ const experienceSchema = Joi.object({
   thruDate: Joi.number().optional(),
   isCurrent: Joi.boolean(),
   terminationReason: Joi.string().allow('').optional(),
-  terminationType: Joi.string().allow('').optional()
+  terminationType: Joi.string().allow('').optional(),
+  jobFunction: Joi.string().allow('').optional()
 });
 
 
@@ -53,6 +54,7 @@ async function add(form) {
       experience.isCurrent = form.isCurrent;
       experience.terminationReason = form.terminationReason;
       experience.terminationType = form.terminationType;
+      experience.jobFunction = form.jobFunction;
       await experience.save();
     }
   } else {
