@@ -800,9 +800,9 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
 }
 
 
-async function addPaymentMethod(companyId, currentUserId, card) {
+async function addPaymentMethod(companyId, currentUserId, form) {
 
-  if(!companyId || !currentUserId || !card){
+  if(!companyId || !currentUserId || !form){
     return null;
   }
 
@@ -818,8 +818,8 @@ async function addPaymentMethod(companyId, currentUserId, card) {
       partyId: companyId,
       partyType: 'COMPANY',
       name: company.name,
-      phone: card.phone,
-      email: card.email,
+      phone: form.card.phone,
+      email: form.card.email,
       address: {
         address1: company.primaryAddress.address1,
         address2: company.primaryAddress.address2,
@@ -837,7 +837,7 @@ async function addPaymentMethod(companyId, currentUserId, card) {
     }
   }
 
-  let result = await paymentProvider.addPaymentMethod(company.customerId, card);
+  let result = await paymentProvider.addPaymentMethod(company.customerId, form);
   return result;
 }
 

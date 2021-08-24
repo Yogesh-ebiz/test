@@ -11,7 +11,7 @@ let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/ap
 
 async function addCustomer(form) {
 
-
+  console.log(form)
   let response = await client.post(`/customers/`, form, options).catch(function (error) {
     if (error.response) {
       // Request made and server responded
@@ -199,7 +199,6 @@ async function getAdroducts() {
 
 
 async function addPaymentMethod(customerId, form) {
-
 
   let response = await client.post(`/customers/${customerId}/paymentmethod`, form, options).catch(function (error) {
     if (error.response) {
