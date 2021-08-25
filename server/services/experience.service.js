@@ -40,7 +40,8 @@ async function add(form) {
   }
 
   if(form._id){
-    let experience = await Experience.findById(ObjectID(form._id));
+    experience = await Experience.findById(ObjectID(form._id));
+
     if(experience){
       experience.city = form.city;
       experience.state = form.state;
@@ -55,10 +56,9 @@ async function add(form) {
       experience.terminationReason = form.terminationReason;
       experience.terminationType = form.terminationType;
       experience.jobFunction = form.jobFunction;
-      await experience.save();
+      experience = await experience.save();
     }
   } else {
-    console.log('not found')
     experience = await new Experience(form).save();
   }
 

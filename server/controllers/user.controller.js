@@ -25,6 +25,7 @@ const partyEnum = require('../const/partyEnum');
 const statusEnum = require('../const/statusEnum');
 const alertEnum = require('../const/alertEnum');
 
+const userService = require('../services/user.service');
 const parserService = require('../services/api/sovren.service.api');
 const {upload} = require('../services/aws.service');
 const feedService = require('../services/api/feed.service.api');
@@ -153,6 +154,7 @@ const partyCertificationSchema = Joi.object({
 
 
 module.exports = {
+  register,
   sync,
   syncCompanies,
   getUserDetail,
@@ -192,6 +194,25 @@ module.exports = {
 }
 
 
+
+
+async function register(form) {
+  if(!form){
+    return null;
+  }
+
+  let result;
+  try {
+    await memberService.sync(form);
+
+  } catch(e){
+    console.log('sync: Error', e);
+  }
+
+
+  return result;
+
+}
 
 
 async function sync(user) {
