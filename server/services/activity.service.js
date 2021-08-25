@@ -278,11 +278,64 @@ async function findByCandidateId(companyId, candidateId, sort) {
 }
 
 
+async function findByApplicationId(companyId, applicationId, sort) {
+  if(!companyId || !applicationId || !sort){
+    return;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size > 0) ? parseInt(sort.size) : 20;
+  let page = (sort.page && sort.page == 0) ? 1 : parseInt(sort.page) + 1;
+  let direction = (sort.direction && sort.direction == "DESC") ? -1 : 1;
+
+  const options = {
+    page: page,
+    limit: limit,
+  };
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = {$match: {$or: [{'meta.applicationId': applicationId}, {subject: applicationId}] }};
+  let aSort = {$sort: {createdDate: direction}};
+
+  aList.push(aMatch);
+  aList.push(
+    {
+      $lookup: {
+        let: {causer: '$causer'},
+        from: "candidates",
+        pipeline: [
+          {$match: {company: companyId}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+          {
+            $unionWith: {
+              coll: "members",
+              pipeline: [
+                {$match: {company: companyId}}
+              ]
+            }
+          },
+          {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+        ],
+        as: "causer"
+      }
+    },
+    {$unwind: '$causer'}
+  );
+
+  const aggregate = Activity.aggregate(aList);
+
+  return Activity.aggregatePaginate(aggregate, options);
+
+}
+
 module.exports = {
   addActivity:addActivity,
   findBySubjectTypeAndSubjectId:findBySubjectTypeAndSubjectId,
   findBySubjectTypeAndSubject:findBySubjectTypeAndSubject,
   findByJobId:findByJobId,
-  findByCandidateId:findByCandidateId
+  findByCandidateId:findByCandidateId,
+  findByApplicationId:findByApplicationId
 
 }

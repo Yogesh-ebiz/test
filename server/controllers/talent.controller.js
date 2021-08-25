@@ -2736,7 +2736,23 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
         await application.currentProgress.save();
         await application.user.save();
         let job = await jobService.findJob_Id(application.jobId);
-        let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.EVALUATION, subjectId: ''+result._id, action: actionEnum.ADDED, meta: {candidate: application.user._id, name: application.currentProgress.stage.name, jobId: job._id}});
+
+        let activity = await activityService.addActivity({
+          causer: member._id,
+          causerType: subjectType.MEMBER,
+          subjectType: subjectType.EVALUATION,
+          subject: result._id,
+          action: actionEnum.ADDED,
+          meta: {
+            candidate: application.user._id,
+            name: application.user.firstName + ' ' + application.user.lastName,
+            stage: application.currentProgress.stage.name,
+            jobId: job._id,
+            applicationId: application._id,
+            rating: result.rating
+          }
+        });
+
       }
     }
 
@@ -2760,7 +2776,46 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
 
   let result;
   try {
-    result = await evaluationService.remove(member._id, ObjectID(applicationId), ObjectID(applicationProgressId));
+    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+      {
+        path: 'currentProgress',
+        model: 'ApplicationProgress',
+        populate: [{
+          path: 'evaluations',
+          model: 'Evaluation'
+        },
+          {
+            path: 'stage',
+            model: 'Stage'
+          }]
+      },
+      {
+        path: 'user',
+        model: 'Candidate'
+      }
+    ]);
+
+    let foundEvaluation = _.find(application.currentProgress.evaluations, {applicationProgressId: applicationProgressId, createdBy: member._id});
+    if(foundEvaluation) {
+      result = await evaluationService.remove(member._id, applicationId, applicationProgressId);
+      if (result) {
+        let activity = await activityService.addActivity({
+          causer: member._id,
+          causerType: subjectType.MEMBER,
+          subjectType: subjectType.EVALUATION,
+          subject: application._id,
+          action: actionEnum.DELETED,
+          meta: {
+            candidate: application.user._id,
+            name: application.user.firstName + ' ' + application.user.lastName,
+            stage: application.currentProgress.stage.name,
+            jobId: application.job,
+            applicationId: application._id
+          }
+        });
+        console.log(activity)
+      }
+    }
   } catch (error) {
     console.log(error);
   }
@@ -3000,7 +3055,7 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
   let result;
   try {
 
-    result = await activityService.findBySubjectTypeAndSubject(companyId, subjectType.APPLICATION, applicationId, sort);
+    result = await activityService.findByApplicationId(companyId, applicationId, sort);
     let userIds = _.map(result.docs, 'causerId');
     let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(activity){

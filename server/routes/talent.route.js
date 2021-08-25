@@ -911,8 +911,8 @@ async function addApplicationProgressEvaluation(req, res) {
 async function removeApplicationProgressEvaluation(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let applicationId = req.params.applicationId;
-  let progressId = req.params.progressId;
+  let applicationId = ObjectID(req.params.applicationId);
+  let progressId = ObjectID(req.params.progressId);
 
   let data = await talentCtrl.removeApplicationProgressEvaluation(companyId, currentUserId, applicationId, progressId);
 
