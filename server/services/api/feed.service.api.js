@@ -44,6 +44,20 @@ async function registerCompany(userId, company){
   return response.data.data;
 };
 
+async function registerInstitute(userId, company){
+  if(!userId || !company){
+    return null;
+  }
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.post(`/institute/register`, company, options);
+  return response.data.data;
+};
+
 
 async function createCompany(company){
   if(!company){
@@ -528,6 +542,7 @@ module.exports = {
   createInstitute:createInstitute,
   createCompany:createCompany,
   registerCompany:registerCompany,
+  registerInstitute:registerInstitute,
   createNotification:createNotification,
   createMessageThread:createMessageThread,
   getCurrentUser:getCurrentUser,

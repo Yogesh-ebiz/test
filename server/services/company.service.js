@@ -68,7 +68,14 @@ async function register(currentParty, form) {
   }
 
   form = await Joi.validate(form, feedCompanySchema, {abortEarly: false});
-  let company = await feedService.registerCompany(currentParty.id, form);
+  let company = null;
+
+  if(form.partyType===''){
+    company = await feedService.registerCompany(currentParty.id, form);
+  } else {
+    company = await feedService.registerInstitute(currentParty.id, form);
+  }
+
   let savedCompany;
   if(company){
 
