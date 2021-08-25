@@ -1711,11 +1711,8 @@ async function searchApplications(companyId, currentUserId, jobId, filter, sort,
   }
 
   let result = await applicationService.search(jobId, filter, sort);
-    // let userIds = _.map(result.docs, 'user');
-    // let users = await feedService.lookupUserIds(userIds);
 
   let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
-  console.log(applicationSubscribed)
   result.docs.forEach(function(app){
     app.labels = [];
     app.note = [];

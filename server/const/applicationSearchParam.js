@@ -80,7 +80,6 @@ function SearchParam(filter) {
     this.query.$and =  [{noOfMonthExperiences:  {$gte: (filter.minYear * 12)} }, {noOfMonthExperiences: { $lte: (filter.maxYear * 12)}}];
   }
 
-
   return this.query;
 }
 

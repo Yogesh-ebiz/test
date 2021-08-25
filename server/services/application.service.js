@@ -1263,7 +1263,6 @@ async function search(jobId, filter, sort) {
 
   aList.push({ $match: {jobId: jobId, status: {$in: filter.status} } });
   aList.push(
-    {$match: {status: statusEnum.ACTIVE}},
     {$lookup:{
         from:"applicationprogresses",
         let:{currentProgress:"$currentProgress"},
