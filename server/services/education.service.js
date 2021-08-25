@@ -33,7 +33,7 @@ async function add(form) {
   let education;
 
   if(!form.institute.id){
-    let institute = {name: form.institute.name, primaryAddress: {name: '', address1: '', address2: '', city: form.city, state: form.state, country: form.country, postalCode: ''} };
+    institute = {name: form.institute.name, primaryAddress: {name: '', address1: '', address2: '', city: form.city, state: form.state, country: form.country, postalCode: ''} };
     institute = await feedService.createInstitute(institute);
     form.institute.id=institute.id;
   }
@@ -53,7 +53,7 @@ async function add(form) {
       education.isCurrent = form.isCurrent;
       education.terminationReason = form.terminationReason;
       education.terminationType = form.terminationType;
-      await education.save();
+      education = await education.save();
     }
   } else {
     education = await new Education(form).save();
