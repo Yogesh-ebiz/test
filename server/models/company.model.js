@@ -13,6 +13,9 @@ const CompanySchema = new mongoose.Schema({
   partyType: {
     type: String
   },
+  type: {
+    type: String
+  },
   customerId: {
     type: String
   },

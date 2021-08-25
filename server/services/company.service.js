@@ -22,16 +22,25 @@ const roleService = require('../services/role.service');
 
 const companySchema = Joi.object({
   name: Joi.string(),
+  legalName: Joi.string().allow('').optional(),
   companyId: Joi.number(),
   partyType: Joi.string(),
+  type: Joi.string(),
   createdBy: Joi.number(),
   email: Joi.string(),
-  primaryAddress: Joi.object()
+  primaryAddress: Joi.object(),
+  partyType: Joi.string(),
+  size: Joi.string(),
+  about: Joi.string().allow('').optional(),
+  mission: Joi.string().allow('').optional(),
+  website: Joi.string().allow('').optional(),
+  yearFounded: Joi.number().optional(),
 });
 
 const feedCompanySchema = Joi.object({
   name: Joi.string(),
   legalName: Joi.string(),
+  partyType: Joi.string(),
   about: Joi.string().allow(''),
   mission: Joi.string().allow(''),
   size: Joi.string(),
@@ -83,6 +92,7 @@ async function register(currentParty, form) {
       name: company.name,
       companyId: company.id,
       partyType: company.partyType,
+      type: company.type,
       createdBy: currentParty.id,
       email:currentParty.primaryEmail?currentParty.primaryEmail.value:'',
       primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
