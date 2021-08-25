@@ -133,6 +133,17 @@ async function getUserEducations(id) {
   return user;
 };
 
+async function getUserSkills(id) {
+  let user = null;
+  try {
+    let response = await client.get(`/user/${id}/skills/list`);
+    user = response.data.data;
+  } catch(error) {
+    console.log("getUserEducations: error", error);
+  }
+  return user;
+};
+
 
 async function getCurrentUser(id) {
   let user = null;
@@ -525,6 +536,7 @@ module.exports = {
   findCompanyById: findCompanyById,
   getUserExperiences:getUserExperiences,
   getUserEducations:getUserEducations,
+  getUserSkills:getUserSkills,
   followCompany: followCompany,
   hasFollowed:hasFollowed,
   syncPeople:syncPeople,

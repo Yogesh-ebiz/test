@@ -168,7 +168,7 @@ async function search(filter, sort) {
       },
     },
     {$unwind: '$candidate'},
-    // {$lookup: {from: 'emailcampaigns', localField: 'campaign', foreignField: '_id', as: 'campaign' } },
+    {$lookup: {from: 'emailcampaigns', localField: '_id', foreignField: 'candidate', as: 'campaigns' } },
     {$lookup:{
         from:"emailcampaigns",
         let:{campaigns:"$campaigns"},

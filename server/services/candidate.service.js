@@ -598,16 +598,6 @@ async function addSkills(id, form) {
   return candidate;
 }
 
-async function getSkills(id) {
-
-  if(!id){
-    return;
-  }
-
-  let candidate = await Candidate.findById(id);
-  return candidate.skills;
-}
-
 
 async function checkEmail(company, email) {
 
@@ -646,6 +636,5 @@ module.exports = {
   getEducations:getEducations,
   removeEducation:removeEducation,
   addSkills:addSkills,
-  getSkills:getSkills,
   checkEmail:checkEmail
 }

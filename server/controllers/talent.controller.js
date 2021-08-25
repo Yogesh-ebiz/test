@@ -3853,20 +3853,31 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
     return null;
   }
 
-  let result;
+  let result = [];
   try {
-    let skills = await candidateService.getSkills(candidateId);
-    let foundSkills = await feedService.findSkillsById(_.map(skills, 'id'));
+    let candidate = await candidateService.findById(candidateId);
+    if(candidate.userId){
+      let skills = await feedService.getUserSkills(candidate.userId);
+      result = _.reduce(skills, function(res, item){
+        let skill = {id: item.skill.id, name: item.skill.name, noOfMonths: item.noOfMonths, rating: 0};
+        res.push(skill);
+        return res;
+      }, []);
+    } else {
+      let foundSkills = await feedService.findSkillsById(_.map(candidate.skills, 'id'));
+      result = _.reduce(skills, function(res, skill){
+        let found = _.find(foundSkills, {id: skill.id})
+        if(found){
+          skill.name = found.name;
+        }
+        res.push(skill);
+        return res;
 
-    result = _.reduce(skills, function(res, skill){
-      let found = _.find(foundSkills, {id: skill.id})
-      if(found){
-        skill.name = found.name;
-      }
-      res.push(skill);
-      return res;
+      }, []);
+    }
 
-    }, []);
+
+
 
   } catch (error) {
     console.log(error);
