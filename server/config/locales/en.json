@@ -238,5 +238,6 @@
 	"experiences_added_successful": "experiences_added_successful",
 	"educations_added_successful": "educations_added_successful",
 	"skills_added_successful": "skills_added_successful",
-	"experience_deleted_successful": "experience_deleted_successful"
+	"experience_deleted_successful": "experience_deleted_successful",
+	"educations_deleted_successful": "educations_deleted_successful"
 }

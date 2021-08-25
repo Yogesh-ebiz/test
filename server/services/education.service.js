@@ -37,7 +37,7 @@ async function add(form) {
     institute = await feedService.createInstitute(institute);
     form.institute.id=institute.id;
   }
-
+    
   if(form._id){
     education = await Education.findById(ObjectID(form._id));
     if(education){
@@ -45,14 +45,14 @@ async function add(form) {
       education.state = form.state;
       education.country = form.country
       education.institute = form.institute
-      education.description = form.description;
-      education.employmentTitle = form.employmentTitle
+      education.degree = form.degree;
+      education.fieldOfStudy = form.fieldOfStudy
       education.employmentType = form.employmentType;
       education.fromDate = form.fromDate;
       education.thruDate = form.thruDate;
       education.isCurrent = form.isCurrent;
-      education.terminationReason = form.terminationReason;
-      education.terminationType = form.terminationType;
+      education.hasGraduated = form.hasGraduated;
+      education.gpa = form.gpa;
       education = await education.save();
     }
   } else {

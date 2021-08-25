@@ -1019,7 +1019,7 @@ async function unarchiveJob(companyId, currentUserId, jobId) {
     return null;
   }
 
-  let result = await jobService.unarchiveJob(jobId, currentUserId);
+  let result = await jobService.unarchiveJob(jobId, member);
 
   return result;
 }
