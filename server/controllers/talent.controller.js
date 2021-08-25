@@ -3708,7 +3708,21 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
 
   let result=[];
   try {
-    let experiences = await candidateService.getExperiences(candidateId);
+
+    let experiences = [];
+    let candidate = await candidateService.findById(candidateId);
+    if(candidate.userId){
+      experiences = await feedService.getUserExperiences(candidate.userId);
+      experiences = _.reduce(experiences, function(res, exp){
+        exp.employer = convertToCompany(exp.employer);
+        console.log(res);
+        res.push(exp);
+        return res;
+      }, []);
+    } else {
+      experiences = await candidateService.getExperiences(candidateId);
+    }
+
     result = experiences;
 
   } catch (error) {
@@ -3767,9 +3781,23 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
     return null;
   }
 
+  let educations = [];
   let result;
   try {
-    result = await candidateService.getEducations(candidateId);
+    // result = await candidateService.getEducations(candidateId);
+    let candidate = await candidateService.findById(candidateId);
+    if(candidate.userId){
+      educations = await feedService.getUserEducations(candidate.userId);
+      educations = _.reduce(educations, function(res, exp){
+        exp.institute = convertToCompany(exp.institute);
+        res.push(exp);
+        return res;
+      }, []);
+    } else {
+      educations = await candidateService.getExperiences(candidateId);
+    }
+
+    result = educations;
 
   } catch (error) {
     console.log(error);
