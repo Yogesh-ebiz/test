@@ -481,7 +481,11 @@ async function addExperience(id, form) {
   let candidate = await Candidate.findById(id);
   let experience = await experienceService.add(form);
   if(experience) {
-    candidate.experiences.push(experience._id);
+    let found = _.find(candidate.experiences, {_id: experience._id});
+    if(!found){
+      candidate.experiences.push(experience._id);
+    }
+
   }
 
   candidate = await candidate.save();
@@ -533,7 +537,10 @@ async function addEducation(id, form) {
   let candidate = await Candidate.findById(id);
   let education = await educationService.add(form);
   if(education) {
-    candidate.educations.push(education._id);
+    let found = _.find(candidate.educations, {_id: education._id});
+    if(!found){
+      candidate.educations.push(education._id);
+    }
   }
 
   candidate = await candidate.save();

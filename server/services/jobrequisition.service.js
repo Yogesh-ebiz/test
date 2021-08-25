@@ -610,10 +610,17 @@ async function unarchiveJob(jobId, member) {
     return;
   }
 
-  let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: member.userId, updatedDate: Date.now()}});
-  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.UNARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: result.title, jobId: ObjectID(jobId)}});
+  // let result = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ACTIVE, updatedBy: member.userId, updatedDate: Date.now()}});
+  let job = await JobRequisition.findById(ObjectID(jobId));
+  if(job){
+    job.status = job.publishedDate?statusEnum.ACTIVE:statusEnum.DRAFT;
+    job = await job.save();
 
-  return result;
+    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: result._id, action: actionEnum.UNARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: result.title, jobId: ObjectID(jobId)}});
+    console.log(activity)
+  }
+
+  return job;
 
 }
 
