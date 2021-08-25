@@ -340,21 +340,21 @@ async function getUserSession(currentUserId, preferredCompany) {
   }
 
 
-  user = convertToTalentUser(member);
+  let user = convertToTalentUser(member);
+  if(user) {
+    companies = _.reduce(companies, function (res, item) {
+      let found = _.find(allAccounts, {company: item.companyId});
+      // item = convertToCompany(item);
+      item.avatar = buildCompanyUrl(item);
+      item.role = roleMinimal(found.role);
+      item.memberId = found._id;
+      res.push(item)
+      return res;
+    }, [])
 
-  companies = _.reduce(companies, function(res, item){
-    let found = _.find(allAccounts, {company: item.companyId});
-    // item = convertToCompany(item);
-    item.avatar = buildCompanyUrl(item);
-    item.role = roleMinimal(found.role);
-    item.memberId = found._id;
-    res.push(item)
-    return res;
-  }, [])
-
-  user.company = companies;
-  user.preferredCompany = preferredCompany;
-
+    user.company = companies;
+    user.preferredCompany = preferredCompany;
+  }
 
   return user;
 
