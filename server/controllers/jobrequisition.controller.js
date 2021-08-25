@@ -538,7 +538,7 @@ async function getJobLanding(currentUserId, locale) {
     let ids = _.map(viewed, 'jobId').concat(_.map(saved, 'jobId')).concat(_.map(popularJobs, '_id')).concat(_.map(highlight, '_id')).concat(_.map(newJobs, '_id'));
 
     let jobs = await JobRequisition.find({_id: {$in: ids}}).populate('company');
-    let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(jobs, function(res, i){ res.push(i.company.companyId); return res;},  []));
+    let foundCompanies = await feedService.lookupCompaniesIds(_.map(jobs, 'company.companyId'));
     jobs = _.reduce(jobs, function(res, job){
       job.company = convertToCompany(job.company);
       job.description = null;

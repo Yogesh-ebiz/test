@@ -1415,6 +1415,7 @@ async function publishJob(companyId, currentUserId, jobId, type) {
 
     job.skills = await feedService.findSkillsById(job.skills);
 
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.PUBLISHED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id}});
 
     // var promise = new Promise(function (resolve, reject) {
     //
