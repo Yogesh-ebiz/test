@@ -70,7 +70,7 @@ async function register(currentParty, form) {
   form = await Joi.validate(form, feedCompanySchema, {abortEarly: false});
   let company = null;
 
-  if(form.partyType===''){
+  if(form.partyType==='COMPANY'){
     company = await feedService.registerCompany(currentParty.id, form);
   } else {
     company = await feedService.registerInstitute(currentParty.id, form);
