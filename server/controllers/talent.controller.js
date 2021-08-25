@@ -334,7 +334,9 @@ async function getUserSession(currentUserId, preferredCompany) {
     }
   } else {
     member = allAccounts[0];
-    preferredCompany = companies[0].companyId;
+    if(companies.length) {
+      preferredCompany = companies[0].companyId;
+    }
   }
 
 
