@@ -3744,8 +3744,8 @@ async function getCandidatesSimilar(companyId, currentUserId, candidateId) {
 
 
 
-async function getCandidateActivities(companyId, currentUserId, userId, sort) {
-  if(!companyId || !currentUserId || !userId || !sort){
+async function getCandidateActivities(companyId, currentUserId, candidateId, sort) {
+  if(!companyId || !currentUserId || !candidateId || !sort){
     return null;
   }
 
@@ -3756,10 +3756,9 @@ async function getCandidateActivities(companyId, currentUserId, userId, sort) {
 
   let result;
   try {
-    let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId);
-    if(candidate) {
-      result = await activityService.findByCandidateId(companyId, candidate._id, sort);
-    }
+
+    result = await activityService.findByCandidateId(companyId, candidateId, sort);
+
 
   } catch (error) {
     console.log(error);

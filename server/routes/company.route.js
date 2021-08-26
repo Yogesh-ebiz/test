@@ -77,6 +77,7 @@ async function syncAvatar(req, res) {
   res.json(new Response(data, data?'company_synced_successful':'not_found', res));
 }
 
+
 async function register(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = req.body;

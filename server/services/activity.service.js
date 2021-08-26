@@ -242,7 +242,7 @@ async function findByCandidateId(companyId, candidateId, sort) {
 
   let aList = [];
   let aLookup = [];
-  let aMatch = {$match: {'meta.candidate': candidateId}};
+  let aMatch = {$match: {$or: [{subject: candidateId}, {'meta.candidate': candidateId}] }};
   let aSort = {$sort: {createdDate: direction}};
 
   aList.push(aMatch);
