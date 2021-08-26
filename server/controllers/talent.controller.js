@@ -1458,7 +1458,7 @@ async function publishJob(companyId, currentUserId, jobId, type) {
 
     job.skills = await feedService.findSkillsById(job.skills);
 
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.PUBLISHED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id}});
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.PUBLISHED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
 
     // var promise = new Promise(function (resolve, reject) {
     //
@@ -2262,7 +2262,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
       }
 
 
-      let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, jobId: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
+      let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, job: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
     }
 
   } catch (error) {
@@ -2790,8 +2790,8 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
             candidate: application.user._id,
             name: application.user.firstName + ' ' + application.user.lastName,
             stage: application.currentProgress.stage.name,
-            jobId: job._id,
-            applicationId: application._id,
+            job: job._id,
+            application: application._id,
             rating: result.rating
           }
         });
@@ -2852,8 +2852,8 @@ async function removeApplicationProgressEvaluation(companyId, currentUserId, app
             candidate: application.user._id,
             name: application.user.firstName + ' ' + application.user.lastName,
             stage: application.currentProgress.stage.name,
-            jobId: application.job,
-            applicationId: application._id
+            job: application.job,
+            application: application._id
           }
         });
         console.log(activity)
@@ -4228,7 +4228,7 @@ async function assignCandidatesJobs(companyId, currentUserId, candidates, jobs) 
             candidateName: candidate.firstName + ' ' + candidate.lastName,
             candidate: candidate._id,
             jobTitle: job.title,
-            jobId: job._id
+            job: job._id
           };
           await activityService.addActivity({
             causer: member._id,

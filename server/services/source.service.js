@@ -71,7 +71,7 @@ async function addSources(candidate, jobIds, member) {
     await Joi.validate(source, sourceSchema, {abortEarly: false});
 
     sources.push(source);
-    let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.title, jobId: job._id};
+    let meta= {candidateName: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.title, job: job._id};
     let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.CANDIDATE, subject: candidate._id, action: actionEnum.ADDED, meta: meta});
     console.log(activity)
   }

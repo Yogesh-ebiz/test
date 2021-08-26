@@ -192,7 +192,7 @@ async function compose(form, companyId) {
                 candidateName: candidate.firstName + " " + candidate.lastName,
                 candidate: candidate._id,
                 jobTitle: job.title,
-                jobId: job._id
+                job: job._id
               };
               await activityService.addActivity({
                 causer: ObjectID(form.from.memberId),

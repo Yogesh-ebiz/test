@@ -189,7 +189,7 @@ async function findByJobId(companyId, jobId, sort) {
 
   let aList = [];
   let aLookup = [];
-  let aMatch = { $match: {'meta.jobId': jobId}};
+  let aMatch = { $match: {'meta.job': jobId}};
   let aSort = { $sort: {createdDate: direction} };
 
   aList.push(aMatch);
@@ -295,7 +295,7 @@ async function findByApplicationId(companyId, applicationId, sort) {
 
   let aList = [];
   let aLookup = [];
-  let aMatch = {$match: {$or: [{'meta.applicationId': applicationId}, {subject: applicationId}] }};
+  let aMatch = {$match: {$or: [{'meta.application': applicationId}, {subject: applicationId}] }};
   let aSort = {$sort: {createdDate: direction}};
 
   aList.push(aMatch);

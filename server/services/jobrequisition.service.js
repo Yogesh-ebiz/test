@@ -184,7 +184,7 @@ async function updateJob(jobId, member, form) {
 
     result = await job.save();
 
-    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.UPDATED, meta: {jobId: job._id, jobTitle: job.title}});
+    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.UPDATED, meta: {job: job._id, jobTitle: job.title}});
 
   }
 
@@ -585,7 +585,7 @@ async function closeJob(jobId, member) {
   }
 
   let job = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: member.userId, updatedDate: Date.now()}});
-  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.CLOSED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id}});
+  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.CLOSED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
   return job;
 
 }
@@ -597,7 +597,7 @@ async function archiveJob(jobId, member) {
   }
 
   let job = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.ARCHIVED, updatedBy: member.userId, updatedDate: Date.now()}});
-  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.ARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id}});
+  await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.ARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
 
   return job;
 
@@ -617,7 +617,7 @@ async function unarchiveJob(jobId, member) {
     job.status = job.publishedDate?statusEnum.ACTIVE:statusEnum.DRAFT;
     job = await job.save();
 
-    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.UNARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id}});
+    let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.UNARCHIVED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
     console.log(activity)
   }
 

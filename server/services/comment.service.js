@@ -118,7 +118,7 @@ async function addComment(comment, member) {
       job = await jobService.findJob_Id(application.jobId);
     }
 
-    activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: job.title, jobId: job._id};
+    activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: job.title, job: job._id};
   }
 
   await activityService.addActivity(activity);

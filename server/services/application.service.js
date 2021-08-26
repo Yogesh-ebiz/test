@@ -219,7 +219,7 @@ async function apply(application) {
 
     }
 
-    let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobId: job._id, jobTitle: job.title}});
+    let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, job: job._id, jobTitle: job.title}});
 
     //Create Notification
     let meta = {
@@ -581,7 +581,7 @@ async function disqualify(applicationId, reason, member) {
     }
     let job = await application.job;
     //Add activity
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id, reason: reason}});
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, job: job._id, reason: reason}});
 
     result = {status: statusEnum.DISQUALIFIED};
   }
@@ -606,7 +606,7 @@ async function revert(applicationId, member) {
       result = {status: statusEnum.ACTIVE};
 
       let job = await jobService.findJob_Id(ObjectID(application.jobId));
-      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REVERTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
+      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REVERTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, job: job._id}});
     }
   }
   return result;
@@ -627,7 +627,7 @@ async function deleteById(id, member) {
     application.status = statusEnum.DELETED;
     application = await application.save();
     let job = await jobService.findJob_Id(ObjectID(application.jobId));
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DELETED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, jobId: job._id}});
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DELETED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, job: job._id}});
     result = {status: statusEnum.DELETED};
   }
   return result;
@@ -681,7 +681,7 @@ async function accept(applicationId, member) {
   if(application){
     application.status = statusEnum.ACTIVE;
     application = await application.save();
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.ACCEPTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, jobId: application.jobId}});
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.ACCEPTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, job: application.job}});
     result = {status: statusEnum.ACTIVE};
   }
   return result;
@@ -699,7 +699,7 @@ async function reject(applicationId, member) {
   if(application){
     application.status = statusEnum.REJECTED;
     application = await application.save();
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REJECTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, jobId: application.jobId}});
+    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REJECTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, job: application.job}});
     result = {status: statusEnum.REJECTED};
   }
   return result;
