@@ -500,7 +500,6 @@ async function getExperiences(id) {
 
   let candidate = await Candidate.findById(id).populate('experiences').select('experiences');
   let companies = await feedService.lookupCompaniesIds(_.map(candidate.experiences, 'employer.id'))
-
   candidate.experiences = _.reduce(candidate.experiences, function(res, exp){
     let employer = _.find(companies, {id: exp.employer.id});
     exp.employer = convertToCompany(employer);

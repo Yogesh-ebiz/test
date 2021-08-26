@@ -14,6 +14,7 @@ router.route('/register').post(asyncHandler(register));
 router.route('/:id').get(asyncHandler(getCompany));
 
 router.route('/:id/sync').post(asyncHandler(sync));
+router.route('/:id/sync/avatar').post(asyncHandler(syncAvatar));
 
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
@@ -67,6 +68,12 @@ async function getCompany(req, res) {
 async function sync(req, res) {
   let company = req.body;
   let data = await companyCtl.sync(company);
+  res.json(new Response(data, data?'company_synced_successful':'not_found', res));
+}
+
+async function syncAvatar(req, res) {
+  let company = req.body;
+  let data = await companyCtl.syncAvatar(company);
   res.json(new Response(data, data?'company_synced_successful':'not_found', res));
 }
 

@@ -3804,18 +3804,25 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
   let result=[];
   try {
 
-    let experiences = [];
+    let experiences;
     let candidate = await candidateService.findById(candidateId);
     if(candidate.userId){
       experiences = await feedService.getUserExperiences(candidate.userId);
       experiences = _.reduce(experiences, function(res, exp){
         exp.employer = convertToCompany(exp.employer);
-        console.log(res);
         res.push(exp);
         return res;
       }, []);
     } else {
       experiences = await candidateService.getExperiences(candidateId);
+
+      let companies = await feedService.lookupCompaniesIds(_.map(candidate.experiences, 'employer.id'))
+      experiences = _.reduce(candidate.experiences, function(res, exp){
+        let employer = _.find(companies, {id: exp.employer.id});
+        exp.employer = convertToCompany(employer);
+        res.push(exp);
+        return res;
+      }, []);
     }
 
     result = experiences;
@@ -3876,11 +3883,11 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
     return null;
   }
 
-  let educations = [];
-  let result;
+  let educations;
+  let result = [];
   try {
     // result = await candidateService.getEducations(candidateId);
-    let candidate = await candidateService.findById(candidateId);
+    let candidate = await candidateService.findById(candidateId).populate('educations');
     if(candidate.userId){
       educations = await feedService.getUserEducations(candidate.userId);
       educations = _.reduce(educations, function(res, exp){
@@ -3889,7 +3896,14 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
         return res;
       }, []);
     } else {
-      educations = await candidateService.getExperiences(candidateId);
+      let institutes = await feedService.lookupInstituteIds(_.map(candidate.educations, 'institute.id'))
+      educations = _.reduce(candidate.educations, function(res, exp){
+        let institute = _.find(institutes, {id: exp.institute.id});
+        exp.institute = convertToCompany(institute);
+        res.push(exp);
+        return res;
+      }, []);
+
     }
 
     result = educations;
