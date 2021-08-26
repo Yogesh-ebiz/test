@@ -17,6 +17,7 @@ router.route('/session').get(asyncHandler(getUserSession));
 router.route('/market/salary').get(asyncHandler(getMarketSalary));
 
 router.route('/company/search').post(asyncHandler(searchCompany));
+router.route('/company/:id').get(asyncHandler(getCompany));
 router.route('/company/:id/subscriptions').get(asyncHandler(getSubscriptions));
 router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
@@ -253,6 +254,20 @@ router.route('/company/:id/contacts/search').get(asyncHandler(searchContacts));
 router.route('/company/:id/sources').post(asyncHandler(searchSources));
 router.route('/company/:id/sources/:sourceId').delete(asyncHandler(removeSources));
 router.route('/company/:id/sources').delete(asyncHandler(removeSources));
+
+async function getCompany(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let data = await talentCtrl.getCompany(currentUserId, companyId);
+  res.json(new Response(data, data?'company_retrieved_successful':'not_found', res));
+}
+
+async function updateCompany(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let data = await talentCtrl.updateCompany(currentUserId, companyId);
+  res.json(new Response(data, data?'company_updated_successful':'not_found', res));
+}
 
 
 async function getUserSession(req, res) {

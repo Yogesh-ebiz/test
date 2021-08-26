@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:5000/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:5000/api');
 
 async function createJobFeed(jobId, partyId, text, userId){
 
@@ -30,8 +30,8 @@ async function register(user){
 
 
 
-async function registerCompany(userId, company){
-  if(!userId || !company){
+async function registerCompany(userId, form){
+  if(!userId || !form){
     return null;
   }
 
@@ -40,12 +40,13 @@ async function registerCompany(userId, company){
   };
 
 
-  let response = await client.post(`/company/register`, company, options);
+  let response = await client.post(`/company/register`, form, options);
   return response.data.data;
 };
 
-async function registerInstitute(userId, company){
-  if(!userId || !company){
+
+async function updateCompany(id, userId, form){
+  if(!id || !userId || !form){
     return null;
   }
 
@@ -54,9 +55,39 @@ async function registerInstitute(userId, company){
   };
 
 
-  let response = await client.post(`/institute/register`, company, options);
+  let response = await client.put(`/company/${id}`, form, options);
   return response.data.data;
 };
+
+
+async function registerInstitute(userId, form){
+  if(!userId || !form){
+    return null;
+  }
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.post(`/institute/register`, form, options);
+  return response.data.data;
+};
+
+async function updateInstitute(id, userId, form){
+  if(!id || !userId || !form){
+    return null;
+  }
+
+  const options = {
+    headers: {'userId': userId}
+  };
+
+
+  let response = await client.put(`/institute/${id}`, form, options);
+  return response.data.data;
+};
+
 
 
 async function createCompany(company){
@@ -214,12 +245,16 @@ async function getUserEmployers(id) {
 };
 
 
-async function findCompanyById(companyId, userId) {
-  const options = {
-    headers: {'userId': userId}
-  };
+async function findCompanyById(companyId) {
 
-  let response = await client.get(`/company/${companyId}`, options);
+  let response = await client.get(`/company/${companyId}`, null);
+
+  return response.data.data;
+};
+
+async function findInstituteById(instituteId, userId) {
+
+  let response = await client.get(`/institute/${instituteId}`, null);
 
   return response.data.data;
 };
@@ -542,13 +577,16 @@ module.exports = {
   createInstitute:createInstitute,
   createCompany:createCompany,
   registerCompany:registerCompany,
+  updateCompany:updateCompany,
   registerInstitute:registerInstitute,
+  updateInstitute:updateInstitute,
   createNotification:createNotification,
   createMessageThread:createMessageThread,
   getCurrentUser:getCurrentUser,
   findByUserId: findUserById,
   findUserByIdFull:findUserByIdFull,
   findCompanyById: findCompanyById,
+  findInstituteById: findInstituteById,
   getUserExperiences:getUserExperiences,
   getUserEducations:getUserEducations,
   getUserSkills:getUserSkills,

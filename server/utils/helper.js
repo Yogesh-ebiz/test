@@ -83,7 +83,6 @@ const convertToTalentUser = (user) => {
 
 
 const convertToAvatar = (user) => {
-  console.log(user)
   let data = {
     _id: user._id,
     id: user._id?user.userId:user.id,

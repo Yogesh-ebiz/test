@@ -122,6 +122,39 @@ async function register(currentParty, form) {
 
 }
 
+async function update(companyId, currentUserId, form) {
+
+  if(!companyId || !form){
+    return;
+  }
+
+  form = await Joi.validate(form, feedCompanySchema, {abortEarly: false});
+  let company = await findByCompanyId(companyId);
+
+
+
+  if(company){
+    let savedCompany;
+
+    if(form.partyType==='COMPANY'){
+      savedCompany = await feedService.updateCompany(currentUserId, companyId, form);
+    } else {
+      savedCompany = await feedService.updateInstitute(currentUserId, companyId, form);
+    }
+
+    if(savedCompany){
+      company.name = form.name;
+      company.legalName = form.legalName;
+      company.type = form.type;
+      company = await company.save();
+    }
+
+  }
+
+  return company;
+
+}
+
 async function findById(id) {
 
   if(!id){
@@ -133,7 +166,6 @@ async function findById(id) {
   return company;
 
 }
-
 
 
 async function findByCompanyId(companyId) {
@@ -760,6 +792,7 @@ function addCompanyReviewReport(report) {
 module.exports = {
   add:add,
   register:register,
+  update:update,
   findById:findById,
   findByCompanyId:findByCompanyId,
   findByCompanyIds:findByCompanyIds,

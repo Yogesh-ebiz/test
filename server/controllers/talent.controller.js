@@ -123,6 +123,8 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
+  getCompany,
+  updateCompany,
   getUserSession,
   getSubscriptions,
   getMarketSalary,
@@ -311,6 +313,47 @@ function getRandomInt(min, max) {
 }
 
 
+
+async function getCompany(currentUserId, companyId, locale) {
+
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+  let company = await companyService.findByCompanyId(companyId)
+  if(company.partyType=='COMPANY'){
+    company = await feedService.findCompanyById(companyId);
+  }else {
+    company = await feedService.findInstituteById(companyId);
+  }
+  return company;
+
+}
+
+
+async function updateCompany(companyId, currentUserId, form) {
+  if(!currentUserId || !companyId, form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    let update = await companyService.update(companyId, currentUserId, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return update;
+}
+
 async function getUserSession(currentUserId, preferredCompany) {
 
   if(!currentUserId){
@@ -318,43 +361,42 @@ async function getUserSession(currentUserId, preferredCompany) {
   }
 
   let result;
-  // let user = await feedService.findUserByIdFull(currentUserId);
+  let user;
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
   let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
 
-  let member;
   if(allAccounts.length>1) {
     if (preferredCompany) {
       preferredCompany = _.some(companies, {companyId: preferredCompany}) ? preferredCompany : companies.length ? companies[0].companyId : null;
-      member = _.find(allAccounts, {company: preferredCompany});
+      user = convertToTalentUser(_.find(allAccounts, {company: preferredCompany}));
     } else {
-      member = allAccounts[0];
+      user = convertToTalentUser(allAccounts[0]);
       preferredCompany = companies[0].companyId;
     }
   } else {
-    member = allAccounts[0];
+    user = await feedService.findUserByIdFull(currentUserId);
+    user = convertToTalentUser(user);
     if(companies.length) {
       preferredCompany = companies[0].companyId;
     }
   }
 
 
-  let user = convertToTalentUser(member);
-  if(user) {
-    companies = _.reduce(companies, function (res, item) {
-      let found = _.find(allAccounts, {company: item.companyId});
-      // item = convertToCompany(item);
-      item.avatar = buildCompanyUrl(item);
-      item.role = roleMinimal(found.role);
-      item.memberId = found._id;
-      res.push(item)
-      return res;
-    }, [])
+  companies = _.reduce(companies, function (res, item) {
+    let found = _.find(allAccounts, {company: item.companyId});
+    // item = convertToCompany(item);
+    item.avatar = buildCompanyUrl(item);
+    item.role = roleMinimal(found.role);
+    item.memberId = found._id;
+    res.push(item)
+    return res;
+  }, [])
 
-    user.company = companies;
-    user.preferredCompany = preferredCompany;
-  }
+  console.log(user)
+  user.company = companies;
+  user.preferredCompany = preferredCompany;
+
 
   return user;
 

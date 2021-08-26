@@ -11,6 +11,8 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('/register').post(asyncHandler(register));
+router.route('/:id').get(asyncHandler(getCompany));
+
 router.route('/:id/sync').post(asyncHandler(sync));
 
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
@@ -55,6 +57,12 @@ router.route('/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
 
 
+async function getCompany(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let data = await companyCtl.getCompany(currentUserId, companyId);
+  res.json(new Response(data, data?'company_retrieved_successful':'not_found', res));
+}
 
 async function sync(req, res) {
   let company = req.body;

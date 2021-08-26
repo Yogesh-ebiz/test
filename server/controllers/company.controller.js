@@ -136,6 +136,7 @@ const labelSchema = Joi.object({
 module.exports = {
   sync,
   register,
+  getCompany,
   getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
@@ -207,6 +208,19 @@ async function register(currentUserId, form) {
     console.log('register: Error', e);
   }
 
+
+  return company;
+
+}
+
+
+async function getCompany(currentUserId, companyId, locale) {
+
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+  let company = companyService.findById(companyId)
 
   return company;
 
