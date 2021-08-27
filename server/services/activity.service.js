@@ -4,6 +4,7 @@ const Joi = require('joi');
 const config = require('../config/config');
 
 const statusEnum = require('../const/statusEnum');
+const {buildCandidateUrl} = require('../utils/helper');
 const Activity = require('../models/activity.model');
 
 const candidateService = require('../services/candidate.service');
@@ -222,7 +223,17 @@ async function findByJobId(companyId, jobId, sort) {
 
   const aggregate = Activity.aggregate(aList);
 
-  return Activity.aggregatePaginate(aggregate, options);
+  let result = Activity.aggregatePaginate(aggregate, options);
+
+  result.docs = _.reduce(result.docs, function(res, activity){
+    if(activity.causer) {
+      activity.causer = buildCandidateUrl(activity.causer)
+    }
+    res.push(activity);
+    return res;
+  }, []);
+
+  return result;
 
 }
 
@@ -274,9 +285,12 @@ async function findByCandidateId(companyId, candidateId, sort) {
   );
 
   const aggregate = Activity.aggregate(aList);
+
   let result = await Activity.aggregatePaginate(aggregate, options);
   result.docs = _.reduce(result.docs, function(res, activity){
-    activity.causer.avatar = config.cdn + "/" + activity.causer.avatar;;
+    if(activity.causer) {
+      activity.causer = buildCandidateUrl(activity.causer)
+    }
     res.push(activity);
     return res;
   }, []);
@@ -335,8 +349,17 @@ async function findByApplicationId(companyId, applicationId, sort) {
   );
 
   const aggregate = Activity.aggregate(aList);
+  let result = await Activity.aggregatePaginate(aggregate, options);
 
-  return Activity.aggregatePaginate(aggregate, options);
+  result.docs = _.reduce(result.docs, function(res, activity){
+    if(activity.causer) {
+      activity.causer = buildCandidateUrl(activity.causer)
+    }
+    res.push(activity);
+    return res;
+  }, []);
+  
+  return result;
 
 }
 

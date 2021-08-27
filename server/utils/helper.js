@@ -103,6 +103,26 @@ const convertToAvatar = (user) => {
   return data;
 }
 
+const convertToCauser = (user) => {
+
+  if(!user){
+    return;
+  }
+
+  let data = {
+    _id: user._id,
+    userId: user.userId,
+    firstName: user.firstName,
+    middleName: user.middleName,
+    lastName: user.lastName,
+    avatar: user.avatar,
+    isMember: user.isMember
+  };
+
+
+  return data;
+}
+
 const convertToCandidate = (user) => {
   if(!user){
     return;
@@ -318,6 +338,7 @@ module.exports = {
   categoryMinimal:categoryMinimal,
   convertToTalentUser:convertToTalentUser,
   convertToCandidate:convertToCandidate,
+  convertToCauser:convertToCauser,
   roleMinimal:roleMinimal,
   jobMinimal:jobMinimal,
   buildFileUrl:buildFileUrl,
