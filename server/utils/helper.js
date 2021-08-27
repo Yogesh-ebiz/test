@@ -310,6 +310,7 @@ const buildFileUrl = (file) => {
 }
 
 const buildCompanyUrl = (company) => {
+  console.log(company.avatar)
   let id = company._id?company.companyId:company.id;
   let avatar = company.avatar?company.avatar:'';
   return avatar?config.cdn + '/company/' + id + '/avatar/' + avatar:'';

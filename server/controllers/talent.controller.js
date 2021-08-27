@@ -880,9 +880,6 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
       job.department = _.find(departments, {_id: job.department});
       job.hasSaved = _.find(jobSubscribed, {subject: job._id})?true:false;
       job.createdBy.avatar = buildUserUrl(job.createdBy);
-      job.company.avatar = buildCompanyUrl(job.company);
-
-
       return job;
     });
 
