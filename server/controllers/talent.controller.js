@@ -444,7 +444,6 @@ async function getUserSession(currentUserId, preferredCompany) {
     return res;
   }, [])
 
-  console.log(user)
   user.company = companies;
   user.preferredCompany = preferredCompany;
 

@@ -70,20 +70,17 @@ async function addCandidate(companyId, user, isApplied) {
     about: about, gender: gender, marital: user.marital
   }
 
-  if(candidate.avatar){
-    candidate._avatar = user.avatar;
+  if(user.avatar){
+    let avatar = user.avatar.split('/');
+    avatar = avatar[avatar.length-1];
+
+    candidate._avatar = avatar;
   }
 
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
   candidate.hasImported = isApplied?false:true;
   candidate.hasApplied = isApplied?true:false;
   candidate = await new Candidate(candidate).save();
-
-  if(user.avatar){
-    await awsService.copy("/user/" + user.id + "/avatar/" + user.avatar, "candidates/" + candidate._id + "/images", user.avatar)
-  }
-
-
 
   return candidate;
 
