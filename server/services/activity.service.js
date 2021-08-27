@@ -9,7 +9,7 @@ const Activity = require('../models/activity.model');
 const candidateService = require('../services/candidate.service');
 
 const activitySchema = Joi.object({
-  causer: Joi.object().optional(),
+  causer: Joi.any().optional(),
   causerType: Joi.string(),
   causerId: Joi.string(),
   action: Joi.string().required(),
@@ -330,7 +330,8 @@ async function findByApplicationId(companyId, applicationId, sort) {
         as: "causer"
       }
     },
-    {$unwind: '$causer'}
+    // {$unwind: '$causer', preserveNullAndEmptyArrays: true}
+    { $unwind: { path: '$causer', preserveNullAndEmptyArrays: true } },
   );
 
   const aggregate = Activity.aggregate(aList);
