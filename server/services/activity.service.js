@@ -217,7 +217,7 @@ async function findByJobId(companyId, jobId, sort) {
         as: "causer"
       }
     },
-    { $unwind: '$causer'}
+    { $unwind: { path: '$causer', preserveNullAndEmptyArrays: true } },
   );
 
   const aggregate = Activity.aggregate(aList);
@@ -270,7 +270,7 @@ async function findByCandidateId(companyId, candidateId, sort) {
         as: "causer"
       }
     },
-    {$unwind: '$causer'},
+    { $unwind: { path: '$causer', preserveNullAndEmptyArrays: true } },
   );
 
   const aggregate = Activity.aggregate(aList);
