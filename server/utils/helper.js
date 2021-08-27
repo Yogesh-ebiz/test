@@ -310,7 +310,7 @@ const buildFileUrl = (file) => {
 }
 
 const buildCompanyUrl = (company) => {
-  if(company.avatar.indexOf('http')>-1){
+  if(company && company.avatar.indexOf('http')>-1){
     return company.avatar;
   }
 
@@ -320,7 +320,7 @@ const buildCompanyUrl = (company) => {
 }
 
 const buildUserUrl = (user) => {
-  if(user.avatar.indexOf('http')>-1){
+  if(user && user.avatar.indexOf('http')>-1){
     return user.avatar;
   }
 
@@ -330,7 +330,7 @@ const buildUserUrl = (user) => {
 }
 
 const buildCandidateUrl = (candidate) => {
-  if(candidate.avatar.indexOf('http')>-1){
+  if(candidate && candidate.avatar.indexOf('http')>-1){
     return candidate.avatar;
   }
 
