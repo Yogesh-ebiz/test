@@ -312,7 +312,7 @@ const buildFileUrl = (file) => {
 const buildCompanyUrl = (company) => {
   let id = company._id?company.companyId:company.id;
   let avatar = company.avatar?company.avatar:'';
-  return avatar?config.cdn + '/company/' + id + '/images/' + avatar:'';
+  return avatar?config.cdn + '/company/' + id + '/avatar/' + avatar:'';
 }
 
 const buildUserUrl = (user) => {
