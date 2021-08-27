@@ -178,7 +178,6 @@ async function findByJobId(companyId, jobId, sort) {
     return;
   }
 
-  console.log(jobId, companyId)
 
   let select = '';
   let limit = (sort.size && sort.size>0) ? parseInt(sort.size):20;
@@ -190,7 +189,6 @@ async function findByJobId(companyId, jobId, sort) {
     limit: limit,
   };
 
-  console.log(companyId)
   let aList = [];
   let aLookup = [];
   let aMatch = { $match: {'meta.job': jobId}};
@@ -224,11 +222,10 @@ async function findByJobId(companyId, jobId, sort) {
 
   const aggregate = Activity.aggregate(aList);
 
-  let result = Activity.aggregatePaginate(aggregate, options);
-
+  let result = await Activity.aggregatePaginate(aggregate, options);
   result.docs = _.reduce(result.docs, function(res, activity){
     if(activity.causer) {
-      activity.causer = buildCandidateUrl(activity.causer)
+      activity.causer.avatar = buildCandidateUrl(activity.causer)
     }
     res.push(activity);
     return res;
@@ -334,8 +331,7 @@ async function findByApplicationId(companyId, applicationId, sort) {
             $unionWith: {
               coll: "members",
               pipeline: [
-                {$match: {company: companyId}},
-                {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+                {$match: {company: companyId}}
               ]
             }
           },
@@ -345,7 +341,6 @@ async function findByApplicationId(companyId, applicationId, sort) {
         as: "causer"
       }
     },
-    // {$unwind: '$causer', preserveNullAndEmptyArrays: true}
     { $unwind: { path: '$causer', preserveNullAndEmptyArrays: true } },
   );
 
@@ -354,7 +349,7 @@ async function findByApplicationId(companyId, applicationId, sort) {
 
   result.docs = _.reduce(result.docs, function(res, activity){
     if(activity.causer) {
-      activity.causer = buildCandidateUrl(activity.causer)
+      activity.causer.avatar = buildCandidateUrl(activity.causer)
     }
     res.push(activity);
     return res;

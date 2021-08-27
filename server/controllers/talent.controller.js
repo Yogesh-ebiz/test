@@ -836,7 +836,6 @@ async function searchCompany(currentUserId, filter, sort) {
 
   companies = _.reduce(companies, function(res, item){
     let found = _.find(result.docs, {company: item.companyId});
-    console.log(item.avatar)
     item = convertToCompany(item);
     item.role = found.role;
     item.subscription = null;
