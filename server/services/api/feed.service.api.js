@@ -1,8 +1,8 @@
 const ApiClient = require('../apiManager');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:5000/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:5000/api');
 
 async function createJobFeed(jobId, partyId, text, userId){
 
@@ -56,6 +56,21 @@ async function updateCompany(id, userId, form){
 
 
   let response = await client.put(`/company/${id}`, form, options);
+  return response.data.data;
+};
+
+async function uploadCompanyAvatar(id, userId, file){
+  if(!id || !userId || !file){
+    return null;
+  }
+
+  const options = {
+    headers: {'userId': userId},
+    'content-type': 'multipart/form-data'
+  };
+
+
+  let response = await client.post(`/company/${id}/upload/avatar`, file, options);
   return response.data.data;
 };
 
@@ -578,6 +593,7 @@ module.exports = {
   createCompany:createCompany,
   registerCompany:registerCompany,
   updateCompany:updateCompany,
+  uploadCompanyAvatar:uploadCompanyAvatar,
   registerInstitute:registerInstitute,
   updateInstitute:updateInstitute,
   createNotification:createNotification,

@@ -133,19 +133,18 @@ router.route('/company/:id/candidates/:candidateId/evaluations/stats').post(asyn
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
+
 router.route('/company/:id/candidates/:candidateId/experiences').post(asyncHandler(addCandidateExperience));
 router.route('/company/:id/candidates/:candidateId/experiences').get(asyncHandler(getCandidateExperiences));
 router.route('/company/:id/candidates/:candidateId/experiences/:experienceId').delete(asyncHandler(removeCandidateExperience));
-
 router.route('/company/:id/candidates/:candidateId/educations').post(asyncHandler(addCandidateEducation));
 router.route('/company/:id/candidates/:candidateId/educations').get(asyncHandler(getCandidateEducations));
 router.route('/company/:id/candidates/:candidateId/educations/:educationId').delete(asyncHandler(removeCandidateEducation));
-
 router.route('/company/:id/candidates/:candidateId/skills').post(asyncHandler(addCandidateSkills));
 router.route('/company/:id/candidates/:candidateId/skills').get(asyncHandler(getCandidateSkills));
-
 router.route('/company/:id/candidates/:candidateId/accomplishments').get(asyncHandler(getCandidateAccomplishments));
 router.route('/company/:id/candidates/:candidateId/languages').post(asyncHandler(addCandidateLanguages));
+
 
 
 router.route('/company/:id/candidates/:candidateId/upload/avatar').post(asyncHandler(uploadAvatar));
@@ -276,7 +275,7 @@ async function updateCompany(req, res) {
 async function uploadCompanyAvatar(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
-  let data = await talentCtrl.uploadCompanyAvatar(companyId, currentUserId, req.files.file[0]);
+  let data = await talentCtrl.uploadCompanyAvatar(companyId, currentUserId, req);
   res.json(new Response(data, data?'company_updated_successful':'not_found', res));
 }
 
@@ -1425,6 +1424,15 @@ async function getCandidateAccomplishments(req, res) {
 
 
 
+async function getCandidateAccomplishments(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = ObjectID(req.params.candidateId);
+
+  let data = await talentCtrl.getCandidateAccomplishments(company, currentUserId, candidateId);
+  res.json(new Response(data, data?'accomplishments_retrieved_successful':'not_found', res));
+}
+
 async function addCandidateLanguages(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -1434,6 +1442,7 @@ async function addCandidateLanguages(req, res) {
   let data = await talentCtrl.addCandidateLanguages(company, currentUserId, candidateId, form);
   res.json(new Response(data, data?'skills_added_successful':'not_found', res));
 }
+
 
 
 async function uploadAvatar(req, res) {
