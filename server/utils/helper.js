@@ -325,7 +325,7 @@ const buildUserUrl = (user) => {
 const buildCandidateUrl = (candidate) => {
   let avatar = candidate.avatar?candidate.avatar:candidate._avatar;
   let path = candidate.avatar?'/candidates/' + candidate._id + '/images/':'/user/' + candidate.userId + '/avatar/';
-  return config.cdn + path + avatar;
+  return candidate?config.cdn + path + avatar:'';
 }
 
 module.exports = {

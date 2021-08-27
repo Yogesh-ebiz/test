@@ -190,6 +190,7 @@ async function findByJobId(companyId, jobId, sort) {
     limit: limit,
   };
 
+  console.log(companyId)
   let aList = [];
   let aLookup = [];
   let aMatch = { $match: {'meta.job': jobId}};
@@ -289,7 +290,7 @@ async function findByCandidateId(companyId, candidateId, sort) {
   let result = await Activity.aggregatePaginate(aggregate, options);
   result.docs = _.reduce(result.docs, function(res, activity){
     if(activity.causer) {
-      activity.causer = buildCandidateUrl(activity.causer)
+      activity.causer.avatar = buildCandidateUrl(activity.causer)
     }
     res.push(activity);
     return res;
@@ -358,7 +359,7 @@ async function findByApplicationId(companyId, applicationId, sort) {
     res.push(activity);
     return res;
   }, []);
-  
+
   return result;
 
 }
