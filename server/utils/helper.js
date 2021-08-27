@@ -310,12 +310,19 @@ const buildFileUrl = (file) => {
 }
 
 const buildCompanyUrl = (company) => {
+  if(company.avatar.indexOf('http')>-1){
+    return company.avatar;
+  }
+
   let id = company._id?company.companyId:company.id;
   let avatar = company.avatar?company.avatar:'';
   return avatar?config.cdn + '/company/' + id + '/avatar/' + avatar:'';
 }
 
 const buildUserUrl = (user) => {
+  if(user.avatar.indexOf('http')>-1){
+    return user.avatar;
+  }
 
   let id = user.id?user.id:user._id?user.userId:null;
   let avatar = user.avatar?user.avatar:'';
@@ -323,6 +330,10 @@ const buildUserUrl = (user) => {
 }
 
 const buildCandidateUrl = (candidate) => {
+  if(candidate.avatar.indexOf('http')>-1){
+    return candidate.avatar;
+  }
+
   let avatar = candidate.avatar?candidate.avatar:candidate._avatar;
   let path = candidate.avatar?'/candidates/' + candidate._id + '/images/':'/user/' + candidate.userId + '/avatar/';
   return candidate?config.cdn + path + avatar:'';
