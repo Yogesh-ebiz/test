@@ -63,11 +63,15 @@ async function addCandidate(companyId, user, isApplied) {
   let phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
   let primaryAddress = user.primaryAddress?{address1: user.primaryAddress.address1, address2: user.primaryAddress.address2, district: user.primaryAddress.district, city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country}:null
 
-  let candidate = {userId: user.id, avatar: user.avatar, company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
+  let candidate = {userId: user.id, company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
     primaryAddress: primaryAddress,
     skills: _.map(user.skills, 'id'), url: user.shareUrl, links: user.links,
     about: about, gender: gender, marital: user.marital
+  }
+
+  if(candidate.avatar){
+    candidate._avatar = user.avatar;
   }
 
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});

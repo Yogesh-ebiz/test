@@ -11,8 +11,6 @@ var async = require("async");
 var Promise = require('promise');
 var FormData = require('form-data');
 
-
-
 const config = require('../config/config');
 
 let CustomPagination = require('../utils/custompagination');
@@ -173,8 +171,6 @@ module.exports = {
   addApplication,
   getAllApplicationsEndingSoon,
   getApplicationById,
-  acceptApplication,
-  rejectApplication,
   updateApplicationProgress,
   getApplicationProgress,
   getApplicationQuestions,
@@ -195,6 +191,7 @@ module.exports = {
   disqualifyApplication,
   revertApplication,
   deleteApplication,
+  acceptApplication,
   rejectApplication,
   subscribeApplication,
   unsubscribeApplication,
@@ -2146,22 +2143,25 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         }
 
         hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
-        progress.stage.tasks.forEach(function (task) {
-          if (task.type === taskType.EMAIL) {
-            task.isCompleted = progress.emails.length ? true : false;
-            task.required = (!progress.emails.length) ? true : false;
-          }
+        if(progress.stage) {
+          progress.stage.tasks.forEach(function (task) {
+            if (task.type === taskType.EMAIL) {
+              task.isCompleted = progress.emails.length ? true : false;
+              task.required = (!progress.emails.length) ? true : false;
+            }
 
-          if (task.type === taskType.EVENT) {
-            task.isCompleted = progress.event ? true : false;
-            task.required = (!progress.event) ? true : false;
-          }
+            if (task.type === taskType.EVENT) {
+              task.isCompleted = progress.event ? true : false;
+              task.required = (!progress.event) ? true : false;
+            }
 
-          if (task.type === taskType.EVALUATION) {
-            task.isCompleted = hasEvaluated;
-            task.required = (!hasEvaluated) ? true : false;
-          }
-        });
+            if (task.type === taskType.EVALUATION) {
+              task.isCompleted = hasEvaluated;
+              task.required = (!hasEvaluated) ? true : false;
+            }
+          });
+          progress.stage.members = [];
+        }
 
         if (progress._id.equals(application.currentProgress)) {
           application.currentProgress = progress
@@ -2169,7 +2169,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
 
         // progress.stage.evaluations = [];
-        progress.stage.members = [];
+
         // progress.stage.tasks = [];
         progress.evaluations = [];
         // progress.emails = [];
@@ -2180,6 +2180,8 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
       application.noOfEvaluations = noOfEvaluations;
       application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
+
+      application.user.avatar = buildCandidateUrl(application.user);
     }
 
   } catch (error) {

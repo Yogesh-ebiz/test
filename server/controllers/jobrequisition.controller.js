@@ -866,7 +866,7 @@ async function applyJobById(currentUserId, jobId, application ) {
           candidate.status = statusEnum.ACTIVE;
           candidate.email = application.email;
           candidate.phoneNumber = application.phoneNumber;
-          candidate.avatar = currentParty.avatar;
+          candidate._avatar = currentParty.avatar;
           candidate.company = job.company.companyId;
           candidate.firstName = currentParty.firstName;
           candidate.middleName = currentParty.middleName;

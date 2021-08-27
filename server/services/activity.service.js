@@ -1,13 +1,15 @@
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
+const config = require('../config/config');
+
 const statusEnum = require('../const/statusEnum');
 const Activity = require('../models/activity.model');
 
 const candidateService = require('../services/candidate.service');
 
 const activitySchema = Joi.object({
-  causer: Joi.object(),
+  causer: Joi.object().optional(),
   causerType: Joi.string(),
   causerId: Joi.string(),
   action: Joi.string().required(),
@@ -200,7 +202,7 @@ async function findByJobId(companyId, jobId, sort) {
         from: "candidates",
         pipeline: [
           { $match: {company: companyId} },
-          { $project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1} },
+          { $project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1} },
           {
             $unionWith: {
               coll: "members",
@@ -210,7 +212,7 @@ async function findByJobId(companyId, jobId, sort) {
             }
           },
           { $match: {$expr: {$eq: ["$_id", "$$causer"]}}},
-          { $project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1} },
+          { $project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1, isMember: true} },
         ],
         as: "causer"
       }
@@ -253,7 +255,7 @@ async function findByCandidateId(companyId, candidateId, sort) {
         from: "candidates",
         pipeline: [
           {$match: {company: companyId}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1}},
           {
             $unionWith: {
               coll: "members",
@@ -263,17 +265,23 @@ async function findByCandidateId(companyId, candidateId, sort) {
             }
           },
           {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1, isMember: true}},
         ],
         as: "causer"
       }
     },
-    {$unwind: '$causer'}
+    {$unwind: '$causer'},
   );
 
   const aggregate = Activity.aggregate(aList);
+  let result = await Activity.aggregatePaginate(aggregate, options);
+  result.docs = _.reduce(result.docs, function(res, activity){
+    activity.causer.avatar = config.cdn + "/" + activity.causer.avatar;;
+    res.push(activity);
+    return res;
+  }, []);
 
-  return Activity.aggregatePaginate(aggregate, options);
+  return result;
 
 }
 
@@ -306,17 +314,18 @@ async function findByApplicationId(companyId, applicationId, sort) {
         from: "candidates",
         pipeline: [
           {$match: {company: companyId}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1}},
           {
             $unionWith: {
               coll: "members",
               pipeline: [
-                {$match: {company: companyId}}
+                {$match: {company: companyId}},
+                {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
               ]
             }
           },
           {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
+          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1, isMember: true}},
         ],
         as: "causer"
       }

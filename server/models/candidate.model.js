@@ -56,6 +56,10 @@ const CandidateSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  _avatar: {
+    type: String,
+    required:false
+  },
   jobTitle: {
     type: String,
     required:false

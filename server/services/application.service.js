@@ -217,21 +217,27 @@ async function apply(application) {
         }
       }
 
+      await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, job: job._id, jobTitle: job.title}});
+      if(jobPipeline.autoRejectBlackList && candidate.flag){
+        await activityService.addActivity({causer: null, causerType: subjectType.SYSTEM, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.AUTO_REJECTED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.jobTitle, job: job._id}});
+      }
+
+      //Create Notification
+      let meta = {
+        companyId: job.company.companyId,
+        jobId: job.jobId,
+        jobTitle: job.title,
+        applicationId: savedApplication._id,
+        applicantId: candidate.userId,
+        createdBy: job.createdBy.userId
+      };
+
+      await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+
     }
 
-    let activity = await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, job: job._id, jobTitle: job.title}});
 
-    //Create Notification
-    let meta = {
-      companyId: job.company.companyId,
-      jobId: job.jobId,
-      jobTitle: job.title,
-      applicationId: savedApplication._id,
-      applicantId: candidate.userId,
-      createdBy: job.createdBy.userId
-    };
 
-    await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
     if (application.follow) {
       await feedService.followCompany(application.company, candidate.userId);
