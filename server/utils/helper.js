@@ -310,7 +310,7 @@ const buildFileUrl = (file) => {
 }
 
 const buildCompanyUrl = (company) => {
-  if(company && company.avatar.indexOf('http')>-1){
+  if(company && company.avatar && company.avatar.indexOf('http')>-1){
     return company.avatar;
   }
 
