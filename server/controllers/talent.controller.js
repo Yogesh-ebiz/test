@@ -125,6 +125,7 @@ const labelSchema = Joi.object({
 module.exports = {
   getCompany,
   updateCompany,
+  uploadCompanyAvatar,
   getUserSession,
   getSubscriptions,
   getMarketSalary,
@@ -345,6 +346,28 @@ async function updateCompany(companyId, currentUserId, form) {
   try {
 
     result = await companyService.update(companyId, currentUserId, form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function uploadCompanyAvatar(companyId, currentUserId, file) {
+  if(!currentUserId || !companyId || !file){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+    console.log(file)
 
   } catch (error) {
     console.log(error);
@@ -1458,7 +1481,15 @@ async function publishJob(companyId, currentUserId, jobId, type) {
 
     job.skills = await feedService.findSkillsById(job.skills);
 
-    await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.PUBLISHED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
+
+    await activityService.addActivity({
+      causer: member._id,
+      causerType: subjectType.MEMBER,
+      subjectType: subjectType.JOB,
+      subject: job._id,
+      action: actionEnum.PUBLISHED,
+      meta: {type: type, job: job._id}
+    });
 
     // var promise = new Promise(function (resolve, reject) {
     //
@@ -1576,6 +1607,15 @@ async function payJob(companyId, currentUserId, jobId, form) {
         job.publishedDate = Date.now();
         job.type = jobType.PROMOTION;
         job = await job.save();
+
+        await activityService.addActivity({
+          causer: member._id,
+          causerType: subjectType.MEMBER,
+          subjectType: subjectType.JOB,
+          subject: job._id,
+          action: actionEnum.PUBLISHED,
+          meta: {type: jobType.PROMOTION, job: job._id}
+        });
       }
 
       result = {success: true, verification: false};

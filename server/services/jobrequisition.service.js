@@ -534,7 +534,6 @@ async function getJobAds(jobId) {
     return;
   }
 
-  console.log(jobId)
   /*
   let job = await JobRequisition.aggregate([
     {$match: {_id: jobId}},

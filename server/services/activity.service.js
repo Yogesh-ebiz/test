@@ -246,30 +246,6 @@ async function findByCandidateId(companyId, candidateId, sort) {
   let aSort = {$sort: {createdDate: direction}};
 
   aList.push(aMatch);
-  aList.push(
-    {
-      $lookup: {
-        let: {causer: '$causer'},
-        from: "candidates",
-        pipeline: [
-          {$match: {company: companyId}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
-          {
-            $unionWith: {
-              coll: "members",
-              pipeline: [
-                {$match: {company: companyId}}
-              ]
-            }
-          },
-          {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, company: 1, userId: 1}},
-        ],
-        as: "causer"
-      }
-    },
-    {$unwind: '$causer'}
-  );
 
   const aggregate = Activity.aggregate(aList);
 
