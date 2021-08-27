@@ -201,7 +201,7 @@ const convertToCompany = (company) => {
   let result = {
     id: company._id?company.companyId:company.id?company.id:null,
     name: company.name,
-    avatar: company.avatar?company.avatar:'',
+    avatar: buildCompanyUrl(company),
     cover: company.cover,
     partyType: company.partyType,
     headline: company.headline,
@@ -310,7 +310,6 @@ const buildFileUrl = (file) => {
 }
 
 const buildCompanyUrl = (company) => {
-  console.log(company.avatar)
   let id = company._id?company.companyId:company.id;
   let avatar = company.avatar?company.avatar:'';
   return avatar?config.cdn + '/company/' + id + '/avatar/' + avatar:'';
