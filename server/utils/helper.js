@@ -320,7 +320,7 @@ const buildCompanyUrl = (company) => {
 }
 
 const buildUserUrl = (user) => {
-  if(user && user.avatar.indexOf('http')>-1){
+  if(user && user.avatar && user.avatar.indexOf('http')>-1){
     return user.avatar;
   }
 
