@@ -1350,15 +1350,7 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
     return null;
   }
 
-  let result = null;
-  try {
-
-    result = await jobService.updateJobPipeline(jobId, form, currentUserId);
-
-  } catch(e){
-    console.log('updateJobPipeline: Error', e);
-  }
-
+  let result = await jobService.updateJobPipeline(jobId, form, currentUserId);
 
   return result
 }

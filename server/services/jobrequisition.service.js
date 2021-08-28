@@ -60,7 +60,7 @@ const jobSchema = Joi.object({
   state: Joi.string().allow(''),
   country: Joi.string().allow(''),
   postalCode: Joi.string(),
-  externalUrl: Joi.string(),
+  externalUrl: Joi.string().allow('').optional(),
   hasApplied: Joi.boolean(),
   questions: Joi.array(),
   tags: Joi.array(),
@@ -69,6 +69,7 @@ const jobSchema = Joi.object({
   autoConfirmationEmail: Joi.object(),
   pipeline: Joi.object(),
   type: Joi.string()
+
 });
 
 
@@ -108,7 +109,7 @@ async function addJob(companyId, member, form) {
     }
   }
   form.tags = tags;
-
+  form.isExternal = form.externalUrl?true:false;
   result = await new JobRequisition(form).save();
   let subscription = {member: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subject: result._id};
   await memberService.subscribe(subscription);
