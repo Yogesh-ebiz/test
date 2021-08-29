@@ -1851,6 +1851,7 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
     source.candidate.firstName = source.candidate.firstName?source.candidate.firstName:source.candidate.email;
     source.candidate.avatar = buildCandidateUrl(source.candidate);
     source.candidate = convertToCandidate(source.candidate);
+    source.candidate.hasApplied = _.some(source.candidate.applications, {job: filter.jobs[0]});
   })
 
   return new Pagination(result);

@@ -156,6 +156,7 @@ async function search(filter, sort) {
         let:{candidate:"$candidate"},
         pipeline:[
           {$match:{$expr:{$eq:["$_id","$$candidate"]}}},
+          {$lookup: {from: 'applications', localField: 'applications', foreignField: '_id', as: 'applications' } },
           {$lookup: {from: 'evaluations', localField: 'evaluations', foreignField: '_id', as: 'evaluations' } },
           { $addFields:
               {
