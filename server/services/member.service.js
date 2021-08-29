@@ -167,7 +167,7 @@ async function searchMembers(company, query) {
   return result
 }
 
-async function findMemberBy_Id(memberId) {
+async function findById(memberId) {
   let data = null;
 
   if(memberId==null){
@@ -251,7 +251,7 @@ async function updateMember(memberId, form) {
 
 
   form = await Joi.validate(form, memberSchema, {abortEarly: false});
-  let member = await findMemberBy_Id(memberId);
+  let member = await findById(memberId);
 
   if(member){
     member.firstName = form.firstName;
@@ -276,7 +276,7 @@ async function updateMemberRole(memberId, role) {
   }
 
 
-  let member = await findMemberBy_Id(memberId);
+  let member = await findById(memberId);
 
   if(member){
     member.role = role;
@@ -294,7 +294,7 @@ async function followJob(memberId, jobId) {
     return;
   }
 
-  let member = await findMemberBy_Id(memberId);
+  let member = await findById(memberId);
 
   if(member){
     member.followedJobs.push(jobId);
@@ -312,7 +312,7 @@ async function unfollowJob(memberId, jobId) {
   }
 
 
-  let member = await findMemberBy_Id(memberId);
+  let member = await findById(memberId);
 
   if(member){
     member.followedJobs.forEach(function(item, index, object){
@@ -661,7 +661,7 @@ module.exports = {
   cancelMemberInvitation:cancelMemberInvitation,
   getMembers:getMembers,
   searchMembers:searchMembers,
-  findMemberBy_Id:findMemberBy_Id,
+  findById:findById,
   findMemberByUserId:findMemberByUserId,
   findByUserIdAndCompany:findByUserIdAndCompany,
   addMember:addMember,

@@ -5386,6 +5386,7 @@ async function getCompanyMember(companyId, memberId, currentUserId) {
   try {
     if(isNaN(memberId)){
       member = await memberService.findById(memberId);
+      member.avatar = buildUserUrl(member);
     }
 
   } catch(e){
