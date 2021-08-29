@@ -736,7 +736,7 @@ async function addApplication(req, res) {
   form.user = ObjectID(form.user);
   let data = await talentCtrl.addApplication(companyId, currentUserId, form);
 
-  res.json(new Response(data, data?'applicagion_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'application_retrieved_successful':'not_found', res));
 }
 
 

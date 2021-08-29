@@ -1990,13 +1990,11 @@ async function addApplication(companyId, currentUserId, application ) {
         candidate.lastName = application.lastName;
         candidate.hasApplied = true;
 
-
-
         application.jobTitle = job.title;
         application.partyId = candidate.userId;
-        application.jobId = job;
+        application.job = job;
         application.user = candidate;
-        application.company = job.company
+        application.company = companyId;
 
 
         savedApplication = await applicationService.apply(application);

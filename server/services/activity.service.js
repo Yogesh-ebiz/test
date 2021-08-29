@@ -318,6 +318,7 @@ async function findByApplicationId(companyId, applicationId, sort) {
   let aMatch = {$match: {$or: [{'meta.application': applicationId}, {subject: applicationId}] }};
   let aSort = {$sort: {createdDate: direction}};
 
+  console.log(aMatch)
   aList.push(aMatch);
   aList.push(
     {
