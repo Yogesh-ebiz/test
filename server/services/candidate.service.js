@@ -32,6 +32,7 @@ const candidateSchema = Joi.object({
   company: Joi.number(),
   about: Joi.string().allow('').optional(),
   avatar: Joi.string().allow('').optional(),
+  _avatar: Joi.string().allow('').optional(),
   firstName: Joi.string().allow(''),
   lastName: Joi.string().allow(''),
   middleName: Joi.string().allow('').optional(),

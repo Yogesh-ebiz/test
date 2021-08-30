@@ -367,7 +367,8 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
         form.jobId = job._id;
         pipeline = await pipelineService.addPipeline(jobId, form);
         let oldPipeline = job.pipeline;
-
+        console.log(oldPipeline);
+        console.log(pipeline)
         if (pipeline) {
           job.pipeline = pipeline._id;
           await job.save();
