@@ -130,6 +130,7 @@ async function compose(form, companyId) {
             }
 
             if (candidate) {
+              console.log(form.meta.jobId, candidate._id)
               let source = await sourceService.findByJobIdAndCandidateId(ObjectID(form.meta.jobId), candidate._id);
 
               let campaign = {
@@ -145,6 +146,7 @@ async function compose(form, companyId) {
               campaign.userId = candidate.userId;
               campaign = await emailCampaignService.add(campaign);
 
+              console.log(campaign)
               if (!source) {
                 source = {
                   job: ObjectID(form.meta.jobId),
