@@ -1851,8 +1851,9 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
   result.docs.forEach(function(source){
     source.candidate.firstName = source.candidate.firstName?source.candidate.firstName:source.candidate.email;
     source.candidate.avatar = buildCandidateUrl(source.candidate);
+    source.candidate.hasApplied = (_.some(source.candidate.applications, {job: filter.jobs[0]}) )? true: false;
     source.candidate = convertToCandidate(source.candidate);
-    source.candidate.hasApplied = _.some(source.candidate.applications, {job: filter.jobs[0]});
+
     source.candidate.educations = [];
     source.candidate.experiences = [];
   })
