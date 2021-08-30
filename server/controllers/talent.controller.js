@@ -1845,6 +1845,7 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
   // let userIds = _.map(result.docs, 'user');
   // let users = await feedService.lookupUserIds(userIds);
 
+
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
   result.docs.forEach(function(source){
