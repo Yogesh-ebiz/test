@@ -72,8 +72,7 @@ const ApplicationSchema = new mongoose.Schema({
     required: true
   },
   availableDate: {
-    type: Number,
-    required: true
+    type: Number
   },
   hasAccepted: {
     type: Boolean

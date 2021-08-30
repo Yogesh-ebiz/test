@@ -42,7 +42,7 @@ const applicationSchema = Joi.object({
   partyId: Joi.number().required(),
   phoneNumber: Joi.string(),
   email: Joi.string().required(),
-  availableDate: Joi.number(),
+  availableDate: Joi.number().optional(),
   attachment: Joi.string().allow('').optional(),
   follow: Joi.boolean().optional(),
   resumeId: Joi.any().optional(),
