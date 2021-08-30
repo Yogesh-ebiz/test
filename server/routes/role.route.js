@@ -11,6 +11,8 @@ router.route('/').post(asyncHandler(addRole));
 router.route('/').get(asyncHandler(getAllRoles));
 router.route('/:id').put(asyncHandler(updateRole()));
 router.route('/:id').delete(asyncHandler(removeRole()));
+router.route('/privileges').get(asyncHandler(getAllPrivileges));
+
 
 
 
@@ -53,3 +55,11 @@ async function removeRole(req, res) {
 
 
 
+
+async function getAllPrivileges(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await roleCtl.getAllPrivileges(currentUserId, company, res.locale);
+  res.json(new Response(data, data?'privileges_retrieved_successful':'not_found', res));
+}

@@ -8,6 +8,7 @@ const partyEnum = require('../const/partyEnum');
 const statusEnum = require('../const/statusEnum');
 const alertEnum = require('../const/alertEnum');
 const Role = require('../models/role.model');
+const Privilege = require('../models/privilege.model');
 
 
 const {syncExperiences, getUserEmployers, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findByUserId, findCompanyById, searchCompany} = require('../services/api/feed.service.api');
@@ -23,9 +24,9 @@ const roleSchema = Joi.object({
   createdBy: Joi.number().required(),
   company: Joi.number().required(),
   roleName: Joi.string().required(),
-  name: Joi.number().string(),
+  name: Joi.string(),
   privileges: Joi.array().required(),
-  description: Jo.string()
+  description: Joi.string()
 });
 
 
@@ -36,7 +37,8 @@ module.exports = {
   addRole,
   getAllRoles,
   updateRole,
-  deleteRole
+  deleteRole,
+  getAllPrivileges
 }
 
 
@@ -139,4 +141,16 @@ async function deleteRole(roleId, currentUserId) {
 
 
   return result
+}
+
+async function getAllPrivileges(currentUserId, company, locale) {
+
+
+  let result = await Privilege.find();
+  return _.chain(result)
+    .groupBy("type")
+    .map((value, key) => ({ type: key, privileges: value }))
+    .orderBy('type')
+    .value();
+
 }

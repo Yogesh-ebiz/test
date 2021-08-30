@@ -52,7 +52,6 @@ async function getPeopleSuggestions(req, res) {
   let sort = req.query;
   filter.query = req.query.query;
 
-
   data = await peopleCtrl.getPeopleSuggestions(filter, sort, res.locale);
   res.json(new Response(data, data?'people_retrieved_successful':'not_found', res));
 }

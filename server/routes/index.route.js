@@ -25,6 +25,7 @@ const parserRoutes = require('./parser.route');
 const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
 const subscriptionRoutes = require('./subscription.route');
+const roleRoutes = require('./role.route');
 
 
 
@@ -56,6 +57,7 @@ router.use('/parser', parserRoutes);
 router.use('/policies', policyRoutes);
 router.use('/products', productRoutes);
 router.use('/people', peopleRoutes);
+router.use('/roles', roleRoutes);
 
 router.use('/subscriptions', subscriptionRoutes);
 router.use('/talent', talentRoutes);

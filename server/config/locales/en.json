@@ -241,5 +241,6 @@
 	"experience_deleted_successful": "experience_deleted_successful",
 	"educations_deleted_successful": "educations_deleted_successful",
 	"company_retrieved_successful": "company_retrieved_successful",
-	"company_updated_successful": "company_updated_successful"
+	"company_updated_successful": "company_updated_successful",
+	"privileges_retrieved_successful": "privileges_retrieved_successful"
 }
