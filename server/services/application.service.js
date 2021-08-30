@@ -1355,11 +1355,11 @@ async function search(jobId, filter, sort) {
 }
 
 
-async function searchEmails(companyId, applicationId, sort) {
+async function searchEmails(companyId, member, applicationId, sort) {
   let data = null;
 
 
-  if(!companyId || applicationId==null || !sort){
+  if(!companyId || !member || applicationId==null || !sort){
     return;
   }
 
@@ -1437,10 +1437,12 @@ async function searchEmails(companyId, applicationId, sort) {
   }
 
   result.docs = _.reduce(result.docs, function(res, email){
-    email.hasRead = email.hasRead?email.hasRead:false;
-    let member = _.find(members, {_id: ObjectID(email.from.memberId)});
-    email.from = convertToAvatar(member);
-    res.push(email);
+    if(email) {
+      email.hasRead = ((email.from.memberId && email.from.memberId.equals(member._id)) || email.hasRead) ? email.hasRead : false;
+      let member = _.find(members, {_id: ObjectID(email.from.memberId)});
+      email.from = convertToAvatar(member);
+      res.push(email);
+    }
     return res;
   }, []);
 
