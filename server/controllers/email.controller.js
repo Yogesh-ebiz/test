@@ -87,6 +87,9 @@ async function getEmailById(currentUserId, emailId)  {
       res.push(file);
       return res;
     }, []);
+
+    email.hasRead = true;
+    await email.save();
   }
 
   return email;

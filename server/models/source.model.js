@@ -37,7 +37,7 @@ const SourceSchema = new mongoose.Schema({
   updatedBy: { type: Schema.Types.ObjectId, ref: 'Member' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },
   candidate: { type: Schema.Types.ObjectId, ref: 'Candidate' },
-  campaigns: [{ type: Schema.Types.ObjectId, ref: 'EmailCampaign' }]
+  campaigns: [{ type: Schema.Types.ObjectId, ref: 'EmailCampaign', default: [] }]
 }, {
   versionKey: false
 });
