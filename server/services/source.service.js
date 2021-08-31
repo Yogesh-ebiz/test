@@ -28,6 +28,7 @@ async function add(source) {
   }
 
   source = await Joi.validate(source, sourceSchema, {abortEarly: false});
+  source.campaigns = [];
   source = await new Source(source).save();
 
   return source;
