@@ -42,7 +42,7 @@ async function addWithCheck(source) {
 
   source = await Joi.validate(source, sourceSchema, {abortEarly: false});
   source.status = statusEnum.ACTIVE;
-  source.campaign = [];
+  source.campaigns = [];
   source.createdDate = Date.now();
   source = await Source.findOneAndUpdate({job: source.job, candidate: source.candidate}, source, {upsert: true});
 
