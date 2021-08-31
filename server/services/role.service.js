@@ -61,6 +61,7 @@ async function remove(id) {
   let role = await Role.findById(id);
   if(role && !role.default){
     result = await role.delete();
+    await memberService.removeRole(id);
   }
   return result;
 
@@ -79,7 +80,7 @@ async function disable(id) {
     role.updatedDate = Date.now();
     role.status = statusEnum.DISABLED;
     result = await role.save();
-    
+
     await memberService.removeRole(id);
   }
   return role;

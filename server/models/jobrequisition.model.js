@@ -203,6 +203,9 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  feedId: {
+    type: Number
+  },
   isExternal: {
     type: Boolean,
     default: false,

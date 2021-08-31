@@ -1303,7 +1303,6 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
       }
 
       for(let [i, ad] of job.ads.entries()){
-        console.log(ad)
         if(ad.feedId){
           job.feedId = ad.feedId;
         }
@@ -1584,7 +1583,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
               ageMax: 100,
               genders: [],
               geoLocations: {countries: [job.country]},
-              adPositions: ['feed']
+              adPositions: ['jobsearch']
             }
           };
           ad = await adService.add(ad);
