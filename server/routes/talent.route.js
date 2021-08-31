@@ -71,6 +71,7 @@ router.route('/company/:id/jobs/:jobId/sources/:sourceId').post(asyncHandler(add
 router.route('/company/:id/jobs/:jobId/campaigns').post(asyncHandler(searchCampaigns));
 router.route('/company/:id/jobs/:jobId/ads').get(asyncHandler(getJobAds));
 router.route('/company/:id/jobs/:jobId/ads').get(asyncHandler(getJobAds));
+router.route('/company/:id/jobs/:jobId/ads/feed').get(asyncHandler(getJobAds));
 
 
 router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
@@ -179,10 +180,12 @@ router.route('/company/:id/pipelines/:pipelineId/disable').post(asyncHandler(dea
 router.route('/company/:id/pipelines/:pipelineId/enable').post(asyncHandler(activateCompanyPipelineTemplate));
 router.route('/company/:id/pipelines').get(asyncHandler(getCompanyPipelineTemplates));
 
+router.route('/company/:id/roles').get(asyncHandler(getCompanyRoles));
 router.route('/company/:id/roles').post(asyncHandler(addCompanyRole));
 router.route('/company/:id/roles/:roleId').put(asyncHandler(updateCompanyRole));
-router.route('/company/:id/roles/:roleId').delete(asyncHandler(deleteCompanyRole));
-router.route('/company/:id/roles').get(asyncHandler(getCompanyRoles));
+router.route('/company/:id/roles/:roleId/disable').post(asyncHandler(disableCompanyRole));
+router.route('/company/:id/roles/:roleId/enable').post(asyncHandler(enableCompanyRole));
+
 
 router.route('/company/:id/labels').post(asyncHandler(addCompanyLabel));
 router.route('/company/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
@@ -1723,10 +1726,8 @@ async function updateCompanyRole(req, res) {
   let company = parseInt(req.params.id);
   let roleId = req.params.roleId;
   let role = req.body;
-  role.company = company;
-  role.createdBy = currentUserId;
 
-  let data = await talentCtrl.updateCompanyRole(company, roleId, currentUserId, role);
+  let data = await talentCtrl.updateCompanyRole(company, currentUserId, roleId, role);
   res.json(new Response(data, data?'role_updated_successful':'not_found', res));
 }
 
@@ -1735,8 +1736,27 @@ async function deleteCompanyRole(req, res) {
   let company = parseInt(req.params.id);
   let roleId = req.params.roleId;
 
-  let data = await talentCtrl.deleteCompanyRole(company, roleId, currentUserId);
+  let data = await talentCtrl.deleteCompanyRole(company, currentUserId, roleId);
   res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
+}
+
+
+async function disableCompanyRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let roleId = ObjectID(req.params.roleId);
+
+  let data = await talentCtrl.disableCompanyRole(company, currentUserId, roleId);
+  res.json(new Response(data, data?'role_updated_successful':'not_found', res));
+}
+
+async function enableCompanyRole(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let roleId = req.params.roleId;
+
+  let data = await talentCtrl.enableCompanyRole(company, currentUserId, roleId);
+  res.json(new Response(data, data?'role_updated_successful':'not_found', res));
 }
 
 async function getCompanyRoles(req, res) {

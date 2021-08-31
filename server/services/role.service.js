@@ -1,6 +1,121 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const Joi = require('joi');
+
 const Role = require('../models/role.model');
+const memberService = require('../services/member.service');
+
+
+const roleSchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string().allow('').optional(),
+  privileges: Joi.array().required(),
+  company: Joi.number().optional(),
+  updatedBy: Joi.number().optional(),
+  createdBy: Joi.number().optional()
+});
+
+async function add(form) {
+  if(!form){
+    return;
+  }
+
+  form = await Joi.validate(form, roleSchema, { abortEarly: false });
+  form.default = false;
+
+  let role = new Role(form).save();
+  return role;
+
+}
+
+async function update(id, form) {
+  let data = null;
+
+  if(!id || !form){
+    return;
+  }
+
+  form = await Joi.validate(form, roleSchema, { abortEarly: false });
+
+  let role = await Role.findById(id);
+  if(role && !role.default){
+    role.updatedDate = Date.now();
+    role.name = form.name;
+    role.privileges=form.privileges;
+    role.description=form.description;
+    result = await role.save();
+  }
+  return role;
+
+}
+
+
+async function remove(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  let result;
+  let role = await Role.findById(id);
+  if(role && !role.default){
+    result = await role.delete();
+  }
+  return result;
+
+}
+
+
+async function disable(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  let role = await Role.findById(id);
+  if(role && !role.default){
+    role.updatedDate = Date.now();
+    role.status = statusEnum.DISABLED;
+    result = await role.save();
+    
+    await memberService.removeRole(id);
+  }
+  return role;
+
+}
+
+
+async function enable(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+
+  let role = await Role.findById(id);
+  if(role && !role.default){
+    role.updatedDate = Date.now();
+    role.status = statusEnum.ACTIVE;
+    result = await role.save();
+  }
+  return role;
+
+}
+
+function getRoles(company) {
+  let data = null;
+
+  if(company==null){
+    return;
+  }
+
+
+  return Role.find({$or: [{company:company}, {default: true}]});
+
+}
 
 
 function getAdminRole() {
@@ -32,37 +147,17 @@ function getRoleByName(name) {
 }
 
 
-function addRole(role) {
-  let data = null;
-
-  if(role==null){
-    return;
-  }
-
-  role = new Role(role).save();
-  return role;
-
-}
-
-
-function getRoles(company) {
-  let data = null;
-
-  if(company==null){
-    return;
-  }
-
-
-  return Role.find({$or: [{company:company}, {default: true}]});
-
-}
-
 
 
 module.exports = {
+  add:add,
+  update:update,
+  remove:remove,
+  disable:disable,
+  enable:enable,
+  getRoles:getRoles,
   getAdminRole:getAdminRole,
   getRoleByRole:getRoleByRole,
-  getRoleByName:getRoleByName,
-  addRole:addRole,
-  getRoles:getRoles
+  getRoleByName:getRoleByName
+
 }

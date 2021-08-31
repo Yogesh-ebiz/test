@@ -105,14 +105,6 @@ const pipelineSchema = Joi.object({
   stageMigration: Joi.array()
 });
 
-const roleSchema = Joi.object({
-  name: Joi.string().required(),
-  createdBy: Joi.number().required(),
-  company: Joi.number().required(),
-  description: Joi.object().required(),
-  privileges: Joi.array().required(),
-  default: Joi.boolean()
-});
 
 const labelSchema = Joi.object({
   name: Joi.string().required(),
@@ -251,6 +243,8 @@ module.exports = {
   getCompanyRoles,
   updateCompanyRole,
   deleteCompanyRole,
+  disableCompanyRole,
+  enableCompanyRole,
   addCompanyLabel,
   getLabels,
   updateCompanyLabel,
@@ -5075,7 +5069,7 @@ async function getCompanyPipelineTemplates(companyId, currentUserId, locale) {
 
 /************************** ROLES *****************************/
 async function addCompanyRole(companyId, currentUserId, form) {
-  form = await Joi.validate(form, roleSchema, { abortEarly: false });
+
   if(!companyId || !currentUserId || !form){
     return null;
   }
@@ -5086,19 +5080,13 @@ async function addCompanyRole(companyId, currentUserId, form) {
   }
 
   let result = null;
-  try {
-    result = await roleService.addRole(form);
-
-  } catch(e){
-    console.log('addCompanyRole: Error', e);
-  }
-
+  form.createdBy = member.userId;
+  result = await roleService.add(form);
 
   return result
 }
 
-async function updateCompanyRole(companyId, roleId, currentUserId, form) {
-  form = await Joi.validate(form, roleSchema, { abortEarly: false });
+async function updateCompanyRole(companyId, currentUserId, roleId, form) {
   if(!companyId || !currentUserId || !roleId || !form){
     return null;
   }
@@ -5109,26 +5097,13 @@ async function updateCompanyRole(companyId, roleId, currentUserId, form) {
   }
 
   let result = null;
-  console.log(member)
-  try {
-      let role = await Role.findById(roleId);
-      if(role){
-        role.name = form.name;
-        role.updatedBy = currentUserId;
-        role.privileges=form.privileges;
-        role.description=form.description;
-        result = await role.save();
-      }
-
-  } catch(e){
-    console.log('updateCompanyRole: Error', e);
-  }
-
+  form.updatedBy = member.userId;
+  result = roleService.update(roleId, form);
 
   return result
 }
 
-async function deleteCompanyRole(companyId, roleId, currentUserId) {
+async function deleteCompanyRole(companyId, currentUserId, roleId) {
   if(!companyId || !currentUserId || !roleId){
     return null;
   }
@@ -5138,23 +5113,49 @@ async function deleteCompanyRole(companyId, roleId, currentUserId) {
     return null;
   }
 
-  let result = null;
-
-
-  try {
-
-    let role = await Role.findById(roleId);
-    if(role){
-      result = await role.delete();
-      if(result){
-        result = {deleted: 1};
-      }
-    }
-
-
-  } catch(e){
-    console.log('deleteCompanyRole: Error', e);
+  let result = await roleService.remove(roleId);
+  if(result){
+    result = {success: true}
   }
+
+  return result
+}
+
+
+async function disableCompanyRole(companyId, currentUserId, roleId) {
+  if(!companyId || !currentUserId || !roleId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await roleService.disable(roleId);
+  if(result){
+    result = {success: true}
+  }
+
+  return result
+}
+
+
+async function enableCompanyRole(companyId, currentUserId, roleId) {
+  if(!companyId || !currentUserId || !roleId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await roleService.enable(roleId);
+  if(result){
+    result = {success: true}
+  }
+
 
 
   return result

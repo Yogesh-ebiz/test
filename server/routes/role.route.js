@@ -9,8 +9,8 @@ module.exports = router;
 
 router.route('/').post(asyncHandler(addRole));
 router.route('/').get(asyncHandler(getAllRoles));
-router.route('/:id').put(asyncHandler(updateRole()));
-router.route('/:id').delete(asyncHandler(removeRole()));
+router.route('/:id').put(asyncHandler(updateRole));
+router.route('/:id').delete(asyncHandler(removeRole));
 router.route('/privileges').get(asyncHandler(getAllPrivileges));
 
 

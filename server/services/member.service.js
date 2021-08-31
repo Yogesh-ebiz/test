@@ -651,6 +651,18 @@ async function searchCompanyByUserId(userId, filter, sort) {
 }
 
 
+async function removeRole(roleId) {
+  let data = null;
+
+  if(!roleId){
+    return;
+  }
+
+
+  return await Member.updateMany({role: roleId}, {$set: {role: null}});
+}
+
+
 
 module.exports = {
   sync:sync,
@@ -678,5 +690,6 @@ module.exports = {
   findSubscribeByUserIdAndSubjectTypeAndSubjectIds:findSubscribeByUserIdAndSubjectTypeAndSubjectIds,
   findJobSubscriptions:findJobSubscriptions,
   findApplicationSubscriptions:findApplicationSubscriptions,
-  searchCompanyByUserId:searchCompanyByUserId
+  searchCompanyByUserId:searchCompanyByUserId,
+  removeRole:removeRole
 }
