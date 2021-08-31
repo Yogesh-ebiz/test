@@ -15,7 +15,8 @@ const adSchema = Joi.object({
   billingEvent: Joi.string(),
   optimizationGoal: Joi.string().allow('').optional(),
   targeting: Joi.object(),
-  productId: Joi.string().allow('').optional()
+  productId: Joi.string().allow('').optional(),
+  feedId: Joi.number().optional()
 });
 
 

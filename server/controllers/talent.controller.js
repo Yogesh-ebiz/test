@@ -1615,6 +1615,14 @@ async function payJob(companyId, currentUserId, jobId, form) {
                 adPositions: [product.adPosition]
               }
             };
+
+            if(product.adPosition=='feed'){
+              let feed = await feedService.createJobFeed(job.jobId, company.partyType, company.companyId, job.description, member.userId);
+              if(feed){
+                ad.feedId = feed.id;
+              }
+            }
+
             ad = await adService.add(ad);
             job.ads.push(ad);
           }

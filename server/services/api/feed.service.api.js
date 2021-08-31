@@ -4,18 +4,21 @@ const options = { headers: {'userId': null } };
 let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
 // let client = new ApiClient('http://localhost:5000/api');
 
-async function createJobFeed(jobId, partyId, text, userId){
-
+async function createJobFeed(jobId, partyType, partyId, text, userId){
+  const options = {
+    headers: {'userId': userId}
+  };
 
   let data = {};
   data.type = "JOB";
   data.text = text;
-  data.policy = {type: "COMPANY", destinationId: partyId};
+  data.policy = {type: partyType, destinationId: partyId};
   data.shareRefId = jobId;
   data.shareRefType = "JOB";
 
-  options.headers.userId = userId;
-  return client.post(`/feeds`, data, options);
+  let response = await client.post(`/feeds`, data, options);
+  return response.data.data;
+
 };
 
 async function register(user){
