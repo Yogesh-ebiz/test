@@ -939,6 +939,8 @@ async function addBookmark(currentUserId, jobId, token) {
             campaign.currentStage = stage;
             await campaign.save();
           }
+        } else {
+          let campaign = await emailCampaignService.findByJobId(jobId);
         }
       }
 

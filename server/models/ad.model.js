@@ -9,6 +9,9 @@ const AdSchema = new mongoose.Schema({
   productId: {
     type: String
   },
+  feedId: {
+    type: Number
+  },
   lifetimeBudget: {
     type: Number,
     required: false

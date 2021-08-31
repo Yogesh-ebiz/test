@@ -628,6 +628,7 @@ async function searchCompanyByUserId(userId, filter, sort) {
 
 
 
+
   const options = {
     page: page,
     limit: limit,
@@ -646,7 +647,7 @@ async function searchCompanyByUserId(userId, filter, sort) {
   );
 
   const aggregate = Member.aggregate(aList);
-
+  console.log(options)
   return await Member.aggregatePaginate(aggregate, options);
 }
 

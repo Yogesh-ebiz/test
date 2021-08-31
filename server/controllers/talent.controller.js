@@ -825,6 +825,7 @@ async function searchCompany(currentUserId, filter, sort) {
   }
 
   let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
+  console.log(_.map(result.docs, 'company'))
   let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'), true);
 
 
@@ -1274,7 +1275,8 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
   try {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
-    job = await jobService.findJob_Id(jobId, locale);
+    // job = await jobService.findJob_Id(jobId, locale);
+    job = await jobService.findById(jobId, locale).populate('department').populate('tags').populate('members').populate('createdBy').populate('ads');
 
     if(job) {
 

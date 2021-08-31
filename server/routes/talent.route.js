@@ -71,7 +71,7 @@ router.route('/company/:id/jobs/:jobId/sources/:sourceId').post(asyncHandler(add
 router.route('/company/:id/jobs/:jobId/campaigns').post(asyncHandler(searchCampaigns));
 router.route('/company/:id/jobs/:jobId/ads').get(asyncHandler(getJobAds));
 router.route('/company/:id/jobs/:jobId/ads').get(asyncHandler(getJobAds));
-router.route('/company/:id/jobs/:jobId/ads/feed').get(asyncHandler(getJobAds));
+router.route('/company/:id/jobs/:jobId/feed').get(asyncHandler(getJobAds));
 
 
 router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
@@ -183,6 +183,7 @@ router.route('/company/:id/pipelines').get(asyncHandler(getCompanyPipelineTempla
 router.route('/company/:id/roles').get(asyncHandler(getCompanyRoles));
 router.route('/company/:id/roles').post(asyncHandler(addCompanyRole));
 router.route('/company/:id/roles/:roleId').put(asyncHandler(updateCompanyRole));
+router.route('/company/:id/roles/:roleId').delete(asyncHandler(deleteCompanyRole));
 router.route('/company/:id/roles/:roleId/disable').post(asyncHandler(disableCompanyRole));
 router.route('/company/:id/roles/:roleId/enable').post(asyncHandler(enableCompanyRole));
 
