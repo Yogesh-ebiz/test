@@ -1302,6 +1302,13 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
         job.skills = jobSkills;
       }
 
+      for(let [i, ad] of job.ads.entries()){
+        console.log(ad)
+        if(ad.feedId){
+          job.feedId = ad.feedId;
+        }
+      }
+
 
       // let userIds = _.map(job.members, 'userId');
       // userIds.push(job.createdBy)
