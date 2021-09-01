@@ -125,9 +125,7 @@ async function updatePool(poolId, form) {
 
   if(pool){
     pool.name = form.name;
-    pool.department = form.department;
     pool.description = form.description;
-    pool.candidates = form.candidates;
     result = await pool.save();
   }
   return result;

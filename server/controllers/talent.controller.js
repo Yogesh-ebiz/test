@@ -5660,7 +5660,6 @@ async function updateCompanyPool(companyId, poolId, currentUserId, form) {
 
   let result = null;
   try {
-    form.department = ObjectID(form.department);
 
     result = await poolService.updatePool(poolId, form);
 

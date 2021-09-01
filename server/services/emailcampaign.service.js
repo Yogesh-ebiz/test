@@ -44,6 +44,14 @@ async function add(emailCampaign) {
 }
 
 
+function findById(id) {
+  if(!id){
+    return;
+  }
+
+  return EmailCampaign.findById(id);
+}
+
 async function findByEmailAndJobId(email, jobId) {
   if(!email || !jobId){
     return;
@@ -103,7 +111,7 @@ async function findByToken(token) {
     return;
   }
 
-  return EmailCampaign.findOne({token: token}).populate('stages');
+  return EmailCampaign.findOne({token: token}).populate('stages').populate('currentStage');
 
 }
 
@@ -216,6 +224,7 @@ async function search(jobId, filter, sort) {
 
 module.exports = {
   add:add,
+  findById:findById,
   findByEmailAndJobId:findByEmailAndJobId,
   findByEmailAddressAndJobId:findByEmailAddressAndJobId,
   findByJobId:findByJobId,

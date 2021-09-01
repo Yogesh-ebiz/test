@@ -4,6 +4,73 @@ const JobView = require('../models/jobview.model');
 const jobService = require('../services/jobrequisition.service');
 
 
+
+async function add(userId, jobId, token) {
+  let data = null;
+
+  if(!userId || !jobId){
+    return;
+  }
+
+  let job = await jobService.findJobId(jobId);
+
+  if(job) {
+
+    let jobView = await findJobViewByUserIdAndJobId(currentUserId);
+
+    if(!jobView) {
+      await new JobView({partyId: currentParty.id, company: job.company, jobId: job._id, token: capture.token});
+
+    } else {
+      jobView.viewCount++;
+      await jobView.save();
+    }
+
+    job.noOfViews++;
+    await job.save();
+
+
+    if(token) {
+      let campaign = await emailCampaignService.findByToken(token);
+      if(campaign) {
+        let exists = _.find(campaign.stages, {type: capture.type});
+        if (!exists) {
+          let stage = await emailCampaignServiceStage.add({type: capture.type, organic: campaign ? false : true});
+          campaign.stages.push(campaign);
+          campaign.currentStage = stage;
+          await campaign.save();
+        }
+      }
+    }
+
+    if(token){
+      let campaign = await emailCampaignService.findByToken(token);
+
+      if(!exists){
+        let exists = _.find(campaign.stages, {type: emailCampaignStageType.VIEWED});
+        let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
+        let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
+        if(currentStageIndex>0){
+          campaign.stages.splice((currentStageIndex-1), 0, stage._id);
+
+        } else {
+          console.log('else')
+          campaign.stages.push(stage._id);
+          campaign.currentStage = stage._id;
+        }
+        console.log(campaign)
+        await campaign.save();
+      }
+    }
+  }
+
+
+
+  return
+}
+
+
+
 function findJobViewByUserId(userId, size) {
   let data = null;
 
@@ -22,16 +89,6 @@ function findJobViewByUserIdAndJobId(userId, jobId) {
   }
 
   return JobView.findOne({partyId: userId, jobId: jobId});
-}
-
-function addJobViewByUserId(jobView) {
-  let data = null;
-
-  if(!jobView){
-    return;
-  }
-
-  return new JobView(jobView).save();
 }
 
 
@@ -409,9 +466,10 @@ async function getInsightCandidates(from, to, companyId, jobId, options) {
 
 
 module.exports = {
+  add: add,
   findJobViewByUserId: findJobViewByUserId,
   findJobViewByUserIdAndJobId:findJobViewByUserIdAndJobId,
-  addJobViewByUserId: addJobViewByUserId,
+
   findMostViewed:findMostViewed,
   findMostViewedByCompany:findMostViewedByCompany,
   getCompanyInsight: getCompanyInsight,

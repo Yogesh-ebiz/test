@@ -24,6 +24,7 @@ const activityService = require('../services/activity.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignServiceStage = require('../services/emailcampaignstage.service');
 const applicationService = require('../services/application.service');
+const jobviewService = require('../services/jobview.service');
 
 
 const {getListofSkillTypes} = require('../services/skilltype.service');
@@ -38,7 +39,7 @@ const {findById, findByJobId} = require('../services/pipeline.service');
 
 
 const jobService = require('../services/jobrequisition.service');
-const {addJobViewByUserId, findJobViewByUserId, findJobViewByUserIdAndJobId, findMostViewed} = require('../services/jobview.service');
+const {findJobViewByUserId, findJobViewByUserIdAndJobId, findMostViewed} = require('../services/jobview.service');
 const {findSearchHistoryByKeyword, saveSearch} = require('../services/searchhistory.service');
 const {getTopCategory} = require('../services/category.service');
 const {getTopIndustry} = require('../services/industry.service');
@@ -415,34 +416,7 @@ async function captureJob(currentUserId, jobId, capture) {
     return null;
   }
 
-  try {
-    let job = await jobService.findJobId(jobId);
-
-    if(job) {
-
-      let currentParty = await findByUserId(currentUserId);
-
-      await addJobViewByUserId({partyId: currentParty.id, company: job.company, jobId: job._id, token: capture.token});
-      job.noOfViews++;
-      await job.save();
-
-      if(capture.token) {
-        let campaign = await emailCampaignService.findByToken(capture.token);
-        if(campaign) {
-          let exists = _.find(campaign.stages, {type: capture.type});
-          if (!exists) {
-            let stage = await emailCampaignServiceStage.add({type: capture.type, organic: campaign ? false : true});
-            campaign.stages.push(campaign);
-            campaign.currentStage = stage;
-            await campaign.save();
-          }
-        }
-      }
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
+  await jobviewService.add(currentUserId, jobId, capture.token);
 
   return {success: true};
 }

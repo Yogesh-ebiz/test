@@ -1,9 +1,13 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const emailCampaignStageType = require('../const/emailCampaignStageType');
+
 const BookMark = require('../models/bookmark.model');
 const jobService = require('../services/jobrequisition.service');
 const sourceService = require('../services/source.service');
 const candidateService = require('../services/candidate.service');
+const emailCampaignService = require('../services/emailcampaign.service');
+const emailCampaignStageService = require('../services/emailcampaignstage.service');
 
 
 
@@ -19,28 +23,33 @@ async function add(userId, jobId, token) {
 
   if(!bookmark) {
     bookmark = await new BookMark({partyId: userId, company: job.company, jobId: job._id, token: token}).save();
+  }
 
-    let source = await sourceService.findByJobIdAndUserId(jobId, userId);
-    source = source?source[0]:null;
-      console.log(source)
+  let source = await sourceService.findByJobIdAndUserId(jobId, userId);
+  source = source?source[0]:null;
 
-    if(source) {
-      await sourceService.updateSaved(source._id, true);
+  if(source) {
+    await sourceService.updateSaved(source._id, true);
 
-      let campaign;
-      if(token){
-        campaign = await emailCampaignService.findByToken(token);
-      }
 
+    if(token){
+      let campaign = await emailCampaignService.findByToken(token);
       let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
       if(!exists){
-        let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?false:true});
-        campaign.stages.push(campaign);
-        campaign.currentStage = stage;
+
+        let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
+        let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
+        if(currentStageIndex>0){
+          campaign.stages.splice((currentStageIndex-1), 0, stage._id);
+
+        } else {
+          console.log('else')
+          campaign.stages.push(stage._id);
+          campaign.currentStage = stage._id;
+        }
+        console.log(campaign)
         await campaign.save();
       }
-    } else {
-      let campaign = await emailCampaignService.findByJobId(jobId);
     }
   }
 
