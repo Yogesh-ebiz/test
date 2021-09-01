@@ -7,42 +7,46 @@ const candidateService = require('../services/candidate.service');
 
 
 
-async function add(currentUserId, jobId, token) {
+async function add(userId, jobId, token) {
   let data = null;
 
-  if(!currentUserId || !jobId){
+  if(!userId || !jobId){
     return;
   }
 
-  let job = await JobRequisition.findById(jobId);
-  let bookmark = await bookmarkService.findBookById(currentUserId, jobId);
+  let job = await jobService.findById(jobId);
+  let bookmark = await findBookById(userId, jobId);
 
   if(!bookmark) {
-    bookmark = await bookmarkService.addBook({partyId: currentUserId, company: job.company, jobId: job._id, token: token});
+    bookmark = await new BookMark({partyId: userId, company: job.company, jobId: job._id, token: token}).save();
 
     let source = await sourceService.findByJobIdAndUserId(jobId, userId);
-    console.log(source)
+    source = source?source[0]:null;
+      console.log(source)
+
     if(source) {
-    //   let campaign;
-    //   if(token){
-    //     campaign = await emailCampaignService.findByToken(token);
-    //   }
-    //
-    //   let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
-    //   if(!exists){
-    //     let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?false:true});
-    //     campaign.stages.push(campaign);
-    //     campaign.currentStage = stage;
-    //     await campaign.save();
-    //   }
-    // } else {
-    //   let campaign = await emailCampaignService.findByJobId(jobId);
+      await sourceService.updateSaved(source._id, true);
+
+      let campaign;
+      if(token){
+        campaign = await emailCampaignService.findByToken(token);
+      }
+
+      let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
+      if(!exists){
+        let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?false:true});
+        campaign.stages.push(campaign);
+        campaign.currentStage = stage;
+        await campaign.save();
+      }
+    } else {
+      let campaign = await emailCampaignService.findByJobId(jobId);
     }
   }
 
 
 
-  return new BookMark(bookmark).save();
+  return bookmark;
 }
 
 

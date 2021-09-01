@@ -5179,9 +5179,9 @@ async function enableCompanyRole(companyId, currentUserId, roleId) {
   return result
 }
 
-async function getCompanyRoles(companyId, currentUserId, locale) {
+async function getCompanyRoles(companyId, currentUserId, filter, locale) {
 
-  if(!companyId || !currentUserId){
+  if(!companyId || !currentUserId || !filter){
     return null;
   }
 
@@ -5190,7 +5190,7 @@ async function getCompanyRoles(companyId, currentUserId, locale) {
     return null;
   }
 
-  let result = await roleService.getRoles(companyId);
+  let result = await roleService.getRoles(companyId, filter.all);
 
   return result;
 

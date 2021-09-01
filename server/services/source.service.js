@@ -134,6 +134,7 @@ function findByJobIdAndUserId(jobId, userId) {
 
   return Source.aggregate([
     {$match: {job: jobId}},
+    { $lookup: {from: 'emailcampaigns', localField: 'campaigns', foreignField: '_id', as: 'campaigns' } },
     {$lookup:{
         from:"candidates",
         let:{candidate: '$candidate'},
@@ -145,8 +146,7 @@ function findByJobIdAndUserId(jobId, userId) {
     {$unwind: '$candidate'},
     {$match: {'candidate.userId': userId}},
     {$limit: 1 }
-  ])
-
+  ]);;
 }
 
 async function search(filter, sort) {
@@ -231,6 +231,28 @@ async function search(filter, sort) {
   // return await Source.find({})
 }
 
+
+function updateViewed(id, hasViewed) {
+
+  hasViewed = hasViewed?true:false;
+  return Source.update({_id: id}, {$set: {hasViewed: hasViewed}});
+}
+
+
+function updateSaved(id, hasSaved) {
+
+  hasSaved = hasSaved?true:false;
+  return Source.update({_id: id}, {$set: {hasSaved: hasSaved}});
+}
+
+
+function updateApplied(id, hasApplied) {
+
+  hasApplied = hasApplied?true:false;
+  return Source.update({_id: id}, {$set: {hasApplied: hasApplied}});
+}
+
+
 module.exports = {
   add:add,
   addWithCheck:addWithCheck,
@@ -241,5 +263,9 @@ module.exports = {
   findByJobId:findByJobId,
   findByJobIdAndCandidateId:findByJobIdAndCandidateId,
   findByJobIdAndUserId:findByJobIdAndUserId,
-  search:search
+  search:search,
+  updateViewed:updateViewed,
+  updateSaved:updateSaved,
+  updateApplied:updateApplied
+
 }

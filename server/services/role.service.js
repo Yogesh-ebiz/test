@@ -106,15 +106,22 @@ async function enable(id) {
 
 }
 
-function getRoles(company) {
+function getRoles(company, all) {
   let data = null;
 
-  if(company==null){
+  if(!company){
     return;
   }
 
+  let status = [];
+  if(all){
+    status.push(statusEnum.ACTIVE);
+    status.push(statusEnum.DISABLED);
+  } else {
+    status.push(statusEnum.ACTIVE);
+  }
 
-  return Role.find({$or: [{company:company}, {default: true}]});
+  return Role.find({$or: [{company:company}, {default: true}], status: {$in: status}});
 
 }
 

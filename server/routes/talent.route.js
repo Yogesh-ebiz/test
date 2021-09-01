@@ -1763,8 +1763,10 @@ async function enableCompanyRole(req, res) {
 async function getCompanyRoles(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
+  let filter = req.query;
+  filter.all = filter.all=='true'?true:false;
 
-  let data = await talentCtrl.getCompanyRoles(company, currentUserId, res.locale);
+  let data = await talentCtrl.getCompanyRoles(company, currentUserId, filter, res.locale);
   res.json(new Response(data, data?'roles_retrieved_successful':'not_found', res));
 }
 
