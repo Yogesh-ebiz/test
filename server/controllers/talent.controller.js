@@ -759,7 +759,7 @@ async function getDashboard(currentUserId, companyId) {
 
   newApplications.forEach(function(app){
     app.progress=[];
-    // app.user.avatar = buildCandidateUrl(app.user);
+    app.user.avatar = buildCandidateUrl(app.user);
   });
 
   let mostViewed = await jobViewService.findMostViewedByCompany(company._id);
