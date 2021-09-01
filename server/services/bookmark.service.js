@@ -37,7 +37,7 @@ async function add(currentUserId, jobId, token) {
     //   }
     // } else {
     //   let campaign = await emailCampaignService.findByJobId(jobId);
-    // }
+    }
   }
 
 
