@@ -127,6 +127,28 @@ function findByJobIdAndCandidateId(jobId, candidateId) {
 }
 
 
+function findByJobIdAndUserId(jobId, userId) {
+  if(!jobId || !userId){
+    return;
+  }
+
+  return Source.aggregate([
+    {$match: {job: jobId}},
+    {$lookup:{
+        from:"candidates",
+        let:{candidate: '$candidate'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$candidate","$_id"]}}}
+        ],
+        as: 'candidate'
+      }},
+    {$unwind: '$candidate'},
+    {$match: {'candidate.userId': userId}},
+    {$limit: 1 }
+  ])
+
+}
+
 async function search(filter, sort) {
 
   if(!filter || !sort){
@@ -218,5 +240,6 @@ module.exports = {
   findByCandidateId:findByCandidateId,
   findByJobId:findByJobId,
   findByJobIdAndCandidateId:findByJobIdAndCandidateId,
+  findByJobIdAndUserId:findByJobIdAndUserId,
   search:search
 }

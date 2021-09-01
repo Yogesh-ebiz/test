@@ -925,24 +925,7 @@ async function addBookmark(currentUserId, jobId, token) {
   try {
     let job = await JobRequisition.findById(jobId);
     if(job) {
-      result = await bookmarkService.findBookById(currentUserId, ObjectID(jobId));
-
-      if(!result) {
-        result = await bookmarkService.addBook({partyId: currentUserId, company: job.company, jobId: job._id, token: token});
-
-        if(token) {
-          let campaign = await emailCampaignService.findByToken(token);
-          let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
-          if(!exists){
-            let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?false:true});
-            campaign.stages.push(campaign);
-            campaign.currentStage = stage;
-            await campaign.save();
-          }
-        } else {
-          let campaign = await emailCampaignService.findByJobId(jobId);
-        }
-      }
+      result = await bookmarkService.add(currentUserId, jobId, token);
 
 
     }

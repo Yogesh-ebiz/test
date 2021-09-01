@@ -2,9 +2,59 @@ const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
 const BookMark = require('../models/bookmark.model');
 const jobService = require('../services/jobrequisition.service');
+const sourceService = require('../services/source.service');
+const candidateService = require('../services/candidate.service');
 
 
 
+async function add(currentUserId, jobId, token) {
+  let data = null;
+
+  if(!currentUserId || !jobId){
+    return;
+  }
+
+  let job = await JobRequisition.findById(jobId);
+  let bookmark = await bookmarkService.findBookById(currentUserId, jobId);
+
+  if(!bookmark) {
+    bookmark = await bookmarkService.addBook({partyId: currentUserId, company: job.company, jobId: job._id, token: token});
+
+    let source = await sourceService.findByJobIdAndUserId(jobId, userId);
+    console.log(source)
+    if(source) {
+    //   let campaign;
+    //   if(token){
+    //     campaign = await emailCampaignService.findByToken(token);
+    //   }
+    //
+    //   let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
+    //   if(!exists){
+    //     let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.SAVED, organic: campaign?false:true});
+    //     campaign.stages.push(campaign);
+    //     campaign.currentStage = stage;
+    //     await campaign.save();
+    //   }
+    // } else {
+    //   let campaign = await emailCampaignService.findByJobId(jobId);
+    // }
+  }
+
+
+
+  return new BookMark(bookmark).save();
+}
+
+
+function removeBookById(userId, jobId) {
+  let data = null;
+  if(!userId || !jobId){
+    return;
+  }
+
+
+  return BookMark.remove({partyId: userId, jobId: jobId});
+}
 
 function findBookById(userId, jobId) {
   let data = null;
@@ -26,26 +76,6 @@ function findBookByUserId(userId, size) {
   return size?BookMark.find({partyId: userId}).sort({createdDate: -1}).limit(size):BookMark.find({partyId: userId}).sort({createdDate: -1});
 }
 
-function addBook(bookmark) {
-  let data = null;
-
-  if(!bookmark){
-    return;
-  }
-
-  return new BookMark(bookmark).save();
-}
-
-
-function removeBookById(userId, jobId) {
-  let data = null;
-  if(!userId || !jobId){
-    return;
-  }
-
-
-  return BookMark.remove({partyId: userId, jobId: jobId});
-}
 
 async function findMostBookmarked() {
   let data = null;
@@ -264,11 +294,12 @@ async function getInsightCandidates(from, to, companyId, jobId, options) {
   return result;
 }
 
+
 module.exports = {
+  add: add,
+  removeBookById: removeBookById,
   findBookById: findBookById,
   findBookByUserId: findBookByUserId,
-  addBook: addBook,
-  removeBookById: removeBookById,
   findMostBookmarked:findMostBookmarked,
   getCompanyInsight:getCompanyInsight,
   getJobInsight:getJobInsight,

@@ -1859,14 +1859,16 @@ async function searchSources(companyId, currentUserId, filter, sort, locale) {
   let subscriptions = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.APPLICATION);
 
   result.docs.forEach(function(source){
-    let hasApplied = _.find(source.campaigns, function(o){return o.application;})? true:false;
+
     source.candidate.firstName = source.candidate.firstName?source.candidate.firstName:source.candidate.email;
     source.candidate.avatar = buildCandidateUrl(source.candidate);
-    source.candidate.hasApplied = (hasApplied || _.some(source.candidate.applications, {job: filter.jobs[0]}) )? true: false;
     source.candidate = convertToCandidate(source.candidate);
-
     source.candidate.educations = [];
     source.candidate.experiences = [];
+
+    let hasApplied = _.find(source.campaigns, function(o){return o.application;})? true:false;
+    source.hasApplied = (hasApplied || _.some(source.candidate.applications, {job: filter.jobs[0]}) )? true: false;
+
   })
 
   return new Pagination(result);

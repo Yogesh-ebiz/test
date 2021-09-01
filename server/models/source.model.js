@@ -25,13 +25,20 @@ const SourceSchema = new mongoose.Schema({
     type: Number
   },
   hasViewed: {
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   hasSaved: {
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   hasApplied: {
-    type: Boolean
+    type: Boolean,
+    default: false
+  },
+  hasLiked: {
+    type: Boolean,
+    default: false
   },
   job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
   updatedBy: { type: Schema.Types.ObjectId, ref: 'Member' },

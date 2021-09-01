@@ -1438,7 +1438,9 @@ async function searchEmails(companyId, member, applicationId, sort) {
 
   result.docs = _.reduce(result.docs, function(res, email){
     if(email) {
-      email.hasRead = ((email.from.memberId && email.from.memberId.equals(member._id)) || email.hasRead) ? email.hasRead : false;
+
+      // email.hasRead = ((email.from.memberId && email.from.memberId.equals(member._id)) || email.hasRead) ? email.hasRead : false;
+
       let member = _.find(members, {_id: ObjectID(email.from.memberId)});
       email.from = convertToAvatar(member);
       res.push(email);
