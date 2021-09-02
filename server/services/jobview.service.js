@@ -46,7 +46,7 @@ async function add(userId, jobId, token) {
     //   }
     // }
 
-    let source = await sourceService.findByJobIdAndUserId(jobId, userId);
+    let source = await sourceService.findByJobIdAndUserId(job._id, userId);
     source = source?source[0]:null;
     console.log(source)
     if(source) {
