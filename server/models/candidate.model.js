@@ -9,6 +9,9 @@ const CandidateSchema = new mongoose.Schema({
   userId: {
     type: Number
   },
+  partyType: {
+    type: String
+  },
   company: {
     type: Number,
   },
