@@ -244,7 +244,11 @@ async function apply(application) {
 
 
     if (application.follow) {
-      await feedService.followCompany(application.company, candidate.userId);
+      if(job.company.partyType=='COMPANY') {
+        await feedService.followCompany(application.company, candidate.userId);
+      } else {
+        await feedService.followInstitute(application.company, candidate.userId);
+      }
     }
 
   }

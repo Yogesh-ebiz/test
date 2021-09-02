@@ -303,6 +303,15 @@ async function followCompany(id, userId){
   return await client.post(`/company/${id}/follow`, {}, options);
 };
 
+
+async function followInstitute(id, userId){
+
+  const options = {
+    headers: {'userId': userId}
+  };
+  return await client.post(`/institute/${id}/follow`, {}, options);
+};
+
 async function hasFollowed(id, userId){
 
   const options = {
@@ -610,6 +619,7 @@ module.exports = {
   getUserEducations:getUserEducations,
   getUserSkills:getUserSkills,
   followCompany: followCompany,
+  followInstitute: followInstitute,
   hasFollowed:hasFollowed,
   syncPeople:syncPeople,
   searchCompany:searchCompany,
