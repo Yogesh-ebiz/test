@@ -2018,6 +2018,25 @@ async function addApplication(companyId, currentUserId, application ) {
         savedApplication = await applicationService.apply(application);
         await candidate.save();
 
+        let campaign = await emailCampaignService.findByToken(token);
+        let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
+        if(!exists){
+
+          let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
+          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
+          if(currentStageIndex>0){
+            campaign.stages.splice((currentStageIndex-1), 0, stage._id);
+
+          } else {
+            console.log('else')
+            campaign.stages.push(stage._id);
+            campaign.currentStage = stage._id;
+          }
+          console.log(campaign)
+          await campaign.save();
+        }
+
+
       }
     }
 
@@ -3881,7 +3900,7 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
   try {
 
     let experiences;
-    let candidate = await candidateService.findById(candidateId);
+    let candidate = await candidateService.findById(candidateId).populate('experiences');
     if(candidate.userId){
       experiences = await feedService.getUserExperiences(candidate.userId);
       experiences = _.reduce(experiences, function(res, exp){
@@ -3890,7 +3909,7 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
         return res;
       }, []);
     } else {
-      experiences = await candidateService.getExperiences(candidateId);
+      experiences = candidate.experiences;
 
       let companies = await feedService.lookupCompaniesIds(_.map(candidate.experiences, 'employer.id'))
       experiences = _.reduce(candidate.experiences, function(res, exp){
