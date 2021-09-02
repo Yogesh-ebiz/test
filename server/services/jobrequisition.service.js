@@ -951,7 +951,7 @@ async function search(currentUserId, query, filter, sort, locale) {
 
   _.forEach(result.docs, function(job){
     job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
-    job.company = convertToCompany(_.find(foundCompanies, {id: job.company.companyId}));
+    job.company = convertToCompany(job.company);
     job.createdBy = convertToAvatar(job.createdBy);
     job.shareUrl = 'https://www.accessed.co/jobs/'+job.jobId;
 
