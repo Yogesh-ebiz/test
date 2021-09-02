@@ -80,7 +80,7 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   }
 
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
-  candidate.hasImported = isImported?false:true;
+  candidate.hasImported = isImported?true:false;
   candidate.hasApplied = isApplied?true:false;
   candidate = await new Candidate(candidate).save();
 
