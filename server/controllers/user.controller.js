@@ -1781,12 +1781,12 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
         ]);
 
         result = await Application.aggregatePaginate(aggregate, options);
-        let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
+        // let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
         let hasSaves = await findBookByUserId(currentParty.id);
 
         _.forEach(result.docs, function(application, idx) {
           application.job.hasSaved = _.some(hasSaves, {jobId: application.job._id});
-          application.job.company = convertToCompany(_.find(foundCompanies, {id: application.job.company.companyId}));
+          application.job.company = convertToCompany(application.job.company);
           application.job = jobMinimal(application.job);
 
         })
@@ -1860,11 +1860,11 @@ async function getBookmarksByUserId(currentUserId, filter, locale) {
       let hasSaves = await findBookByUserId(currentUserId);
       let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
 
-      result.docs = _.reduce(result.docs, function(res, view){
-        view.job.hasSaved = _.some(hasSaves, {jobId: view.jobId});
-        view.job.company = convertToCompany(_.find(foundCompanies, {id: view.job.company.companyId}));
-        view.job = jobMinimal(view.job);
-        res.push(view);
+      result.docs = _.reduce(result.docs, function(res, bookmark){
+        bookmark.job.hasSaved = _.some(hasSaves, {jobId: bookmark.jobId});
+        bookmark.job.company = convertToCompany(bookmark.job.company);
+        bookmark.job = jobMinimal(bookmark.job);
+        res.push(bookmark);
         return res;
       }, []);
 
@@ -2113,11 +2113,11 @@ async function getJobViewsByUserId(currentUserId, filter, locale) {
       result = await JobView.aggregatePaginate(aggregate, options);
 
       let hasSaves = await findBookByUserId(currentUserId);
-      let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
+      // let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.job.company.companyId); return res;},  []));
 
       result.docs = _.reduce(result.docs, function(res, view){
         view.job.hasSaved = _.some(hasSaves, {jobId: view.jobId});
-        view.job.company = convertToCompany(_.find(foundCompanies, {id: view.job.company.companyId}));
+        view.job.company = convertToCompany(view.job.company);
         view.job = jobMinimal(view.job);
         res.push(view);
         return res;

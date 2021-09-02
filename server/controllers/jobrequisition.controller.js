@@ -186,8 +186,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
       }
 
 
-      let company = await feedService.lookupCompaniesIds([job.company.companyId]);
-      job.company = convertToCompany(company[0]);
+      // let company = await feedService.lookupCompaniesIds([job.company.companyId]);
+      job.company = convertToCompany(job.company);
 
       if(!isMinimal) {
           job.createdBy = convertToAvatar(job.createdBy);
