@@ -29,6 +29,7 @@ const skillSchema = Joi.object({
 
 const candidateSchema = Joi.object({
   userId: Joi.number().allow('', null).optional(),
+  partyType: Joi.string(),
   company: Joi.number(),
   about: Joi.string().allow('').optional(),
   avatar: Joi.string().allow('').optional(),
