@@ -107,7 +107,6 @@ async function pay(userId, form) {
           status = 500;
           break;
       }
-      console.log(error)
       throw new PaymentError(status, error.response.data.message);
 
     } else if (error.request) {
@@ -310,8 +309,12 @@ async function getCards(customerId) {
 
 async function lookupProducts(ids) {
 
-  let response = await client.get(`/products/lookup?ids=${ids}`, null, null).catch(function (error) {
-    if (error.request) {
+  let response = await client.get(`/products/lookup?ids=${ids.join()}`, null, null).catch(function (error) {
+    if (error.response) {
+      // Request made and server responded
+      throw new PaymentError(error.response.data.message);
+
+    } else if (error.request) {
       // The request was made but no response was received
       console.log(error.request);
     } else {

@@ -1,8 +1,12 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
+const emailCampaignStageType = require('../const/emailCampaignStageType');
+
 const JobView = require('../models/jobview.model');
 const jobService = require('../services/jobrequisition.service');
-
+const sourceService = require('../services/source.service');
+const emailCampaignService = require('../services/emailcampaign.service');
+const emailCampaignStageService = require('../services/emailcampaignstage.service');
 
 
 async function add(userId, jobId, token) {
@@ -13,14 +17,13 @@ async function add(userId, jobId, token) {
   }
 
   let job = await jobService.findJobId(jobId);
-
+  let jobView;
   if(job) {
 
-    let jobView = await findJobViewByUserIdAndJobId(currentUserId);
-
+    console.log(userId, jobId)
+    jobView = await findJobViewByUserIdAndJobId(userId, jobId);
     if(!jobView) {
-      await new JobView({partyId: currentParty.id, company: job.company, jobId: job._id, token: capture.token});
-
+      jobView = await new JobView({partyId: userId, company: job.company, jobId: job._id, token: token}).save();
     } else {
       jobView.viewCount++;
       await jobView.save();
@@ -30,43 +33,47 @@ async function add(userId, jobId, token) {
     await job.save();
 
 
-    if(token) {
-      let campaign = await emailCampaignService.findByToken(token);
-      if(campaign) {
-        let exists = _.find(campaign.stages, {type: capture.type});
+    // if(token) {
+    //   let campaign = await emailCampaignService.findByToken(token);
+    //   if(campaign) {
+    //     let exists = _.find(campaign.stages, {type: emailCampaignStageType.VIEWED});
+    //     if (!exists) {
+    //       let stage = await emailCampaignServiceStage.add({type: emailCampaignStageType.VIEWED, organic: false});
+    //       campaign.stages.push(campaign);
+    //       campaign.currentStage = stage;
+    //       await campaign.save();
+    //     }
+    //   }
+    // }
+
+    let source = await sourceService.findByJobIdAndUserId(jobId, userId);
+    source = source?source[0]:null;
+    console.log(source)
+    if(source) {
+      await sourceService.updateViewed(source._id, true);
+      if (token) {
+        let campaign = await emailCampaignService.findByToken(token);
+        let exists = _.find(campaign.stages, {type: emailCampaignStageType.VIEWED});
         if (!exists) {
-          let stage = await emailCampaignServiceStage.add({type: capture.type, organic: campaign ? false : true});
-          campaign.stages.push(campaign);
-          campaign.currentStage = stage;
+
+          let invitedStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.INVITED});
+          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.VIEWED, organic: false});
+          campaign.stages.splice((invitedStageIndex), 0, stage._id);
+
+          let appliedStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
+          if (appliedStageIndex < 0) {
+            campaign.currentStage = stage._id;
+          }
+          console.log(campaign)
           await campaign.save();
         }
-      }
-    }
-
-    if(token){
-      let campaign = await emailCampaignService.findByToken(token);
-
-      if(!exists){
-        let exists = _.find(campaign.stages, {type: emailCampaignStageType.VIEWED});
-        let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
-        let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
-        if(currentStageIndex>0){
-          campaign.stages.splice((currentStageIndex-1), 0, stage._id);
-
-        } else {
-          console.log('else')
-          campaign.stages.push(stage._id);
-          campaign.currentStage = stage._id;
-        }
-        console.log(campaign)
-        await campaign.save();
       }
     }
   }
 
 
 
-  return
+  return jobView;
 }
 
 

@@ -119,7 +119,6 @@ async function findByToken(token) {
 
 async function search(jobId, filter, sort) {
   let data = null;
-  console.log(jobId, filter, sort)
   if(jobId==null || !filter || !sort){
     return;
   }

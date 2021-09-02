@@ -416,9 +416,9 @@ async function captureJob(currentUserId, jobId, capture) {
     return null;
   }
 
-  await jobviewService.add(currentUserId, jobId, capture.token);
+  let result = await jobviewService.add(currentUserId, jobId, capture.token);
 
-  return {success: true};
+  return result;
 }
 
 

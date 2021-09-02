@@ -103,7 +103,7 @@ async function captureJob(req, res) {
   let capture = {type: req.query.type, token: req.query.token};
   let data = await jobRequisitionCtl.captureJob(currentUserId, jobId, capture);
 
-  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'job_captured_successful':'not_found', res));
 }
 
 

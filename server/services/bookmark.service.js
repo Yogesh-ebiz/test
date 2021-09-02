@@ -38,16 +38,14 @@ async function add(userId, jobId, token) {
       if(!exists){
 
         let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
-        let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
+        let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: false});
         if(currentStageIndex>0){
           campaign.stages.splice((currentStageIndex-1), 0, stage._id);
 
         } else {
-          console.log('else')
           campaign.stages.push(stage._id);
           campaign.currentStage = stage._id;
         }
-        console.log(campaign)
         await campaign.save();
       }
     }

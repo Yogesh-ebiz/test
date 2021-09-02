@@ -4104,9 +4104,10 @@ async function getCandidateAccomplishments(companyId, currentUserId, candidateId
   let result = {languages: [], publications:[], certifications:[]}
   try {
     let candidate = await candidateService.findById(candidateId);
-    let languages = candidate.languages;
-    let publications = candidate.publications;
-    let certifications = candidate.certifications
+    console.log(candidate)
+    result.languages = candidate.languages;
+    result.publications = candidate.publications;
+    result.certifications = candidate.certifications
 
   } catch (error) {
     console.log(error);
