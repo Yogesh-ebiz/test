@@ -7,6 +7,7 @@ const statusEnum = require('../const/statusEnum');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const labelType = require('../const/labelType');
+const adPosition = require('../const/adPosition');
 
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
@@ -917,22 +918,22 @@ async function search(currentUserId, query, filter, sort, locale) {
         ],
         as: 'ads'
       }},
-    { $addFields:
-        {isHot: {
-            $reduce: {
-              input: "$ads",
-              initialValue: false,
-              in: {
-                $cond: [
-                  { $and: [ {$in: [ "hottag" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
-                  true,
-                  false
-                ]
-
-              }
-            }
-          } }
-    },
+    // { $addFields:
+    //     {isHot: {
+    //         $reduce: {
+    //           input: "$ads",
+    //           initialValue: false,
+    //           in: {
+    //             $cond: [
+    //               { $and: [ {$in: [ "hottag" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
+    //               true,
+    //               false
+    //             ]
+    //
+    //           }
+    //         }
+    //       } }
+    // },
   );
 
   aList.push({ $match: new SearchParam(filter)});
@@ -949,6 +950,7 @@ async function search(currentUserId, query, filter, sort, locale) {
   // }
 
 
+  let today = Date.now();
   _.forEach(result.docs, function(job){
     job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
     job.company = convertToCompany(job.company);
@@ -963,6 +965,15 @@ async function search(currentUserId, query, filter, sort, locale) {
     job.minimumQualifications=[];
     job.applicationForm=null;
     job.description = null;
+    job.isHot = _.reduce(job.ads, function(res, ad){
+      if(_.includes(ad.targeting.adPositions, adPosition.hottag)){
+        if(ad.startTime < today && ad.endTime > today){
+          res = true;
+        }
+
+      }
+      return res;
+    }, false);
     job.ads = [];
 
   })
