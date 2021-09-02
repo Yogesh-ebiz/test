@@ -132,7 +132,6 @@ function findByJobIdAndUserId(jobId, userId) {
     return;
   }
 
-  console.log(jobId, userId)
   return Source.aggregate([
     {$match: {job: jobId}},
     { $lookup: {from: 'emailcampaigns', localField: 'campaigns', foreignField: '_id', as: 'campaigns' } },

@@ -3486,7 +3486,7 @@ async function addCandidate(currentUserId, companyId, form) {
     return null;
   }
 
-  let candidate = await candidateService.addCandidate(companyId, form);
+  let candidate = await candidateService.addCandidate(companyId, form, false, true);
   return candidate
 }
 
@@ -4625,7 +4625,7 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
   if(!candidate){
     let user = await feedService.findCandidateById(userId);
     if(user){
-        candidate = await candidateService.addCandidate(companyId, user);
+        candidate = await candidateService.addCandidate(companyId, user, false, false);
         candidateId = candidate._id;
     }
   } else {

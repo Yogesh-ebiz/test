@@ -50,7 +50,7 @@ const candidateSchema = Joi.object({
 });
 
 
-async function addCandidate(companyId, user, isApplied) {
+async function addCandidate(companyId, user, isApplied, isImported) {
   if(!companyId || !user){
     return;
   }
@@ -79,7 +79,7 @@ async function addCandidate(companyId, user, isApplied) {
   }
 
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
-  candidate.hasImported = isApplied?false:true;
+  candidate.hasImported = isImported?false:true;
   candidate.hasApplied = isApplied?true:false;
   candidate = await new Candidate(candidate).save();
 

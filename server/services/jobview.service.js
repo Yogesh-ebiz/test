@@ -20,7 +20,6 @@ async function add(userId, jobId, token) {
   let jobView;
   if(job) {
 
-    console.log(userId, jobId)
     jobView = await findJobViewByUserIdAndJobId(userId, jobId);
     if(!jobView) {
       jobView = await new JobView({partyId: userId, company: job.company, jobId: job._id, token: token}).save();
@@ -48,7 +47,6 @@ async function add(userId, jobId, token) {
 
     let source = await sourceService.findByJobIdAndUserId(job._id, userId);
     source = source?source[0]:null;
-    console.log(source)
     if(source) {
       await sourceService.updateViewed(source._id, true);
       if (token) {
@@ -64,7 +62,6 @@ async function add(userId, jobId, token) {
           if (appliedStageIndex < 0) {
             campaign.currentStage = stage._id;
           }
-          console.log(campaign)
           await campaign.save();
         }
       }

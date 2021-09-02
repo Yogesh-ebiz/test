@@ -111,7 +111,7 @@ async function compose(form, companyId) {
                 if (!candidate) {
                   let user = await feedService.findCandidateById(contact.id);
                   if (user) {
-                    candidate = await candidateService.addCandidate(companyId, user);
+                    candidate = await candidateService.addCandidate(companyId, user, false, false);
                   }
                 }
               } else {
@@ -123,7 +123,8 @@ async function compose(form, companyId) {
                     primaryAddress: {city: job.city, state: job.state, country: job.country}
                   });
                   if (user) {
-                    candidate = await candidateService.addCandidate(companyId, user);
+                    let hasImported = user.partyType==='PERSON'?false:true;
+                    candidate = await candidateService.addCandidate(companyId, user, false, hasImported);
                   }
                 }
               }
