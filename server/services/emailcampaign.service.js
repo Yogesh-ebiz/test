@@ -61,6 +61,15 @@ async function findByEmailAndJobId(email, jobId) {
 }
 
 
+async function findByJobIdAndCandidateId(jobId, candidateId) {
+  if(!jobId || !candidateId){
+    return;
+  }
+
+  return EmailCampaign.findOne({job: jobId, candidateId: candidateId}).populate('stages').populate('currentStage');
+}
+
+
 
 async function findByEmailAddressAndJobId(email, jobId) {
   if(!email || !jobId){
@@ -225,6 +234,7 @@ module.exports = {
   add:add,
   findById:findById,
   findByEmailAndJobId:findByEmailAndJobId,
+  findByJobIdAndCandidateId:findByJobIdAndCandidateId,
   findByEmailAddressAndJobId:findByEmailAddressAndJobId,
   findByJobId:findByJobId,
   findCampaignsByJobId:findCampaignsByJobId,

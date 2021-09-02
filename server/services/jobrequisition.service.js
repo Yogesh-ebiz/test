@@ -917,23 +917,7 @@ async function search(currentUserId, query, filter, sort, locale) {
           {$unwind: '$targeting' }
         ],
         as: 'ads'
-      }},
-    // { $addFields:
-    //     {isHot: {
-    //         $reduce: {
-    //           input: "$ads",
-    //           initialValue: false,
-    //           in: {
-    //             $cond: [
-    //               { $and: [ {$in: [ "hottag" , "$$this.targeting.adPositions"] }, {$lte: ["$$this.startTime", currentDate]}, {$gte: ["$$this.endTime", currentDate]} ] },
-    //               true,
-    //               false
-    //             ]
-    //
-    //           }
-    //         }
-    //       } }
-    // },
+      }}
   );
 
   aList.push({ $match: new SearchParam(filter)});
@@ -944,10 +928,6 @@ async function search(currentUserId, query, filter, sort, locale) {
 
   let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
   let hasSaves = [];
-
-  // if(currentUserId){
-  //   hasSaves=await bookmarkService.findBookByUserId(currentUserId);
-  // }
 
 
   let today = Date.now();

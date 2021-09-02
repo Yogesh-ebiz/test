@@ -22,10 +22,12 @@ const questionSubmissionService = require('../services/questionsubmission.servic
 const stageService = require('../services/stage.service');
 const activityService = require('../services/activity.service');
 const pipelineService = require('../services/pipeline.service');
+const sourceService = require('../services/source.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignStageService = require('../services/emailcampaignstage.service');
 const fileService = require('../services/file.service');
 const memberService = require('../services/member.service');
+
 
 const feedService = require('../services/api/feed.service.api');
 const calendarService = require('../services/api/calendar.service.api');
@@ -195,25 +197,27 @@ async function apply(application) {
 
       await stageService.createTasksForStage(applyStage, job.title, taskMeta);
 
-      let campaign;
-      if(application.token){
-        campaign = await emailCampaignService.findByToken(application.token);
-      } else {
-        campaign = await emailCampaignService.findByEmailAddressAndJobId(application.email, job._id);
-      }
+
 
       savedApplication = await savedApplication.save();
 
-      if(campaign) {
-        let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
+      let source = await sourceService.findByJobIdAndCandidateId(job._id, candidate._id);
 
-        if (!exists) {
-          let organic = campaign.token===application.token?false:true;
-          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: organic});
-          campaign.stages.push(campaign);
-          campaign.currentStage = stage;
-          campaign.application = savedApplication;
-          await campaign.save();
+      if(source) {
+        let campaign;
+        if (application.token) {
+          campaign = await emailCampaignService.findByToken(application.token);
+
+          if (campaign) {
+            let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
+            if (!exists) {
+              let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: false});
+              campaign.stages.push(campaign);
+              campaign.currentStage = stage;
+              campaign.application = savedApplication;
+              await campaign.save();
+            }
+          }
         }
       }
 

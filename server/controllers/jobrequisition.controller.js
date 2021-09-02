@@ -190,26 +190,15 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
       job.company = convertToCompany(company[0]);
 
       if(!isMinimal) {
-          // let hiringManager = await findByUserId(job.createdBy.userId);
           job.createdBy = convertToAvatar(job.createdBy);
 
           let jobSkills = [];
           if(job.skills.length){
             jobSkills = await findSkillsById(job.skills);
           }
-          // console.log('jobSkils', jobSkills)
-
 
           let noApplied = await findAppliedCountByJobId(job.jobId);
           job.noApplied = noApplied;
-
-          // let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
-          // job.employmentType = employmentType[0];
-
-          // let experienceLevel = await getExperienceLevels(_.map(job, 'level'), locale);
-          // job.level = experienceLevel[0];
-
-
 
           if(job.industry) {
             let industry = await findIndustry('', job.industry, locale);
@@ -250,11 +239,14 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
           }, []);
 
           job.skills = skills;
-          job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
+          job.shareUrl = 'https://www.accessed.co/jobs/' + job.jobId;
+
+          let today = Date.now();
           job.isHot = job.ads?_.reduce(job.ads, function(res, ad){
-            if(_.includes(ad.targeting.adPositions, 'hottag')){
-              return true;
+            if(_.includes(ad.targeting.adPositions, 'hottag') && (ad.startTime < today && ad.endTime > today)){
+              res = true;
             }
+            return res;
           }, false):false;
       }
     }
@@ -835,7 +827,7 @@ async function applyJobById(currentUserId, jobId, application ) {
         if(!candidate){
           currentParty.primaryEmail = {value: application.email};
           currentParty.primaryPhone = {value: application.phoneNumber};
-          candidate = await candidateService.addCandidate(job.company.companyId, currentParty, true);
+          candidate = await candidateService.addCandidate(job.company.companyId, currentParty, true, false);
         } else {
           candidate.status = statusEnum.ACTIVE;
           candidate.email = application.email;
