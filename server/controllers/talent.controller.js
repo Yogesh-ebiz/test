@@ -189,7 +189,7 @@ module.exports = {
   unsubscribeApplication,
   getApplicationActivities,
   addCandidate,
-  importCandidateResumes,
+  importResumes,
   searchCandidates,
   getCandidateById,
   updateCandidateById,
@@ -3493,7 +3493,7 @@ async function addCandidate(currentUserId, companyId, form) {
 }
 
 
-async function importCandidateResumes(companyId, currentUserId, files) {
+async function importResumes(companyId, currentUserId, files) {
   if(!companyId || !currentUserId || !files){
     return null;
   }
@@ -3514,7 +3514,64 @@ async function importCandidateResumes(companyId, currentUserId, files) {
       candidates.push(candidate);
     }
 
-    result = candidates;
+    result = {
+      "firstName": "test@gmail.com",
+      "middleName": "",
+      "lastName": "",
+      "email": "test@gmail.com",
+      "phoneNumber": "",
+      "primaryAddress": {
+        "address1": null,
+        "address2": null,
+        "district": null,
+        "city": null,
+        "state": "Hồ Chí Minh",
+        "country": "Vietnam"
+      },
+      "partyType": "",
+      "jobTitle": "",
+      "about": "",
+      "gender": "",
+      "noOfMonthExperiences": 35,
+      "level": "SENIOR",
+      "links": [],
+      "experiences": [
+        {
+          "isCurrent": false,
+          "employmentTitle": "Android Developer",
+          "employmentType": "FREELANCE",
+          "description": "",
+          "terminationReason": "",
+          "terminationType": "",
+          "employer": {
+            "name": "NewCompany"
+          },
+          "fromDate": 534859340,
+          "thruDate": 63465,
+          "city": "aaaa",
+          "state": "bbbb",
+          "country": "ccc"
+        }
+      ],
+      "educations": [
+        {
+          "_id": "6125c3a6aabb9195144146f2",
+          "fieldOfStudy": {"shortCode": "BUS"},
+          "degree": "MASTER",
+          "gpa": 4,
+          "fromDate": 1320123741111,
+          "thruDate": 1398920541111,
+          "hasGraduated": true,
+          "isCurrent": false,
+          "institute": {
+            "name": "San Diego University"
+          },
+          "city": "San Jose",
+          "state": "California",
+          "country": "US"
+        }
+      ]
+    };
 
   } catch (error) {
     console.log(error);
@@ -4069,16 +4126,20 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
         return res;
       }, []);
     } else {
-      let foundSkills = await feedService.findSkillsById(_.map(candidate.skills, 'id'));
-      result = _.reduce(foundSkills, function(res, skill){
-        let found = _.find(foundSkills, {id: skill.id})
-        if(found){
-          skill.name = found.name;
-        }
-        res.push(skill);
-        return res;
+      let skillIds = _.map(candidate.skills, 'id');
 
-      }, []);
+      if(skillIds.length) {
+        let foundSkills = await feedService.findSkillsById(skillIds);
+        result = _.reduce(foundSkills, function (res, skill) {
+          let found = _.find(foundSkills, {id: skill.id})
+          if (found) {
+            skill.name = found.name;
+          }
+          res.push(skill);
+          return res;
+
+        }, []);
+      }
     }
 
 
