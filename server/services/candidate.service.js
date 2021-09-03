@@ -47,7 +47,11 @@ const candidateSchema = Joi.object({
   hasApplied: Joi.boolean().optional(),
   gender: Joi.string().allow('').optional(),
   marital: Joi.string().allow('').optional(),
-  links: Joi.array().optional()
+  links: Joi.array().optional(),
+  resumes: Joi.array().optional(),
+  experiences: Joi.array().optional(),
+  educations: Joi.array().optional(),
+  languages: Joi.array().optional()
 });
 
 
