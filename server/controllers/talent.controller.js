@@ -10,6 +10,8 @@ var path = require('path');
 var async = require("async");
 var Promise = require('promise');
 var FormData = require('form-data');
+const ResumeParser = require('simple-resume-parser');
+
 
 const config = require('../config/config');
 
@@ -3507,12 +3509,22 @@ async function importResumes(companyId, currentUserId, files) {
   let basePath = 'candidates/';
   try {
 
-    let candidates = [];
-    for(let [i, file] of files.file.entries()){
+    // let candidates = [];
+    // for(let [i, file] of files.file.entries()){
+    //
+    //   let candidate = await candidateService.addCandidateByResume(companyId, member, file);
+    //   candidates.push(candidate);
+    // }
 
-      let candidate = await candidateService.addCandidateByResume(companyId, member, file);
-      candidates.push(candidate);
-    }
+    // const resume = new ResumeParser(files.file[0].path);
+    // //Convert to JSON Object
+    // resume.parseToJSON()
+    //   .then(data => {
+    //     console.log('Yay! ', data);
+    //   })
+    //   .catch(error => {
+    //     console.error(error);
+    //   });
 
     result = {
       "firstName": "test@gmail.com",
@@ -3535,6 +3547,11 @@ async function importResumes(companyId, currentUserId, files) {
       "noOfMonthExperiences": 35,
       "level": "SENIOR",
       "links": [],
+      "resumes": [
+        {
+          "_id": "611cd438c1a0aa1d052717d2"
+        }
+      ],
       "experiences": [
         {
           "isCurrent": false,
