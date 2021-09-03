@@ -3527,9 +3527,9 @@ async function importResumes(companyId, currentUserId, files) {
     //   });
 
     result = {
-      "firstName": "test@gmail.com",
+      "firstName": "John",
       "middleName": "",
-      "lastName": "",
+      "lastName": "Doe",
       "email": "test@gmail.com",
       "phoneNumber": "",
       "primaryAddress": {
