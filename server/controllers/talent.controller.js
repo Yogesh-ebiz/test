@@ -1726,7 +1726,11 @@ async function getJobInsights(currentUserId, companyId, jobId) {
   let applicationByStages = await applicationService.getApplicationsStagesByJobId(jobId);
   result.stages = applicationByStages;
 
-  let job = await jobService.getJobAds(jobId);
+  let job = await jobService.findById(jobId).populate([
+    {path: 'searchAd', model: 'Ad'},
+    {path: 'ads', model: 'Ad'}
+  ]);
+  console.log(job.searchAd)
   let ads = {
     budget: job.searchAd?{lifetimeBudget: parseInt(job.searchAd.lifetimeBudget), remainingBudget: 100, startTime: job.searchAd.startTime, endTime: job.searchAd.endTime, bidAmount: job.searchAd.bidAmount}:null,
     ads: job.ads? _.reduce(job.ads, function(res, ad){
@@ -3852,7 +3856,6 @@ async function getCandidateActivities(companyId, currentUserId, candidateId, sor
 
   let result;
   try {
-
     result = await activityService.findByCandidateId(companyId, candidateId, sort);
 
 

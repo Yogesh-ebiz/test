@@ -98,23 +98,19 @@ async function addPeopleToBlacklist(currentUserId, flag) {
   }
 
   let result = null;
-  try {
-    let candidate = await candidateService.findByUserIdAndCompanyId(flag.userId, flag.companyId);
-    if(!candidate){
-      let user = await feedService.findCandidateById(flag.userId);
-      if(user){
-        candidate = await candidateService.addCandidate(flag.companyId, user, false, false);
-      }
+  let candidate = await candidateService.findByUserIdAndCompanyId(flag.userId, flag.companyId);
+  if(!candidate){
+    let user = await feedService.findCandidateById(flag.userId);
+    if(user){
+      candidate = await candidateService.addCandidate(flag.companyId, user, false, false);
     }
-
-    result = await flagService.add(flag);
-    candidate.flag = result._id;
-    await candidate.save();
-
-  } catch(e){
-    console.log('addPeopleToBlacklist: Error', e);
   }
 
+  flag.createdBy = member._id;
+  flag.candidate = candidate._id;
+  result = await flagService.add(flag);
+  candidate.flag = result._id;
+  await candidate.save();
 
   return result
 }
@@ -133,19 +129,14 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
   }
 
   let result = null;
-  try {
-    let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId).populate('flag');
-    if(candidate && candidate.flag) {
-      await candidate.flag.delete();
-      candidate.flag = null;
-      await candidate.save();
+  // let candidate = await candidateService.findByUserIdAndCompanyId(userId, companyId).populate('flag');
+  // if(candidate && candidate.flag) {
+  //   await candidate.flag.delete();
+  //   candidate.flag = null;
+  //   await candidate.save();
 
-      result = {success: true}
-    }
-  } catch(e){
-    console.log('addPeopleToBlacklist: Error', e);
-  }
-
+    await flagService.remove(companyId, userId, member);
+    result = {success: true}
 
   return result
 }

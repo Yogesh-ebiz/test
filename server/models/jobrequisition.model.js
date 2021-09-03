@@ -218,7 +218,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   shareUrl: {
     type: String,
     required: false,
-    default: 'http://www.anymay.com/jobs/'
+    default: 'http://www.accessed.co/jobs/'
   },
   company: { type: Schema.Types.ObjectId, ref: 'Company' },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],

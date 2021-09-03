@@ -8,15 +8,9 @@ const FlagSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  createdBy: {
-    type: Number
-  },
   type: {
     type: String,
     required: true
-  },
-  userId: {
-    type: Number
   },
   companyId: {
     type: Number,
@@ -24,7 +18,9 @@ const FlagSchema = new mongoose.Schema({
   },
   comment: {
     type: String
-  }
+  },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'Meber' },
+  candidate: { type: Schema.Types.ObjectId, ref: 'Candidate' },
 }, {
   versionKey: false
 });
