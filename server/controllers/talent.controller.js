@@ -3572,7 +3572,6 @@ async function importResumes(companyId, currentUserId, files) {
       ],
       "educations": [
         {
-          "_id": "6125c3a6aabb9195144146f2",
           "fieldOfStudy": {"shortCode": "BUS"},
           "degree": "MASTER",
           "gpa": 4,
