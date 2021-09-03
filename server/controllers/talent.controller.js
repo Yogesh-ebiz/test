@@ -2019,10 +2019,10 @@ async function addApplication(companyId, currentUserId, application ) {
         application.company = companyId;
 
 
-        savedApplication = await applicationService.apply(application);
+        savedApplication = await applicationService.add(application, member);
         await candidate.save();
 
-        let campaign = await emailCampaignService.findByToken(token);
+        let campaign = await emailCampaignService.findByToken(application.token);
         let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
         if(!exists){
 
@@ -2032,11 +2032,9 @@ async function addApplication(companyId, currentUserId, application ) {
             campaign.stages.splice((currentStageIndex-1), 0, stage._id);
 
           } else {
-            console.log('else')
             campaign.stages.push(stage._id);
             campaign.currentStage = stage._id;
           }
-          console.log(campaign)
           await campaign.save();
         }
 

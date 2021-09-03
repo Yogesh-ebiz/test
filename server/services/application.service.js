@@ -110,6 +110,121 @@ async function uploadBase64(base64Str, src, dest){
 
 
 
+async function add(application, member) {
+  let data = null;
+
+  if(!application || !member){
+    return;
+  }
+
+
+  let job = application.job;
+  let candidate = application.user;
+  application.job = job._id;
+  application.user = candidate._id;
+
+  let resume = application.resume;
+  delete application.resume;
+
+  let photo = application.photo;
+  delete application.photo;
+
+  application = await Joi.validate(application, applicationSchema, {abortEarly: false});
+
+  let savedApplication = await new Application(application).save();
+  if (savedApplication) {
+
+    if(resume && resume.base64) {
+      let uploaded = await uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
+      let file = await fileService.addFile({
+        filename: uploaded.filename,
+        fileType: uploaded.fileType,
+        path: uploaded.path,
+        createdBy: candidate.userId
+      });
+      if (file) {
+        savedApplication.resume = file._id;
+        savedApplication.files.push(file._id);
+
+      }
+    }
+
+    if(photo && photo.base64) {
+      let uploaded = await uploadBase64(photo.base64, "/tmp/" + photo.name, 'applications/' + '/photos/');
+      let file = await fileService.addFile({
+        filename: uploaded.filename,
+        fileType: uploaded.fileType,
+        path: uploaded.path,
+        createdBy: candidate.userId
+      });
+      if (file) {
+        savedApplication.resume = file._id;
+        savedApplication.files.push(file._id);
+      }
+    }
+
+    let jobPipeline = await pipelineService.findById(job.pipeline);
+    if (jobPipeline) {
+
+      let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
+      let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
+      job.noOfApplied+=1;
+      // progress.stage = applyStage._id;
+
+      if(jobPipeline.autoRejectBlackList && candidate.flag){
+        savedApplication.status = applicationEnum.REJECTED;
+      }
+
+      savedApplication.progress.push(progress._id);
+      savedApplication.allProgress.push(progress._id)
+      savedApplication.currentProgress = progress._id;
+
+      let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
+
+      candidate.applications.push(savedApplication._id);
+      await candidate.save();
+      await job.save();
+
+      await stageService.createTasksForStage(applyStage, job.title, taskMeta);
+
+      savedApplication = await savedApplication.save();
+
+      let source = await sourceService.findByJobIdAndCandidateId(job._id, candidate._id);
+      if(source) {
+        let campaign;
+        if (application.token) {
+          campaign = await emailCampaignService.findByToken(application.token);
+
+          if (campaign) {
+            let exists = _.find(campaign.stages, {type: emailCampaignStageType.APPLIED});
+            if (!exists) {
+              let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: false});
+              campaign.stages.push(campaign);
+              campaign.currentStage = stage;
+              campaign.application = savedApplication;
+              await campaign.save();
+            }
+          }
+        }
+      }
+
+      await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.ADDED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, job: job._id, jobTitle: job.title}});
+      if(jobPipeline.autoRejectBlackList && candidate.flag){
+        await activityService.addActivity({causer: null, causerType: subjectType.SYSTEM, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.AUTO_REJECTED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.jobTitle, job: job._id}});
+      }
+    }
+
+  }
+
+
+  return savedApplication;
+
+}
+
+
+
+
+
 async function apply(application) {
   let data = null;
 
@@ -258,16 +373,6 @@ async function apply(application) {
 
 }
 
-
-
-function add(application) {
-  let data = null;
-
-  if(!application){
-    return;
-  }
-  return new Application(application).save();
-}
 
 
 
@@ -1467,6 +1572,7 @@ async function searchEmails(companyId, member, applicationId, sort) {
 
 module.exports = {
   add:add,
+  apply: apply,
   findById: findById,
   findByApplicationId: findByApplicationId,
   findApplicationBy_Id:findApplicationBy_Id,
@@ -1488,7 +1594,6 @@ module.exports = {
   accept:accept,
   reject:reject,
   getApplicationActivities:getApplicationActivities,
-  apply: apply,
   getCompanyInsight: getCompanyInsight,
   getJobInsight:getJobInsight,
   getCandidatesSourceByCompanyId:getCandidatesSourceByCompanyId,
