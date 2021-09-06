@@ -3529,7 +3529,7 @@ async function importResumes(companyId, currentUserId, files) {
 
     if(parsed.parts && parsed.parts.email) {
       console.log('hasEmail')
-      let candidate = await candidateService.findByEmailAndCompanyId("chan@gmail.com", companyId);
+      let candidate = await candidateService.findByEmailAndCompanyId(parsed.parts.email, companyId);
       result.exist = {
         id: candidate._id,
         userId: candidate.userId,

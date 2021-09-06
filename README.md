@@ -19,3 +19,6 @@ cd accessed-job-service
 cp .env.example .env
 docker-compose up -d
 ```
+
+### Dependency
+sudo yum install gcc-c++ pkgconfig poppler-cpp-devel python-devel redhat-rpm-config
