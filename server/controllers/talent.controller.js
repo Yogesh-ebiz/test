@@ -3547,6 +3547,7 @@ async function importResumes(companyId, currentUserId, files) {
       "firstName": "John",
       "middleName": "",
       "lastName": "Doe",
+      "dob": "1968-07-05",
       "email": "test@gmail.com",
       "phoneNumber": "+1 5453453454",
       "primaryAddress": {
