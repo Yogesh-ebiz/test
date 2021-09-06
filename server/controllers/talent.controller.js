@@ -3555,12 +3555,18 @@ async function importResumes(companyId, currentUserId, files) {
         "country": "Vietnam"
       },
       "partyType": "",
-      "jobTitle": "",
+      "jobTitle": "Sr. Java Develooper",
       "about": "",
-      "gender": "",
+      "gender": "M",
+      "marital": "MARRIED",
       "noOfMonthExperiences": 35,
       "level": "SENIOR",
-      "links": [],
+      "links": [
+        {type: "FACEBOOK", "url": "https://www.facebook.com/45345"},
+        {type: "LINKEDIN", "url": "https://www.linkedin.com/45345"},
+        {type: "TWITTER", "url": "https://www.twitter.com/45345"},
+        {type: "WEB", "url": "https://www.profile.com/45345"}
+      ],
       "resumes": [
         {
           "_id": "611cd438c1a0aa1d052717d2"
