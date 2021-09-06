@@ -3547,7 +3547,7 @@ async function importResumes(companyId, currentUserId, files) {
 
 
     result.parsed = {
-      "avatar": "avatar.png",
+      "avatar": "https://accessed.s3.us-west-2.amazonaws.com/candidates/60feef853c173527d8f956d7/images/person_63_1603789806552.jpg",
       "firstName": "John",
       "middleName": "",
       "lastName": "Doe",

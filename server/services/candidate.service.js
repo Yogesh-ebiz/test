@@ -49,6 +49,7 @@ const candidateSchema = Joi.object({
   marital: Joi.string().allow('').optional(),
   links: Joi.array().optional(),
   resumes: Joi.array().optional(),
+  skills: Joi.array().optional(),
   experiences: Joi.array().optional(),
   educations: Joi.array().optional(),
   languages: Joi.array().optional()
@@ -82,6 +83,10 @@ async function addCandidate(companyId, user, isApplied, isImported) {
     candidate._avatar = avatar;
   }
 
+  if(user.links){
+    candidate.links = user.links;
+  }
+
   if(user.experiences){
     candidate.experiences = [];
     for(let [i, exp] of user.experiences.entries()){
@@ -92,7 +97,25 @@ async function addCandidate(companyId, user, isApplied, isImported) {
     }
   }
 
+  if(user.skills){
+    candidate.skills = user.skills;
+  }
+
+  if(user.languages){
+    candidate.languages = user.languages;
+  }
+
   if(user.educations){
+    candidate.educations = [];
+    for(let [i, edu] of user.educations.entries()){
+      let education = await educationService.add(edu);
+      if(education){
+        candidate.educations.push(education._id);
+      }
+    }
+  }
+
+  if(user.resumes){
     candidate.educations = [];
     for(let [i, edu] of user.educations.entries()){
       let education = await educationService.add(edu);
