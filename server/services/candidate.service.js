@@ -79,14 +79,36 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   if(user.avatar){
     let avatar = user.avatar.split('/');
     avatar = avatar[avatar.length-1];
-
     candidate._avatar = avatar;
   }
+
+  if(user.experiences){
+    candidate.experiences = [];
+    for(let [i, exp] of user.experiences.entries()){
+      let experience = await experienceService.add(exp);
+      if(experience){
+        candidate.experiences.push(experience._id);
+      }
+    }
+  }
+
+  if(user.educations){
+    candidate.educations = [];
+    for(let [i, edu] of user.educations.entries()){
+      let education = await educationService.add(edu);
+      if(education){
+        candidate.educations.push(education._id);
+      }
+    }
+  }
+
 
   candidate = await Joi.validate(candidate, candidateSchema, {abortEarly: false});
   candidate.hasImported = isImported?true:false;
   candidate.hasApplied = isApplied?true:false;
   candidate = await new Candidate(candidate).save();
+
+
 
   return candidate;
 
