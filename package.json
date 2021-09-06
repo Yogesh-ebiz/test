@@ -73,7 +73,7 @@
     "promise": "^8.1.0",
     "querystring": "^0.2.0",
     "raven-js": "^3.27.2",
-    "resume-parser": "^1.7.0",
+    "resume-parser": "1.7.0",
     "rxjs": "^6.5.3",
     "simple-resume-parser": "^1.1.8",
     "swagger-editor": "^3.8.0",
