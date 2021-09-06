@@ -3531,7 +3531,7 @@ async function importResumes(companyId, currentUserId, files) {
       console.log('hasEmail')
       let candidate = await candidateService.findByEmailAndCompanyId(parsed.parts.email, companyId);
       if (candidate) {
-      
+
         result.exist = {
           id: candidate._id,
           userId: candidate.userId,
@@ -3608,6 +3608,27 @@ async function importResumes(companyId, currentUserId, files) {
           "city": "San Jose",
           "state": "California",
           "country": "US"
+        }
+      ],
+      "skills": [
+        {
+          "id": 9663,
+          "name": "Analytical Skills",
+          "noOfMonths": 90,
+          "rating": 0
+        },
+        {
+          "id": 7717,
+          "name": "Adobe Photoshop",
+          "noOfMonths": 12,
+          "rating": 0
+        }
+      ],
+      "languages": [
+        {
+          "language": "am",
+          "level": "PROFICIENT",
+          "name": "Amharic (አማርኛ)"
         }
       ]
     }
