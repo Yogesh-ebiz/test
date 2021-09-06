@@ -4,13 +4,12 @@ let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 
-
 const NotificationPrefereneceSchema = new mongoose.Schema({
   isNotificationOn: {
     type: Boolean,
     default: true
   },
-  isAppliedOn: {
+  isApplied: {
     type: Boolean,
     default: true
   },

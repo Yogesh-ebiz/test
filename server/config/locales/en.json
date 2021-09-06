@@ -245,5 +245,6 @@
 	"privileges_retrieved_successful": "privileges_retrieved_successful",
 	"job_captured_successful": "job_captured_successful",
 	"people _removed_successful": "people _removed_successful",
-	"notification_preferene_updated_successful": "notification_preferene_updated_successful"
+	"notification_preferene_updated_successful": "notification_preferene_updated_successful",
+	"notification_preferene_retrieved_successful": "notification_preferene_retrieved_successful"
 }

@@ -3589,7 +3589,8 @@ async function importResumes(companyId, currentUserId, files) {
           "terminationReason": "",
           "terminationType": "",
           "employer": {
-            "name": "NewCompany"
+            "id": 25,
+            "name": "Hacker News"
           },
           "fromDate": 534859340,
           "thruDate": 63465,
@@ -5734,13 +5735,14 @@ async function updateNotificationPreference(companyId, currentUserId, form) {
   if(member.notificationPreference){
     member.notificationPreference.isNotificationOn = form.isNotificationOn;
     member.notificationPreference.isApplicationUpdated = form.isApplicationUpdated;
-    member.notificationPreference.isAppliedOn = form.isAppliedOn
+    member.notificationPreference.isApplied = form.isApplied;
     member.notificationPreference.isCandidateRecommended = form.isCandidateRecommended;
     member.notificationPreference.isEventInvited = form.isEventInvited;
+    member.notificationPreference.isEventConfirmed = form.isEventConfirmed;
     member.notificationPreference.isEventCancelled = form.isEventCancelled;
-    member.notificationPreference.isEventDeclinedOn = form.isEventDeclinedOn;
-    member.notificationPreference.isEventAcceptedOn = form.isEventAcceptedOn;
-    member.notificationPreference.isEventUpdatedOn = form.isEventUpdatedOn;
+    member.notificationPreference.isEventDeclined = form.isEventDeclined;
+    member.notificationPreference.isEventAccepted = form.isEventAccepted;
+    member.notificationPreference.isEventUpdated = form.isEventUpdated;
     member.notificationPreference.isJobUpdated = form.isJobUpdated;
     member.notificationPreference.isJobCommented = form.isJobCommented;
     member.notificationPreference.isJobMembered = form.isJobMembered;
@@ -5750,13 +5752,14 @@ async function updateNotificationPreference(companyId, currentUserId, form) {
     let notificationPreference = {};
     notificationPreference.isNotificationOn = form.isNotificationOn;
     notificationPreference.isApplicationUpdated = form.isApplicationUpdated;
-    notificationPreference.isAppliedOn = form.isAppliedOn
+    notificationPreference.isApplied = form.isApplied
     notificationPreference.isCandidateRecommended = form.isCandidateRecommended;
     notificationPreference.isEventInvited = form.isEventInvited;
+    notificationPreference.isEventConfirmed = form.isEventConfirmed;
     notificationPreference.isEventCancelled = form.isEventCancelled;
-    notificationPreference.isEventDeclinedOn = form.isEventDeclinedOn;
-    notificationPreference.isEventAcceptedOn = form.isEventAcceptedOn;
-    notificationPreference.isEventUpdatedOn = form.isEventUpdatedOn;
+    notificationPreference.isEventDeclined = form.isEventDeclined;
+    notificationPreference.isEventAccepted = form.isEventAccepted;
+    notificationPreference.isEventUpdated = form.isEventUpdated;
     notificationPreference.isJobUpdated = form.isJobUpdated;
     notificationPreference.isJobCommented = form.isJobCommented;
     notificationPreference.isJobMembered = form.isJobMembered;
