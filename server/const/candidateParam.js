@@ -12,9 +12,8 @@ function CandidateParam(filter) {
 
   if(filter.hasApplied) {
     this.query.hasApplied = true;
-  } else if(filter.hasImported) {
+  } else {
     this.query.hasApplied = false;
-    this.query.hasImported = true;
   }
 
 
