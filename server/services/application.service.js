@@ -937,6 +937,7 @@ async function reject(applicationId, member) {
 
 
 
+
 async function followApplication(applicationId, member) {
   let result = null;
 

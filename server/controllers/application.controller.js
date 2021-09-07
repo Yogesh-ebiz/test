@@ -12,7 +12,8 @@ const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
 const workflowEnum = require('../const/workflowEnum');
 const stageType = require('../const/stageType');
-
+const notificationType = require('../const/notificationType');
+const notificationEvent = require('../const/notificationEvent');
 
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
@@ -30,6 +31,7 @@ const {findApplicationByIdAndUserId, findApplicationByUserId, findById, findByAp
 const {findWorkflowById} = require('../services/workflow.service');
 
 const {createEvent, acceptEvent, declineEvent} = require('../services/api/calendar.service.api');
+const feedService = require('../services/api/feed.service.api');
 
 
 
@@ -436,14 +438,30 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
 
 
     if(isPartyActive(currentParty)) {
-      let application = await findByApplicationId(applicationId).populate({
-        path: 'currentProgress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
-      });
+      let application = await findByApplicationId(applicationId)
+        .populate({
+          path: 'currentProgress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        })
+        .populate({
+          path: 'user',
+          model: 'Candidate'
+        })
+        .populate({
+          path: 'job',
+          model: 'JobRequisition',
+          populate: [
+            {
+              path: 'createdBy',
+              model: 'Member'
+            }
+          ]
+        });
+
 
       if (application) {
         // let workflow = await findWorkflowById(application.job.workflowId);
@@ -461,12 +479,29 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
           }
 
           application.status = applicationEnum.ACCEPTED;
+          application.hasAccepted = true;
           await application.save();
 
           if(application.currentProgress.stage.type!=stageType.OFFER){
+
             await acceptEvent(currentParty.id, application.currentProgress.event);
+          } else {
+            //Create Notification
+            let meta = {
+              applicationId: application._id,
+              jobId: application.jobId,
+              jobTitle: application.job.title,
+              candidateId: application.user._id,
+              userId: currentParty.id,
+              name: currentParty.firstName + ' ' + currentParty.lastName,
+              avatar: application.user.avatar
+            };
+
+            await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_ACCEPTED_OFFER, meta);
 
           }
+
+
         }
 
       }
