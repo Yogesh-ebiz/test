@@ -414,6 +414,7 @@ async function getJobPipeline(jobId) {
   });
 
 
+  console.log(job.pipeline)
   if(job){
     data = job.pipeline;
 

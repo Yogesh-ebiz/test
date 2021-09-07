@@ -11,6 +11,7 @@ const statusEnum = require('../const/statusEnum');
 const actionEnum = require('../const/actionEnum');
 const subjectType = require('../const/subjectType');
 const notificationType = require('../const/notificationType');
+const notificationEvent = require('../const/notificationEvent');
 const emailCampaignStageType = require('../const/emailCampaignStageType');
 
 const Application = require('../models/application.model');
@@ -344,11 +345,11 @@ async function apply(application) {
       //Create Notification
       let meta = {
         companyId: job.company.companyId,
+        applicationId: savedApplication._id,
         jobId: job.jobId,
         jobTitle: job.title,
-        applicationId: savedApplication._id,
-        name: candidate.firstName + ' ' + candidate.lastName,
         candidateId: candidate._id,
+        name: candidate.firstName + ' ' + candidate.lastName,
         userId: candidate.userId,
         avatar: candidate.avatar
       };
@@ -687,7 +688,27 @@ async function disqualify(applicationId, reason, member) {
     return;
   }
 
-  let application = await Application.findById(applicationId).populate('user').populate('job').populate('currentProgress');
+  let application = await Application.findById(applicationId).populate([
+    {
+      path: 'user',
+      model: 'Candidate'
+    },
+    {
+      path: 'job',
+      model: 'JobRequisition',
+      populate: [
+        {
+          path: 'createdBy',
+          model: 'Member'
+        }
+      ]
+    },
+    {
+      path: 'currentProgress',
+      model: 'ApplicationProgress'
+    },
+  ])
+
 
   if(application && application.status==statusEnum.ACTIVE){
     application.status = statusEnum.DISQUALIFIED;
@@ -703,6 +724,19 @@ async function disqualify(applicationId, reason, member) {
     let job = await application.job;
     //Add activity
     await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.DISQUALIFIED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, job: job._id, reason: reason}});
+
+    //Create Notification
+    let meta = {
+      applicationId: application._id,
+      jobId: job._id,
+      jobTitle: job.title,
+      candidateId: application.user._id,
+      userId: application.user.userId,
+      name: application.user.firstName + ' ' + application.user.lastName,
+      avatar: application.user.avatar
+    };
+
+    await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_DISQUALIFIED, meta);
 
     result = {status: statusEnum.DISQUALIFIED};
   }
@@ -728,6 +762,20 @@ async function revert(applicationId, member) {
 
       let job = await jobService.findJob_Id(ObjectID(application.jobId));
       await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REVERTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: job.title, job: job._id}});
+
+      //Create Notification
+      let meta = {
+        applicationId: application._id,
+        jobId: job._id,
+        jobTitle: job.title,
+        candidateId: application.user._id,
+        userId: application.user.userId,
+        name: application.user.firstName + ' ' + application.user.lastName,
+        avatar: application.user.avatar
+      };
+
+      await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_REVERTED, meta);
+
     }
   }
   return result;
@@ -798,12 +846,42 @@ async function accept(applicationId, member) {
   }
 
 
-  let application = await Application.findById(applicationId).populate('user');
+  let application = await Application.findById(applicationId).populate([
+    {
+      path: 'user',
+      model: 'Candidate'
+    },
+    {
+      path: 'job',
+      model: 'JobRequisition',
+      populate: [
+        {
+          path: 'createdBy',
+          model: 'Member'
+        }
+      ]
+    }
+  ])
+
   if(application){
     application.status = statusEnum.ACTIVE;
     application = await application.save();
     await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.ACCEPTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, job: application.job}});
     result = {status: statusEnum.ACTIVE};
+
+    //Create Notification
+    let meta = {
+      applicationId: application._id,
+      jobId: application.job._id,
+      jobTitle: application.job.title,
+      candidateId: application.user._id,
+      userId: application.user.userId,
+      name: application.user.firstName + ' ' + application.user.lastName,
+      avatar: application.user.avatar
+    };
+
+    await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_ACCEPTED, meta);
+
   }
   return result;
 }
@@ -816,11 +894,42 @@ async function reject(applicationId, member) {
     return;
   }
 
-  let application = await Application.findById(applicationId).populate('user');
+  let application = await Application.findById(applicationId).populate([
+    {
+      path: 'user',
+      model: 'Candidate'
+    },
+    {
+      path: 'job',
+      model: 'JobRequisition',
+      populate: [
+        {
+          path: 'createdBy',
+          model: 'Member'
+        }
+      ]
+    }
+  ])
+
   if(application){
     application.status = statusEnum.REJECTED;
     application = await application.save();
     await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.REJECTED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user._id, jobTitle: application.jobTitle, job: application.job}});
+
+    //Create Notification
+    let meta = {
+      applicationId: application._id,
+      jobId: application.job._id,
+      jobTitle: application.job.title,
+      candidateId: application.user._id,
+      userId: application.user.userId,
+      name: application.user.firstName + ' ' + application.user.lastName,
+      avatar: application.user.avatar
+    };
+
+    await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_REJECTED, meta);
+
+
     result = {status: statusEnum.REJECTED};
   }
   return result;

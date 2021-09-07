@@ -29,6 +29,9 @@ const actionEnum = require('../const/actionEnum');
 const taskType = require('../const/taskType');
 const stageType = require('../const/stageType');
 const jobType = require('../const/jobType');
+const notificationType = require('../const/notificationType');
+const notificationEvent = require('../const/notificationEvent');
+
 
 const awsService = require('../services/aws.service');
 const {buildFileUrl, buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinimal, categoryMinimal, roleMinimal, convertToCandidate, convertToTalentUser, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
@@ -1153,13 +1156,8 @@ async function getJobComments(companyId, currentUserId, jobId, filter) {
 
     result = await commentService.getComments(subjectType.JOB, jobId, filter);
 
-    // let userIds = _.map(result.docs, 'createdBy.userId');
-    // let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(comment){
-      // let found = _.find(users, {id: comment.createdBy});
-      // if(found){
-        comment.createdBy = convertToTalentUser(comment.createdBy);
-      // }
+      comment.createdBy = convertToTalentUser(comment.createdBy);
     });
 
   } catch (error) {
@@ -2287,7 +2285,6 @@ async function updateApplication(companyId, currentUserId, jobId, applicationId,
 }
 
 async function updateApplicationProgress(companyId, currentUserId, applicationId, newStage) {
-  console.log(companyId, currentUserId, applicationId, newStage)
 
   if(!companyId || !currentUserId || !applicationId || !newStage){
     return null;
@@ -2326,18 +2323,21 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
     ]);
 
 
+    let foundStage;
     if(application) {
-      let job = await jobService.findJob_Id(application.jobId);
+      let job = await jobService.findById(application.jobId).populate('createdBy');
 
       let previousProgress = application.currentProgress;
       _.forEach(application.progress, function(item){
         if(item.stage._id.equals(ObjectID(newStage))){
           progress = item;
+          foundStage = item.stage;
         }
       });
 
 
       if(progress){
+        console.log('stage', foundStage)
         application.currentProgress = progress;
         newStage = progress.stage;
         await application.save();
@@ -2346,6 +2346,7 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
         let pipeline = await pipelineService.findById(job.pipeline);
         if(pipeline) {
           foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)});
+          console.log('stage', foundStage)
           if(foundStage) {
             progress = await  applicationProgressService.addApplicationProgress({
               applicationId: application.applicationId,
@@ -2366,8 +2367,22 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
 
 
       let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, job: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
-    }
 
+      //Create Notification
+      let meta = {
+        applicationId: application._id,
+        jobId: job._id,
+        jobTitle: job.title,
+        candidateId: application.user._id,
+        userId: application.user.userId,
+        name: application.user.firstName + ' ' + application.user.lastName,
+        avatar: application.user.avatar,
+        stageName: foundStage.name
+      };
+
+      await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_PROGRESS_UPDATED, meta);
+
+    }
   } catch (error) {
     console.log(error);
   }
