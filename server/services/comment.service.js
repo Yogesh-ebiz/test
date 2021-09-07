@@ -5,6 +5,8 @@ const ObjectID = require('mongodb').ObjectID;
 const statusEnum = require('../const/statusEnum');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
+const notificationType = require('../const/notificationType');
+const notificationEvent = require('../const/notificationEvent');
 
 const Comment = require('../models/comment.model');
 const feedService = require('../services/api/feed.service.api');
@@ -101,24 +103,29 @@ async function addComment(comment, member) {
 
   comment = await Joi.validate(comment, commentSchema, {abortEarly: false});
 
+
+  let job, application = null;
+
+  if(comment.subjectType==subjectType.JOB){
+    job = comment.subject;
+    comment.subject = comment.subject._id;
+  } else if(comment.subjectType==subjectType.APPLICATION) {
+    application = comment.subject;
+    comment.subject = comment.subject._id;
+  }
+
   comment = await new Comment(comment).save();
 
 
-  let job, application;
   let activity = {causer: comment.createdBy, causerType: subjectType.MEMBER, subjectType: comment.subjectType, subject: comment.subject, action: actionEnum.COMMENTED};
 
 
   if(comment.subjectType==subjectType.JOB){
-    job = await jobService.findJob_Id(comment.subject);
-
     activity.meta= {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id};
-  } else if(comment.subjectType==subjectType.APPLICATION) {
-    application = await applicationService.findApplicationBy_Id(comment.subject).populate('user');
-    if(application){
-      job = await jobService.findJob_Id(application.jobId);
-    }
 
-    activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: job.title, application:application._id, job: job._id};
+
+  } else if(comment.subjectType==subjectType.APPLICATION) {
+    activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: application.job.title, application:application._id, job: application.job._id};
   }
 
   await activityService.addActivity(activity);

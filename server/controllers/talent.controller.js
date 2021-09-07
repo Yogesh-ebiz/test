@@ -1187,7 +1187,7 @@ async function addJobComment(companyId, currentUserId, jobId, comment) {
 
     if(job) {
       comment.subjectType = subjectType.JOB;
-      comment.subject = job._id;
+      comment.subject = job;
       comment.createdBy = member._id;
       result = await commentService.addComment(comment, member);
 
@@ -2698,17 +2698,14 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
   }
 
   let result;
-  try {
 
-  comment.subjectType = subjectType.APPLICATION;
-  comment.subject = applicationId;
-  comment.createdBy = member._id;
-  result = await commentService.addComment(comment, member);
-
-  } catch (error) {
-    console.log(error);
+  let application = await applicationService.findApplicationBy_Id(applicationId).populate('user').populate('job');
+  if(application) {
+    comment.subjectType = subjectType.APPLICATION;
+    comment.subject = application;
+    comment.createdBy = member._id;
+    result = await commentService.addComment(comment, member);
   }
-
   return result;
 }
 

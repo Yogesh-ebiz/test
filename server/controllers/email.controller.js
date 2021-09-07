@@ -108,7 +108,8 @@ async function uploadEmailAttachmentById(currentUserId, threadId, files)  {
   let basePath = 'emails/';
   try {
     let email = await emailService.findByThreadId(threadId);
-    if (email && email.from.id === currentUserId && (files)) {
+
+    if (email && email.from.id === currentUserId && files) {
       let type;
       //------------Upload CV----------------
 
@@ -142,6 +143,7 @@ async function uploadEmailAttachmentById(currentUserId, threadId, files)  {
         }
 
         email.attachments.push({type: type, url: path});
+
         if(email.type===emailType.JOB_OFFER){
           let application = await applicationService.findById(ObjectID(email.meta.applicationId)).populate([
             {
@@ -154,7 +156,7 @@ async function uploadEmailAttachmentById(currentUserId, threadId, files)  {
             }
           ]);
 
-          console.log(application)
+
           if(application){
             let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
             application.files.push(file._id);
