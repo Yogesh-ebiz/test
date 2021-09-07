@@ -37,6 +37,10 @@ const NotificationPrefereneceSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isEventDeclined: {
+    type: Boolean,
+    default: true
+  },
   isJobUpdated: {
     type: Boolean,
     default: true

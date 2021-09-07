@@ -116,13 +116,7 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   }
 
   if(user.resumes){
-    candidate.educations = [];
-    for(let [i, edu] of user.educations.entries()){
-      let education = await educationService.add(edu);
-      if(education){
-        candidate.educations.push(education._id);
-      }
-    }
+    candidate.resumes = user.resumes;
   }
 
 

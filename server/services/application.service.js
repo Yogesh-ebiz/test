@@ -347,8 +347,10 @@ async function apply(application) {
         jobId: job.jobId,
         jobTitle: job.title,
         applicationId: savedApplication._id,
-        applicantId: candidate.userId,
-        createdBy: job.createdBy.userId
+        name: candidate.firstName + ' ' + candidate.lastName,
+        candidateId: candidate._id,
+        userId: candidate.userId,
+        avatar: candidate.avatar
       };
 
       await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
