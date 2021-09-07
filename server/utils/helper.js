@@ -77,6 +77,7 @@ const convertToTalentUser = (user) => {
     currency: user.currency,
     timezone: user.timezone,
     language: user.language,
+    userId: user.userId,
     preferredCompany: user.preferredCompany
   };
 }
