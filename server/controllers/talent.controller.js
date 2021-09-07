@@ -1153,13 +1153,13 @@ async function getJobComments(companyId, currentUserId, jobId, filter) {
 
     result = await commentService.getComments(subjectType.JOB, jobId, filter);
 
-    let userIds = _.map(result.docs, 'createdBy');
-    let users = await feedService.lookupUserIds(userIds);
+    // let userIds = _.map(result.docs, 'createdBy.userId');
+    // let users = await feedService.lookupUserIds(userIds);
     result.docs.forEach(function(comment){
-      let found = _.find(users, {id: comment.createdBy});
-      if(found){
-        comment.createdBy = convertToTalentUser(found);
-      }
+      // let found = _.find(users, {id: comment.createdBy});
+      // if(found){
+        comment.createdBy = convertToTalentUser(comment.createdBy);
+      // }
     });
 
   } catch (error) {
