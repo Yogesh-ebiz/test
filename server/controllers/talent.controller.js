@@ -1179,12 +1179,8 @@ async function addJobComment(companyId, currentUserId, jobId, comment) {
   }
 
   let result;
-  try {
-
-
+  console.log(member)
     let job = await jobService.findJob_Id(jobId);
-
-
     if(job) {
       comment.subjectType = subjectType.JOB;
       comment.subject = job;
@@ -1193,9 +1189,6 @@ async function addJobComment(companyId, currentUserId, jobId, comment) {
 
     }
 
-  } catch (error) {
-    console.log(error);
-  }
 
   return result;
 }

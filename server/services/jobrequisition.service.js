@@ -8,6 +8,8 @@ const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const labelType = require('../const/labelType');
 const adPosition = require('../const/adPosition');
+const notificationType = require('../const/notificationType');
+const notificationEvent = require('../const/notificationEvent');
 
 const JobAlert = require('../models/job_alert.model');
 const JobRequisition = require('../models/jobrequisition.model');
@@ -589,6 +591,19 @@ async function closeJob(jobId, member) {
 
   let job = await JobRequisition.findOneAndUpdate({_id: ObjectID(jobId)}, {$set: {status: statusEnum.CLOSED, updatedBy: member.userId, updatedDate: Date.now()}});
   await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.CLOSED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
+
+  let meta = {
+    jobId: job.jobId,
+    jobTitle: job.title,
+    candidateId: candidate._id,
+    name: candidate.firstName + ' ' + candidate.lastName,
+    userId: candidate.userId,
+    avatar: candidate.avatar
+  };
+
+  await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+
+
   return job;
 
 }

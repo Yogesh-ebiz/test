@@ -497,7 +497,7 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
               avatar: application.user.avatar
             };
 
-            await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_ACCEPTED_OFFER, meta);
+            await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_OFFER_ACCEPTED, meta);
 
           }
 
@@ -523,14 +523,27 @@ async function decline(currentUserId, applicationId, applicationProgressId, form
   try {
     let currentParty = await findByUserId(currentUserId);
     if(isPartyActive(currentParty)) {
-      let application = await findApplicationByIdAndUserId(applicationId, currentParty.id).populate({
-        path: 'currentProgress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
-      });
+      let application = await findByApplicationId(applicationId)
+        .populate({
+          path: 'currentProgress',
+          model: 'ApplicationProgress',
+          populate: {
+            path: 'stage',
+            model: 'Stage'
+          }
+        })
+        .populate({
+          path: 'user',
+          model: 'Candidate',
+        })
+        .populate({
+          path: 'job',
+          model: 'JobRequisition',
+          populate: {
+            path: 'createdBy',
+            model: 'Member'
+          }
+        });
 
       if (application) {
         if(application.currentProgress && application.currentProgress.applicationProgressId==applicationProgressId){
@@ -543,6 +556,19 @@ async function decline(currentUserId, applicationId, applicationProgressId, form
 
           if(application.currentProgress.stage.type===stageType.OFFER){
             application.hasAccepted = false;
+
+            let meta = {
+              applicationId: application._id,
+              jobId: application.jobId,
+              jobTitle: application.job.title,
+              candidateId: application.user._id,
+              userId: currentParty.id,
+              name: currentParty.firstName + ' ' + currentParty.lastName,
+              avatar: application.user.avatar
+            };
+
+            await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_OFFER_DECLINED, meta);
+
           }
 
           application.status = applicationEnum.DECLINED;
