@@ -727,6 +727,7 @@ async function disqualify(applicationId, reason, member) {
 
     //Create Notification
     let meta = {
+      causer: member.userId,
       applicationId: application._id,
       jobId: job._id,
       jobTitle: job.title,
@@ -765,6 +766,7 @@ async function revert(applicationId, member) {
 
       //Create Notification
       let meta = {
+        causer: member.userId,
         applicationId: application._id,
         jobId: job._id,
         jobTitle: job.title,
@@ -871,6 +873,7 @@ async function accept(applicationId, member) {
 
     //Create Notification
     let meta = {
+      causer: member.userId,
       applicationId: application._id,
       jobId: application.job._id,
       jobTitle: application.job.title,
@@ -918,6 +921,7 @@ async function reject(applicationId, member) {
 
     //Create Notification
     let meta = {
+      causer: member.userId,
       applicationId: application._id,
       jobId: application.job._id,
       jobTitle: application.job.title,

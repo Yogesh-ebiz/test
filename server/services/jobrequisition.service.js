@@ -593,6 +593,7 @@ async function closeJob(jobId, member) {
   await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.CLOSED, meta: {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, job: job._id}});
 
   let meta = {
+    causer: member.userId,
     jobId: job.jobId,
     jobTitle: job.title,
     candidateId: candidate._id,
