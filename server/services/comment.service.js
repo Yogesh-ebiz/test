@@ -123,6 +123,17 @@ async function addComment(comment, member) {
   if(comment.subjectType==subjectType.JOB){
     activity.meta= {name: member.firstName + ' ' + member.lastName, jobTitle: job.title, jobId: job._id};
 
+    //Create Notification
+    let meta = {
+      causer: member.userId,
+      jobId: job._id,
+      jobTitle: job.title,
+      memberId: member._id,
+      name: member.firstName + ' ' + member.lastName,
+      avatar: member.avatar
+    };
+
+    await await feedService.createNotification(job.createdBy.userId, notificationType.JOB, notificationEvent.ADDED_JOB_COMMENT, meta);
 
   } else if(comment.subjectType==subjectType.APPLICATION) {
     activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: application.job.title, application:application._id, job: application.job._id};

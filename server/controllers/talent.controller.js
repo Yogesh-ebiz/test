@@ -1179,7 +1179,6 @@ async function addJobComment(companyId, currentUserId, jobId, comment) {
   }
 
   let result;
-  console.log(member)
     let job = await jobService.findJob_Id(jobId);
     if(job) {
       comment.subjectType = subjectType.JOB;
