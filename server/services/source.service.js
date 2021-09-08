@@ -173,6 +173,8 @@ async function search(filter, sort) {
   let aMatch = { $match: new SourceParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
 
+  aList.push({$match: {job: { $in: filter.jobs }}});
+
   aList.push(
     {$lookup:{
         from:"candidates",
@@ -213,8 +215,6 @@ async function search(filter, sort) {
   );
 
   aList.push(aMatch);
-
-
 
   if(sort && sort.sortBy=='rating'){
     aSort = { $sort: { rating: direction} };

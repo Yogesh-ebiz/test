@@ -3,7 +3,7 @@ const dateEnum = require('../const/dateEnum')
 const ObjectID = require('mongodb').ObjectID;
 
 
-function CandidateParam(filter) {
+function SourceParam(filter) {
   this.query = {};
   // this.query.$or = [];
 
@@ -13,9 +13,9 @@ function CandidateParam(filter) {
   }
 
 
-  if(filter.jobs){
-    this.query.job =  { $in: filter.jobs };
-  }
+  // if(filter.jobs){
+  //   this.query.job =  { $in: filter.jobs };
+  // }
 
 
   if(filter.tags && filter.tags.length>0){
@@ -30,7 +30,7 @@ function CandidateParam(filter) {
   }
 
   if (filter.level && filter.level.length) {
-    this.query.candidate.level = { $in: filter.level };
+    this.query['candidate.level'] = { $in: filter.level };
   }
 
   if (filter.jobFunction && filter.jobFunction.length) {
@@ -90,4 +90,4 @@ function CandidateParam(filter) {
   return this.query;
 }
 
-module.exports = CandidateParam;
+module.exports = SourceParam;
