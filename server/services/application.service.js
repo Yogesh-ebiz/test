@@ -346,7 +346,7 @@ async function apply(application) {
       let meta = {
         companyId: job.company.companyId,
         applicationId: savedApplication._id,
-        jobId: job.jobId,
+        jobId: job._id,
         jobTitle: job.title,
         candidateId: candidate._id,
         name: candidate.firstName + ' ' + candidate.lastName,
