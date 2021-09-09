@@ -1466,6 +1466,13 @@ async function getJobAds(companyId, currentuserId, jobId) {
   try {
     let job = await jobService.getJobAds(jobId);
     if (job){
+      let ads = _.reduce(job.ads, function(res, ad){
+        if(ad.endTime>Date.now()){
+          res.push(ad);
+        }
+        return res;
+      }, []);
+
       result = {today: Date.now(), suggestedBudget: 3.80, searchAd: job.searchAd, ads: job.ads}
     }
 
