@@ -31,7 +31,7 @@ async function searchPeople(companyId, filter, sort, locale) {
     return null;
   }
 
-  result = await feedService.searchPeople(filter, sort);
+  result = await feedService.searchCandidates(filter, sort);
   let pools = await poolService.findByCompany(companyId)
   let candidates = await candidateService.getListofCandidates(_.map(result.content, 'id'), companyId)
   result.content = _.reduce(result.content, function(res, people){

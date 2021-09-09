@@ -432,6 +432,13 @@ async function searchPeople(filter, params) {
   return response.data.data;
 };
 
+async function searchCandidates(filter, params) {
+
+  params = new URLSearchParams(params).toString();
+  let response = await client.post(`/people/candidates/search?${params}`, filter, null);
+  return response.data.data;
+};
+
 async function searchPeopleByIds(userId, query, ids, sort) {
   const requestBody = {
     "ids": ids,
@@ -635,6 +642,7 @@ module.exports = {
   findJobfunction:findJobfunction,
   searchUsers: searchUsers,
   searchPeople:searchPeople,
+  searchCandidates:searchCandidates,
   searchPeopleByIds:searchPeopleByIds,
   findCandidateById:findCandidateById,
   lookupUserIds:lookupUserIds,
