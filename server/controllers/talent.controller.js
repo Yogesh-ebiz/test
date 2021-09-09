@@ -649,7 +649,7 @@ async function getImpressionCandidates(companyId, currentUserId, timeframe, type
 
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
-  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let page = (sort.page && sort.page==0) ? sort.page+1:1;
   let sortBy = {};
   sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
 
@@ -707,7 +707,7 @@ async function getImpressionCandidates(companyId, currentUserId, timeframe, type
   }
 
   if(level){
-    result = await companyService.getCompanyCandidateInsights(companyId, sort);
+    result = await companyService.getCompanyCandidateInsights(companyId, options);
   }
 
   if(result){
