@@ -133,7 +133,7 @@ async function addComment(comment, member) {
       avatar: member.avatar
     };
 
-    await await feedService.createNotification(job.createdBy.userId, notificationType.JOB, notificationEvent.ADDED_JOB_COMMENT, meta);
+    await await feedService.createNotification(job.createdBy.userId, member.company, notificationType.JOB, notificationEvent.ADDED_JOB_COMMENT, meta);
 
   } else if(comment.subjectType==subjectType.APPLICATION) {
     activity.meta= {name: member.firstName + ' ' + member.lastName, candidateName: application.user.firstName + ' ' + application.user.lastName,candidate: application.user._id, jobTitle: application.job.title, application:application._id, job: application.job._id};

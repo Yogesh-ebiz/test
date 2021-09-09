@@ -236,7 +236,7 @@ router.route('/company/:id/people/:peopleId/pools').post(asyncHandler(updatePeop
 router.route('/company/:id/people/flagged').get(asyncHandler(getPeopleFlagged));
 
 
-router.route('/company/:id/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
+router.route('/company/:id/impressions').get(asyncHandler(getImpressionCandidates));
 
 router.route('/company/:id/evaluations/templates').get(asyncHandler(getCompanyEvaluationTemplates));
 router.route('/company/:id/evaluations/templates').post(asyncHandler(addCompanyEvaluationTemplate));
@@ -345,14 +345,15 @@ async function getTaxAndFee(req, res) {
 async function getImpressionCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let type = req.params.type;
+  let type = req.query.type;
+  let level = req.query.level;
   let jobId = req.query.jobId;
   let timeframe = req.query.timeframe;
   let sort = req.query;
   sort.page = parseInt(req.query.page)
   sort.size = parseInt(req.query.size)
 
-  let data = await talentCtrl.getImpressionCandidates(company, currentUserId, type, timeframe, jobId, sort, res.locale);
+  let data = await talentCtrl.getImpressionCandidates(company, currentUserId, timeframe, type, level, jobId, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 

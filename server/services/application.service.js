@@ -354,7 +354,7 @@ async function apply(application) {
         avatar: candidate.avatar
       };
 
-      await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+      await await feedService.createNotification(job.createdBy.userId, savedApplication.company, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
     }
 
@@ -737,7 +737,7 @@ async function disqualify(applicationId, reason, member) {
       avatar: application.user.avatar
     };
 
-    await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_DISQUALIFIED, meta);
+    await await feedService.createNotification(application.job.createdBy.userId, application.company, notificationType.APPLICATION, notificationEvent.APPLICATION_DISQUALIFIED, meta);
 
     result = {status: statusEnum.DISQUALIFIED};
   }
@@ -776,7 +776,7 @@ async function revert(applicationId, member) {
         avatar: application.user.avatar
       };
 
-      await await feedService.createNotification(job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_REVERTED, meta);
+      await await feedService.createNotification(job.createdBy.userId, application.company, notificationType.APPLICATION, notificationEvent.APPLICATION_REVERTED, meta);
 
     }
   }
@@ -883,7 +883,7 @@ async function accept(applicationId, member) {
       avatar: application.user.avatar
     };
 
-    await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_ACCEPTED, meta);
+    await await feedService.createNotification(application.job.createdBy.userId, application.company, notificationType.APPLICATION, notificationEvent.APPLICATION_ACCEPTED, meta);
 
   }
   return result;
@@ -931,7 +931,7 @@ async function reject(applicationId, member) {
       avatar: application.user.avatar
     };
 
-    await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_REJECTED, meta);
+    await await feedService.createNotification(application.job.createdBy.userId, application.company, notificationType.APPLICATION, notificationEvent.APPLICATION_REJECTED, meta);
 
 
     result = {status: statusEnum.REJECTED};
@@ -1177,7 +1177,7 @@ async function getCandidatesSourceByCompanyId(company, duration) {
 
 
   let candidateSources  = await Application.aggregate([
-    { $match: {company: company}},
+    {$match: {company: company}},
     {$lookup:{
         from:"candidates",
         let:{user: '$user'},

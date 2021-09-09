@@ -642,7 +642,7 @@ async function getCompanyInsights(currentUserId, companyId, timeframe) {
 }
 
 
-async function getImpressionCandidates(company, currentUserId, type, timeframe, jobId, sort, locale) {
+async function getImpressionCandidates(company, currentUserId, timeframe, type, level, jobId, sort, locale) {
   if(!currentUserId || !company || !type || !sort){
     return null;
   }
@@ -696,12 +696,18 @@ async function getImpressionCandidates(company, currentUserId, type, timeframe, 
     }
   }
 
-  if(type=='viewed') {
-    result = await jobViewService.getInsightCandidates(from, to, company, jobId, options);
-  } else if(type=='saved') {
-    result = await bookmarkService.getInsightCandidates(from, to, company, jobId, options);
-  } else if(type=='applied') {
-    result = await applicationService.getInsightCandidates(from, to, company, jobId, options);
+  if(type) {
+    if (type == 'viewed') {
+      result = await jobViewService.getInsightCandidates(from, to, company, jobId, options);
+    } else if (type == 'saved') {
+      result = await bookmarkService.getInsightCandidates(from, to, company, jobId, options);
+    } else if (type == 'applied') {
+      result = await applicationService.getInsightCandidates(from, to, company, jobId, options);
+    }
+  }
+
+  if(level){
+
   }
 
   if(result){
@@ -716,6 +722,8 @@ async function getImpressionCandidates(company, currentUserId, type, timeframe, 
       }
     }
   }
+
+
 
 
   // if(result.docs.length) {

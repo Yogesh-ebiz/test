@@ -505,13 +505,14 @@ async function syncExperiences(id, experiences){
 
 
 
-async function createNotification(userId, notificationType, eventType, meta) {
+async function createNotification(userId, companyId, notificationType, eventType, meta) {
   const options = {
     headers: {'userId': userId}
   };
 
   let body = {
     userId:  userId,
+    companyId: companyId,
     notificationType: notificationType,
     eventType: eventType,
     meta: meta

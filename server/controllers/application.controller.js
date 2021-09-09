@@ -497,7 +497,7 @@ async function accept(currentUserId, applicationId, applicationProgressId) {
               avatar: application.user.avatar
             };
 
-            await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_OFFER_ACCEPTED, meta);
+            await await feedService.createNotification(application.job.createdBy.userId, application.company, notificationType.APPLICATION, notificationEvent.APPLICATION_OFFER_ACCEPTED, meta);
 
           }
 
@@ -567,7 +567,7 @@ async function decline(currentUserId, applicationId, applicationProgressId, form
               avatar: application.user.avatar
             };
 
-            await await feedService.createNotification(application.job.createdBy.userId, notificationType.APPLICATION, notificationEvent.APPLICATION_OFFER_DECLINED, meta);
+            await await feedService.createNotification(application.job.createdBy.userId, application.company, notificationType.APPLICATION, notificationEvent.APPLICATION_OFFER_DECLINED, meta);
 
           }
 
