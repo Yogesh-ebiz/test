@@ -465,6 +465,7 @@ async function lookupUserIds(ids) {
 
 
 async function lookupPeopleIds(ids) {
+  ids = ids.join(',');
   let response = await client.get(`/people/lookup?ids=${ids}`, null, options);
   return response.data.data;
 };

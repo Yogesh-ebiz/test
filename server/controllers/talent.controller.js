@@ -642,8 +642,8 @@ async function getCompanyInsights(currentUserId, companyId, timeframe) {
 }
 
 
-async function getImpressionCandidates(company, currentUserId, timeframe, type, level, jobId, sort, locale) {
-  if(!currentUserId || !company || !type || !sort){
+async function getImpressionCandidates(companyId, currentUserId, timeframe, type, level, jobId, sort, locale) {
+  if(!currentUserId || !companyId || !sort){
     return null;
   }
 
@@ -698,22 +698,21 @@ async function getImpressionCandidates(company, currentUserId, timeframe, type, 
 
   if(type) {
     if (type == 'viewed') {
-      result = await jobViewService.getInsightCandidates(from, to, company, jobId, options);
+      result = await jobViewService.getInsightCandidates(from, to, companyId, jobId, options);
     } else if (type == 'saved') {
-      result = await bookmarkService.getInsightCandidates(from, to, company, jobId, options);
+      result = await bookmarkService.getInsightCandidates(from, to, companyId, jobId, options);
     } else if (type == 'applied') {
-      result = await applicationService.getInsightCandidates(from, to, company, jobId, options);
+      result = await applicationService.getInsightCandidates(from, to, companyId, jobId, options);
     }
   }
 
   if(level){
-
+    result = await companyService.getCompanyCandidateInsights(companyId, sort);
   }
 
   if(result){
     let userIds = _.map(result.docs, 'partyId');
     let users = await feedService.lookupPeopleIds(userIds);
-
     for(i in result.docs){
 
       let found = _.find(users, {id: result.docs[i].partyId});

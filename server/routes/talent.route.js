@@ -26,7 +26,7 @@ router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
 router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
 
-router.route('/company/:id/insights/impressions/:type/candidates').get(asyncHandler(getImpressionCandidates));
+router.route('/company/:id/insights/impressions/candidates').get(asyncHandler(getImpressionCandidates));
 router.route('/company/:id/dashboard').get(asyncHandler(getDashboard));
 
 router.route('/company/:id/paymentmethod').post(asyncHandler(addPaymentMethod));
@@ -344,7 +344,7 @@ async function getTaxAndFee(req, res) {
 
 async function getImpressionCandidates(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+  let companyId = parseInt(req.params.id);
   let type = req.query.type;
   let level = req.query.level;
   let jobId = req.query.jobId;
@@ -353,7 +353,7 @@ async function getImpressionCandidates(req, res) {
   sort.page = parseInt(req.query.page)
   sort.size = parseInt(req.query.size)
 
-  let data = await talentCtrl.getImpressionCandidates(company, currentUserId, timeframe, type, level, jobId, sort, res.locale);
+  let data = await talentCtrl.getImpressionCandidates(companyId, currentUserId, timeframe, type, level, jobId, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 

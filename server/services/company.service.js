@@ -787,6 +787,51 @@ function addCompanyReviewReport(report) {
   return new CompanyReviewReport(report).save();
 }
 
+async function getCompanyCandidateInsights(companyId, options) {
+
+  if(!companyId || !options){
+    return null;
+  }
+
+  let aList = [
+    {$match: {companyId: companyId}},
+    { $lookup:{
+        from:"jobviews",
+        let:{company: '$_id'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$company","$company"]}}}
+        ],
+        as: 'viewers'
+      }},
+    { $lookup:{
+        from:"bookmarks",
+        let:{company: '$_id'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$company","$company"]}}}
+        ],
+        as: 'savers'
+      }},
+    { $lookup:{
+        from:"applications",
+        let:{company: '$companyId'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$company","$company"]}}}
+        ],
+        as: 'applicants'
+      }},
+    { $project: { union: { $concatArrays: ["$viewers", "$savers", "$applicants"] } } },
+
+    // 6. Unwind and replace root so you end up with a result set.
+    { $unwind: '$union' },
+    { $replaceRoot: { newRoot: '$union' } },
+    {$group: {_id: '$partyId'}},
+    {$project: {partyId: '$_id'}}
+  ];
+
+  const aggregate = Company.aggregate(aList);
+  return await Company.aggregatePaginate(aggregate, options);
+}
+
 
 module.exports = {
   add:add,
@@ -808,5 +853,6 @@ module.exports = {
   findCompanyReviewHistoryByCompanyId:findCompanyReviewHistoryByCompanyId,
   findCompanyReviewsByCompanyId: findCompanyReviewsByCompanyId,
   findTop3Highlights:findTop3Highlights,
-  addCompanyReviewReport:addCompanyReviewReport
+  addCompanyReviewReport:addCompanyReviewReport,
+  getCompanyCandidateInsights:getCompanyCandidateInsights
 }
