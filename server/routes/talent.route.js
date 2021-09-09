@@ -26,7 +26,7 @@ router.route('/company/:id/insights').get(asyncHandler(getInsights));
 router.route('/company/:id/inmail/credits').get(asyncHandler(getInmailCredits));
 router.route('/company/:id/taxandfee').get(asyncHandler(getTaxAndFee));
 
-router.route('/company/:id/insights/impressions/candidates').get(asyncHandler(getImpressionCandidates));
+router.route('/company/:id/impression/insight/candidates').get(asyncHandler(getImpressionCandidates));
 router.route('/company/:id/dashboard').get(asyncHandler(getDashboard));
 
 router.route('/company/:id/paymentmethod').post(asyncHandler(addPaymentMethod));
