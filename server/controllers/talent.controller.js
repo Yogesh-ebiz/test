@@ -4046,7 +4046,7 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
     let candidate = await candidateService.findById(candidateId).populate('experiences');
 
     experiences = candidate.experiences;
-    if(!experiences && candidate.userId){
+    if(candidate.userId){
       experiences = await feedService.getUserExperiences(candidate.userId);
       experiences = _.reduce(experiences, function(res, exp){
         exp.employer = convertToCompany(exp.employer);
@@ -4129,7 +4129,7 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
     let candidate = await candidateService.findById(candidateId).populate('educations');
     educations = candidate.educations;
 
-    if(!educations && candidate.userId){
+    if(candidate.userId){
       educations = await feedService.getUserEducations(candidate.userId);
       educations = _.reduce(educations, function(res, exp){
         exp.institute = convertToCompany(exp.institute);
@@ -4221,7 +4221,7 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
       }, []);
     }
 
-    if(!candidate.skills && candidate.userId){
+    if(candidate.userId){
       let skills = await feedService.getUserSkills(candidate.userId);
       result = _.reduce(skills, function(res, item){
         let skill = {id: item.skill.id, name: item.skill.name, noOfMonths: item.noOfMonths, rating: 0};
