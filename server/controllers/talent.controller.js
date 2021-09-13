@@ -4044,24 +4044,25 @@ async function getCandidateExperiences(companyId, currentUserId, candidateId) {
 
     let experiences;
     let candidate = await candidateService.findById(candidateId).populate('experiences');
-    if(candidate.userId){
+
+    experiences = candidate.experiences;
+    if(!experiences && candidate.userId){
       experiences = await feedService.getUserExperiences(candidate.userId);
       experiences = _.reduce(experiences, function(res, exp){
         exp.employer = convertToCompany(exp.employer);
         res.push(exp);
         return res;
       }, []);
-    } else {
-      experiences = candidate.experiences;
-
-      let companies = await feedService.lookupCompaniesIds(_.map(candidate.experiences, 'employer.id'))
-      experiences = _.reduce(candidate.experiences, function(res, exp){
-        let employer = _.find(companies, {id: exp.employer.id});
-        exp.employer = convertToCompany(employer);
-        res.push(exp);
-        return res;
-      }, []);
     }
+
+    let companies = await feedService.lookupCompaniesIds(_.map(experiences, 'employer.id'))
+    experiences = _.reduce(experiences, function(res, exp){
+      let employer = _.find(companies, {id: exp.employer.id});
+      exp.employer = convertToCompany(employer);
+      res.push(exp);
+      return res;
+    }, []);
+
 
     result = experiences;
 
@@ -4126,23 +4127,25 @@ async function getCandidateEducations(companyId, currentUserId, candidateId) {
   try {
     // result = await candidateService.getEducations(candidateId);
     let candidate = await candidateService.findById(candidateId).populate('educations');
-    if(candidate.userId){
+    educations = candidate.educations;
+
+    if(!educations && candidate.userId){
       educations = await feedService.getUserEducations(candidate.userId);
       educations = _.reduce(educations, function(res, exp){
         exp.institute = convertToCompany(exp.institute);
         res.push(exp);
         return res;
       }, []);
-    } else {
-      let institutes = await feedService.lookupInstituteIds(_.map(candidate.educations, 'institute.id'))
-      educations = _.reduce(candidate.educations, function(res, exp){
-        let institute = _.find(institutes, {id: exp.institute.id});
-        exp.institute = convertToCompany(institute);
-        res.push(exp);
-        return res;
-      }, []);
-
     }
+
+    let institutes = await feedService.lookupInstituteIds(_.map(candidate.educations, 'institute.id'));
+    educations = _.reduce(candidate.educations, function(res, exp){
+      let institute = _.find(institutes, {id: exp.institute.id});
+      exp.institute = convertToCompany(institute);
+      res.push(exp);
+      return res;
+    }, []);
+
 
     result = educations;
 
@@ -4203,28 +4206,28 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
   let result = [];
   try {
     let candidate = await candidateService.findById(candidateId);
-    if(candidate.userId){
+    let skillIds = _.map(candidate.skills, 'id');
+
+    if(skillIds.length) {
+      let foundSkills = await feedService.findSkillsById(skillIds);
+      result = _.reduce(foundSkills, function (res, skill) {
+        let found = _.find(foundSkills, {id: skill.id})
+        if (found) {
+          skill.name = found.name;
+        }
+        res.push(skill);
+        return res;
+
+      }, []);
+    }
+
+    if(!candidate.skills && candidate.userId){
       let skills = await feedService.getUserSkills(candidate.userId);
       result = _.reduce(skills, function(res, item){
         let skill = {id: item.skill.id, name: item.skill.name, noOfMonths: item.noOfMonths, rating: 0};
         res.push(skill);
         return res;
       }, []);
-    } else {
-      let skillIds = _.map(candidate.skills, 'id');
-
-      if(skillIds.length) {
-        let foundSkills = await feedService.findSkillsById(skillIds);
-        result = _.reduce(foundSkills, function (res, skill) {
-          let found = _.find(foundSkills, {id: skill.id})
-          if (found) {
-            skill.name = found.name;
-          }
-          res.push(skill);
-          return res;
-
-        }, []);
-      }
     }
 
 
