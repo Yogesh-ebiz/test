@@ -73,7 +73,7 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   let candidate = {userId: user.id, partyType: user.partyType, company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
     primaryAddress: primaryAddress,
-    skills: _.map(user.skills, 'id'), url: user.shareUrl, links: user.links,
+    skills: _.map(user.skills, 'id'), links: user.links,
     about: about, gender: gender, marital: user.marital
   }
 
@@ -81,6 +81,10 @@ async function addCandidate(companyId, user, isApplied, isImported) {
     let avatar = user.avatar.split('/');
     avatar = avatar[avatar.length-1];
     candidate._avatar = avatar;
+  }
+
+  if(user.shareUrl && user.shareUrl.indexOf('/user')>-1){
+    candidate.url = user.shareUrl;
   }
 
   if(user.links){
