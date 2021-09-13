@@ -102,6 +102,9 @@ async function addPeopleToBlacklist(currentUserId, flag) {
   if(!candidate){
     let user = await feedService.findCandidateById(flag.userId);
     if(user){
+      user.skills = null;
+      user.experiences = null;
+      user.educations = null;
       candidate = await candidateService.addCandidate(flag.companyId, user, false, false);
     }
   }
@@ -158,6 +161,9 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
   if(!candidate){
     let user = await feedService.findCandidateById(userId);
     if(user){
+      user.skills = null;
+      user.experiences = null;
+      user.educations = null;
       candidate = await candidateService.addCandidate(companyId, user, false, false);
     }
   }

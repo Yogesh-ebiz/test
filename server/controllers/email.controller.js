@@ -51,7 +51,7 @@ async function getEmailById(currentUserId, emailId)  {
     let userIds = _.map(email.to, 'id').concat(_.map(email.cc, 'id'));
     userIds.push(email.from.id);
 
-    let users = await feedService.lookupPeopleIds(userIds)
+    let users = await feedService.lookupCandidateIds(userIds)
     if(email.from.id){
       if(users.length){
         email.to = _.reduce(email.to, function(res, contact){

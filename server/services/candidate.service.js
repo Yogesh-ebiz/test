@@ -30,7 +30,6 @@ const skillSchema = Joi.object({
 
 const candidateSchema = Joi.object({
   userId: Joi.number().allow('', null).optional(),
-  partyType: Joi.string(),
   company: Joi.number(),
   about: Joi.string().allow('').optional(),
   avatar: Joi.string().allow('').optional(),
@@ -70,27 +69,26 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   let email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
   let phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
   let primaryAddress = user.primaryAddress?{address1: user.primaryAddress.address1, address2: user.primaryAddress.address2, district: user.primaryAddress.district, city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country}:null
+  let links = user.links?user.links:[];
 
-  let candidate = {userId: user.id, partyType: user.partyType, company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
+  let candidate = {company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
-    primaryAddress: primaryAddress,
-    skills: _.map(user.skills, 'id'), links: user.links,
+    primaryAddress: primaryAddress, links: links,
     about: about, gender: gender, marital: user.marital
+  }
+
+  if(user.id){
+    candidate.userId = user.id;
+  }
+
+  if(user.shareUrl && user.shareUrl.indexOf('/user')>-1){
+    candidate.url = user.shareUrl;
   }
 
   if(user.avatar){
     let avatar = user.avatar.split('/');
     avatar = avatar[avatar.length-1];
     candidate._avatar = avatar;
-  }
-
-  if(user.shareUrl && user.shareUrl.indexOf('/user')>-1){
-    console.log('url', user.shareUrl)
-    candidate.url = user.shareUrl;
-  }
-
-  if(user.links){
-    candidate.links = user.links;
   }
 
   if(user.experiences){

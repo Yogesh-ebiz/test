@@ -712,7 +712,7 @@ async function getImpressionCandidates(companyId, currentUserId, timeframe, type
 
   if(result){
     let userIds = _.map(result.docs, 'partyId');
-    let users = await feedService.lookupPeopleIds(userIds);
+    let users = await feedService.lookupCandidateIds(userIds);
     for(i in result.docs){
 
       let found = _.find(users, {id: result.docs[i].partyId});
@@ -1998,15 +1998,16 @@ async function searchCompanyApplications(currentUserId, companyId, filter, local
 
 async function addApplication(companyId, currentUserId, application ) {
 
+
   if(!companyId || !currentUserId || !application){
     return null;
   }
-
 
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
+
 
   let savedApplication;
   try {
@@ -3549,7 +3550,6 @@ async function importResumes(companyId, currentUserId, files) {
       });
 
     if(parsed.parts && parsed.parts.email) {
-      console.log('hasEmail')
       let candidate = await candidateService.findByEmailAndCompanyId(parsed.parts.email, companyId);
       if (candidate) {
 
@@ -4775,6 +4775,9 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
   if(!candidate){
     let user = await feedService.findCandidateById(userId);
     if(user){
+        user.skills = null;
+        user.experiences = null;
+        user.educations = null;
         candidate = await candidateService.addCandidate(companyId, user, false, false);
         candidateId = candidate._id;
     }
@@ -4790,7 +4793,6 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
         let existPool = _.find(poolIds, function(item){return ObjectID(item).equals(pool._id); });
         if(!existPool){
           for(const [i, candidate] of pool.candidates.entries()){
-            console.log(candidate, candidateId)
             if(candidate.equals(candidateId)){
               pool.candidates.splice(i, 1);
             }

@@ -4,6 +4,15 @@ const options = { headers: {'userId': null } };
 let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
 // let client = new ApiClient('http://localhost:5000/api');
 
+
+async function addContact(contact){
+  if(!contact){
+    return null;
+  }
+
+  let response = await client.post(`/contacts/add`, contact, null);
+};
+
 async function createJobFeed(jobId, partyType, partyId, text, userId){
   const options = {
     headers: {'userId': userId}
@@ -321,8 +330,8 @@ async function hasFollowed(id, userId){
 };
 
 
-async function syncPeople(form) {
-  let response = await client.post(`/people/sync`, form, null);
+async function syncCandidate(form) {
+  let response = await client.post(`/people/candidates/sync`, form, null);
   return response.data.data;
 };
 
@@ -490,7 +499,6 @@ async function lookupCompaniesIds(ids) {
 
 
 async function lookupInstituteIds(ids) {
-  console.log(ids)
   let response = await client.get(`/search/institute/lookup?ids=${ids}`, null, options);
   return response.data.data;
 };
@@ -608,6 +616,7 @@ async function updateResumeDefault(userId, id) {
 
 
 module.exports = {
+  addContact:addContact,
   register:register,
   syncUserCompanies:syncUserCompanies,
   createInstitute:createInstitute,
@@ -630,7 +639,7 @@ module.exports = {
   followCompany: followCompany,
   followInstitute: followInstitute,
   hasFollowed:hasFollowed,
-  syncPeople:syncPeople,
+  syncCandidate:syncCandidate,
   searchCompany:searchCompany,
   searchPopularCompany:searchPopularCompany,
 

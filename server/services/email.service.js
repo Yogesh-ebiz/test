@@ -111,21 +111,21 @@ async function compose(form, companyId) {
                 if (!candidate) {
                   let user = await feedService.findCandidateById(contact.id);
                   if (user) {
+                    user.skills = null;
+                    user.experiences = null;
+                    user.educations = null;
                     candidate = await candidateService.addCandidate(companyId, user, false, false);
                   }
                 }
               } else {
                 candidate = await candidateService.findByEmailAndCompanyId(contact.email, companyId);
                 if(!candidate) {
-                  //Sync: Create new User or Return if exist by email
-                  let user = await feedService.syncPeople({
+                  await feedService.addContact({type: 'EMAIL_ADDRESS', value: contact.email});
+                  let user = {
                     email: contact.email,
                     primaryAddress: {city: job.city, state: job.state, country: job.country}
-                  });
-                  if (user) {
-                    let hasImported = user.partyType==='PERSON'?false:true;
-                    candidate = await candidateService.addCandidate(companyId, user, false, hasImported);
-                  }
+                  };
+                  candidate = await candidateService.addCandidate(companyId, user, false, false);
                 }
               }
             }
