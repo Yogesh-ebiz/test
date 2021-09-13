@@ -143,6 +143,7 @@ const convertToCandidate = (user) => {
     past.employer = convertToCompany(past.employer);
   }
 
+  console.log(user.url)
   return {
     id: user.id?user.id:user._id,
     userId: user.userId?user.userId:null,
@@ -185,7 +186,7 @@ const convertToCandidate = (user) => {
     evaluations: user.evaluations?user.evaluations:[],
     experiences: user.experiences?_.reduce(user.experiences, function(res, i){ i.employer = convertToCompany(i.company); res.push(i);  return res;}, []):[],
     educations: user.educations?_.reduce(user.educations, function(res, i){ i.institute = convertToCompany(i.institute); res.push(i);  return res;}, []):[],
-    url: user.shareUrl?user.shareUrl:user.url?user.url:'',
+    url: user.shareUrl?user.shareUrl:user.url?user.url:null,
     flag: user.flag
   };
 }
