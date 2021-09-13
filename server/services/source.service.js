@@ -89,6 +89,17 @@ async function remove(ids) {
   await Source.deleteMany({_id: {$in: ids}});
 }
 
+async function removeByCandidateId(candidateId) {
+  if(!candidateId){
+    return;
+  }
+
+  let source = Source.find({candidate: candidateId});
+  if(source) {
+    await source.delete();
+  }
+}
+
 function findById(id) {
   if(!id){
     return;
@@ -258,6 +269,7 @@ module.exports = {
   addWithCheck:addWithCheck,
   addSources:addSources,
   remove:remove,
+  removeByCandidateId:removeByCandidateId,
   findById:findById,
   findByCandidateId:findByCandidateId,
   findByJobId:findByJobId,

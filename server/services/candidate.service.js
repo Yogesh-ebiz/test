@@ -14,6 +14,7 @@ const applicationService = require('../services/application.service');
 const poolService = require('../services/pool.service');
 const experienceService = require('../services/experience.service');
 const educationService = require('../services/education.service');
+const sourceService = require('../services/source.service');
 
 const feedService = require('../services/api/feed.service.api');
 const sovrenService = require('../services/api/sovren.service.api');
@@ -84,6 +85,7 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   }
 
   if(user.shareUrl && user.shareUrl.indexOf('/user')>-1){
+    console.log('url', user.shareUrl)
     candidate.url = user.shareUrl;
   }
 
@@ -202,7 +204,9 @@ async function removeCandidate(id) {
     candidate.sources = [];
     candidate.status = statusEnum.DELETED;
     await poolService.removeCandidate(id);
+    await sourceService.removeByCandidateId(candidate._id);
     await candidate.save();
+
 
   } catch (error) {
     console.log(error);
