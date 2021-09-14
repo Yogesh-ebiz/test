@@ -135,35 +135,6 @@ async function add(application, member) {
   let savedApplication = await new Application(application).save();
   if (savedApplication) {
 
-    if(resume && resume.base64) {
-      let uploaded = await uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
-      let file = await fileService.addFile({
-        filename: uploaded.filename,
-        fileType: uploaded.fileType,
-        path: uploaded.path,
-        createdBy: candidate.userId
-      });
-      if (file) {
-        savedApplication.resume = file._id;
-        savedApplication.files.push(file._id);
-
-      }
-    }
-
-    if(photo && photo.base64) {
-      let uploaded = await uploadBase64(photo.base64, "/tmp/" + photo.name, 'applications/' + '/photos/');
-      let file = await fileService.addFile({
-        filename: uploaded.filename,
-        fileType: uploaded.fileType,
-        path: uploaded.path,
-        createdBy: candidate.userId
-      });
-      if (file) {
-        savedApplication.resume = file._id;
-        savedApplication.files.push(file._id);
-      }
-    }
-
     let jobPipeline = await pipelineService.findById(job.pipeline);
     if (jobPipeline) {
 
