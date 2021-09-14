@@ -2033,21 +2033,22 @@ async function addApplication(companyId, currentUserId, application ) {
         await candidate.save();
 
         let campaign = await emailCampaignService.findByToken(application.token);
-        let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
-        if(!exists){
+        if(campaign) {
+          let exists = _.find(campaign.stages, {type: emailCampaignStageType.SAVED});
+          if (!exists) {
 
-          let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
-          let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
-          if(currentStageIndex>0){
-            campaign.stages.splice((currentStageIndex-1), 0, stage._id);
+            let currentStageIndex = _.findIndex(campaign.stages, {type: emailCampaignStageType.APPLIED});
+            let stage = await emailCampaignStageService.add({type: emailCampaignStageType.SAVED, organic: true});
+            if (currentStageIndex > 0) {
+              campaign.stages.splice((currentStageIndex - 1), 0, stage._id);
 
-          } else {
-            campaign.stages.push(stage._id);
-            campaign.currentStage = stage._id;
+            } else {
+              campaign.stages.push(stage._id);
+              campaign.currentStage = stage._id;
+            }
+            await campaign.save();
           }
-          await campaign.save();
         }
-
 
       }
     }
