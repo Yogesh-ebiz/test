@@ -42,6 +42,7 @@ const applicationSchema = Joi.object({
   job: Joi.object().required(),
   jobId: Joi.object().required(),
   user: Joi.object().required(),
+  partyId: Joi.number().optional(),
   phoneNumber: Joi.string(),
   email: Joi.string().required(),
   availableDate: Joi.number().optional(),
