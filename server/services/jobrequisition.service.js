@@ -961,7 +961,7 @@ async function search(currentUserId, query, filter, sort, locale) {
     job.qualifications = [];
     job.minimumQualifications=[];
     job.applicationForm=null;
-    job.description = null;
+    // job.description = null;
     job.isHot = _.reduce(job.ads, function(res, ad){
       if(_.includes(ad.targeting.adPositions, adPosition.hottag)){
         if(ad.startTime < today && ad.endTime > today){
