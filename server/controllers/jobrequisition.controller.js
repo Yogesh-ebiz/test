@@ -134,7 +134,7 @@ async function importJobs(type, jobs) {
 
 async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
-  if(!jobId || !currentUserId){
+  if(!jobId){
     return null;
   }
 
@@ -170,21 +170,22 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
     if(job) {
       job = job.toObject();
-      let currentParty = await findByUserId(currentUserId);
+      if(currentUserId) {
+        let currentParty = await findByUserId(currentUserId);
 
-      if (isPartyActive(currentParty)) {
+        if (isPartyActive(currentParty)) {
 
-        let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
-        job.hasSaved = (hasSaved) ? true : false;
+          let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
+          job.hasSaved = (hasSaved) ? true : false;
 
-        let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
-        job.hasApplied = (hasApplied) ? true : false;
+          let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
+          job.hasApplied = (hasApplied) ? true : false;
 
-        partySkills = await findUserSkillsById(currentParty.id);
-        partySkills = _.map(partySkills, "id");
+          partySkills = await findUserSkillsById(currentParty.id);
+          partySkills = _.map(partySkills, "id");
 
+        }
       }
-
 
       // let company = await feedService.lookupCompaniesIds([job.company.companyId]);
       job.company = convertToCompany(job.company);
