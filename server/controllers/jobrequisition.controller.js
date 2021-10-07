@@ -544,7 +544,7 @@ async function getJobLanding(currentUserId, locale) {
     }, []);
 
     result.popularJobs = _.reduce(popularJobs, function(res, item){
-      let job = _.find(jobs, {_id: item.jobId});
+      let job = _.find(jobs, {_id: item._id});
       if(job){
         res.push(job);
       }
@@ -554,7 +554,7 @@ async function getJobLanding(currentUserId, locale) {
 
 
     _.forEach(highlight, function(item){
-      let job = _.find(jobs, {_id: item.jobId});
+      let job = _.find(jobs, {_id: item._id});
 
       if(job) {
         result.highlightJobs.push(job);
@@ -563,7 +563,7 @@ async function getJobLanding(currentUserId, locale) {
     })
 
     _.forEach(newJobs, function(item){
-      let job = _.find(jobs, {_id: item.jobId});
+      let job = _.find(jobs, {_id: item._id});
 
       if(job) {
         result.newJobs.push(job);
