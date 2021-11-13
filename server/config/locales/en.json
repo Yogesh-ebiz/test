@@ -246,5 +246,7 @@
 	"job_captured_successful": "job_captured_successful",
 	"people _removed_successful": "people _removed_successful",
 	"notification_preferene_updated_successful": "notification_preferene_updated_successful",
-	"notification_preferene_retrieved_successful": "notification_preferene_retrieved_successful"
+	"notification_preferene_retrieved_successful": "notification_preferene_retrieved_successful",
+	"note_added_successful": "note_added_successful",
+	"notes_retrieved_successful": "notes_retrieved_successful"
 }

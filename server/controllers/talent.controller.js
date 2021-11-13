@@ -57,6 +57,7 @@ const poolService = require('../services/pool.service');
 const projectService = require('../services/project.service');
 const activityService = require('../services/activity.service');
 const commentService = require('../services/comment.service');
+const noteService = require('../services/note.service');
 const evaluationService = require('../services/evaluation.service');
 const evaluationTemplateService = require('../services/evaluationtemplate.service');
 const emailService = require('../services/email.service');
@@ -221,6 +222,10 @@ module.exports = {
   assignCandidatesJobs,
   checkCandidateEmail,
   getAllCandidatesSkills,
+  getCandidateNotes,
+  addCandidateNote,
+  removeCandidateNote,
+  updateCandidateNote,
   addCandidateTag,
   removeCandidateTag,
   addCandidateSource,
@@ -4543,6 +4548,123 @@ async function getAllCandidatesSkills(companyId, currentUserId, locale) {
 
   return result;
 }
+
+/************************** CANDIDATE NOTES *****************************/
+
+async function getCandidateNotes(companyId, currentUserId, candidateId, filter) {
+  console.log(companyId, currentUserId, candidateId, filter)
+  if(!currentUserId || !candidateId || !filter){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    result = await noteService.getNotes(subjectType.CANDIDATE, candidateId, filter);
+
+    result.docs.forEach(function(note){
+      note.createdBy = convertToTalentUser(note.createdBy);
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+}
+
+async function addCandidateNote(companyId, currentUserId, candidateId, note) {
+  if(!currentUserId || !candidateId || !note){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  // let job = await jobService.findJob_Id(jobId);
+  // if(job) {
+    note.subjectType = subjectType.CANDIDATE;
+    note.subject = ObjectID(candidateId);
+    note.createdBy = member._id;
+    result = await noteService.addNote(note, member);
+
+  // }
+
+
+  return result;
+}
+
+
+async function removeCandidateNote(companyId, currentUserId, noteId) {
+
+  if(!companyId || !currentUserId || !noteId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let note = await noteService.findBy_Id(noteId);
+
+    if(note) {
+      result = await note.delete();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function updateCandidateNote(companyId, currentUserId, candidateId, noteId, note) {
+
+  if(!companyId || !currentUserId || !commentId || !note){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+
+
+    let found = await noteService.findBy_Id(noteId);
+
+
+    if(found) {
+      found.message = note.message;
+      found.lastUpdatedDate = Date.now();
+      result = await found.save()
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
 
 
 /************************** CANDIDATE TAGS *****************************/

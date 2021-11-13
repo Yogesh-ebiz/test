@@ -124,6 +124,9 @@ router.route('/company/:id/candidates/search').post(asyncHandler(searchCandidate
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
 router.route('/company/:id/candidates/:candidateId').delete(asyncHandler(removeCandidateById));
+router.route('/company/:id/candidates/:candidateId/notes').get(asyncHandler(getCandidateNotes));
+router.route('/company/:id/candidates/:candidateId/notes').post(asyncHandler(addCandidateNote));
+router.route('/company/:id/candidates/:candidateId/notes/:noteId').delete(asyncHandler(removeCandidateNote));
 router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
 router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
 router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
@@ -1221,6 +1224,42 @@ async function removeCandidateById(req, res) {
   res.json(new Response(data, data ? 'candidate_removed_successful' : 'not_found', res));
 
 }
+
+async function getCandidateNotes(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = req.params.candidateId;
+  let filter = req.query;
+
+  let data = await talentCtrl.getCandidateNotes(companyId, currentUserId, candidateId, filter);
+
+  res.json(new Response(data, data?'notes_retrieved_successful':'not_found', res));
+}
+
+async function addCandidateNote(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = ObjectID(req.params.candidateId);
+  let note = req.body;
+
+  let data = await talentCtrl.addCandidateNote(companyId, currentUserId, candidateId, note);
+
+  res.json(new Response(data, data?'note_added_successful':'not_found', res));
+}
+
+
+
+async function removeCandidateNote(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = ObjectID(req.params.candidateId);
+  let noteId = req.params.noteId;
+
+  let data = await talentCtrl.removeCandidateNote(companyId, currentUserId, candidateId, noteId);
+
+  res.json(new Response(data, data?'note_removed_successful':'not_found', res));
+}
+
 
 async function addCandidateTag(req, res) {
   let companyId = parseInt(req.params.id);
