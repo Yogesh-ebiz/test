@@ -1,4 +1,5 @@
 const ApiClient = require('../apiManager');
+const _ = require('lodash');
 
 const options = { headers: {'userId': null } };
 let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
@@ -505,7 +506,14 @@ async function lookupInstituteIds(ids) {
 
 async function findCandidateById(id) {
   let response = await client.get(`/people/candidates/${id}`, null, options);
-  return response.data.data;
+  let candidate = response.data.data?response.data.data:null;
+  if(candidate){
+    let experiences = _.uniqBy(candidate.experiences, 'id');
+    let educations = _.uniqBy(candidate.educations, 'id');
+    candidate.experiences = experiences;
+    candidate.educations = educations;
+  }
+  return candidate;
 };
 
 
