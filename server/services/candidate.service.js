@@ -457,23 +457,22 @@ async function getCandidatesSimilar(userId) {
   }
   let list = [];
   //
-  // let filter = {
-  //   "jobTitles": ["Sr. Manager"],
-  //   "locations": ["US"],
-  //   "skills": [],
-  //   "companies": [""],
-  //   "schools": [],
-  //   "industries": [],
-  //   "employmentTypes": []
-  // }
-  // let result = await feedService.searchPeople(filter, {});
-  // list = _.reduce(result.content, function(res, p){
-  //   res.push(p);
-  //   return res;
-  // }, []);
+  let filter = {
+    "jobTitles": ["Sr. Manager"],
+    "locations": [{"district": "", "city": "San Jose", "state": "California", "country": "US"}],
+    "skills": [],
+    "companies": [""],
+    "schools": [],
+    "industries": [],
+    "employmentTypes": []
+  }
+  let result = await feedService.searchPeople(filter, {});
+  list = _.reduce(result.content, function(res, p){
+    res.push(p);
+    return res;
+  }, []);
 
-  // let candidate = await Can
-  list = sovrenService.matchResume();
+  // list = sovrenService.matchResume();
   return list;
 }
 
