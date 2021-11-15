@@ -184,7 +184,7 @@ const convertToCandidate = (user) => {
     sources: user.sources?user.sources:[],
     applications: user.applications?user.applications:[],
     evaluations: user.evaluations?user.evaluations:[],
-    experiences: user.experiences?_.reduce(user.experiences, function(res, i){ i.employer = convertToCompany(i.company); res.push(i);  return res;}, []):[],
+    experiences: user.experiences?_.reduce(user.experiences, function(res, i){ i.employer = convertToCompany(i.employer); res.push(i);  return res;}, []):[],
     educations: user.educations?_.reduce(user.educations, function(res, i){ i.institute = convertToCompany(i.institute); res.push(i);  return res;}, []):[],
     url: user.shareUrl?user.shareUrl:user.url?user.url:null,
     flag: user.flag
