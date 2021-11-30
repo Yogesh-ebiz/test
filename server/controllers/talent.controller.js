@@ -2718,6 +2718,10 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
     comment.subject = application;
     comment.createdBy = member._id;
     result = await commentService.addComment(comment, member);
+    if(result){
+      application.noOfComments++;
+      await application.save();
+    }
   }
   return result;
 }
@@ -3343,7 +3347,9 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
             note: 1,
             user: 1,
             jobTitle: 1,
-            currentProgress: 1
+            currentProgress: 1,
+            noOfComments: 1,
+            noOfEvaluations: 1
           }
         },
         {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
@@ -3361,7 +3367,6 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
         }
         let found = _.find(applicationsGroupByStage, {'_id': item._id});
         if (found) {
-
           stage.applications = found.applications;
           for (let [i, item] of stage.applications.entries()) {
             item.hasFollowed = _.find(applicationSubscribed, {subject: item._id}) ? true : false;
