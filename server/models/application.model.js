@@ -97,6 +97,10 @@ const ApplicationSchema = new mongoose.Schema({
   rating: {
     type: Number
   },
+  noOfComments: {
+    type: Number,
+    default: 0
+  },
   noOfEvaluations: {
     type: Number
   },

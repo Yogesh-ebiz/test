@@ -4565,9 +4565,9 @@ async function getAllCandidatesSkills(companyId, currentUserId, locale) {
 
 /************************** CANDIDATE NOTES *****************************/
 
-async function getCandidateNotes(companyId, currentUserId, candidateId, filter) {
-  console.log(companyId, currentUserId, candidateId, filter)
-  if(!currentUserId || !candidateId || !filter){
+async function getCandidateNotes(companyId, currentUserId, candidateId, sort) {
+  console.log(companyId, currentUserId, candidateId, sort)
+  if(!currentUserId || !candidateId || !sort){
     return null;
   }
 
@@ -4580,7 +4580,7 @@ async function getCandidateNotes(companyId, currentUserId, candidateId, filter) 
   try {
 
 
-    result = await noteService.getNotes(subjectType.CANDIDATE, candidateId, filter);
+    result = await noteService.getNotes(subjectType.CANDIDATE, candidateId, sort);
 
     result.docs.forEach(function(note){
       note.createdBy = convertToTalentUser(note.createdBy);

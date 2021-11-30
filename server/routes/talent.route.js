@@ -1229,9 +1229,9 @@ async function getCandidateNotes(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let candidateId = req.params.candidateId;
-  let filter = req.query;
+  let sort = req.query;
 
-  let data = await talentCtrl.getCandidateNotes(companyId, currentUserId, candidateId, filter);
+  let data = await talentCtrl.getCandidateNotes(companyId, currentUserId, candidateId, sort);
 
   res.json(new Response(data, data?'notes_retrieved_successful':'not_found', res));
 }
