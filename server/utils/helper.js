@@ -167,7 +167,7 @@ const convertToCandidate = (user) => {
     gender: user.gender,
     noOfMonthExperiences: user.noOfMonthExperiences?user.noOfMonthExperiences:35,
     level:user.level?user.level:'SENIOR',
-    match:user.match?user.match:match.toFixed(2),
+    match:user.match?user.match:match.toFixed(0),
     rating: Math.round(user.rating * 10) /10,
     teamRating: user.teamRating?user.teamRating:0,
     hasApplied: user.hasApplied?user.hasApplied:false,
