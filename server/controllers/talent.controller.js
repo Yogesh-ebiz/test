@@ -1849,6 +1849,7 @@ async function searchApplications(companyId, currentUserId, jobId, filter, sort,
     }
     app.hasFollowed = _.some(applicationSubscribed, {subject: ObjectID(app._id)});
     app.user.avatar = buildCandidateUrl(app.user);
+    app.user = convertToCandidate(app.user);
   })
 
   return new Pagination(result);

@@ -76,7 +76,8 @@ const CandidateSchema = new mongoose.Schema({
   },
   match: {
     type: Number,
-    required:false
+    required:false,
+    default: 0
   },
   rating: {
     type: Number,
