@@ -361,8 +361,8 @@ async function search(filter, sort) {
 
   aList.push(aMatch);
 
+  aList.push({$match: {status: statusEnum.ACTIVE}});
   aList.push(
-    {$match: {status: statusEnum.ACTIVE}},
     {$lookup:{
         from:"applications",
         let:{user:"$_id"},
@@ -391,15 +391,20 @@ async function search(filter, sort) {
         ],
         as: 'applications'
       },
-    },
-    {$lookup: {from: 'evaluations', localField: 'userId', foreignField: 'partyId', as: 'evaluations' } },
+    })
+
+    if(filter.job) {
+      aList.push({$match: {'applications.job': ObjectID(filter.job)}})
+    }
+    
+    aList.push({$lookup: {from: 'evaluations', localField: 'userId', foreignField: 'partyId', as: 'evaluations' } })
+    aList.push(
     { $addFields:
         {
           rating: {$round: [{$avg: "$evaluations.rating"}, 1]},
           evaluations: []
         }
-    },
-  );
+    });
 
 
   if(filter.stages.length){
