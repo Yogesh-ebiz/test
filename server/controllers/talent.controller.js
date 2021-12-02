@@ -3691,7 +3691,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
   }
 
   result = await candidateService.search(filter, sort);
-  let people = await feedService.lookupPeopleIds(_.map(result.docs, 'userId'));
+  let people = await feedService.lookupCandidateIds(_.map(result.docs, 'userId'));
   let pools = await poolService.findByCompany(companyId);
 
   result.docs = _.reduce(result.docs, function(res, candidate){
@@ -3711,6 +3711,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
     let found = _.find(people, {id: candidate.userId});
     if(found)
     {
+      candidate.skills = found.skills
       candidate.past = found.past;
       candidate.experiences = found.experiences;
       candidate.educations = found.educations;
