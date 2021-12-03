@@ -45,6 +45,8 @@ router.route('/:id/candidates').get(asyncHandler(searchCandidates));
 router.route('/:id/questionaires').post(asyncHandler(submitJobQuestionaires));
 router.route('/:id/questionaires').get(asyncHandler(getJobQuestionaires));
 
+router.route('/:id/skills').get(asyncHandler(getJobSkills));
+
 router.route('/category').get(asyncHandler(getCategories));
 
 //
@@ -273,6 +275,11 @@ async function getJobQuestionaires(req, res) {
   res.json(new Response(data, data?'job_questions_retrieved_successful':'not_found', res));
 }
 
+
+async function getJobSkills(req, res) {
+  let data = await jobRequisitionCtl.getJobSkills(req.params.id);
+  res.json(new Response(data, data?'job_questions_retrieved_successful':'not_found', res));
+}
 
 
 async function getCategories(req, res) {
