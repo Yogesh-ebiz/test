@@ -532,6 +532,47 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
 }
 
 
+async function getSimilarJobList(jobId) {
+  let data = [];
+
+  if(!jobId){
+    return data;
+  }
+
+  let job  = await JobRequisition.findOne({jobId: jobId});
+
+  if(job) {
+    data = await JobRequisition.aggregate([
+      { $match: {
+          $text: {
+            $search: job.title,
+            $diacriticSensitive: true,
+            $caseSensitive: false
+          }
+        }
+      },
+      { $limit: 8}
+    ])
+
+      // .populate([
+      // {
+      //   path: 'searchAd',
+      //   populate: {
+      //     path: 'targeting',
+      //     model: 'Target'
+      //   }
+      // },
+      // {
+      //   path: 'ads',
+      //   model: 'Ad',
+      //   populate: {
+      //     path: 'targeting',
+      //     model: 'Target'
+      //   }
+      // }]);
+  }
+  return data;
+}
 
 async function getJobAds(jobId) {
   let data = null;
@@ -1011,6 +1052,7 @@ module.exports = {
   updateJobMembers:updateJobMembers,
   getJobMembers:getJobMembers,
   updateJobApplicationForm:updateJobApplicationForm,
+  getSimilarJobList,
   getJobAds:getJobAds,
   closeJob:closeJob,
   archiveJob:archiveJob,
