@@ -92,6 +92,7 @@ const convertToAvatar = (user) => {
     _id: user._id,
     id: user._id?user.userId:user.id,
     name: user.name,
+    tagname: user.tagname,
     firstName: user.firstName,
     middleName: user.middleName,
     lastName: user.lastName,
@@ -152,6 +153,7 @@ const convertToCandidate = (user) => {
     status: user.status,
     company: user.company,
     name: user.name,
+    tagname: user.tagname,
     firstName: user.firstName,
     middleName: user.middleName,
     lastName: user.lastName,
@@ -210,6 +212,7 @@ const convertToCompany = (company) => {
   let result = {
     id: company._id?company.companyId:company.id?company.id:null,
     name: company.name,
+    tagname: user.tagname,
     avatar: buildCompanyUrl(company),
     cover: company.cover,
     partyType: company.partyType,
