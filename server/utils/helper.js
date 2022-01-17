@@ -212,7 +212,7 @@ const convertToCompany = (company) => {
   let result = {
     id: company._id?company.companyId:company.id?company.id:null,
     name: company.name,
-    tagname: user.tagname,
+    tagname: company.tagname,
     avatar: buildCompanyUrl(company),
     cover: company.cover,
     partyType: company.partyType,
