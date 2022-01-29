@@ -414,7 +414,7 @@ function findSalariesByCompanyId(filter) {
   data = CompanySalary.aggregate([
     {$match: {$and: and}},
     {$group: {_id: {employmentTitle: '$employmentTitle', basePayPeriod: '$basePayPeriod', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, avgTotalSalary: {'$avg': {'$add': ['$baseSalary', '$additionalIncome', '$cashBonus', '$commision', '$profitSharing', '$stockBonus']}}, avgBaseSalary: {'$avg': '$baseSalary'}, avgAdditionalIncome: {'$avg': '$additionalIncome'}, count: {'$sum': 1}}},
-    // {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, avgBaseSalary: 1}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, avgTotalSalary:1, avgBaseSalary: 1, avgAdditionalIncome: 1}},
     {$sort: sort},
     {$skip: skip},
     {$limit: size}
