@@ -286,7 +286,6 @@ async function getCompanySalaries(currentUserId, filter, locale) {
     if (isPartyActive(currentParty)) {
       let total = await findEmploymentTitlesCountByCompanyId(filter);
       result = await findSalariesByCompanyId(filter);
-      console.log(result)
       let listOfCurrencies = _.reduce(result, function(res, item){
         let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
         res.push({src: item.currency, target: preferredCurrency});
@@ -315,7 +314,6 @@ async function getCompanySalaries(currentUserId, filter, locale) {
         }
         */
 
-        console.log(item)
         item.hasLiked = false;
         item.avgBaseSalary =  Math.floor(item.avgBaseSalary * currency.rate, 0);
         item.displayCurrency = currentParty.preferredCurrency;
