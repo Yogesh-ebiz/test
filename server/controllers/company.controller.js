@@ -140,6 +140,7 @@ module.exports = {
   getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
+  getCompanySalaryGroupByFunctions,
   getCompanySalaryByEmploymentTitle,
   getCompanySalaryLocations,
   getCompanySalaryEmploymentTitles,
@@ -282,11 +283,10 @@ async function getCompanySalaries(currentUserId, filter, locale) {
   try {
     let currentParty = await findByUserId(currentUserId);
 
-
     if (isPartyActive(currentParty)) {
       let total = await findEmploymentTitlesCountByCompanyId(filter);
       result = await findSalariesByCompanyId(filter);
-
+      console.log(result)
       let listOfCurrencies = _.reduce(result, function(res, item){
         let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
         res.push({src: item.currency, target: preferredCurrency});
@@ -315,8 +315,9 @@ async function getCompanySalaries(currentUserId, filter, locale) {
         }
         */
 
+        console.log(item)
         item.hasLiked = false;
-        item.avgBaseSalary = avgBaseSalary //Math.floor(item.avgBaseSalary * currency.rate, 0);
+        item.avgBaseSalary =  Math.floor(item.avgBaseSalary * currency.rate, 0);
         item.displayCurrency = currentParty.preferredCurrency;
 
         res.push(item);
@@ -326,6 +327,34 @@ async function getCompanySalaries(currentUserId, filter, locale) {
       let pagination = new CustomPagination({count: total, result: result}, filter, locale);
       result = pagination;
     }
+  } catch (e) {
+    console.log('getCompanySalaries: Error', e);
+  }
+
+  return result;
+}
+
+
+async function getCompanySalaryGroupByFunctions(currentUserId, companyId, locale) {
+  if(currentUserId==null || companyId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+      result = await getSalaryOverall(companyId);
+
+      let listOfCurrencies = _.reduce(result, function(res, item){
+        let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
+        res.push({src: item.currency, target: preferredCurrency});
+        return res;
+      }, []);
+
+      // let currencies = await findCurrencyRate(currentParty.preferredCurrency);
+      let loadCurrencies = listOfCurrencies.map(currency => findCurrencyRate(currency.src, currency.target));
+      let currencies = await Promise.all(loadCurrencies);
+
   } catch (e) {
     console.log('getCompanySalaries: Error', e);
   }

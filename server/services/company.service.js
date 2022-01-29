@@ -333,7 +333,6 @@ async function findEmploymentTitlesCountByCompanyId(filter) {
 
 function findSalariesByCompanyId(filter) {
   let data = null;
-  console.log('filter', filter)
 
   if(!filter){
     return [];
@@ -414,8 +413,8 @@ function findSalariesByCompanyId(filter) {
 
   data = CompanySalary.aggregate([
     {$match: {$and: and}},
-    {$group: {_id: {employmentTitle: '$employmentTitle', basePayPeriod: '$basePayPeriod', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, avgBaseSalary: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
-    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, avgBaseSalary: 1}},
+    {$group: {_id: {employmentTitle: '$employmentTitle', basePayPeriod: '$basePayPeriod', country: '$country'}, basePayPeriod: {$first: '$basePayPeriod'}, currency: {$first: '$currency'}, avgTotalSalary: {'$avg': {'$add': ['$baseSalary', '$additionalIncome', '$cashBonus', '$commision', '$profitSharing', '$stockBonus']}}, avgBaseSalary: {'$avg': '$baseSalary'}, avgAdditionalIncome: {'$avg': '$additionalIncome'}, count: {'$sum': 1}}},
+    // {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', country: '$_id.country', basePayPeriod: '$basePayPeriod', currency: '$currency', count: 1, avgBaseSalary: 1}},
     {$sort: sort},
     {$skip: skip},
     {$limit: size}
@@ -833,6 +832,52 @@ async function getCompanyCandidateInsights(companyId, options) {
 }
 
 
+async function groupSalaryByJobFunctions(companyId) {
+
+  if(!companyId){
+    return null;
+  }
+
+  let aList = [
+    {$match: {companyId: companyId}},
+    { $lookup:{
+        from:"jobviews",
+        let:{company: '$_id'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$company","$company"]}}}
+        ],
+        as: 'viewers'
+      }},
+    { $lookup:{
+        from:"bookmarks",
+        let:{company: '$_id'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$company","$company"]}}}
+        ],
+        as: 'savers'
+      }},
+    { $lookup:{
+        from:"applications",
+        let:{company: '$companyId'},
+        pipeline:[
+          {$match:{$expr:{$eq:["$$company","$company"]}}}
+        ],
+        as: 'applicants'
+      }},
+    { $project: { union: { $concatArrays: ["$viewers", "$savers", "$applicants"] } } },
+
+    // 6. Unwind and replace root so you end up with a result set.
+    { $unwind: '$union' },
+    { $replaceRoot: { newRoot: '$union' } },
+    {$group: {_id: '$partyId'}},
+    {$project: {partyId: '$_id'}}
+  ];
+
+  const aggregate = Company.aggregate(aList);
+  return await Company.aggregatePaginate(aggregate, options);
+}
+
+
 module.exports = {
   add:add,
   register:register,
@@ -854,5 +899,6 @@ module.exports = {
   findCompanyReviewsByCompanyId: findCompanyReviewsByCompanyId,
   findTop3Highlights:findTop3Highlights,
   addCompanyReviewReport:addCompanyReviewReport,
-  getCompanyCandidateInsights:getCompanyCandidateInsights
+  getCompanyCandidateInsights:getCompanyCandidateInsights,
+  groupSalaryByJobFunctions:groupSalaryByJobFunctions
 }
