@@ -831,50 +831,21 @@ async function getCompanyCandidateInsights(companyId, options) {
   return await Company.aggregatePaginate(aggregate, options);
 }
 
+async function groupSalaryByJobFunctions(company, locale) {
+  let data = null;
 
-async function groupSalaryByJobFunctions(companyId) {
-
-  if(!companyId){
-    return null;
+  if(!company){
+    return [];
   }
 
-  let aList = [
-    {$match: {companyId: companyId}},
-    { $lookup:{
-        from:"jobviews",
-        let:{company: '$_id'},
-        pipeline:[
-          {$match:{$expr:{$eq:["$$company","$company"]}}}
-        ],
-        as: 'viewers'
-      }},
-    { $lookup:{
-        from:"bookmarks",
-        let:{company: '$_id'},
-        pipeline:[
-          {$match:{$expr:{$eq:["$$company","$company"]}}}
-        ],
-        as: 'savers'
-      }},
-    { $lookup:{
-        from:"applications",
-        let:{company: '$companyId'},
-        pipeline:[
-          {$match:{$expr:{$eq:["$$company","$company"]}}}
-        ],
-        as: 'applicants'
-      }},
-    { $project: { union: { $concatArrays: ["$viewers", "$savers", "$applicants"] } } },
+  let match = {};
+  data = CompanySalary.aggregate([
+    {$match: {company: company}},
+    {$group: {_id: {employmentTitle: '$employmentTitle', jobFunction: '$jobFunction'}, jobFunction: {$first: '$jobFunction'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', jobFunction: 1,count: 1}}
+  ]);
 
-    // 6. Unwind and replace root so you end up with a result set.
-    { $unwind: '$union' },
-    { $replaceRoot: { newRoot: '$union' } },
-    {$group: {_id: '$partyId'}},
-    {$project: {partyId: '$_id'}}
-  ];
-
-  const aggregate = Company.aggregate(aList);
-  return await Company.aggregatePaginate(aggregate, options);
+  return data;
 }
 
 

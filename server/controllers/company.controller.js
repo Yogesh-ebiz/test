@@ -27,7 +27,7 @@ const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 
 
-const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
+const {addCompanySalary, groupSalaryByJobFunctions, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
 const memberService = require('../services/member.service');
@@ -333,25 +333,16 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 }
 
 
-async function getCompanySalaryGroupByFunctions(currentUserId, companyId, locale) {
-  if(currentUserId==null || companyId==null){
+async function getCompanySalaryGroupByFunctions(companyId, locale) {
+  if(!companyId){
     return null;
   }
 
   let result = null;
   try {
 
-      result = await getSalaryOverall(companyId);
+      result = await groupSalaryByJobFunctions(companyId);
 
-      let listOfCurrencies = _.reduce(result, function(res, item){
-        let preferredCurrency = currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
-        res.push({src: item.currency, target: preferredCurrency});
-        return res;
-      }, []);
-
-      // let currencies = await findCurrencyRate(currentParty.preferredCurrency);
-      let loadCurrencies = listOfCurrencies.map(currency => findCurrencyRate(currency.src, currency.target));
-      let currencies = await Promise.all(loadCurrencies);
 
   } catch (e) {
     console.log('getCompanySalaries: Error', e);

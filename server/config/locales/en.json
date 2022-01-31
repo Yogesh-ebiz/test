@@ -248,5 +248,6 @@
 	"notification_preferene_updated_successful": "notification_preferene_updated_successful",
 	"notification_preferene_retrieved_successful": "notification_preferene_retrieved_successful",
 	"note_added_successful": "note_added_successful",
-	"notes_retrieved_successful": "notes_retrieved_successful"
+	"notes_retrieved_successful": "notes_retrieved_successful",
+	"companysalarylanding_retrieved_successful": "companysalarylanding_retrieved_successful"
 }

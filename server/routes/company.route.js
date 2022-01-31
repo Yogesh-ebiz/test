@@ -136,7 +136,7 @@ async function getCompanySalaries(req, res) {
 async function getCompanySalaryGroupByFunctions(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
-  let data = await companyCtl.getCompanySalaryGroupByFunctions(currentUserId, req.locale);
+  let data = await companyCtl.getCompanySalaryGroupByFunctions(company, req.locale);
   res.json(new Response(data, data?'companysalarylanding_retrieved_successful':'not_found', res));
 }
 
