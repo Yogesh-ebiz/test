@@ -839,12 +839,13 @@ async function groupSalaryByJobFunctions(company, locale) {
   }
 
   let match = {};
-  data = CompanySalary.aggregate([
+  data = await CompanySalary.aggregate([
     {$match: {company: company}},
     {$group: {_id: {employmentTitle: '$employmentTitle', jobFunction: '$jobFunction'}, jobFunction: {$first: '$jobFunction'}, count: {'$sum': 1}}},
     {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', jobFunction: 1,count: 1}}
   ]);
 
+  data = _.groupBy(data, 'jobFunction');
   return data;
 }
 
