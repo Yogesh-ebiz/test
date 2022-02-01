@@ -413,6 +413,7 @@ async function findJobfunction(query, shortCodes, locale) {
   const options = {
     'Accept-Language': locale
   };
+
   let response = await client.get(`/common/jobfunction/search?query=${query}&shortCodes=${shortCodes}`);
   return response.data.data;
 };

@@ -845,7 +845,13 @@ async function groupSalaryByJobFunctions(company, locale) {
     {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', jobFunction: 1,count: 1}}
   ]);
 
-  data = _.groupBy(data, 'jobFunction');
+  let jobFunctions = await feedService.findJobfunction('', _.map(data, 'jobFunction'), locale);
+  data = _.reduce(_.groupBy(data, 'jobFunction'), function(res, val, key) {
+    let jobFunction = _.find(jobFunctions, {shortCode: key});
+    let item = {id: jobFunction.id, name: jobFunction.name, shortCode: key, list: val}
+    res.push(item);
+    return res;
+  }, []);
   return data;
 }
 

@@ -341,7 +341,7 @@ async function getCompanySalaryGroupByFunctions(companyId, locale) {
   let result = null;
   try {
 
-      result = await groupSalaryByJobFunctions(companyId);
+      result = await groupSalaryByJobFunctions(companyId, locale);
 
 
   } catch (e) {
