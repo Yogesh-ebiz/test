@@ -848,7 +848,7 @@ async function groupSalaryByJobFunctions(company, locale) {
   let jobFunctions = await feedService.findJobfunction('', _.map(data, 'jobFunction'), locale);
   data = _.reduce(_.groupBy(data, 'jobFunction'), function(res, val, key) {
     let jobFunction = _.find(jobFunctions, {shortCode: key});
-    let item = {id: jobFunction.id, name: jobFunction.name, shortCode: key, list: val}
+    let item = {id: jobFunction.id, name: jobFunction.name, shortCode: key, count: _.sumBy(val, 'count'), list: val}
     res.push(item);
     return res;
   }, []);
