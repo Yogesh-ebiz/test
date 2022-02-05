@@ -419,7 +419,7 @@ function findSalariesByCompanyId(filter) {
     {$skip: skip},
     {$limit: size}
   ]);
-
+ 
   return data;
 }
 
