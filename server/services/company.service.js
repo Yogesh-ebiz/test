@@ -419,7 +419,7 @@ function findSalariesByCompanyId(filter) {
     {$skip: skip},
     {$limit: size}
   ]);
- 
+
   return data;
 }
 
@@ -841,14 +841,23 @@ async function groupSalaryByJobFunctions(company, locale) {
   let match = {};
   data = await CompanySalary.aggregate([
     {$match: {company: company}},
-    {$group: {_id: {employmentTitle: '$employmentTitle', jobFunction: '$jobFunction'}, jobFunction: {$first: '$jobFunction'}, count: {'$sum': 1}}},
-    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', jobFunction: 1,count: 1}}
+    {$group: {_id: {employmentTitle: '$employmentTitle', jobFunction: '$jobFunction'}, jobFunction: {$first: '$jobFunction'}, avgBaseSalary: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', avgBaseSalary: 1, jobFunction: 1,count: 1}}
   ]);
 
   let jobFunctions = await feedService.findJobfunction('', _.map(data, 'jobFunction'), locale);
   data = _.reduce(_.groupBy(data, 'jobFunction'), function(res, val, key) {
+    let avgBaseSalary = 0;
+    let total = 0;
+    let totalCount = 0
+
+    for(let i = 0; i< val.length; i++){
+      total+=val[i].avgBaseSalary;
+    }
+    avgBaseSalary = total/val.length;
+
     let jobFunction = _.find(jobFunctions, {shortCode: key});
-    let item = {id: jobFunction.id, name: jobFunction.name, shortCode: key, count: _.sumBy(val, 'count'), list: val}
+    let item = {id: jobFunction.id, name: jobFunction.name, shortCode: key, count: _.sumBy(val, 'count'), avgBaseSalary:avgBaseSalary, list: val}
     res.push(item);
     return res;
   }, []);
