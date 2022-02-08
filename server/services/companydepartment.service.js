@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const statusEnum = require('../const/statusEnum');
-const Department = require('../models/department.model');
+const CompanyDepartment = require('../models/companydepartment.model');
 
 
 function getDepartments(company, query) {
@@ -10,7 +10,7 @@ function getDepartments(company, query) {
     return;
   }
 
-  return Department.aggregate([ {$match: {company: company}}, {$lookup: {from: "jobrequisitions", localField: "_id", foreignField: "department", as: "jobs"}}, {$project: {_id: 1, company: 1, name: 1, background: 1, noOfJobs: {$size: "$jobs"}}} ]);
+  return CompanyDepartment.aggregate([ {$match: {company: company}}, {$lookup: {from: "jobrequisitions", localField: "_id", foreignField: "department", as: "jobs"}}, {$project: {_id: 1, company: 1, name: 1, background: 1, noOfJobs: {$size: "$jobs"}}} ]);
 }
 
 function findDepartmentsByCompany(company) {
@@ -20,7 +20,7 @@ function findDepartmentsByCompany(company) {
     return;
   }
 
-  return Department.find({company: company});
+  return CompanyDepartment.find({company: company});
 }
 
 
@@ -33,7 +33,7 @@ function addDepartment(department) {
 
   const randomColor = Math.floor(Math.random()*16777215).toString(16);
   department.background = "#" + randomColor;
-  department = new Department(department).save();
+  department = new CompanyDepartment(department).save();
   return department;
 
 }
@@ -45,7 +45,7 @@ function getDepartmentsByList(departments) {
     return;
   }
 
-  data = Department.find({_id: {$in: departments}});
+  data = CompanyDepartment.find({_id: {$in: departments}});
   return data;
 
 }

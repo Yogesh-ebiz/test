@@ -45,7 +45,7 @@ const applicationService = require('../services/application.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
-const {getDepartments, addDepartment} = require('../services/department.service');
+const {getDepartments, addDepartment} = require('../services/companydepartment.service');
 const pipelineTemplateService = require('../services/pipelineTemplate.service');
 
 const pipelineService = require('../services/pipeline.service');
@@ -66,7 +66,7 @@ const questionTemplateService= require('../services/questiontemplate.service');
 const candidateService = require('../services/candidate.service');
 const jobViewService = require('../services/jobview.service');
 const bookmarkService = require('../services/bookmark.service');
-const departmentService = require('../services/department.service');
+const departmentService = require('../services/companydepartment.service');
 const cardService = require('../services/card.service');
 const flagService = require('../services/flag.service');
 const taskService = require('../services/task.service');
@@ -87,7 +87,7 @@ const {} = require('../services/company.service');
 const JobRequisition = require('../models/jobrequisition.model');
 const Application = require('../models/application.model');
 const Role = require('../models/role.model');
-const Department = require('../models/department.model');
+const Department = require('../models/companydepartment.model');
 const NotificationPreference = require('../models/notificationpreference.model');
 
 

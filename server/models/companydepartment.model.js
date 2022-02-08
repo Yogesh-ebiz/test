@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
-const DepartmentSchema = new mongoose.Schema({
+const CompanyDepartmentSchema = new mongoose.Schema({
   name: {
     type: String
   },
@@ -33,15 +33,15 @@ const DepartmentSchema = new mongoose.Schema({
 });
 
 
-DepartmentSchema.plugin(autoIncrement, {
-  model: 'Department',
+CompanyDepartmentSchema.plugin(autoIncrement, {
+  model: 'CompanyDepartment',
   field: 'departmentId',
   startAt: 100000,
   incrementBy: 1
 });
-DepartmentSchema.plugin(mongoosePaginate);
+CompanyDepartmentSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('Department', DepartmentSchema);
+module.exports = mongoose.model('CompanyDepartment', CompanyDepartmentSchema);
 
 

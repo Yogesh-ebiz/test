@@ -20,7 +20,7 @@ const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getPromotions, findPromotionById, findPromotionByObjectId} = require('../services/promotion.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
-const {getDepartments, addDepartment} = require('../services/department.service');
+const {getDepartments, addDepartment} = require('../services/companydepartment.service');
 const {getPipelines, addPipeline} = require('../services/pipeline.service');
 const companyService = require('../services/company.service');
 const roleService = require('../services/role.service');
@@ -39,7 +39,7 @@ const JobRequisition = require('../models/jobrequisition.model');
 const CompanyReview = require('../models/companyreview.model');
 // const CompanyReviewReport = require('../models/companyreviewreport.model');
 const CompanyReviewReaction = require('../models/companyreviewreaction.model');
-const Department = require('../models/department.model');
+const CompanyDepartment = require('../models/companydepartment.model');
 const Pipeline = require('../models/pipeline.model');
 const Role = require('../models/role.model');
 const Label = require('../models/label.model');
@@ -762,7 +762,7 @@ async function updateCompanyDepartment(company, departmentId, currentUserId, for
   try {
     if (isPartyActive(currentParty)) {
 
-      let department = await Department.findById(departmentId);
+      let department = await CompanyDepartment.findById(departmentId);
       if(department){
         department.name = form.name;
         department.updatedBy = currentUserId;
@@ -789,7 +789,7 @@ async function deleteCompanyDepartment(company, departmentId, currentUserId) {
 
   try {
     if (isPartyActive(currentParty)) {
-      let department = await Department.findById(departmentId);
+      let department = await CompanyDepartment.findById(departmentId);
       if(department){
         result = await department.delete();
         if(result){
