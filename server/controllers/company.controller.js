@@ -62,8 +62,8 @@ const salarySchema = Joi.object({
   tip: Joi.number(),
   commision: Joi.number(),
   gender: Joi.string(),
-  city: Joi.string(),
-  state: Joi.string().optional(),
+  city: Joi.string().allow(''),
+  state: Joi.string().allow(''),
   country: Joi.string()
 })
 
