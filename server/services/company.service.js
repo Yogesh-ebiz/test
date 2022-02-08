@@ -466,7 +466,7 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
       noOfTip: {$sum: {$cond: {if: {$gt: ['$tip', 0]}, then: 1, else: 0}}},
       minCommision: {'$min': '$commision'},
       maxCommision: {'$max': '$commision'},
-      avgCommission: {'$avg': '$commision'},
+      avgCommision: {'$avg': '$commision'},
       noOfCommision: {$sum: {$cond: {if: {$gt: ['$commision', 0]}, then: 1, else: 0}}},
       count: {'$sum': 1}
     };
@@ -484,7 +484,7 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
           minBaseSalary: 1, maxBaseSalary: 1, avgBaseSalary: {$floor: '$avgBaseSalary'},
           minAdditionalIncome: 1, maxAdditionalIncome: 1, avgAdditionalIncome: {$floor: '$avgAdditionalIncome'},
           minCashBonus: 1, maxCashBonus: 1, avgCashBonus: {$floor: '$avgCashBonus'}, noCashBonus: 1,
-          minStockBonus: 1, maxStockBonus: 1, avgStockBonus: {$floor: '$StockBonus'}, noStockBonus: 1,
+          minStockBonus: 1, maxStockBonus: 1, avgStockBonus: {$floor: '$avgStockBonus'}, noStockBonus: 1,
           minProfitSharing: 1, maxProfitSharing: 1, avgProfitSharing: {$floor: '$avgProfitSharing'}, noOfProfitSharing: 1,
           minTip: 1, maxTip: 1, avgTip: {$floor: '$avgTip'}, noOfTip: 1,
           minCommision: 1, maxCommision: 1, avgCommision: {$floor: '$avgCommision'}, noOfCommision: 1,
