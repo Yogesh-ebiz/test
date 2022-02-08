@@ -845,23 +845,33 @@ async function groupSalaryByJobFunctions(company, locale) {
     {$project: {_id: 0, employmentTitle: '$_id.employmentTitle', avgBaseSalary: 1, jobFunction: 1,count: 1}}
   ]);
 
-  let jobFunctions = await feedService.findJobfunction('', _.map(data, 'jobFunction'), locale);
-  data = _.reduce(_.groupBy(data, 'jobFunction'), function(res, val, key) {
-    let avgBaseSalary = 0;
-    let total = 0;
-    let totalCount = 0
+  data = _.groupBy(data, 'jobFunction');
 
-    for(let i = 0; i< val.length; i++){
-      total+=val[i].avgBaseSalary;
+  let jobFunctions = await feedService.findJobfunction('', [],  locale);
+
+  jobFunctions = _.reduce(jobFunctions, function(res, val, key) {
+
+    let item = {id: val.id, name: val.name, shortCode: val.shortCode, count: 0, avgBaseSalary:0, list: []};
+    let jobFunction = data[val.shortCode];
+
+    if(jobFunction){
+      item.count = _.sumBy(jobFunction, 'count');
+      let total = 0;
+      for(let i = 0; i< jobFunction.length; i++){
+        total+=jobFunction[i].avgBaseSalary;
+      }
+
+      item.avgBaseSalary = total/jobFunction.length;
+      item.list = jobFunction;
+
     }
-    avgBaseSalary = total/val.length;
 
-    let jobFunction = _.find(jobFunctions, {shortCode: key});
-    let item = {id: jobFunction.id, name: jobFunction.name, shortCode: key, count: _.sumBy(val, 'count'), avgBaseSalary:avgBaseSalary, list: val}
+
+
     res.push(item);
     return res;
   }, []);
-  return data;
+  return jobFunctions;
 }
 
 
