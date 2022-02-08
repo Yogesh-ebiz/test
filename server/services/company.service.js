@@ -467,7 +467,7 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
     };
 
     data = await CompanySalary.aggregate([
-      {$match: {company: companyId, employmentTitle: employmentTitle}},
+      {$match: {company: companyId, employmentTitle: { $regex: new RegExp("^" + employmentTitle.toLowerCase(), "i")  }}},
       {
         $group: group
       },
