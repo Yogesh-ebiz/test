@@ -640,14 +640,15 @@ async function searchSuggestions(keyword, locale) {
 
 
   let results = await JobRequisition.aggregate([
-      {$match: {title: { $regex: keyword, $options: 'i'} } },
-      { $project: {_id: 0, title: 1} }
+      { $match: {title: { $regex: keyword, $options: 'i'} } },
+      { $group:{_id:{title:'$title'}, count:{$sum:1}} },
+      { $project: {_id: 0, title:'$_id.title'} }
       ]).limit(10).sort({title: 1});
 
   results = _.reduce(results, function(a, b){
-      a.push(b.title);
-      return a;
-      }, []);
+    a.push(b.title);
+    return a;
+  }, []);
 
   return results;
 
