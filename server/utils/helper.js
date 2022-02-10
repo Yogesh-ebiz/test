@@ -257,6 +257,17 @@ const categoryMinimal = (category) => {
   };
 }
 
+
+function isUserActive(user){{
+
+  if(!user){
+    return false;
+  }
+  let status = _.includes(['ACTIVE', 'NEW'], user.status);
+
+  return status;
+}}
+
 const roleMinimal = (role) => {
   if(!role){
     return null;
@@ -363,6 +374,7 @@ module.exports = {
   convertToCandidate:convertToCandidate,
   convertToCauser:convertToCauser,
   roleMinimal:roleMinimal,
+  isUserActive: isUserActive,
   jobMinimal:jobMinimal,
   buildFileUrl:buildFileUrl,
   buildCompanyUrl:buildCompanyUrl,

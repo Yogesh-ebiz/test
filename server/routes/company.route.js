@@ -20,12 +20,13 @@ router.route('/:id/sync/avatar').post(asyncHandler(syncAvatar));
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
-router.route('/:id/salaries/jobfunctions').get(asyncHandler(getCompanySalaryGroupByFunctions));
+router.route('/:id/salaries/jobfunctions').get(asyncHandler(getCompanySalariesGroupByJobFunctions));
 router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymentTitle));
 router.route('/:id/salaries/filter/locations/search').get(asyncHandler(getCompanySalaryLocations));
 router.route('/:id/salaries/filter/employmenttitles/search').get(asyncHandler(getCompanySalaryEmploymentTitles));
 router.route('/:id/salaries/filter/jobfunctions/search').get(asyncHandler(getCompanySalaryJobFunctions));
-router.route('/:id/salaries/:id/reaction').post(asyncHandler(addSalaryReaction));
+router.route('/:id/salaries/:id/reactions').post(asyncHandler(addSalaryReaction));
+router.route('/:id/salaries/:id/gender').get(asyncHandler(getCompanySalaryGroupByGender));
 
 
 router.route('/:id/reviews').post(asyncHandler(addCompanyReview));
@@ -135,12 +136,14 @@ async function getCompanySalaries(req, res) {
   res.json(new Response(data, data?'companysalaries_retrieved_successful':'not_found', res));
 }
 
-async function getCompanySalaryGroupByFunctions(req, res) {
+async function getCompanySalariesGroupByJobFunctions(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
-  let data = await companyCtl.getCompanySalaryGroupByFunctions(company, req.locale);
+  let data = await companyCtl.getCompanySalariesGroupByJobFunctions(company, req.locale);
   res.json(new Response(data, data?'companysalarylanding_retrieved_successful':'not_found', res));
 }
+
+
 
 async function getCompanySalaryByEmploymentTitle(req, res) {
 
@@ -174,6 +177,15 @@ async function getCompanySalaryJobFunctions(req, res) {
 }
 
 
+
+async function getCompanySalaryGroupByGender(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let data = await companyCtl.getCompanySalaryGroupByGender(company, req.locale);
+  res.json(new Response(data, data?'companysalarygroupgender_retrieved_successful':'not_found', res));
+}
+
+
 async function addSalaryReaction(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let company = parseInt(req.params.id);
@@ -182,6 +194,7 @@ async function addSalaryReaction(req, res) {
   let data = await companyCtl.addSalaryReaction(currentUserId, salaryHistoryId, reaction);
   res.json(new Response(data, data?'companysalary_reaction_added_successful':'not_found', res));
 }
+
 
 
 async function addCompanyReview(req, res) {

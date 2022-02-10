@@ -427,7 +427,7 @@ function findSalariesByCompanyId(filter) {
 
 //TODO: Refactor
 async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country) {
-  let data = null;
+  let result = null;
 
   if (!companyId || !employmentTitle) {
     return null;
@@ -435,22 +435,22 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
 
   country = country ? country : 'US';
 
-  data = await CompanySalaryHistory.findOne({
+  result = await CompanySalaryHistory.findOne({
     company: companyId,
     employmentTitle: {$regex: new RegExp("^" + employmentTitle.toLowerCase(), "i")},
     country: country
   });
   var diffDays = 0;
 
-  if (data){
+  if (result){
     let date = new Date();
-    var differenceTime = date.getTime() - data.createdDate;
+    var differenceTime = date.getTime() - result.createdDate;
     diffDays = differenceTime / (1000 * 3600 * 24);
   }
 
-  if(!data || diffDays>7){
+  if(!result || diffDays>7){
     let group = {
-      _id: {employmentTitle: '$employmentTitle', country: '$country', company: '$company'},
+      _id: {employmentTitle: '$employmentTitle', country: '$country', company: '$company', gender: '$gender'},
       avgTotalPay: {$avg: {$sum: ['$baseSalary', '$additionalIncome', '$cashBonus', '$stockBonus', '$profitSharing', '$tip', '$commision']}},
       minBaseSalary: {'$min': '$baseSalary'},
       maxBaseSalary: {'$max': '$baseSalary'},
@@ -481,7 +481,19 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
       count: {'$sum': 1}
     };
 
-    data = await CompanySalary.aggregate([
+    let group2 = {
+      _id: {gender: '$_id.gender'},
+      avgTotalPay: {$first: '$avgTotalPay'},
+      avgBaseSalary: {$first: '$avgBaseSalary'},
+      count: { $first: '$count' },
+      genders: {
+        $push: {
+          gender: '$_id.gender'
+        }
+      }
+    };
+
+    let data = await CompanySalary.aggregate([
       {$match: {company: companyId, employmentTitle: {$regex: new RegExp("^" + employmentTitle.toLowerCase(), "i")}}},
       {
         $group: group
@@ -522,26 +534,36 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
           maxCommision: 1,
           avgCommision: {$floor: '$avgCommision'},
           noOfCommision: 1,
+          genders: 1,
           count: '$count'
         }
       }
     ]);
+
+
+    console.log(data);
 
     if (data.length) {
       data = data[0];
       data.createdDate = Date.now();
       data.lastUpdatedDate = Date.now();
 
-      data = await new CompanySalaryHistory(data).save();
+      if(result){
+        result = _.merge(result, data);
+        result = result.save();
+      } else {
+        result = await new CompanySalaryHistory(data).save();
+      }
+
 
     } else {
-      data = null;
+      result = null;
     }
 
   }
 
 
-  return data;
+  return result;
 }
 
 
@@ -886,6 +908,50 @@ async function groupSalaryByJobFunctions(company, locale) {
 }
 
 
+async function groupSalaryByGender(company, locale) {
+  let data = null;
+
+  if(!company){
+    return [];
+  }
+
+  let match = {};
+  data = await CompanySalary.aggregate([
+    {$match: {company: company}},
+    {$group: {_id: {employmentTitle: '$employmentTitle', gender: '$gender'}, avgBaseSalary: {'$avg': '$baseSalary'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, gender: '$_id.gender', employmentTitle: '$_id.employmentTitle', avgBaseSalary: 1,count: 1}}
+  ]);
+
+  data = _.groupBy(data, 'jobFunction');
+
+  let jobFunctions = await feedService.findJobfunction('', [],  locale);
+
+  jobFunctions = _.reduce(jobFunctions, function(res, val, key) {
+
+    let item = {id: val.id, name: val.name, shortCode: val.shortCode, count: 0, avgBaseSalary:0, list: []};
+    let jobFunction = data[val.shortCode];
+
+    if(jobFunction){
+      item.count = _.sumBy(jobFunction, 'count');
+      let total = 0;
+      for(let i = 0; i< jobFunction.length; i++){
+        total+=jobFunction[i].avgBaseSalary;
+      }
+
+      item.avgBaseSalary = total/jobFunction.length;
+      item.list = jobFunction;
+
+    }
+
+
+
+    res.push(item);
+    return res;
+  }, []);
+  return jobFunctions;
+}
+
+
 module.exports = {
   add:add,
   register:register,
@@ -908,5 +974,6 @@ module.exports = {
   findTop3Highlights:findTop3Highlights,
   addCompanyReviewReport:addCompanyReviewReport,
   getCompanyCandidateInsights:getCompanyCandidateInsights,
-  groupSalaryByJobFunctions:groupSalaryByJobFunctions
+  groupSalaryByJobFunctions:groupSalaryByJobFunctions,
+  groupSalaryByGender: groupSalaryByGender
 }

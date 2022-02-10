@@ -12,6 +12,19 @@ function addReaction(reaction) {
 }
 
 
+function getReactionsCountBySalaryHistoryId(salaryHistoryId) {
+
+  if(!salaryHistoryId){
+    return null;
+  }
+  return SalaryReaction.aggregate([
+    { $match: {salaryHistoryId: salaryHistoryId} },
+    { $group:{_id:{reactionType:'$reactionType'}, count:{$sum:1}} },
+    { $project:{_id:0, reactionType: '$_id.reactionType', count: 1 } }
+  ]);
+}
+
 module.exports = {
-  addReaction: addReaction
+  addReaction: addReaction,
+  getReactionsCountBySalaryHistoryId:getReactionsCountBySalaryHistoryId
 }

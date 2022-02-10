@@ -26,6 +26,7 @@ const filterRoutes = require('./filter.route');
 const policyRoutes = require('./policy.route');
 const subscriptionRoutes = require('./subscription.route');
 const roleRoutes = require('./role.route');
+const salaryRoutes = require('./salary.route');
 
 
 
@@ -58,11 +59,12 @@ router.use('/policies', policyRoutes);
 router.use('/products', productRoutes);
 router.use('/people', peopleRoutes);
 router.use('/roles', roleRoutes);
-
+router.use('/salaries', salaryRoutes);
 router.use('/subscriptions', subscriptionRoutes);
 router.use('/talent', talentRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/users', userRoutes);
 router.use('/workflows', workflowRoutes);
+
 
 module.exports = router;

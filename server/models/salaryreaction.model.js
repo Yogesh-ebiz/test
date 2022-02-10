@@ -5,12 +5,8 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 
 
 const SalaryReactionSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: false
-  },
   salaryHistoryId: {
-    type: Number,
+    type: Object,
     required: true
   },
   userId: {

@@ -59,6 +59,11 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  noCashBonus: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   maxCashBonus: {
     type: Number,
     required: false,
@@ -79,6 +84,11 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  noStockBonus: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   avgProfitSharing: {
     type: Number,
     required: false,
@@ -90,6 +100,11 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     default: 0
   },
   maxProfitSharing: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  noProfitSharing: {
     type: Number,
     required: false,
     default: 0
@@ -109,6 +124,11 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  noTip: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   avgCommision: {
     type: Number,
     required: false,
@@ -120,6 +140,11 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     default: 0
   },
   maxCommision: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  noCommision: {
     type: Number,
     required: false,
     default: 0

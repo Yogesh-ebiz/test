@@ -27,7 +27,7 @@ const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const salaryReactionService = require('../services/salaryreaction.service');
 
-const {addCompanySalary, groupSalaryByJobFunctions, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
+const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
 const memberService = require('../services/member.service');
@@ -140,11 +140,12 @@ module.exports = {
   getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
-  getCompanySalaryGroupByFunctions,
+  getCompanySalariesGroupByJobFunctions,
   getCompanySalaryByEmploymentTitle,
   getCompanySalaryLocations,
   getCompanySalaryEmploymentTitles,
-  getCompanySalaryJobFunctions,
+  getCompanySalariesJobFunctions,
+  getCompanySalaryGroupByGender,
   addSalaryReaction,
   addNewReview,
   getCompanyReviewStats,
@@ -334,7 +335,7 @@ async function getCompanySalaries(currentUserId, filter, locale) {
 }
 
 
-async function getCompanySalaryGroupByFunctions(companyId, locale) {
+async function getCompanySalariesGroupByJobFunctions(companyId, locale) {
   if(!companyId){
     return null;
   }
@@ -342,7 +343,7 @@ async function getCompanySalaryGroupByFunctions(companyId, locale) {
   let result = null;
   try {
 
-      result = await groupSalaryByJobFunctions(companyId, locale);
+      result = await companyService.groupSalaryByJobFunctions(companyId, locale);
 
 
   } catch (e) {
@@ -409,7 +410,7 @@ async function getCompanySalaryEmploymentTitles(currentUserId, companyId) {
   return result;
 }
 
-async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
+async function getCompanySalariesJobFunctions(currentUserId, companyId, locale) {
 
   if(currentUserId==null || companyId==null){
     return null;
@@ -418,7 +419,7 @@ async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
   let result = null;
   try {
 
-    result = await findAllCompanySalaryJobFunctions(companyId, locale);
+    result = await companyService.findAllCompanySalaryJobFunctions(companyId, locale);
     // result = _.reduce(result, function(res, item){
     //   if(item.jobFunction){
     //     res.push(item.jobFunction);
@@ -428,7 +429,25 @@ async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
     // }, []);
 
   } catch (e) {
-    console.log('Error: getCompanySalaryEmploymentTitles', e)
+    console.log('Error: getCompanySalaryJobFunctions', e)
+  }
+  return result;
+}
+
+
+async function getCompanySalaryGroupByGender(currentUserId, salaryHistoryId) {
+
+  if(!currentUserId || !salaryHistoryId){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await companyService.groupSalaryByGender(salaryHistoryId);
+
+  } catch (e) {
+    console.log('Error: getCompanySalaryGender', e)
   }
   return result;
 }
@@ -457,6 +476,8 @@ async function addSalaryReaction(currentUserId, salaryHistoryId, reaction) {
   }
   return result;
 }
+
+
 
 async function getCompanySalaryById(filter, locale) {
   let result = null;
