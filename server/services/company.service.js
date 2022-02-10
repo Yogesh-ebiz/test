@@ -428,19 +428,28 @@ function findSalariesByCompanyId(filter) {
 async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country) {
   let data = null;
 
-  if(!companyId || !employmentTitle){
-    return [];
+  if (!companyId || !employmentTitle) {
+    return null;
   }
 
-  // data = await CompanySalaryHistory.findOne({company: companyId, employmentTitle: employmentTitle, country: country});
-  //
-  // if(data){
-  //   // data.lastUpdatedDate = data.lastUpdatedDate?data.lastUpdatedDate:data.createdDate;
-  //
-  // } else {
+  country = country ? country : 'US';
 
+  data = await CompanySalaryHistory.findOne({
+    company: companyId,
+    employmentTitle: {$regex: new RegExp("^" + employmentTitle.toLowerCase(), "i")},
+    country: country
+  });
+  var diffDays = 0;
+
+  if (data){
+    let date = new Date();
+    var differenceTime = date.getTime() - data.createdDate;
+    diffDays = differenceTime / (1000 * 3600 * 24);
+  }
+
+  if(!data || diffDays>7){
     let group = {
-      _id: {employmentTitle: '$employmentTitle', country: '$country'},
+      _id: {employmentTitle: '$employmentTitle', country: '$country', company: '$company'},
       avgTotalPay: {$avg: {$sum: ['$baseSalary', '$additionalIncome', '$cashBonus', '$stockBonus', '$profitSharing', '$tip', '$commision']}},
       minBaseSalary: {'$min': '$baseSalary'},
       maxBaseSalary: {'$max': '$baseSalary'},
@@ -472,67 +481,63 @@ async function findCompanySalaryByEmploymentTitle(companyId, employmentTitle, co
     };
 
     data = await CompanySalary.aggregate([
-      {$match: {company: companyId, employmentTitle: { $regex: new RegExp("^" + employmentTitle.toLowerCase(), "i")  }}},
+      {$match: {company: companyId, employmentTitle: {$regex: new RegExp("^" + employmentTitle.toLowerCase(), "i")}}},
       {
         $group: group
       },
       {
         $project: {
           _id: 0,
-          employmentTitle: '$_id.employmentTitle', country: '$_id.country', baseSalary: '$baseSalary',
+          company: '$_id.company',
+          employmentTitle: '$_id.employmentTitle',
+          city: '$_id.city',
+          state: '$_id.state',
+          country: '$_id.country',
+          baseSalary: '$baseSalary',
           avgTotalPay: {$floor: '$avgTotalPay'},
-          minBaseSalary: 1, maxBaseSalary: 1, avgBaseSalary: {$floor: '$avgBaseSalary'},
-          minAdditionalIncome: 1, maxAdditionalIncome: 1, avgAdditionalIncome: {$floor: '$avgAdditionalIncome'},
-          minCashBonus: 1, maxCashBonus: 1, avgCashBonus: {$floor: '$avgCashBonus'}, noCashBonus: 1,
-          minStockBonus: 1, maxStockBonus: 1, avgStockBonus: {$floor: '$avgStockBonus'}, noStockBonus: 1,
-          minProfitSharing: 1, maxProfitSharing: 1, avgProfitSharing: {$floor: '$avgProfitSharing'}, noOfProfitSharing: 1,
-          minTip: 1, maxTip: 1, avgTip: {$floor: '$avgTip'}, noOfTip: 1,
-          minCommision: 1, maxCommision: 1, avgCommision: {$floor: '$avgCommision'}, noOfCommision: 1,
+          minBaseSalary: 1,
+          maxBaseSalary: 1,
+          avgBaseSalary: {$floor: '$avgBaseSalary'},
+          minAdditionalIncome: 1,
+          maxAdditionalIncome: 1,
+          avgAdditionalIncome: {$floor: '$avgAdditionalIncome'},
+          minCashBonus: 1,
+          maxCashBonus: 1,
+          avgCashBonus: {$floor: '$avgCashBonus'},
+          noCashBonus: 1,
+          minStockBonus: 1,
+          maxStockBonus: 1,
+          avgStockBonus: {$floor: '$avgStockBonus'},
+          noStockBonus: 1,
+          minProfitSharing: 1,
+          maxProfitSharing: 1,
+          avgProfitSharing: {$floor: '$avgProfitSharing'},
+          noOfProfitSharing: 1,
+          minTip: 1,
+          maxTip: 1,
+          avgTip: {$floor: '$avgTip'},
+          noOfTip: 1,
+          minCommision: 1,
+          maxCommision: 1,
+          avgCommision: {$floor: '$avgCommision'},
+          noOfCommision: 1,
           count: '$count'
         }
       }
     ]);
 
-    if(data.length){
-      data=data[0];
+    if (data.length) {
+      data = data[0];
       data.createdDate = Date.now();
       data.lastUpdatedDate = Date.now();
+
+      data = await new CompanySalaryHistory(data).save();
+
     } else {
-      data=null;
+      data = null;
     }
 
-
-    // console.log('data', data)
-    // if(data.length){
-    //   // for(data[0] of data){
-    //     data = await CompanySalaryHistory.findOneAndUpdate({company: companyId, employmentTitle: employmentTitle, country: country},
-    //       {$set: {
-    //           company: companyId,
-    //           avgTotalPay: data[0].avgTotalPay,
-    //           employmentTitle: data[0].employmentTitle,
-    //           minBaseSalary: data[0].minBaseSalary,
-    //           maxBaseSalary: data[0].maxBaseSalary,
-    //           avgBaseSalary: data[0].avgBaseSalary,
-    //           minAdditionalIncome: data[0].minAdditionalIncome,
-    //           maxAdditionalIncome: data[0].maxAdditionalIncome,
-    //           avgAdditionalIncome: data[0].avgAdditionalIncome,
-    //           minCashBonus: data[0].minCashBonus,
-    //           maxCashBonus: data[0].maxCashBonus,
-    //           minStockBonus: data[0].minStockBonus,
-    //           maxStockBonus: data[0].maxStockBonus,
-    //           minProfitSharing: data[0].minProfitSharing,
-    //           maxProfitSharing: data[0].maxProfitSharing,
-    //           count: data[0].count,
-    //           lastUpdatedDate: Date.now()
-    //         }
-    //     }, {upsert:true, new: true});
-    //   // }
-    //
-    //   // data = _.find(data, {country: country});
-    // }
-  //
-  // }
-
+  }
 
 
   return data;
@@ -879,6 +884,14 @@ async function groupSalaryByJobFunctions(company, locale) {
   return jobFunctions;
 }
 
+async function addSalaryReview(form) {
+  if(!form){
+    return null;
+  }
+
+  let data = await
+  return data;
+}
 
 module.exports = {
   add:add,
@@ -902,5 +915,6 @@ module.exports = {
   findTop3Highlights:findTop3Highlights,
   addCompanyReviewReport:addCompanyReviewReport,
   getCompanyCandidateInsights:getCompanyCandidateInsights,
-  groupSalaryByJobFunctions:groupSalaryByJobFunctions
+  groupSalaryByJobFunctions:groupSalaryByJobFunctions,
+  addSalaryReview: addSalaryReview
 }

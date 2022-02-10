@@ -25,7 +25,7 @@ const {getPipelines, addPipeline} = require('../services/pipeline.service');
 const companyService = require('../services/company.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
-
+const salaryReactionService = require('../services/salaryreaction.service');
 
 const {addCompanySalary, groupSalaryByJobFunctions, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
@@ -145,6 +145,7 @@ module.exports = {
   getCompanySalaryLocations,
   getCompanySalaryEmploymentTitles,
   getCompanySalaryJobFunctions,
+  addSalaryReaction,
   addNewReview,
   getCompanyReviewStats,
   getCompanyReviews,
@@ -428,6 +429,31 @@ async function getCompanySalaryJobFunctions(currentUserId, companyId, locale) {
 
   } catch (e) {
     console.log('Error: getCompanySalaryEmploymentTitles', e)
+  }
+  return result;
+}
+
+
+async function addSalaryReaction(currentUserId, salaryHistoryId, reaction) {
+
+  if(!currentUserId || !salaryHistoryId || !reaction){
+    return null;
+  }
+
+  let result = null;
+  try {
+    let currentParty = await findByUserId(currentUserId);
+
+    if (isPartyActive(currentParty)) {
+      reaction.salaryHistoryId = salaryHistoryId;
+      reaction.userId = currentUserId;
+      result = await salaryReactionService.addReaction(reaction);
+    }
+
+
+
+  } catch (e) {
+    console.log('Error: addSalaryReaction', e)
   }
   return result;
 }

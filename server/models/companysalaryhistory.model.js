@@ -34,12 +34,22 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  avgAdditionalIncome: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   minAdditionalIncome: {
     type: Number,
     required: false,
     default: 0
   },
   maxAdditionalIncome: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  avgCashBonus: {
     type: Number,
     required: false,
     default: 0
@@ -54,12 +64,22 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  avgStockBonus: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   minStockBonus: {
     type: Number,
     required: false,
     default: 0
   },
   maxStockBonus: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  avgProfitSharing: {
     type: Number,
     required: false,
     default: 0
@@ -74,12 +94,22 @@ const CompanySalaryHistorySchema = new mongoose.Schema({
     required: false,
     default: 0
   },
+  avgTip: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   minTip: {
     type: Number,
     required: false,
     default: 0
   },
   maxTip: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  avgCommision: {
     type: Number,
     required: false,
     default: 0

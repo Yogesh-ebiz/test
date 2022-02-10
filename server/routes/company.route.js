@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const ObjectID = require('mongodb').ObjectID;
 const asyncHandler = require('express-async-handler');
 const companyCtl = require('../controllers/company.controller');
 const hr = require('../controllers/hr.controller');
@@ -24,6 +25,7 @@ router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymen
 router.route('/:id/salaries/filter/locations/search').get(asyncHandler(getCompanySalaryLocations));
 router.route('/:id/salaries/filter/employmenttitles/search').get(asyncHandler(getCompanySalaryEmploymentTitles));
 router.route('/:id/salaries/filter/jobfunctions/search').get(asyncHandler(getCompanySalaryJobFunctions));
+router.route('/:id/salaries/:id/review').post(asyncHandler(addSalaryReview));
 
 
 router.route('/:id/reviews').post(asyncHandler(addCompanyReview));
@@ -170,6 +172,17 @@ async function getCompanySalaryJobFunctions(req, res) {
   let data = await companyCtl.getCompanySalaryJobFunctions(currentUserId, company, res.locale);
   res.json(new Response(data, data?'companysalary_jobfunctions_retrieved_successful':'not_found', res));
 }
+
+
+async function addSalaryReaction(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let salaryHistoryId = ObjectID(req.params.id);
+  let reaction = req.body;
+  let data = await companyCtl.addSalaryReaction(currentUserId, salaryHistoryId, reaction);
+  res.json(new Response(data, data?'companysalary_reaction_added_successful':'not_found', res));
+}
+
 
 async function addCompanyReview(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
