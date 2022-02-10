@@ -25,7 +25,7 @@ router.route('/:id/salaries/title').get(asyncHandler(getCompanySalaryByEmploymen
 router.route('/:id/salaries/filter/locations/search').get(asyncHandler(getCompanySalaryLocations));
 router.route('/:id/salaries/filter/employmenttitles/search').get(asyncHandler(getCompanySalaryEmploymentTitles));
 router.route('/:id/salaries/filter/jobfunctions/search').get(asyncHandler(getCompanySalaryJobFunctions));
-router.route('/:id/salaries/:id/review').post(asyncHandler(addSalaryReview));
+router.route('/:id/salaries/:id/reaction').post(asyncHandler(addSalaryReaction));
 
 
 router.route('/:id/reviews').post(asyncHandler(addCompanyReview));

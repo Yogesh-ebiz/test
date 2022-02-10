@@ -7,6 +7,7 @@ const roleType = require('../const/roleType');
 const Company = require('../models/company.model');
 const CompanySalary = require('../models/companysalary.model');
 const CompanySalaryHistory = require('../models/companysalaryhistory.model');
+const SalaryReaction = require('../models/salaryreaction.model');
 
 const CompanyReview = require('../models/companyreview.model');
 const CompanyReviewHistory = require('../models/companyreviewhistory.model');
@@ -884,14 +885,6 @@ async function groupSalaryByJobFunctions(company, locale) {
   return jobFunctions;
 }
 
-async function addSalaryReview(form) {
-  if(!form){
-    return null;
-  }
-
-  let data = await
-  return data;
-}
 
 module.exports = {
   add:add,
@@ -915,6 +908,5 @@ module.exports = {
   findTop3Highlights:findTop3Highlights,
   addCompanyReviewReport:addCompanyReviewReport,
   getCompanyCandidateInsights:getCompanyCandidateInsights,
-  groupSalaryByJobFunctions:groupSalaryByJobFunctions,
-  addSalaryReview: addSalaryReview
+  groupSalaryByJobFunctions:groupSalaryByJobFunctions
 }
