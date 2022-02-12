@@ -924,30 +924,14 @@ async function groupSalaryByLocations(company, locale) {
 
   data = _.groupBy(data, 'country');
 
-  //
-  //
-  // jobFunctions = _.reduce(jobFunctions, function(res, val, key) {
-  //
-  //   let item = {id: val.id, name: val.name, shortCode: val.shortCode, count: 0, avgBaseSalary:0, list: []};
-  //   let jobFunction = data[val.shortCode];
-  //
-  //   if(jobFunction){
-  //     item.count = _.sumBy(jobFunction, 'count');
-  //     let total = 0;
-  //     for(let i = 0; i< jobFunction.length; i++){
-  //       total+=jobFunction[i].avgBaseSalary;
-  //     }
-  //
-  //     item.avgBaseSalary = total/jobFunction.length;
-  //     item.list = jobFunction;
-  //
-  //   }
-  //
-  //
-  //
-  //   res.push(item);
-  //   return res;
-  // }, []);
+  data = _.reduce(data, function(res, val, key) {
+
+    res[key] = _.groupBy(val, function(item) {
+      return item.state?item.state:'UNKNOWN';
+    });
+
+    return res;
+  }, {});
   return data;
 }
 
