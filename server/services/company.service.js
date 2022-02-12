@@ -908,6 +908,50 @@ async function groupSalaryByJobFunctions(company, locale) {
 }
 
 
+async function groupSalaryByLocations(company, locale) {
+  let data = null;
+
+  if(!company){
+    return [];
+  }
+
+  let match = {};
+  data = await CompanySalary.aggregate([
+    {$match: {company: company}},
+    {$group: {_id: {city: '$city', state: '$state', country: '$country'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, city: '$_id.city', state: '$_id.state', country: '$_id.country', count: 1}}
+  ]);
+
+  data = _.groupBy(data, 'country');
+
+  //
+  //
+  // jobFunctions = _.reduce(jobFunctions, function(res, val, key) {
+  //
+  //   let item = {id: val.id, name: val.name, shortCode: val.shortCode, count: 0, avgBaseSalary:0, list: []};
+  //   let jobFunction = data[val.shortCode];
+  //
+  //   if(jobFunction){
+  //     item.count = _.sumBy(jobFunction, 'count');
+  //     let total = 0;
+  //     for(let i = 0; i< jobFunction.length; i++){
+  //       total+=jobFunction[i].avgBaseSalary;
+  //     }
+  //
+  //     item.avgBaseSalary = total/jobFunction.length;
+  //     item.list = jobFunction;
+  //
+  //   }
+  //
+  //
+  //
+  //   res.push(item);
+  //   return res;
+  // }, []);
+  return data;
+}
+
+
 async function groupSalaryByGender(company, locale) {
   let data = null;
 
@@ -975,5 +1019,6 @@ module.exports = {
   addCompanyReviewReport:addCompanyReviewReport,
   getCompanyCandidateInsights:getCompanyCandidateInsights,
   groupSalaryByJobFunctions:groupSalaryByJobFunctions,
+  groupSalaryByLocations:groupSalaryByLocations,
   groupSalaryByGender: groupSalaryByGender
 }

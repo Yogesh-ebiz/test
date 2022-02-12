@@ -141,6 +141,7 @@ module.exports = {
   addNewSalary,
   getCompanySalaries,
   getCompanySalariesGroupByJobFunctions,
+  getCompanySalariesGroupByLocations,
   getCompanySalaryByEmploymentTitle,
   getCompanySalaryLocations,
   getCompanySalaryEmploymentTitles,
@@ -348,6 +349,24 @@ async function getCompanySalariesGroupByJobFunctions(companyId, locale) {
 
   } catch (e) {
     console.log('getCompanySalaries: Error', e);
+  }
+
+  return result;
+}
+
+
+async function getCompanySalariesGroupByLocations(companyId, locale) {
+  if(!companyId){
+    return null;
+  }
+
+  let result = null;
+  try {
+
+    result = await companyService.groupSalaryByLocations(companyId, locale);
+
+  } catch (e) {
+    console.log('getCompanySalariesGroupByLocations: Error', e);
   }
 
   return result;

@@ -29,7 +29,7 @@ router.route('/:id/report').post(asyncHandler(reportJobById));
 router.route('/:id/capture').get(asyncHandler(captureJob));
 router.route('/:id/insight').get(asyncHandler(getJobInsight));
 
-
+router.route('/similar').get(asyncHandler(getSimilarJobsByTitle));
 router.route('/:id/similar').get(asyncHandler(getSimilarJobs));
 router.route('/:id/similar/list').get(asyncHandler(getSimilarJobList));
 router.route('/:id/similar/company').get(asyncHandler(getSimilarCompany));
@@ -179,6 +179,14 @@ async function getSimilarJobList(req, res) {
   }
   let jobId = parseInt(req.params.id);
   let data = await jobRequisitionCtl.getSimilarJobList(jobId, res.locale);
+  res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
+}
+
+
+async function getSimilarJobsByTitle(req, res) {
+  let title = req.query.title;
+  console.log(req.query.title)
+  let data = await jobRequisitionCtl.getSimilarJobsByTitle(title, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 

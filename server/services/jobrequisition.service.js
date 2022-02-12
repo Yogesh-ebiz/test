@@ -574,6 +574,30 @@ async function getSimilarJobList(jobId) {
   return data;
 }
 
+
+async function getSimilarJobsByTitle(title) {
+  let data = [];
+
+  if(!title){
+    return data;
+  }
+
+  data = await JobRequisition.aggregate([
+    { $match: {
+        $text: {
+          $search: title,
+          $diacriticSensitive: true,
+          $caseSensitive: false
+        }
+      }
+    },
+    { $limit: 10}
+  ])
+
+
+  return data;
+}
+
 async function getJobAds(jobId) {
   let data = null;
 
@@ -1053,6 +1077,7 @@ module.exports = {
   getJobMembers:getJobMembers,
   updateJobApplicationForm:updateJobApplicationForm,
   getSimilarJobList,
+  getSimilarJobsByTitle,
   getJobAds:getJobAds,
   closeJob:closeJob,
   archiveJob:archiveJob,

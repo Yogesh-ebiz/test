@@ -113,6 +113,7 @@ module.exports = {
   searchSuggestions,
   getSimilarJobs,
   getSimilarJobList,
+  getSimilarJobsByTitle,
   getLatestJobs,
   getSimilarCompany,
   applyJobById,
@@ -757,6 +758,16 @@ async function getSimilarJobList(jobId, locale) {
 
 }
 
+async function getSimilarJobsByTitle(title, locale) {
+  if(!title) {
+    return [];
+  }
+
+  let result = await jobService.getSimilarJobList(jobId);
+
+  return result;
+
+}
 
 async function getLatestJobs(req) {
 
