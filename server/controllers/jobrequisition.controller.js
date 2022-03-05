@@ -178,7 +178,7 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
 
         if (isPartyActive(currentParty)) {
 
-          let hasSaved = await bookmarkService.findBookById(currentParty.id, job.jobId);
+          let hasSaved = await bookmarkService.findBookById(currentParty.id, job._id);
           job.hasSaved = (hasSaved) ? true : false;
 
           let hasApplied = await findApplicationByUserIdAndJobId(currentParty.id, job._id);
@@ -711,7 +711,6 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
 
       let hasSaves = await bookmarkService.findBookByUserId(currentUserId);
 
-
       _.forEach(result.docs, function (job) {
         job.shareUrl = 'https://www.anymay.com/jobs/' + job.jobId;
         job.hasSaved = _.includes(_.map(hasSaves, 'jobId'), job.jobId);
@@ -745,7 +744,7 @@ async function getSimilarJobs(currentUserId, jobId, filter, pagination, locale) 
 }
 
 
-async function getSimilarJobList(jobId, locale) {
+async function getSimilarJobList(currentUserId, jobId, locale) {
 
   let foundJob = null;
   if(!jobId) {
@@ -753,7 +752,19 @@ async function getSimilarJobList(jobId, locale) {
   }
 
   let result = await jobService.getSimilarJobList(jobId);
-
+  let saved = await bookmarkService.findBookByUserId(currentUserId);
+  result = _.reduce(result, function(res, job){
+    if(_.some(saved, {jobId: job._id})){
+      job.hasSaved=true;
+    }
+    job.responsibilities=[];
+    job.qualifications=[];
+    job.minimumQualifications=[];
+    job.description='';
+    job.updatedBy=null
+    res.push(job);
+    return res;
+  }, []);
   return result;
 
 }

@@ -583,6 +583,23 @@ function findAllCompanySalaryLocations(company) {
   return data;
 }
 
+
+function findAllCompanySalaryTop5Locations(company) {
+  let data = null;
+
+  if(!company){
+    return;
+  }
+
+  data = CompanySalary.aggregate([
+    {$match: {company: company} },
+    {$group: {_id: {city: '$city', state: '$state', country: '$country'}, count:{$sum:1}}},
+    {$project: {_id: 0, city: '$_id.city', state: '$_id.state', country: '$_id.country', count: 1}}
+  ]).sort({count: -1});
+
+  return data;
+}
+
 function findAllCompanySalaryEmploymentTitles(company) {
   let data = null;
 
@@ -993,6 +1010,7 @@ module.exports = {
   findSalariesByCompanyId: findSalariesByCompanyId,
   findCompanySalaryByEmploymentTitle:findCompanySalaryByEmploymentTitle,
   findAllCompanySalaryLocations:findAllCompanySalaryLocations,
+  findAllCompanySalaryTop5Locations:findAllCompanySalaryTop5Locations,
   findAllCompanySalaryEmploymentTitles:findAllCompanySalaryEmploymentTitles,
   findAllCompanySalaryJobFunctions:findAllCompanySalaryJobFunctions,
   addCompanyReview:addCompanyReview,

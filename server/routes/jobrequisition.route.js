@@ -177,15 +177,15 @@ async function getSimilarJobList(req, res) {
   if(!req.params.id){
     res.json(new Response(null, res));
   }
+  let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
-  let data = await jobRequisitionCtl.getSimilarJobList(jobId, res.locale);
+  let data = await jobRequisitionCtl.getSimilarJobList(currentUserId, jobId, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
 
 
 async function getSimilarJobsByTitle(req, res) {
   let title = req.query.title;
-  console.log(req.query.title)
   let data = await jobRequisitionCtl.getSimilarJobsByTitle(title, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }

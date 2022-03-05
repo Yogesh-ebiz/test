@@ -551,7 +551,7 @@ async function getSimilarJobList(jobId) {
           }
         }
       },
-      { $limit: 9}
+      { $limit: 9 }
     ])
 
       // .populate([

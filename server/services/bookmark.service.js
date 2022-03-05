@@ -67,14 +67,14 @@ function removeBookById(userId, jobId) {
   return BookMark.remove({partyId: userId, jobId: jobId});
 }
 
-function findBookById(userId, jobId) {
+function findBookById(userId, id) {
   let data = null;
 
-  if(userId==null || jobId==null){
+  if(userId==null || id==null){
     return;
   }
 
-  return BookMark.findOne({partyId: userId, jobId: jobId});
+  return BookMark.findOne({partyId: userId, jobId: id});
 }
 
 function findBookByUserId(userId, size) {

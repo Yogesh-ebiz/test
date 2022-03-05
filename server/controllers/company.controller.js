@@ -144,6 +144,7 @@ module.exports = {
   getCompanySalariesGroupByLocations,
   getCompanySalaryByEmploymentTitle,
   getCompanySalaryLocations,
+  getCompanySalaryTop5Locations,
   getCompanySalaryEmploymentTitles,
   getCompanySalariesJobFunctions,
   getCompanySalaryGroupByGender,
@@ -381,7 +382,7 @@ async function getCompanySalaryByEmploymentTitle(currentUserId, companyId, emplo
   let result = null;
   try {
 
-    result = await findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country);
+    result = await companyService.findCompanySalaryByEmploymentTitle(companyId, employmentTitle, country);
     result.shareUrl = 'https://www.accessed.co/company/' + companyId + '/salary/' + employmentTitle.replace(' ', '-');
 
   } catch (e) {
@@ -399,7 +400,26 @@ async function getCompanySalaryLocations(currentUserId, companyId) {
   let result = null;
   try {
 
-    result = await findAllCompanySalaryLocations(companyId);
+    result = await companyService.findAllCompanySalaryLocations(companyId);
+
+
+  } catch (e) {
+    console.log('Error: getCompanySalaryLocations', e)
+  }
+  return result;
+}
+
+
+async function getCompanySalaryTop5Locations(companyId) {
+
+  if(companyId==null){
+    return null;
+  }
+
+  let result = null;
+  try {
+    console.log('getCompanySalaryTop5Locations')
+    result = await companyService.findAllCompanySalaryTop5Locations(companyId);
 
 
   } catch (e) {
@@ -417,7 +437,7 @@ async function getCompanySalaryEmploymentTitles(currentUserId, companyId) {
   let result = null;
   try {
 
-    result = await findAllCompanySalaryEmploymentTitles(companyId);
+    result = await companyService.findAllCompanySalaryEmploymentTitles(companyId);
     result = _.reduce(result, function(res, item){
       res.push(item.employmentTitle);
       return res;
