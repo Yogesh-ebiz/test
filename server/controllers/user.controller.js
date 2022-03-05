@@ -32,6 +32,7 @@ const feedService = require('../services/api/feed.service.api');
 const memberService = require('../services/member.service');
 const companyService = require('../services/company.service');
 const roleService = require('../services/role.service');
+const jobPreferenceService = require('../services/jobPreference.service');
 
 
 const {addCompany} = require('../services/api/party.service.api');
@@ -190,7 +191,9 @@ module.exports = {
   getPartyCertifications,
   addPartyCertification,
   updatePartyCertifications,
-  getUserEmployersJobs
+  getUserEmployersJobs,
+  getJobPreferences,
+  updateJobPreferences
 }
 
 
@@ -2482,6 +2485,33 @@ async function getUserEmployersJobs(currenterUserid, locale) {
 
     return a;
   }, []);
+  return res;
+
+}
+
+
+async function getJobPreferences(currenterUserid, locale) {
+
+  let res = null;
+  if(!currenterUserid){
+    return null;
+  }
+
+  res = await jobPreferenceService.getJobPreferences(currenterUserid);
+  return res;
+
+}
+
+
+async function updateJobPreferences(currenterUserid, jobPreferences, locale) {
+
+  let res = null;
+  if(!currenterUserid || !jobPreferences){
+    return null;
+  }
+
+  jobPreferences.userId = currenterUserid;
+  res = await jobPreferenceService.updateJobPreferences(jobPreferences);
   return res;
 
 }

@@ -253,5 +253,6 @@
 	"companysalary_reaction_added_successful": "companysalary_reaction_added_successful",
 	"companysalary_reaction_retrieved_successful": "companysalary_reaction_retrieved_successful",
 	"companysalary_gender_retrieved_successful": "companysalary_gender_retrieved_successful",
-	"companysalarygroupgender_retrieved_successful": "companysalarygroupgender_retrieved_successful"
+	"companysalarygroupgender_retrieved_successful": "companysalarygroupgender_retrieved_successful",
+	"jobPreferences_retrieved_successful": "jobPreferences_retrieved_successful"
 }

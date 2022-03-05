@@ -18,7 +18,6 @@ router.route('/:userId/resumes/upload').post(asyncHandler(uploadResume));
 router.route('/:userId/resumes').get(asyncHandler(getUserResumes));
 router.route('/:userId/resumes/:resumeId/default').post(asyncHandler(setResumeDefault));
 
-
 router.route('/:userId/experiences').get(asyncHandler(getPartyExperiences));
 router.route('/:userId/experiences').post(asyncHandler(updatePartyExperiences));
 router.route('/:userId/employers/jobs').get(asyncHandler(getEmployersJobs));
@@ -69,6 +68,8 @@ router.route('/:userId/certifications').get(asyncHandler(getPartyCertifications)
 router.route('/:userId/certifications').post(asyncHandler(addPartyCertification));
 router.route('/:userId/certifications').put(asyncHandler(updatePartyCertifications));
 
+router.route('/:userId/job/preferences').get(asyncHandler(getJobPreferences));
+router.route('/:userId/job/preferences').put(asyncHandler(updateJobPreferences));
 
 
 async function sync(req, res) {
@@ -284,6 +285,7 @@ async function setResumeDefault(req, res) {
 }
 
 
+
 async function getApplicationsByUserId(req, res) {
 
   let currentUserId = parseInt(req.params.userId);
@@ -413,4 +415,23 @@ async function updatePartyCertifications(req, res) {
   let data = await userCtl.updatePartyCertifications(currentUserId, certifications);
 
   res.json(new Response(data, data?'certifications_updated_successful':'not_found', res));
+}
+
+
+
+async function getJobPreferences(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let userId = parseInt(req.params.userId);
+  let data = await userCtl.getJobPreferences(currentUserId, userId, res.locale);
+  res.json(new Response(data, data?'jobPreferences_retrieved_successful':'not_found', res));
+}
+
+
+
+async function updateJobPreferences(req, res) {
+
+  let currentUserId = parseInt(req.params.userId);
+  let data = await userCtl.updateJobPreferences(currentUserId, req.body, res.locale);
+  res.json(new Response(data, data?'jobPreferences_updated_successful':'not_found', res));
 }
