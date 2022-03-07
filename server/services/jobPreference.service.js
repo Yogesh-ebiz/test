@@ -14,7 +14,7 @@ const jobPreferenceSchema = Joi.object({
   openToRelocate: Joi.boolean().optional(),
   openToJob: Joi.boolean().optional(),
   openToRemote: Joi.boolean().optional(),
-  startDate: Joi.string().optional(),
+  startDate: Joi.string().allow(''),
 });
 
 
@@ -25,7 +25,7 @@ async function updateJobPreferences(jobPreferences) {
   }
 
   jobPreferences = await Joi.validate(jobPreferences, jobPreferenceSchema, {abortEarly: false});
-  jobPreferences = await new JobPreference(jobPreferences).save();
+  jobPreferences = await JobPreference.update({userId:jobPreferences.userId}, {$set:{...jobPreferences}}, {upsert:true})
 
   return jobPreferences;
 

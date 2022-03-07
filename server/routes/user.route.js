@@ -421,7 +421,7 @@ async function updatePartyCertifications(req, res) {
 
 async function getJobPreferences(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let userId = parseInt(req.params.userId);
   let data = await userCtl.getJobPreferences(currentUserId, userId, res.locale);
   res.json(new Response(data, data?'jobPreferences_retrieved_successful':'not_found', res));
