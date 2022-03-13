@@ -220,6 +220,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     required: false,
     default: 'http://www.accessed.co/jobs/'
   },
+  companyId: {
+    type: Number,
+    required: true
+  },
   company: { type: Schema.Types.ObjectId, ref: 'Company' },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
   department: { type: Schema.Types.ObjectId, ref: 'Department'},

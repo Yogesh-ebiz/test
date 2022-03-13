@@ -38,6 +38,7 @@ const jobSchema = Joi.object({
   durationMonths: Joi.number().optional(),
   minMonthExperience: Joi.number().optional(),
   maxMonthExperience: Joi.number().optional(),
+  companyId: Joi.number().optional(),
   currency: Joi.string(),
   noOfResources: Joi.number(),
   type: Joi.string(),
@@ -95,6 +96,7 @@ async function addJob(companyId, member, form) {
   let pipeline = await pipelineService.getDefaultTemplate();
   form.pipeline = pipeline._id;
   form.company = company._id;
+  form.companyId = companyId;
   form.members = [member._id];
   form.createdBy = member._id;
 

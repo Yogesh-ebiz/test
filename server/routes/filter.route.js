@@ -29,7 +29,6 @@ router.use('/cities/search', getAllCities);
 
 router.use('/languages/search', getLanguages);
 
-router.use('/locations/search', getAllJobLocations);
 
 router.route('/industries/search').get(asyncHandler(getAllIndustryies));
 router.route('/industries/:id').get(asyncHandler(getIndustryById));
@@ -41,7 +40,7 @@ router.route('/employmenttypes/:id').get(asyncHandler(getEmploymentTypeById));
 
 router.route('/skilltypes/search').get(asyncHandler(getAllSkillTypes));
 
-router.use('/jobfunctions/search', getAllJobFunctions);
+router.route('/jobfunctions/search', getAllJobFunctions);
 router.route('/jobfunctions/:id').get(asyncHandler(getJobFunctionById));
 
 router.route('/locations/search').get(asyncHandler(getAllJobLocations));
@@ -121,8 +120,7 @@ async function getLanguages(req, res) {
 }
 
 async function getAllJobLocations(req, res) {
-  let filter = req.query;
-  let data = await filterService.getAllJobLocations(filter);
+  let data = await filterService.getAllJobLocations(req.query);
   data = _.reduce(data, function(res, item){
       let temp = item._id;
       temp.count = item.count;

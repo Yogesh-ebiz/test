@@ -305,9 +305,18 @@ function getAllSkillTypes(filter, locale) {
 
 function getAllJobLocations(filter) {
   let aggregate = [];
-  if(filter.company){
-    aggregate.push({$match: {company: parseInt(filter.company)}});
+  let match = {};
+
+  if(filter.query){
+    let regex = new RegExp(filter.query,"i");
+    match['$or']= [{ city: { $regex: regex }}, { state: { $regex: regex }}, { country: { $regex: regex }}, { district: { $regex: regex }} ];
   }
+
+  if(filter.company){
+    match.companyId = parseInt(filter.company);
+  }
+
+  aggregate.push({$match: match});
 
   let group = { $group: {_id:{district:"$district", city:"$city", state: '$state', country: '$country'}, count:{$sum:1} } };
   aggregate.push(group);
@@ -358,7 +367,6 @@ module.exports = {
   getAllIndustries: getAllIndustries,
   getAllFeedIndustries:getAllFeedIndustries,
   getAllSkillTypes: getAllSkillTypes,
-  getAllJobLocations:getAllJobLocations,
   getAllFieldStudy:getAllFieldStudy,
   getAllCategories:getAllCategories,
   getFieldOfStudyListByShortCode:getFieldOfStudyListByShortCode
