@@ -927,25 +927,27 @@ async function search(currentUserId, query, filter, sort, locale) {
   let result;
   let currentDate = Date.now();
   let aList = [];
-  let aMatch = {$match: {}};
+  let match = {};
   let aSort;
 
 
-  if(query){
-    aMatch.$match.$or =  [{$text: { $search: query, $diacriticSensitive: true, $caseSensitive: false }}, {title: { $regex: query, $options: 'i'} }];
-  }
+  // if(query){
+  //   let regex = new RegExp(query, 'i');
+  //   match['$or'] =  [{title: { $regex: regex} }];
+  // }
 
 
-  if(filter.company.length){
-    let companies = await companyService.findByCompanyIds(filter.company, false);
-    aMatch.$match.company = {$in: _.reduce(companies, function(res, item){res.push(item._id); return res;}, [])};
-    filter.company = [];
-  }
 
-  if(filter.status.length){
-    aMatch.$match.status = {$in:filter.status};
-    filter.status = [];
-  }
+  // if(filter.company.length){
+  //   let companies = await companyService.findByCompanyIds(filter.company, false);
+  //   match.company = {$in: _.reduce(companies, function(res, item){res.push(item._id); return res;}, [])};
+  //   filter.company = [];
+  // }
+  //
+  // if(filter.status.length){
+  //   match.status = {$in:filter.status};
+  //   filter.status = [];
+  // }
 
 
 
@@ -957,7 +959,9 @@ async function search(currentUserId, query, filter, sort, locale) {
     aSort = { $sort: {createdDate: direction} };
   }
 
-  aList.push(aMatch);
+  console.log(match)
+  // aList.push({$match: match});
+  aList.push({ $match: new SearchParam(filter)});
   aList.push(
     {
       $lookup: {
@@ -1004,7 +1008,7 @@ async function search(currentUserId, query, filter, sort, locale) {
       }}
   );
 
-  aList.push({ $match: new SearchParam(filter)});
+
   aList.push(aSort);
 
   const aggregate = JobRequisition.aggregate(aList);

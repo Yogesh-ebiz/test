@@ -6,6 +6,9 @@ const ObjectID = require('mongodb').ObjectID;
 function SearchParam(filter) {
   this.query = {};
 
+  if (filter.query && filter.query!="") {
+    this.query.$text = { $search: filter.query, $diacriticSensitive: true, $caseSensitive: false };
+  }
 
   if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };
@@ -60,9 +63,6 @@ function SearchParam(filter) {
   }
 
 
-  if (filter.query && filter.query!="") {
-    this.query.$text = { $search: filter.query, $diacriticSensitive: true, $caseSensitive: false };
-  }
 
   if (filter.level && filter.level.length) {
     this.query.level = { $in: filter.level };
@@ -147,7 +147,6 @@ function SearchParam(filter) {
   //   }
   //   this.query.createdDate =  { $gte: date.getTime()};
   // }
-
 
 
   return this.query;
