@@ -959,10 +959,9 @@ async function search(currentUserId, query, filter, sort, locale) {
     aSort = { $sort: {createdDate: direction} };
   }
 
-  // aList.push({$match: match});
+  filter.query=query;
   filter.companyId = filter.company;
   delete filter.company;
-  console.log(new SearchParam(filter))
 
   aList.push({ $match: new SearchParam(filter)});
   aList.push(
