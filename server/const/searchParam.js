@@ -85,6 +85,11 @@ function SearchParam(filter) {
     this.query.company = { $in: filter.company };
   }
 
+  if (filter.companyId && filter.companyId.length) {
+
+    this.query.companyId = { $in: filter.companyId };
+  }
+
   if (filter.district && filter.district.length) {
     this.query.district =  { $in: filter.district};
   }
