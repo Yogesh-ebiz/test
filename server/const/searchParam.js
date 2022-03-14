@@ -62,7 +62,34 @@ function SearchParam(filter) {
     this.query.publishedDate =  { $gte: start.getTime()};
   }
 
+  if(filter.publishedDate && filter.publishedDate!='ANY'){
+    let start, end;
 
+
+    start = new Date();
+    start.setHours(0,0,0,0);
+
+    end = new Date();
+
+    switch (filter.publishedDate) {
+      case dateEnum.PASTDAY:
+        start.setDate(start.getDate() - 1);
+        console.log(dateEnum.PASTDAY, start)
+        break;
+      case dateEnum.PASTWEEK:
+        start.setDate(start.getDate() - 7);
+        console.log(dateEnum.PASTWEEK, start)
+        break;
+      case dateEnum.PASTBIWEEK:
+        start.setDate(start.getDate() - 14);
+        break;
+      case dateEnum.PASTMONTH:
+        start.setDate(start.getDate() - 30);
+        break;
+    }
+
+    this.query.publishedDate =  { $gte: start.getTime()};
+  }
 
   if (filter.level && filter.level.length) {
     this.query.level = { $in: filter.level };
