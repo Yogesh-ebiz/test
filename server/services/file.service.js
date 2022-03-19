@@ -28,6 +28,19 @@ async function addFile(file) {
 
 }
 
+async function findyByUserAndFileId(userId, fileId) {
+
+  if(!userId || !fileId){
+    return;
+  }
+
+  let file = await File.find({userId: userId, fileId: fileId});
+
+  return file;
+
+}
+
 module.exports = {
-  addFile:addFile
+  addFile:addFile,
+  findyByUserAndFileId:findyByUserAndFileId
 }

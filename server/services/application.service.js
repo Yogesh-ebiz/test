@@ -16,6 +16,9 @@ const emailCampaignStageType = require('../const/emailCampaignStageType');
 
 const Application = require('../models/application.model');
 const ApplicationProgress = require('../models/applicationprogress.model');
+const User = require('../models/user.model');
+
+
 const Pagination = require('../utils/job.pagination');
 const jobService = require('../services/jobrequisition.service');
 const applicationProgressService = require('../services/applicationprogress.service');
@@ -28,6 +31,7 @@ const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignStageService = require('../services/emailcampaignstage.service');
 const fileService = require('../services/file.service');
 const memberService = require('../services/member.service');
+const userService = require('../services/user.service');
 
 
 const feedService = require('../services/api/feed.service.api');
@@ -195,8 +199,6 @@ async function add(application, member) {
 
 
 
-
-
 async function apply(application) {
   let data = null;
 
@@ -218,8 +220,12 @@ async function apply(application) {
 
   application = await Joi.validate(application, applicationSchema, {abortEarly: false});
 
-  let savedApplication = await new Application(application).save();
-  if (savedApplication) {
+  let user = await User.findOneAndUpdate({ userId: candidate.userId},
+    {userId: candidate.userId, firstName: candidate.firstName, lastName: candidate.lastName, lastApplied: Date.now()},
+    {new: true,   upsert: true })
+
+  let newApplication = await new Application(application).save();
+  if (newApplication) {
 
     if(resume && resume.base64) {
       let uploaded = await uploadBase64(resume.base64, "/tmp/" + resume.name, 'user/' + candidate.userId + '/_resumes/');
@@ -230,9 +236,11 @@ async function apply(application) {
         createdBy: candidate.userId
       });
       if (file) {
-        savedApplication.resume = file._id;
-        savedApplication.files.push(file._id);
+        newApplication.resume = file._id;
+        newApplication.files.push(file._id);
 
+        user.resumes = user.resumes?user.resumes:[];
+        user.resumes.push(file._id);
       }
     }
 
@@ -245,8 +253,8 @@ async function apply(application) {
         createdBy: candidate.userId
       });
       if (file) {
-        savedApplication.resume = file._id;
-        savedApplication.files.push(file._id);
+        newApplication.resume = file._id;
+        newApplication.files.push(file._id);
       }
     }
 
@@ -254,39 +262,40 @@ async function apply(application) {
     if (jobPipeline) {
 
       let applyStage = _.find(jobPipeline.stages, {type: 'APPLIED'});
-      let progress = await applicationProgressService.addApplicationProgress({applicationId: savedApplication.applicationId, stage: applyStage._id});
+      let progress = await applicationProgressService.addApplicationProgress({applicationId: newApplication.applicationId, stage: applyStage._id});
       job.noOfApplied+=1;
       // progress.stage = applyStage._id;
 
       if(jobPipeline.autoRejectBlackList && candidate.flag){
-        savedApplication.status = applicationEnum.REJECTED;
+        newApplication.status = applicationEnum.REJECTED;
       }
 
-      savedApplication.progress.push(progress._id);
-      savedApplication.allProgress.push(progress._id)
-      savedApplication.currentProgress = progress._id;
+      newApplication.progress.push(progress._id);
+      newApplication.allProgress.push(progress._id)
+      newApplication.currentProgress = progress._id;
 
       if(application.applicationQuestions) {
         application.applicationQuestions.createdBy = candidate.userId;
         let questionSubmission = await questionSubmissionService.addSubmission(application.applicationQuestions);
 
         if (questionSubmission) {
-          savedApplication.questionSubmission = questionSubmission._id;
-          savedApplication.hasSubmittedQuestion = true;
+          newApplication.questionSubmission = questionSubmission._id;
+          newApplication.hasSubmittedQuestion = true;
         }
       }
 
-      let taskMeta = {applicationId: savedApplication._id, applicationProgressId: progress._id};
+      let taskMeta = {applicationId: newApplication._id, applicationProgressId: progress._id};
 
-      candidate.applications.push(savedApplication._id);
+      candidate.applications.push(newApplication._id);
       await candidate.save();
       await job.save();
+      await user.save();
 
       await stageService.createTasksForStage(applyStage, job.title, taskMeta);
 
 
 
-      savedApplication = await savedApplication.save();
+      newApplication = await newApplication.save();
 
       let source = await sourceService.findByJobIdAndCandidateId(job._id, candidate._id);
 
@@ -301,22 +310,22 @@ async function apply(application) {
               let stage = await emailCampaignStageService.add({type: emailCampaignStageType.APPLIED, organic: false});
               campaign.stages.push(campaign);
               campaign.currentStage = stage;
-              campaign.application = savedApplication;
+              campaign.application = newApplication;
               await campaign.save();
             }
           }
         }
       }
 
-      await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, job: job._id, jobTitle: job.title}});
+      await activityService.addActivity({causer: candidate._id, causerType: subjectType.CANDIDATE, subjectType: subjectType.APPLICATION, subject: newApplication._id, action: actionEnum.APPLIED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, job: job._id, jobTitle: job.title}});
       if(jobPipeline.autoRejectBlackList && candidate.flag){
-        await activityService.addActivity({causer: null, causerType: subjectType.SYSTEM, subjectType: subjectType.APPLICATION, subject: savedApplication._id, action: actionEnum.AUTO_REJECTED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.jobTitle, job: job._id}});
+        await activityService.addActivity({causer: null, causerType: subjectType.SYSTEM, subjectType: subjectType.APPLICATION, subject: newApplication._id, action: actionEnum.AUTO_REJECTED, meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id, jobTitle: job.jobTitle, job: job._id}});
       }
 
       //Create Notification
       let meta = {
         companyId: job.company.companyId,
-        applicationId: savedApplication._id,
+        applicationId: newApplication._id,
         jobId: job._id,
         jobTitle: job.title,
         candidateId: candidate._id,
@@ -325,7 +334,7 @@ async function apply(application) {
         avatar: candidate.avatar
       };
 
-      await await feedService.createNotification(job.createdBy.userId, savedApplication.company, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
+      await await feedService.createNotification(job.createdBy.userId, newApplication.company, notificationType.APPLICATION, applicationEnum.APPLIED, meta);
 
     }
 
@@ -343,7 +352,7 @@ async function apply(application) {
   }
 
 
-  return savedApplication;
+  return newApplication;
 
 }
 

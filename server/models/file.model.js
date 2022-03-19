@@ -2,8 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
+const statusEnum = require('../const/statusEnum');
 
 const FileSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    default: statusEnum.ACTIVE
+  },
   createdDate: {
     type: Number,
     default: Date.now
@@ -11,6 +16,14 @@ const FileSchema = new mongoose.Schema({
   createdBy: {
     type: Number,
     required: false
+  },
+  lastModifiedDate: {
+    type: Number,
+    default: Date.now
+  },
+  lastModifiedBy: {
+    type: Number,
+    default: Date.now
   },
   fileType: {
     type: String,
@@ -22,7 +35,9 @@ const FileSchema = new mongoose.Schema({
   },
   path: {
     type: String,
-    required: true
+  },
+  description: {
+    type: String,
   },
   hash: {
     type: String
@@ -31,6 +46,13 @@ const FileSchema = new mongoose.Schema({
   versionKey: false
 });
 
+// FileSchema.plugin(mongoosePaginate);
+FileSchema.plugin(autoIncrement, {
+  model: 'File',
+  field: 'fileId',
+  startAt: 100000,
+  incrementBy: 1
+});
 FileSchema.plugin(mongoosePaginate);
 
 

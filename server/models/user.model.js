@@ -14,9 +14,12 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     required:false
   },
+  lastApplied: {
+    type: Number,
+    required:false
+  },
   status: {
     type: String,
-    required: true
   },
   firstName: {
     type: String,
@@ -28,9 +31,9 @@ const UserSchema = new mongoose.Schema({
   },
   middleName: {
     type: String,
-      required:false
+    required:false
   },
-  companyReviews: { type: Schema.Types.ObjectId, ref: 'User' }
+  resumes: [{ type: Schema.Types.ObjectId, ref: 'File' }]
 }, {
   versionKey: false
 });

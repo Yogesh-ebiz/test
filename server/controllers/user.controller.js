@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
+var path = require('path')
 
 const ISO6391 = require('iso-639-1');
 const {jobMinimal, convertToAvatar, convertToCompany, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
@@ -16,6 +17,7 @@ const Skilltype = require('../models/skilltype.model');
 const JobView = require('../models/jobview.model');
 const CompanySalary = require('../models/companysalary.model');
 const Endorsement = require('../models/endorsement.model');
+const User = require('../models/user.model');
 
 
 
@@ -26,6 +28,7 @@ const statusEnum = require('../const/statusEnum');
 const alertEnum = require('../const/alertEnum');
 
 const userService = require('../services/user.service');
+const fileService = require('../services/file.service');
 const parserService = require('../services/api/sovren.service.api');
 const {upload} = require('../services/aws.service');
 const feedService = require('../services/api/feed.service.api');
@@ -423,114 +426,8 @@ async function getUserDetail(currentUserId, userId, locale) {
  * @param {HTTP} currentUserId
  * @param {HTTP} files
  */
-async function uploadResume(currentUserId, file) {
-  if(currentUserId==null || file==null){
-    return null;
-  }
-
-  let result = null;
-  try {
-    let currentParty = await feedService.findByUserId(currentUserId);
-
-
-    if (isPartyActive(currentParty)) {
-
-      let fileExt = file.originalFilename.split('.');
-      let timestamp = Date.now();
-      let name = currentParty.firstName  + currentParty.lastName + '_' + currentParty.id + '_' + timestamp + '.' + fileExt[fileExt.length - 1];
-
-      let path = 'user/' + currentParty.id + '/resumes/' + name;
-
-
-      result = await upload(path, file.path);
-
-      result = {
-        employments: [
-          {
-            "employmentTitle": "Sr. Android Developer",
-            "fromDate": 1554080400000,
-            "description": "Lead a team of 5 mobile developers",
-            "isCurrent": false,
-            "terminationReason": '',
-            "terminationType": '',
-            "company": {
-              "id": 15,
-              "partyType": "ORGANIZATION",
-              "groupName": "eBay"
-            },
-            "city": "San Jose",
-            "state": "California",
-            "country": "US"
-          },
-          {
-            "employmentTitle": "Android Developer",
-            "fromDate": 1483232400000,
-            "thruDate": 1554080400000,
-            "description": "Developed first app",
-            "isCurrent": false,
-            "terminationReason": '',
-            "terminationType": '',
-            "company": {
-              "partyType": "ORGANIZATION",
-              "groupName": "FPT"
-            },
-            "city": "Seattle",
-            "state": "Washington",
-            "country": "US"
-          }
-
-        ],
-        educations: [
-          {
-            "typeOfDegree": "Bachelor of Science",
-            "major": "CIS",
-            "fromDate": 1320123740000,
-            "thruDate": 1398920540000,
-            "hasGraduated": true,
-            "isCurrent": false,
-            "school": {
-              "id": 27,
-              "partyType": "INSTITUTE",
-              "groupName": "Temple University"
-            },
-          },
-          {
-            "typeOfDegree": "Bachelor of Science",
-            "major": "MIS",
-            "fromDate": 1320123740000,
-            "thruDate": 1398920540000,
-            "hasGraduated": true,
-            "isCurrent": false,
-            "school": {
-              "partyType": "INSTITUTE",
-              "groupName": "Ohio University"
-            },
-
-          },
-        ]
-
-      }
-
-
-
-      // console.log('result', result)
-
-
-
-
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  return result;
-
-}
-
 async function uploadResume(currentUserId, files, name) {
-
-  if(!currentUserId || !files){
+  if(currentUserId==null || files==null){
     return null;
   }
 
@@ -539,106 +436,52 @@ async function uploadResume(currentUserId, files, name) {
   try {
     let currentParty = await feedService.findByUserId(currentUserId);
     if (isPartyActive(currentParty)) {
-      if(files.file) {
-        let type;
-        let cv = files.file[0];
-        let originalname = cv.originalname.split('.');
-        let fileName = name ? name.split('.') : cv.originalname.split('.');
-        let fileExt = originalname[originalname.length - 1];
-        // let date = new Date();
-        let timestamp = Date.now();
-        name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + application.user._id + '-' + timestamp + '.' + fileExt : name + '-' + timestamp + '.' + fileExt;
-        let path = basePath + currentUserId + '/_resumes/' + name;
-        // let response = await upload(path, cv.path);
-        switch (fileExt) {
-          case 'pdf':
-            type = 'PDF';
-            break;
-          case 'doc':
-            type = 'WORD';
-            break;
-          case 'docx':
-            type = 'WORD';
-            break;
 
+      let user = await User.findOneAndUpdate({ userId: currentUserId},
+        {userId: currentUserId, firstName: currentParty.firstName, lastName: currentParty.lastName},
+        {new: true,   upsert: true })
+
+        let type;
+        //------------Upload CV----------------
+
+        if(files.file) {
+          console.log(files.file[0], type)
+          let cv = files.file[0];
+          let fileName = name ? name.split('.') : cv.originalname.split('.');
+          let fileExt = files.file[0].originalname.split('.').pop();
+          // let date = new Date();
+          let timestamp = Date.now();
+          name = (!name) ? currentParty.firstName + '_' + currentParty.lastName + '_' + currentParty.id + '-' + timestamp + '.' + fileExt : name + '-' + timestamp + '.' + fileExt;
+          let path = basePath + currentUserId + '/_resumes/' + name;
+          let response = await upload(path, cv.path);
+          switch (fileExt) {
+            case 'pdf':
+              type = 'PDF';
+              break;
+            case 'doc':
+              type = 'WORD';
+              break;
+            case 'docx':
+              type = 'WORD';
+              break;
+
+          }
+
+          console.log(fileExt)
+          let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
+
+          if(file){
+            console.log(file, user)
+            user.resumes = user.resumes?user.resumes:[];
+            user.resumes.push(file._id);
+            await user.save();
+          }
+
+          //Temporary commented out
+          // await parserService.uploadJob(cv.path);
         }
 
-        await feedService.addUserResume(currentUserId, name, type);
-
-        // result = {
-        //   employments: [
-        //     {
-        //       "employmentTitle": "Sr. Android Developer",
-        //       "fromDate": 1554080400000,
-        //       "description": "Lead a team of 5 mobile developers",
-        //       "isCurrent": false,
-        //       "terminationReason": '',
-        //       "terminationType": '',
-        //       "company": {
-        //         "id": 15,
-        //         "partyType": "ORGANIZATION",
-        //         "groupName": "eBay"
-        //       },
-        //       "city": "San Jose",
-        //       "state": "California",
-        //       "country": "US"
-        //     },
-        //     {
-        //       "employmentTitle": "Android Developer",
-        //       "fromDate": 1483232400000,
-        //       "thruDate": 1554080400000,
-        //       "description": "Developed first app",
-        //       "isCurrent": false,
-        //       "terminationReason": '',
-        //       "terminationType": '',
-        //       "company": {
-        //         "partyType": "ORGANIZATION",
-        //         "groupName": "FPT"
-        //       },
-        //       "city": "Seattle",
-        //       "state": "Washington",
-        //       "country": "US"
-        //     }
-        //
-        //   ],
-        //   educations: [
-        //     {
-        //       "typeOfDegree": "Bachelor of Science",
-        //       "major": "CIS",
-        //       "fromDate": 1320123740000,
-        //       "thruDate": 1398920540000,
-        //       "hasGraduated": true,
-        //       "isCurrent": false,
-        //       "school": {
-        //         "id": 27,
-        //         "partyType": "INSTITUTE",
-        //         "groupName": "Temple University"
-        //       },
-        //     },
-        //     {
-        //       "typeOfDegree": "Bachelor of Science",
-        //       "major": "MIS",
-        //       "fromDate": 1320123740000,
-        //       "thruDate": 1398920540000,
-        //       "hasGraduated": true,
-        //       "isCurrent": false,
-        //       "school": {
-        //         "partyType": "INSTITUTE",
-        //         "groupName": "Ohio University"
-        //       },
-        //
-        //     },
-        //   ]
-        //
-        // }
-
-        result = await parserService.uploadJob(cv.path);
-
-      }
-
     }
-
-
 
   } catch (error) {
     console.log(error);
@@ -1697,7 +1540,8 @@ async function getUserResumes(currentUserId) {
 
   let result = null;
   try {
-    result = await feedService.getUserLast5Resumese(currentUserId);
+    // result = await feedService.getUserLast5Resumes(currentUserId);
+    result = await userService.getUserLast5Resumes(currentUserId);
 
   } catch (error) {
     console.log(error);

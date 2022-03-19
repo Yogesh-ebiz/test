@@ -2,6 +2,7 @@ const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
+const User = require('../models/user.model');
 
 
 const form = Joi.object({
@@ -33,8 +34,33 @@ async function register(form) {
 
 }
 
+async function findByUserId(userId) {
+
+  if(!userId){
+    return;
+  }
+
+  let user  = await User.findOne({userId: userId});
+  return user;
+
+}
+
+
+
+async function getUserLast5Resumes(userId) {
+
+  if(!userId){
+    return;
+  }
+
+  let user  = await User.findOne({userId: userId}).populate('resumes').sort({createdDate: -1}).limit(5);
+  return _.orderBy(user.resumes, ['createdDate'], ['desc']);
+
+}
+
 
 module.exports = {
-  register:register
-
+  register:register,
+  findByUserId:findByUserId,
+  getUserLast5Resumes:getUserLast5Resumes
 }
