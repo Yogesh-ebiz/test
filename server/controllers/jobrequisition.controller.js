@@ -895,12 +895,12 @@ async function applyJobById(currentUserId, jobId, application ) {
         let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
         if (!foundApplication) {
 
-          if (application.resumeId) {
-            let resume = await feedService.getResumeById(currentUserId, application.resumeId);
-            if (resume) {
-              application.resume = {filename: resume.name, fileType: resume.fileType}
-            }
-          }
+          // if (application.resumeId) {
+          //   let resume = await feedService.getResumeById(currentUserId, application.resumeId);
+          //   if (resume) {
+          //     application.resume = {filename: resume.name, fileType: resume.fileType}
+          //   }
+          // }
 
 
           if (application.source) {

@@ -242,6 +242,11 @@ async function apply(application) {
         user.resumes = user.resumes?user.resumes:[];
         user.resumes.push(file._id);
       }
+    } else if(application.resumeId) {
+      let file = await fileService.findyByFileId(application.resumeId);
+      if(file){
+        newApplication.resume = file._id;
+      }
     }
 
     if(photo && photo.base64) {
@@ -253,7 +258,7 @@ async function apply(application) {
         createdBy: candidate.userId
       });
       if (file) {
-        newApplication.resume = file._id;
+        // newApplication.resume = file._id;
         newApplication.files.push(file._id);
       }
     }

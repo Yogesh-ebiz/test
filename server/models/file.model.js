@@ -42,6 +42,9 @@ const FileSchema = new mongoose.Schema({
   hash: {
     type: String
   },
+  fileId: {
+    type: Number
+  },
 }, {
   versionKey: false
 });
