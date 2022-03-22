@@ -1107,6 +1107,7 @@ async function getJobQuestionaires(jobId) {
       }
     });
 
+    console.log(job)
     if(job.questionTemplate && job.questionTemplate.questions) {
       // delete job.questionTemplate.questions.answers;
       result = job.questionTemplate.questions;

@@ -226,7 +226,7 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   company: { type: Schema.Types.ObjectId, ref: 'Company' },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
-  department: { type: Schema.Types.ObjectId, ref: 'Department'},
+  department: { type: Schema.Types.ObjectId, ref: 'CompanyDepartment'},
   tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   questionTemplate: { type: Schema.Types.ObjectId, ref: 'QuestionTemplate'},
   hasQuestions: {

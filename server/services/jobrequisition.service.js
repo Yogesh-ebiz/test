@@ -507,6 +507,7 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
 
 
   let job = await JobRequisition.findById(jobId);
+  console.log(job)
   if(job){
     if(form.questionTemplateId) {
       let questionTemplate = await QuestionTemplate.findById(form.questionTemplateId);
