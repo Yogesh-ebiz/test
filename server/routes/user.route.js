@@ -50,6 +50,8 @@ router.route('/:userId/skills/:partySkillId/endorsements/:endorsementId').delete
 
 
 router.route('/:userId/applications').get(asyncHandler(getApplicationsByUserId));
+router.route('/:userId/applications/list').get(asyncHandler(getApplicationListByUserId));
+
 router.route('/:userId/bookmarks').get(asyncHandler(getBookmarksByUserId));
 
 router.route('/:userId/alerts').get(asyncHandler(getAlertsByUserId));
@@ -296,6 +298,13 @@ async function getApplicationsByUserId(req, res) {
   res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
 }
 
+async function getApplicationListByUserId(req, res) {
+
+  let currentUserId = parseInt(req.params.userId);
+
+  let data = await userCtl.getApplicationListByUserId(currentUserId, res.locale);
+  res.json(new Response(data, data?'applications_retrieved_successful':'not_found', res));
+}
 
 async function getBookmarksByUserId(req, res) {
 

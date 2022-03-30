@@ -54,6 +54,7 @@ async function getUserLast5Resumes(userId) {
   }
 
   let user  = await User.findOne({userId: userId}).populate('resumes').sort({createdDate: -1}).limit(5);
+  console.log(user)
   return _.orderBy(user.resumes, ['createdDate'], ['desc']);
 
 }

@@ -182,6 +182,7 @@ module.exports = {
   getUserResumes,
   setResumeDefault,
   getApplicationsByUserId,
+  getApplicationListByUserId,
   getBookmarksByUserId,
   getAlertsByUserId,
   addPartyAlert,
@@ -1574,6 +1575,7 @@ async function setResumeDefault(currentUserId, resumeId) {
 
 async function getApplicationsByUserId(currentUserId, filter, locale) {
 
+  console.log('getApplicationsByUserId')
   if(currentUserId==null || filter==null){
     return null;
   }
@@ -1604,6 +1606,7 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
 
 
         const aggregate = Application.aggregate([
+          {$match: {partyId: currentUserId}},
           {$lookup:{
               from:"jobrequisitions",
               let:{job: '$jobId'},
@@ -1622,9 +1625,9 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
               as: 'job'
             }},
           { $unwind: '$job' },
-          { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
-          { $unwind: '$user'},
-          { $match: {'user.userId': currentUserId}}
+          // { $lookup: {from: 'candidates', localField: 'user', foreignField: '_id', as: 'user' } },
+          // { $unwind: '$user'},
+          // { $match: {'user.userId': currentUserId}}
         ]);
 
         result = await Application.aggregatePaginate(aggregate, options);
@@ -1645,6 +1648,29 @@ async function getApplicationsByUserId(currentUserId, filter, locale) {
   }
 
   return new Pagination(result);
+
+}
+
+
+async function getApplicationListByUserId(currentUserId, locale) {
+
+  if(!currentUserId){
+    return null;
+  }
+
+  let result = [];
+  try {
+
+    result = await Application.aggregate([
+      {$match: {partyId: currentUserId}},
+      {$project: {_id: 1, status: 1, job: 1, jobTitle: 1, createdDate: 1, currentProgress: 1}}
+    ]);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
 
 }
 

@@ -126,15 +126,27 @@ function SearchParam(filter) {
   }
 
   if (filter.city && filter.city.length) {
-    this.query.city =  { $in: filter.city};
+    const city = _.reduce(filter.city, function(res, item){
+      res.push(new RegExp(item, 'i'));
+      return res;
+    }, []);
+    this.query.city =  { $in: city};
   }
 
   if (filter.state && filter.state.length) {
-    this.query.state =  { $in: filter.state};
+    const state = _.reduce(filter.state, function(res, item){
+      res.push(new RegExp(item, 'i'));
+      return res;
+    }, []);
+    this.query.state =  { $in: state};
   }
 
   if (filter.country && filter.country.length) {
-    this.query.country =  { $in: filter.country};
+    const country = _.reduce(filter.country, function(res, item){
+      res.push(new RegExp(item, 'i'));
+      return res;
+    }, []);
+    this.query.country =  { $in: country};
   }
 
   if (filter.department && filter.department.length) {
