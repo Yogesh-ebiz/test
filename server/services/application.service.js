@@ -1476,8 +1476,9 @@ async function search(jobId, filter, sort) {
     sort:     sortBy,
     lean:     true,
     limit:    limit,
-    page: parseInt(filter.page)+1
+    page: parseInt(sort.page)+1
   };
+
 
   let aList = [];
   let aLookup = [];
