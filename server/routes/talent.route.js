@@ -973,7 +973,7 @@ async function removeApplicationProgressEvent(req, res) {
   let applicationId = ObjectID(req.params.applicationId);
   let progressId = ObjectID(req.params.progressId);
 
-  let data = await talentCtrl.removeApplicationProgressEvent(companyId, currentUserId, applicationId, progressId);
+  let data = await talentCtrl.removeApplicationProgressEvent(companyId, applicationId, progressId);
 
   res.json(new Response(data, data?'application_event_updated_successful':'not_found', res));
 }
