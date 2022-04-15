@@ -767,7 +767,7 @@ async function getApplicationById(req, res) {
 
   let data = await talentCtrl.getApplicationById(companyId, currentUserId, applicationId);
 
-  res.json(new Response(data, data?'applicagion_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'application_retrieved_successful':'not_found', res));
 }
 
 

@@ -2143,6 +2143,16 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         model: 'File'
       }
     ]);
+    let eventIds = _.map(application.progress, 'event');
+    eventIds = _.reduce(eventIds, function (res, id) {
+      if (!isNaN(id)) {
+        res.push(parseInt(id));
+      }
+
+      return res;
+    }, []);
+
+    let events = await calendarService.lookupEvents(eventIds);
 
     if (application) {
       let requiredEvaluation = false;
@@ -2155,16 +2165,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           noOfEvaluations += 1;
         }
 
-        let eventIds = _.map(application.progress, 'event');
-        eventIds = _.reduce(eventIds, function (res, id) {
-          if (!isNaN(id)) {
-            res.push(parseInt(id));
-          }
 
-          return res;
-        }, []);
-
-        let events = await calendarService.lookupEvents(eventIds);
         if (progress.attachment) {
           progress.attachment.path = config.cdn + "/" + progress.attachment.path;
         }

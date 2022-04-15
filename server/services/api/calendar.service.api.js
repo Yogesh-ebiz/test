@@ -63,7 +63,7 @@ async function getEventByEventId(userId, eventId) {
     headers: {'UserId': userId}
   };
 
-
+  console.log(userId, eventId)
   let response = await client.get('/calendars/'+userId+ '/events/' + eventId, options);
   return response.data.data;
 }
