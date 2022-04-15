@@ -139,6 +139,7 @@ async function getById(currentUserId, id) {
         }, [])
 
         if(application.currentProgress.event){
+          console.log('event', application.currentProgress.event)
           let event = await calendarService.getEventByEventId(currentUserId, application.currentProgress.event);
           if(event){
             application.currentProgress.event = event;

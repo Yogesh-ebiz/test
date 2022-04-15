@@ -126,14 +126,14 @@ function updateApplicationProgressEvent(applicationProgress_Id, form) {
 }
 
 
-function removeApplicationProgressEvent(applicationProgress_Id) {
+function removeApplicationProgressEvent(id) {
   let data = null;
 
-  if(!applicationProgress_Id){
+  if(!id){
     return;
   }
 
-  return ApplicationProgress.updateOne({_id: ObjectID(applicationProgress_Id)}, { $unset: {event: ''} });
+  return ApplicationProgress.updateOne({_id: ObjectID(id)}, { $unset: {event: null} });
 }
 
 

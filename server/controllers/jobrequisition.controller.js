@@ -762,6 +762,8 @@ async function getSimilarJobList(currentUserId, jobId, locale) {
     job.minimumQualifications=[];
     job.description='';
     job.updatedBy=null
+    job.company.id = job.company.companyId;
+
     res.push(job);
     return res;
   }, []);
@@ -769,13 +771,26 @@ async function getSimilarJobList(currentUserId, jobId, locale) {
 
 }
 
-async function getSimilarJobsByTitle(title, locale) {
-  if(!title) {
+async function getSimilarJobsByTitle(currentUserId, title, locale) {
+  if(!currentUserId || !title) {
     return [];
   }
 
-  let result = await jobService.getSimilarJobList(jobId);
-
+  let result = await jobService.getSimilarJobsByTitle(title);
+  let saved = await bookmarkService.findBookByUserId(currentUserId);
+  result = _.reduce(result, function(res, job){
+    if(_.some(saved, {jobId: job._id})){
+      job.hasSaved=true;
+    }
+    job.responsibilities=[];
+    job.qualifications=[];
+    job.minimumQualifications=[];
+    job.description='';
+    job.updatedBy=null;
+    job.company.id = job.company.companyId;
+    res.push(job);
+    return res;
+  }, []);
   return result;
 
 }

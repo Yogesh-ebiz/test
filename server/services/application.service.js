@@ -293,6 +293,8 @@ async function apply(application) {
 
       candidate.applications.push(newApplication._id);
       await candidate.save();
+
+      job.applications.push(newApplication._id);
       await job.save();
       await user.save();
 

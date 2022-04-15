@@ -3023,16 +3023,16 @@ async function updateApplicationProgressEvent(companyId, currentUserId, applicat
 }
 
 
-async function removeApplicationProgressEvent(companyId, currentUserId, applicationId, applicationProgressId) {
-
-  if(!companyId || !currentUserId || !applicationId || !applicationProgressId){
+async function removeApplicationProgressEvent(companyId, applicationId, applicationProgressId) {
+  console.log(companyId, applicationId, applicationProgressId)
+  if(!companyId || !applicationId || !applicationProgressId){
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
-    return null;
-  }
+  // let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  // if(!member){
+  //   return null;
+  // }
 
   let result;
   try {

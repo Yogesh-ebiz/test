@@ -554,6 +554,15 @@ async function getSimilarJobList(jobId) {
           }
         }
       },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'company',
+          foreignField: '_id',
+          as: 'company',
+        },
+      },
+      { $unwind: '$company'},
       { $limit: 9 }
     ])
 
@@ -594,6 +603,15 @@ async function getSimilarJobsByTitle(title) {
         }
       }
     },
+    {
+      $lookup: {
+        from: 'companies',
+        localField: 'company',
+        foreignField: '_id',
+        as: 'company',
+      },
+    },
+    { $unwind: '$company'},
     { $limit: 10}
   ])
 
@@ -994,22 +1012,39 @@ async function search(currentUserId, query, filter, sort, locale) {
       }
     },
     {$lookup:{
-        from:"ads",
-        let:{ads: '$ads'},
-        pipeline:[
-          {$match:{$expr:{$in:["$_id", "$$ads"]}}},
-          {
-            $lookup: {
-              from: 'targets',
-              localField: "targeting",
-              foreignField: "_id",
-              as: "targeting"
-            }
-          },
-          {$unwind: '$targeting' }
-        ],
-        as: 'ads'
-      }}
+      from:"ads",
+      let:{ads: '$ads'},
+      pipeline:[
+        {$match:{$expr:{$in:["$_id", "$$ads"]}}},
+        {
+          $lookup: {
+            from: 'targets',
+            localField: "targeting",
+            foreignField: "_id",
+            as: "targeting"
+          }
+        },
+        {$unwind: '$targeting' }
+      ],
+      as: 'ads'
+    }},
+    {
+      $lookup: {
+        from: 'applications',
+        localField: "applications",
+        foreignField: "_id",
+        as: "applications"
+      }
+    },
+    { $addFields: {
+        hasApplied: {
+          '$in': [
+            currentUserId,
+            '$applications.partyId'
+          ]
+        }
+      }
+    },
   );
 
 
