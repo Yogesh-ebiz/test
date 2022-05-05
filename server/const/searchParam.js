@@ -18,6 +18,14 @@ function SearchParam(filter) {
     this.query.partyId =  { $eq: filter.partyId };
   }
 
+  if(filter._id){
+    let ids = _.reduce(filter.id.split(','), function(res, i){
+      res.push(ObjectID(i));
+      return res;
+    }, []);
+    this.query._id =  { $in: ids };
+  }
+
   if(filter.id){
     let ids = _.reduce(filter.id.split(','), function(res, i){
       res.push(parseInt(i));

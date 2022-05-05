@@ -337,7 +337,6 @@ function searchCandidates(company, query) {
 
 
 async function search(filter, sort) {
-
   if(!filter || !sort){
     return;
   }
@@ -396,7 +395,7 @@ async function search(filter, sort) {
     if(filter.job) {
       aList.push({$match: {'applications.job': ObjectID(filter.job)}})
     }
-    
+
     aList.push({$lookup: {from: 'evaluations', localField: 'userId', foreignField: 'partyId', as: 'evaluations' } })
     aList.push(
     { $addFields:

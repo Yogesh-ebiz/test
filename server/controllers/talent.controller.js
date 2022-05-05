@@ -440,7 +440,6 @@ async function getUserSession(currentUserId, preferredCompany) {
     }
   }
 
-
   companies = _.reduce(companies, function (res, item) {
     let found = _.find(allAccounts, {company: item.companyId});
     // item = convertToCompany(item);
@@ -884,12 +883,12 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
   filter.company = [companyId];
   filter.status = []
 
-  let result = await jobService.search(currentUserId, query, filter, sort, locale);
+  let result = await jobService.talentSearch(member, query, filter, sort, locale);
 
   if(result) {
     let departmentIds = _.map(result.docs, 'department');
     let departments = await departmentService.findDepartmentsByCompany(companyId);
-    let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(currentUserId, subjectType.JOB);
+    let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.JOB);
 
     result.docs.map(job => {
       job.department = _.find(departments, {_id: job.department});
@@ -4586,8 +4585,6 @@ async function getCandidateNotes(companyId, currentUserId, candidateId, sort) {
 
   let result;
   try {
-
-
     result = await noteService.getNotes(subjectType.CANDIDATE, candidateId, sort);
 
     result.docs.forEach(function(note){

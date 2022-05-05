@@ -108,7 +108,6 @@ function CandidateParam(filter) {
     this.query.$and =  [{noOfMonthExperiences:  {$gte: (filter.minYear * 12)} }, {noOfMonthExperiences: { $lte: (filter.maxYear * 12)}}];
   }
 
-  console.debug(this.query)
   return this.query;
 }
 

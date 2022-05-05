@@ -543,8 +543,9 @@ async function searchJob(req, res) {
   let companyId = parseInt(req.params.id);
   let sort = req.query;
   let filter = req.body;
-  let pagination = req.query;
-
+  filter.createdBy = _.reduce(filter.createdBy, function(res, id){res.push(ObjectID(id)); return res;}, []);
+  filter.tags = _.reduce(filter.tags, function(res, id){res.push(ObjectID(id)); return res;}, []);
+  filter.department = _.reduce(filter.department, function(res, id){res.push(ObjectID(id)); return res;}, []);
   let data = await talentCtrl.searchJobs(currentUserId, companyId, req.query.query, filter, sort, res.locale);
   res.json(new Response(data, data?'jobs_retrieved_successful':'not_found', res));
 }
@@ -1183,7 +1184,6 @@ async function searchCandidates(req, res) {
   let filter = req.body;
   let sort = req.query;
   filter.query = req.query.query;
-
 
   let data = await talentCtrl.searchCandidates(currentUserId, company, filter, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));

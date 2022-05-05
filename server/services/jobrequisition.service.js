@@ -924,7 +924,7 @@ async function getJobsEndingSoon(company) {
 
 
 async function search(currentUserId, query, filter, sort, locale) {
-  if(!filter || !sort){
+  if(!currentUserId || !filter || !sort){
     return null;
   }
 
@@ -972,8 +972,8 @@ async function search(currentUserId, query, filter, sort, locale) {
 
   if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
-  } else if(sort && sort.sortBy=='relevant'){
-    aSort = { $sort: { score: direction} };
+  } else if(sort && sort.sortBy=='title'){
+    aSort = { $sort: {title: direction} };
   } else {
     aSort = { $sort: {createdDate: direction} };
   }
@@ -981,7 +981,7 @@ async function search(currentUserId, query, filter, sort, locale) {
   filter.query=query;
   filter.companyId = filter.company;
   delete filter.company;
-  console.log(new SearchParam(filter))
+  // console.log(new SearchParam(filter))
 
   aList.push({ $match: new SearchParam(filter)});
   aList.push(
@@ -1046,8 +1046,177 @@ async function search(currentUserId, query, filter, sort, locale) {
       }
     },
   );
+  aList.push(aSort);
+
+  const aggregate = JobRequisition.aggregate(aList);
+  result = await JobRequisition.aggregatePaginate(aggregate, options);
+
+  let foundCompanies = await feedService.lookupCompaniesIds(_.reduce(result.docs, function(res, i){ res.push(i.company.companyId); return res;},  []));
+  let hasSaves = [];
 
 
+  let today = Date.now();
+  _.forEach(result.docs, function(job){
+    job.hasSaved = _.find(hasSaves, {jobId: job._id})?true:false;
+    job.company = convertToCompany(job.company);
+    job.createdBy = convertToAvatar(job.createdBy);
+    job.shareUrl = 'https://www.accessed.co/jobs/'+job.jobId;
+
+    job.skills=[];
+    job.industry=[];
+    job.members=[];
+    job.responsibilities=[];
+    job.qualifications = [];
+    job.minimumQualifications=[];
+    // job.description = null;
+    job.isHot = _.reduce(job.ads, function(res, ad){
+      if(_.includes(ad.targeting.adPositions, adPosition.hottag)){
+        if(ad.startTime < today && ad.endTime > today){
+          res = true;
+        }
+
+      }
+      return res;
+    }, false);
+    job.ads = [];
+
+  })
+
+
+
+  return result;
+
+}
+
+async function talentSearch(member, query, filter, sort, locale) {
+  if(!member || !filter || !sort){
+    return null;
+  }
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+  let options = {
+    select:   select,
+    sort:     null,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+
+
+  let result;
+  let currentDate = Date.now();
+  let aList = [];
+  let match = {};
+  let aSort;
+
+
+  // if(query){
+  //   let regex = new RegExp(query, 'i');
+  //   match['$or'] =  [{title: { $regex: regex} }];
+  // }
+
+
+
+  // if(filter.company.length){
+  //   let companies = await companyService.findByCompanyIds(filter.company, false);
+  //   match.company = {$in: _.reduce(companies, function(res, item){res.push(item._id); return res;}, [])};
+  //   filter.company = [];
+  // }
+  //
+  // if(filter.status.length){
+  //   match.status = {$in:filter.status};
+  //   filter.status = [];
+  // }
+
+
+
+  if(sort && sort.sortBy=='popular'){
+    aSort = { $sort: { noOfViews: direction} };
+  } else if(sort && sort.sortBy=='title'){
+    aSort = { $sort: {title: direction} };
+  } else {
+    aSort = { $sort: {createdDate: direction} };
+  }
+
+  filter.query=query;
+  filter.companyId = filter.company;
+  delete filter.company;
+  // console.log(new SearchParam(filter))
+
+  if(filter.hasSaved){
+    let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.JOB);
+    console.log(jobSubscribed, _.map(jobSubscribed, 'subject'));
+    aList.push({ $match: {_id: {$in: _.map(jobSubscribed, 'subject')}} });
+  }
+
+  aList.push({ $match: new SearchParam(filter)});
+  aList.push(
+    {
+      $lookup: {
+        from: 'companies',
+        localField: "company",
+        foreignField: "_id",
+        as: "company"
+      }
+    },
+    { $unwind: '$company' },
+    {
+      $lookup: {
+        from: 'members',
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy"
+      }
+    },
+    { $unwind: '$createdBy'},
+    {
+      $lookup: {
+        from: 'labels',
+        localField: "tags",
+        foreignField: "_id",
+        as: "tags"
+      }
+    },
+    {$lookup:{
+        from:"ads",
+        let:{ads: '$ads'},
+        pipeline:[
+          {$match:{$expr:{$in:["$_id", "$$ads"]}}},
+          {
+            $lookup: {
+              from: 'targets',
+              localField: "targeting",
+              foreignField: "_id",
+              as: "targeting"
+            }
+          },
+          {$unwind: '$targeting' }
+        ],
+        as: 'ads'
+      }},
+    {
+      $lookup: {
+        from: 'applications',
+        localField: "applications",
+        foreignField: "_id",
+        as: "applications"
+      }
+    },
+    { $addFields: {
+        hasApplied: {
+          '$in': [
+            member.createdBy,
+            '$applications.partyId'
+          ]
+        }
+      }
+    },
+  );
   aList.push(aSort);
 
   const aggregate = JobRequisition.aggregate(aList);
@@ -1133,5 +1302,6 @@ module.exports = {
   getGroupOfCompanyJobs:getGroupOfCompanyJobs,
   getJobsEndingSoon:getJobsEndingSoon,
   search:search,
+  talentSearch:talentSearch,
   removePipeline:removePipeline,
 }
