@@ -205,7 +205,7 @@ async function getSimilarCompany(req, res) {
 }
 
 
-async function applyJobById(req, res) {
+async function  applyJobById(req, res) {
   // console.log('currentUserId: ', req.header('UserId'))
   // console.log('JobID: ', req.params.id)
   // console.log('locale', res.locale);

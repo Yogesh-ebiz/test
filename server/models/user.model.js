@@ -33,6 +33,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  preferences: {
+    type: Object
+  },
   resumes: [{ type: Schema.Types.ObjectId, ref: 'File' }]
 }, {
   versionKey: false

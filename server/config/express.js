@@ -17,7 +17,7 @@ const passport = require('./passport');
 const multer = require('multer');
 
 const handleErrors = require('../middleware/handleErrors');
-const { BadRequest } = require('../middleware/baseError');
+const { BadRequest, BaseError} = require('../middleware/baseError');
 
 const i18n = require('./i18n');
 let Response = require('../const/response');
@@ -127,7 +127,6 @@ app.use((err, req, res, next) => {
 
   // customize Joi validation errors
   if (err.isJoi) {
-    console.log('hello')
     err.message = err.details.map(e => e.message).join("; ");
     err.status = 400;
 

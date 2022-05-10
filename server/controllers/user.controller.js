@@ -2367,7 +2367,7 @@ async function getJobPreferences(currenterUserid, locale) {
     return null;
   }
 
-  res = await jobPreferenceService.getJobPreferences(currenterUserid);
+  res = await userService.getJobPreferences(currenterUserid);
   return res;
 
 }
@@ -2380,8 +2380,7 @@ async function updateJobPreferences(currenterUserid, jobPreferences, locale) {
     return null;
   }
 
-  jobPreferences.userId = currenterUserid;
-  res = await jobPreferenceService.updateJobPreferences(jobPreferences);
+  res = await userService.updateJobPreferences(currenterUserid, jobPreferences);
   return res;
 
 }

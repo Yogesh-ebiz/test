@@ -201,6 +201,7 @@ function SearchParam(filter) {
   // }
 
 
+  console.log(this.query)
   return this.query;
 }
 

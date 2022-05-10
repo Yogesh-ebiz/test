@@ -655,6 +655,18 @@ async function findApplicationByUserIdAndJobId(userId, jobId) {
   return data;
 }
 
+
+async function findApplicationByEmailAndJobId(email, jobId) {
+  let data = null;
+
+  if(email==null || jobId==null){
+    return;
+  }
+
+  let application = await Application.findOne({email: email.toLowerCase(), jobId: jobId});
+  return application;
+}
+
 function findAppliedCountByUserIdAndJobId(userId, jobId) {
   let data = null;
 
@@ -1684,6 +1696,7 @@ module.exports = {
   findApplicationByUserId: findApplicationByUserId,
   findApplicationByCandidateIdAndJobId: findApplicationByCandidateIdAndJobId,
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
+  findApplicationByEmailAndJobId: findApplicationByEmailAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
   findAppliedCountByJobId: findAppliedCountByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,

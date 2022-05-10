@@ -38,6 +38,7 @@ const {buildFileUrl, buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinima
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
 const sovrenService = require('../services/api/sovren.service.api');
+const userService = require('../services/user.service');
 
 const companyService = require('../services/company.service');
 const jobService = require('../services/jobrequisition.service');
@@ -881,7 +882,7 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
 
 
   filter.company = [companyId];
-  filter.status = []
+  filter.status = filter.status? filter.status:[statusEnum.ACTIVE, statusEnum.DRAFT];
 
   let result = await jobService.talentSearch(member, query, filter, sort, locale);
 
@@ -3796,6 +3797,9 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
       candidate.educations = people.educations;
     }
 
+    let preferences = await userService.getJobPreferences(candidate.userId);
+    candidate.preferences = preferences;
+
     let evaluations = await evaluationService.getCandidateEvaluations(candidate.userId);
     if (evaluations) {
       let companyEvaluations = _.filter(evaluations, {companyId: companyId});
@@ -3822,7 +3826,8 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
     result = convertToCandidate(candidate);
   } else {
     let people = await feedService.findCandidateById(candidateId);
-
+    let preferences = await userService.getJobPreferences(candidate.userId);
+    people.preferences = preferences;
     people.match = 78;
     people.avatar = buildUserUrl(people);
     result = convertToCandidate(people);

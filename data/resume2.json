@@ -1,1 +1,771 @@
-{"data":{"Info":{"Code":"Success","Message":"Successful transaction","TransactionId":"95908a58-f988-40af-9848-d854737d392f","EngineVersion":"9.6.7.0","ApiVersion":"10.2.0.0","TotalElapsedMilliseconds":1531,"TransactionCost":2,"CustomerDetails":{"AccountId":"35186509","Name":"Accessed","IPAddress":"115.79.175.121","Region":"us-east-1","CreditsRemaining":9996,"CreditsUsed":2,"ExpirationDate":"2027-08-14","MaximumConcurrentRequests":2}},"Value":{"ParsingResponse":{"Code":"Success","Message":"Successful transaction"},"ResumeData":{"ContactInformation":{"CandidateName":{"FormattedName":"Dang Ngoc Vu","GivenName":"Dang","MiddleName":"Ngoc","FamilyName":"Vu"}},"PersonalAttributes":{"DateOfBirth":{"Date":"1991-08-28","IsCurrentDate":false,"FoundYear":true,"FoundMonth":true,"FoundDay":true},"Gender":"Male"},"Education":{"EducationDetails":[{"Id":"DEG-1","Text":"2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10","SchoolName":{"Raw":"UNIVERSITY OF TECHNOLOGY, HCMC","Normalized":"UNIVERSITY OF TECHNOLOGY HCMC"},"SchoolType":"university","Degree":{},"GPA":{"Score":"7.87","ScoringSystem":"GPA","MaxScore":"10","MinimumScore":"0","NormalizedScore":0.787},"LastEducationDate":{"Date":"2014-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false}}]},"EmploymentHistory":{"ExperienceSummary":{"Description":"Dang Ngoc Vu is experienced in:  Information Technology (Mobile Applications). Dang Ngoc Vu has 9 years of work experience, with 5 years of management experience, including a low-level position.","MonthsOfWorkExperience":103,"MonthsOfManagementExperience":55,"ExecutiveType":"NONE","AverageMonthsPerEmployer":34,"FulltimeDirectHirePredictiveIndex":85,"ManagementStory":"Current position is a low-level management role: Leader, Technical Mobile App\nStarting on 1/1/2017, the candidate held the following low-level management position for 4 years and 8 months:\n\tTitle: Leader, Technical Mobile App for VISERVICE COMPANY","CurrentManagementLevel":"low-level","ManagementScore":20},"Positions":[{"Id":"POS-1","Employer":{"Name":{"Probability":"Confident","Raw":"VISERVICE COMPANY","Normalized":"VISERVICE COMPANY"}},"IsSelfEmployed":false,"IsCurrent":true,"JobTitle":{"Raw":"Leader, Technical Mobile App","Normalized":"Leader Technical Mobile App","Probability":"Confident","Variations":["Leader"]},"StartDate":{"Date":"2017-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"EndDate":{"Date":"2021-08-14","IsCurrentDate":true,"FoundYear":true,"FoundMonth":true,"FoundDay":false},"JobType":"directHire","JobLevel":"Experienced (non-manager)","TaxonomyPercentage":0},{"Id":"POS-2","Employer":{"Name":{"Probability":"Confident","Raw":"MUABAN COMPANY","Normalized":"MUABAN COMPANY"}},"IsSelfEmployed":false,"IsCurrent":false,"JobTitle":{"Raw":"Senior Mobile App","Normalized":"Senior Mobile App","Probability":"Confident"},"StartDate":{"Date":"2015-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"EndDate":{"Date":"2017-12-31","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"JobType":"directHire","JobLevel":"Experienced (non-manager)","TaxonomyPercentage":0},{"Id":"POS-3","Employer":{"Name":{"Probability":"Confident","Raw":"GNT COMPANY","Normalized":"GNT COMPANY"}},"IsSelfEmployed":false,"IsCurrent":false,"JobTitle":{"Raw":"Developer Mobile Game and iOS App","Normalized":"Developer Mobile Game and iOS App","Probability":"Confident"},"StartDate":{"Date":"2013-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"EndDate":{"Date":"2015-12-31","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"JobType":"directHire","JobLevel":"Entry Level","TaxonomyPercentage":0}]},"SkillsData":[{"Root":"Sovren","Taxonomies":[{"Id":"10","Name":"Information Technology","PercentOfOverall":93,"SubTaxonomies":[{"SubTaxonomyId":"552","SubTaxonomyName":"Mobile Applications","PercentOfOverall":90,"PercentOfParent":97,"Skills":[{"Id":"5520503","Name":"Android","FoundIn":[{"SectionType":"PROJECT_HEADERS"},{"SectionType":"WORK HISTORY"}],"ExistsInText":true},{"Id":"5520545","Name":"IOS","FoundIn":[{"SectionType":"PROJECT_HEADERS"},{"SectionType":"WORK HISTORY","Id":"POS-3"}],"ExistsInText":true,"MonthsExperience":{"Value":36},"LastUsed":{"Value":"2015-12-31"}}]},{"SubTaxonomyId":"731","SubTaxonomyName":"User Interface","PercentOfOverall":3,"PercentOfParent":3,"Skills":[{"Id":"7310008","Name":"Android","FoundIn":[{"SectionType":"PROJECT_HEADERS"},{"SectionType":"WORK HISTORY"}],"ExistsInText":true}]}]},{"Id":"20","Name":"Sales","PercentOfOverall":7,"SubTaxonomies":[{"SubTaxonomyId":"105","SubTaxonomyName":"General","PercentOfOverall":7,"PercentOfParent":100}]}]}],"LanguageCompetencies":[{"Language":"English","LanguageCode":"en","FoundInContext":"• English: Intermediate"}],"ResumeMetadata":{"FoundSections":[{"FirstLineNumber":56,"LastLineNumber":58,"SectionType":"LANGUAGES","HeaderTextFound":"Languages"},{"FirstLineNumber":59,"LastLineNumber":69,"SectionType":"WORK HISTORY","HeaderTextFound":"WORKING HISTORY"},{"FirstLineNumber":70,"LastLineNumber":87,"SectionType":"PROJECT_HEADERS","HeaderTextFound":"PROJECTS"},{"FirstLineNumber":88,"LastLineNumber":91,"SectionType":"EDUCATION","HeaderTextFound":"EDUCATION"}],"ResumeQuality":[{"Level":"Major Issues Found","Findings":[{"QualityCode":"300","Message":"You should not use the PDF format for your resume. Due to inherent limitations with text extraction from PDFs, you are less likely to get a job when using a PDF resume."},{"QualityCode":"303","SectionIdentifiers":[{"SectionType":"PROJECT_HEADERS","Id":"2"}],"Message":"These sections are longer than the work history and education sections combined. This may indicate a problem with section headers, formatting, or content."}]},{"Level":"Data Missing","Findings":[{"QualityCode":"211","Message":"An email address was not found in the contact information. A resume should always include an email address."},{"QualityCode":"212","Message":"A phone number was not found in the contact information. A resume should always include a phone number."},{"QualityCode":"213","Message":"A street level address was not found in the contact information. A full contact address should always be included in a resume as it allows for location based searches."},{"QualityCode":"231","SectionIdentifiers":[{"SectionType":"DEG-1"}],"Message":"Every degree in a resume should have a name or type associated with it, such as 'B.S.' or 'M.S.'."}]},{"Level":"Suggested Improvements","Findings":[{"QualityCode":"124","Message":"Date of birth information should not be included in a resume (for most cultures)."},{"QualityCode":"151","SectionIdentifiers":[{"SectionType":"LANGUAGES","Id":"0"}],"Message":"Every section should have a clear, unambiguous, commonly-used header on a separate line directly above the content associated with it."}]}],"ReservedData":{"Names":["Dang Ngoc Vu","Full Name: Dang Ngoc Vu"],"Urls":["Muaban.Net"],"OtherData":["Date of Birth: Aug 28th 1991","Wednesday, August 28, 1991","Gender: Male"]},"PlainText":"FORDONOR\n(Senior) Mobile Developer\n\n\nCANDIDATE INFORMATION\n\nFull Name: Dang Ngoc Vu\n\nDate of Birth: Aug 28th 1991\n\nGender: Male\n\nASSESSMENT BY PEOPLE PROFILERS\n\nWith the skills and experiences of more than 6 years developing mobile apps, Mr. Vu is confident that his\nhard-working attitude and inquiring mind will help him encounter the challenges and make a valuable\ncontribution to the profitability of the company\n\n•   Technical skills:\n- Strong in mobile app architecture design pattern, (both iOS and Android), such as: RIBs (uber),\nVIPER, MVVM, Clean architecture, MVP, Bloc for Flutter. Specifically, in-depth understanding\nand using RIBs architecture, it is a cross-platform mobile architecture for iOS and Android\n(based on VIPER and Clean architecture).\n- Strong in using most popular libs for mobile app, such as: RxSwift, RxCocoa, RxJava, RxDart,\nDart Stream, Realm, Dependency Injection tools (Dagger, Needle,\t), Firebase (Auth, Firestore,\nDatabase, Dynamic link   ), Google Maps (Static maps, DirectionAPI, Place API, Geocode API,\ndraw map with marker, polyline, poligon   ). And so on,\n- Strong in research and quickly apply new techniques to mobile applications.\n- Strong in build layout using Auto Layout with multi ways: using Storyboard, XIB, programming\nwith code\n- In-depth understanding and apply SOLID Principles to programming to clean code and make\nit easy to understand.\n- In-depth understanding OOP, POP (Protocol Oriented Programming)\n- Experiences in using CI tools for development, such as: App Center of Microsoft.\n- Experiences in using Github and its tools to control and manage source code: Git board, Git\nPull Request, Git Actions,\n- Experience in using SSL Pinning to prevent capture http requests from apps. Using Proguard\nto security source code (Android)\n- In addition, I have experience at Futter for building Web app, cross platform mobile apps.\n\n•   Independently working skills:\n- Collected information from many sources: library, teaching books and internet to serve my\nstudy and enrich my knowledge.\n- Well reading English documents.\n\n•   Team working skills:\n-   Complete projects and jobs before the deadline.\n-   Support the other members when needed.\n-   Good cooperation with members of teams.\n-   Good at working with the SCRUM model.\n\n•   Computer skills: Good\n- Good at programming some following languages: Swift, Objective-C, Dart, Java, Kotlin, SQL.\n- Had some knowledge about computer architecture.\n- Operating System: Windows, Linux (Ubuntu), Mac OS, iOS, Android.\n\n➢ Languages:\n• English: Intermediate\n\nWORKING HISTORY\n\n2017 - Present\tVISERVICE COMPANY\nLeader, Technical Mobile App\n\n2015 - 2017\tMUABAN COMPANY\nSenior Mobile App\n\n2013 - 2015\tGNT COMPANY\nDeveloper Mobile Game and iOS App\n\nPROJECTS\n\n➢ Project viService:\n• About project: This app support user find motor, car, taxi, delivery quickly and convenient (just like\nUber, Grab)\n• Position: Mobile technical (both iOS and Android)\n• Link app: iOS Rider, iOS Driver, Android Rider, Android Driver\n\n➢ Project Muaban.Net\n• About project: app support for people who want to sell or buy any products. It's just like Chotot.\n• Position: Leader (both iOS and Android)\n• Link app: iOS, Android\n\n➢ Project Muaban.Net\n• About project: app like a market for sell and buy products for lifestyle. (Just like Shopee, Lazada)\n• Position: Senior (both iOS and Android)\n• Link app: no longer support\n\nEDUCATION\n\n2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10","DocumentLanguage":"en","DocumentCulture":"en-US","ParserSettings":"Coverage.PersonalAttributes = True; Coverage.Training = True; Culture.CountryCodeForUnitedKingdomIsUK = True; Culture.DefaultCountryCode = US; Culture.Language = English; Culture.PreferEnglishVersionIfTwoLanguagesInDocument = False; Data.UserDefinedParsing = False; OutputFormat.AssumeCompanyNameFromPrecedingJob = False; OutputFormat.ContactMethod.PackStyle = Split; OutputFormat.DateOutputStyle = ExplicitlyKnownDateInfoOnly; OutputFormat.NestJobsBasedOnDateRanges = True; OutputFormat.NormalizeRegions = False; OutputFormat.SkillsStyle = Default; OutputFormat.StripParsedDataFromPositionHistoryDescription = True; OutputFormat.TelcomNumber.Style = Raw; OutputFormat.XmlFormat = HrXmlResume25","DocumentLastModified":"2021-08-14","SovrenSignature":["q8EBAAAAAAA="]}},"RedactedResumeData":{"ContactInformation":{},"Education":{"EducationDetails":[{"Id":"DEG-1","Text":"2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10","SchoolName":{"Raw":"UNIVERSITY OF TECHNOLOGY, HCMC","Normalized":"UNIVERSITY OF TECHNOLOGY HCMC"},"SchoolType":"university","Degree":{},"GPA":{"Score":"7.87","ScoringSystem":"GPA","MaxScore":"10","MinimumScore":"0","NormalizedScore":0.787},"LastEducationDate":{"Date":"2014-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false}}]},"EmploymentHistory":{"ExperienceSummary":{"Description":"   ~~~~~~~   is experienced in:  Information Technology (Mobile Applications).    ~~~~~~~   has 9 years of work experience, with 5 years of management experience, including a low-level position.","MonthsOfWorkExperience":103,"MonthsOfManagementExperience":55,"ExecutiveType":"NONE","AverageMonthsPerEmployer":34,"FulltimeDirectHirePredictiveIndex":85,"ManagementStory":"Current position is a low-level management role: Leader, Technical Mobile App\nStarting on 1/1/2017, the candidate held the following low-level management position for 4 years and 8 months:\n\tTitle: Leader, Technical Mobile App for VISERVICE COMPANY","CurrentManagementLevel":"low-level","ManagementScore":20},"Positions":[{"Id":"POS-1","Employer":{"Name":{"Probability":"Confident","Raw":"VISERVICE COMPANY","Normalized":"VISERVICE COMPANY"}},"IsSelfEmployed":false,"IsCurrent":true,"JobTitle":{"Raw":"Leader, Technical Mobile App","Normalized":"Leader Technical Mobile App","Probability":"Confident","Variations":["Leader"]},"StartDate":{"Date":"2017-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"EndDate":{"Date":"2021-08-14","IsCurrentDate":true,"FoundYear":true,"FoundMonth":true,"FoundDay":false},"JobType":"directHire","JobLevel":"Experienced (non-manager)","TaxonomyPercentage":0},{"Id":"POS-2","Employer":{"Name":{"Probability":"Confident","Raw":"MUABAN COMPANY","Normalized":"MUABAN COMPANY"}},"IsSelfEmployed":false,"IsCurrent":false,"JobTitle":{"Raw":"Senior Mobile App","Normalized":"Senior Mobile App","Probability":"Confident"},"StartDate":{"Date":"2015-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"EndDate":{"Date":"2017-12-31","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"JobType":"directHire","JobLevel":"Experienced (non-manager)","TaxonomyPercentage":0},{"Id":"POS-3","Employer":{"Name":{"Probability":"Confident","Raw":"GNT COMPANY","Normalized":"GNT COMPANY"}},"IsSelfEmployed":false,"IsCurrent":false,"JobTitle":{"Raw":"Developer Mobile Game and iOS App","Normalized":"Developer Mobile Game and iOS App","Probability":"Confident"},"StartDate":{"Date":"2013-01-01","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"EndDate":{"Date":"2015-12-31","IsCurrentDate":false,"FoundYear":true,"FoundMonth":false,"FoundDay":false},"JobType":"directHire","JobLevel":"Entry Level","TaxonomyPercentage":0}]},"SkillsData":[{"Root":"Sovren","Taxonomies":[{"Id":"10","Name":"Information Technology","PercentOfOverall":93,"SubTaxonomies":[{"SubTaxonomyId":"552","SubTaxonomyName":"Mobile Applications","PercentOfOverall":90,"PercentOfParent":97,"Skills":[{"Id":"5520503","Name":"Android","FoundIn":[{"SectionType":"PROJECT_HEADERS"},{"SectionType":"WORK HISTORY"}],"ExistsInText":true},{"Id":"5520545","Name":"IOS","FoundIn":[{"SectionType":"PROJECT_HEADERS"},{"SectionType":"WORK HISTORY","Id":"POS-3"}],"ExistsInText":true,"MonthsExperience":{"Value":36},"LastUsed":{"Value":"2015-12-31"}}]},{"SubTaxonomyId":"731","SubTaxonomyName":"User Interface","PercentOfOverall":3,"PercentOfParent":3,"Skills":[{"Id":"7310008","Name":"Android","FoundIn":[{"SectionType":"PROJECT_HEADERS"},{"SectionType":"WORK HISTORY"}],"ExistsInText":true}]}]},{"Id":"20","Name":"Sales","PercentOfOverall":7,"SubTaxonomies":[{"SubTaxonomyId":"105","SubTaxonomyName":"General","PercentOfOverall":7,"PercentOfParent":100}]}]}],"LanguageCompetencies":[{"Language":"English","LanguageCode":"en","FoundInContext":"• English: Intermediate"}],"ResumeMetadata":{"FoundSections":[{"FirstLineNumber":56,"LastLineNumber":58,"SectionType":"LANGUAGES","HeaderTextFound":"Languages"},{"FirstLineNumber":59,"LastLineNumber":69,"SectionType":"WORK HISTORY","HeaderTextFound":"WORKING HISTORY"},{"FirstLineNumber":70,"LastLineNumber":87,"SectionType":"PROJECT_HEADERS","HeaderTextFound":"PROJECTS"},{"FirstLineNumber":88,"LastLineNumber":91,"SectionType":"EDUCATION","HeaderTextFound":"EDUCATION"}],"ResumeQuality":[{"Level":"Major Issues Found","Findings":[{"QualityCode":"300","Message":"You should not use the PDF format for your resume. Due to inherent limitations with text extraction from PDFs, you are less likely to get a job when using a PDF resume."},{"QualityCode":"303","SectionIdentifiers":[{"SectionType":"PROJECT_HEADERS","Id":"2"}],"Message":"These sections are longer than the work history and education sections combined. This may indicate a problem with section headers, formatting, or content."}]},{"Level":"Data Missing","Findings":[{"QualityCode":"211","Message":"An email address was not found in the contact information. A resume should always include an email address."},{"QualityCode":"212","Message":"A phone number was not found in the contact information. A resume should always include a phone number."},{"QualityCode":"213","Message":"A street level address was not found in the contact information. A full contact address should always be included in a resume as it allows for location based searches."},{"QualityCode":"231","SectionIdentifiers":[{"SectionType":"DEG-1"}],"Message":"Every degree in a resume should have a name or type associated with it, such as 'B.S.' or 'M.S.'."}]},{"Level":"Suggested Improvements","Findings":[{"QualityCode":"124","Message":"Date of birth information should not be included in a resume (for most cultures)."},{"QualityCode":"151","SectionIdentifiers":[{"SectionType":"LANGUAGES","Id":"0"}],"Message":"Every section should have a clear, unambiguous, commonly-used header on a separate line directly above the content associated with it."}]}],"PlainText":"FORDONOR\n(Senior) Mobile Developer\n\n\nCANDIDATE INFORMATION\n\n   ~~~~~~~~~~~~~~~~~~  \n\n   ~~~~~~~~~~~~~~~~~~~~~~~  \n\n   ~~~~~~~  \n\nASSESSMENT BY PEOPLE PROFILERS\n\nWith the skills and experiences of more than 6 years developing mobile apps, Mr. Vu is confident that his\nhard-working attitude and inquiring mind will help him encounter the challenges and make a valuable\ncontribution to the profitability of the company\n\n•   Technical skills:\n- Strong in mobile app architecture design pattern, (both iOS and Android), such as: RIBs (uber),\nVIPER, MVVM, Clean architecture, MVP, Bloc for Flutter. Specifically, in-depth understanding\nand using RIBs architecture, it is a cross-platform mobile architecture for iOS and Android\n(based on VIPER and Clean architecture).\n- Strong in using most popular libs for mobile app, such as: RxSwift, RxCocoa, RxJava, RxDart,\nDart Stream, Realm, Dependency Injection tools (Dagger, Needle,\t), Firebase (Auth, Firestore,\nDatabase, Dynamic link   ), Google Maps (Static maps, DirectionAPI, Place API, Geocode API,\ndraw map with marker, polyline, poligon   ). And so on,\n- Strong in research and quickly apply new techniques to mobile applications.\n- Strong in build layout using Auto Layout with multi ways: using Storyboard, XIB, programming\nwith code\n- In-depth understanding and apply SOLID Principles to programming to clean code and make\nit easy to understand.\n- In-depth understanding OOP, POP (Protocol Oriented Programming)\n- Experiences in using CI tools for development, such as: App Center of Microsoft.\n- Experiences in using Github and its tools to control and manage source code: Git board, Git\nPull Request, Git Actions,\n- Experience in using SSL Pinning to prevent capture http requests from apps. Using Proguard\nto security source code (Android)\n- In addition, I have experience at Futter for building Web app, cross platform mobile apps.\n\n•   Independently working skills:\n- Collected information from many sources: library, teaching books and internet to serve my\nstudy and enrich my knowledge.\n- Well reading English documents.\n\n•   Team working skills:\n-   Complete projects and jobs before the deadline.\n-   Support the other members when needed.\n-   Good cooperation with members of teams.\n-   Good at working with the SCRUM model.\n\n•   Computer skills: Good\n- Good at programming some following languages: Swift, Objective-C, Dart, Java, Kotlin, SQL.\n- Had some knowledge about computer architecture.\n- Operating System: Windows, Linux (Ubuntu), Mac OS, iOS, Android.\n\n➢ Languages:\n• English: Intermediate\n\nWORKING HISTORY\n\n2017 - Present\tVISERVICE COMPANY\nLeader, Technical Mobile App\n\n2015 - 2017\tMUABAN COMPANY\nSenior Mobile App\n\n2013 - 2015\tGNT COMPANY\nDeveloper Mobile Game and iOS App\n\nPROJECTS\n\n➢ Project viService:\n• About project: This app support user find motor, car, taxi, delivery quickly and convenient (just like\nUber, Grab)\n• Position: Mobile technical (both iOS and Android)\n• Link app: iOS Rider, iOS Driver, Android Rider, Android Driver\n\n➢ Project    ~~~~~  \n• About project: app support for people who want to sell or buy any products. It's just like Chotot.\n• Position: Leader (both iOS and Android)\n• Link app: iOS, Android\n\n➢ Project    ~~~~~  \n• About project: app like a market for sell and buy products for lifestyle. (Just like Shopee, Lazada)\n• Position: Senior (both iOS and Android)\n• Link app: no longer support\n\nEDUCATION\n\n2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10","DocumentLanguage":"en","DocumentCulture":"en-US","ParserSettings":"Coverage.PersonalAttributes = True; Coverage.Training = True; Culture.CountryCodeForUnitedKingdomIsUK = True; Culture.DefaultCountryCode = US; Culture.Language = English; Culture.PreferEnglishVersionIfTwoLanguagesInDocument = False; Data.UserDefinedParsing = False; OutputFormat.AssumeCompanyNameFromPrecedingJob = False; OutputFormat.ContactMethod.PackStyle = Split; OutputFormat.DateOutputStyle = ExplicitlyKnownDateInfoOnly; OutputFormat.NestJobsBasedOnDateRanges = True; OutputFormat.NormalizeRegions = False; OutputFormat.SkillsStyle = Default; OutputFormat.StripParsedDataFromPositionHistoryDescription = True; OutputFormat.TelcomNumber.Style = Raw; OutputFormat.XmlFormat = HrXmlResume25","DocumentLastModified":"2021-08-14","SovrenSignature":["XTsAAAAAAAA="]}},"ConversionMetadata":{"DetectedType":"Pdf","SuggestedFileExtension":"pdf","OutputValidityCode":"ovIsProbablyValid","ElapsedMilliseconds":546,"DocumentHash":"887A81C68E46E467AC9529A99367681C"},"ParsingMetadata":{"ElapsedMilliseconds":421,"TimedOut":false}}},"message":"resume_uploaded_successful","status":200}
+{
+  "data": {
+    "Info": {
+      "Code": "Success",
+      "Message": "Successful transaction",
+      "TransactionId": "95908a58-f988-40af-9848-d854737d392f",
+      "EngineVersion": "9.6.7.0",
+      "ApiVersion": "10.2.0.0",
+      "TotalElapsedMilliseconds": 1531,
+      "TransactionCost": 2,
+      "CustomerDetails": {
+        "AccountId": "35186509",
+        "Name": "Accessed",
+        "IPAddress": "115.79.175.121",
+        "Region": "us-east-1",
+        "CreditsRemaining": 9996,
+        "CreditsUsed": 2,
+        "ExpirationDate": "2027-08-14",
+        "MaximumConcurrentRequests": 2
+      }
+    },
+    "Value": {
+      "ParsingResponse": {
+        "Code": "Success",
+        "Message": "Successful transaction"
+      },
+      "ResumeData": {
+        "ContactInformation": {
+          "CandidateName": {
+            "FormattedName": "Dang Ngoc Vu",
+            "GivenName": "Dang",
+            "MiddleName": "Ngoc",
+            "FamilyName": "Vu"
+          }
+        },
+        "PersonalAttributes": {
+          "DateOfBirth": {
+            "Date": "1991-08-28",
+            "IsCurrentDate": false,
+            "FoundYear": true,
+            "FoundMonth": true,
+            "FoundDay": true
+          },
+          "Gender": "Male"
+        },
+        "Education": {
+          "EducationDetails": [
+            {
+              "Id": "DEG-1",
+              "Text": "2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10",
+              "SchoolName": {
+                "Raw": "UNIVERSITY OF TECHNOLOGY, HCMC",
+                "Normalized": "UNIVERSITY OF TECHNOLOGY HCMC"
+              },
+              "SchoolType": "university",
+              "Degree": {},
+              "GPA": {
+                "Score": "7.87",
+                "ScoringSystem": "GPA",
+                "MaxScore": "10",
+                "MinimumScore": "0",
+                "NormalizedScore": 0.787
+              },
+              "LastEducationDate": {
+                "Date": "2014-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              }
+            }
+          ]
+        },
+        "EmploymentHistory": {
+          "ExperienceSummary": {
+            "Description": "Dang Ngoc Vu is experienced in:  Information Technology (Mobile Applications). Dang Ngoc Vu has 9 years of work experience, with 5 years of management experience, including a low-level position.",
+            "MonthsOfWorkExperience": 103,
+            "MonthsOfManagementExperience": 55,
+            "ExecutiveType": "NONE",
+            "AverageMonthsPerEmployer": 34,
+            "FulltimeDirectHirePredictiveIndex": 85,
+            "ManagementStory": "Current position is a low-level management role: Leader, Technical Mobile App\nStarting on 1/1/2017, the candidate held the following low-level management position for 4 years and 8 months:\n\tTitle: Leader, Technical Mobile App for VISERVICE COMPANY",
+            "CurrentManagementLevel": "low-level",
+            "ManagementScore": 20
+          },
+          "Positions": [
+            {
+              "Id": "POS-1",
+              "Employer": {
+                "Name": {
+                  "Probability": "Confident",
+                  "Raw": "VISERVICE COMPANY",
+                  "Normalized": "VISERVICE COMPANY"
+                }
+              },
+              "IsSelfEmployed": false,
+              "IsCurrent": true,
+              "JobTitle": {
+                "Raw": "Leader, Technical Mobile App",
+                "Normalized": "Leader Technical Mobile App",
+                "Probability": "Confident",
+                "Variations": [
+                  "Leader"
+                ]
+              },
+              "StartDate": {
+                "Date": "2017-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "EndDate": {
+                "Date": "2021-08-14",
+                "IsCurrentDate": true,
+                "FoundYear": true,
+                "FoundMonth": true,
+                "FoundDay": false
+              },
+              "JobType": "directHire",
+              "JobLevel": "Experienced (non-manager)",
+              "TaxonomyPercentage": 0
+            },
+            {
+              "Id": "POS-2",
+              "Employer": {
+                "Name": {
+                  "Probability": "Confident",
+                  "Raw": "MUABAN COMPANY",
+                  "Normalized": "MUABAN COMPANY"
+                }
+              },
+              "IsSelfEmployed": false,
+              "IsCurrent": false,
+              "JobTitle": {
+                "Raw": "Senior Mobile App",
+                "Normalized": "Senior Mobile App",
+                "Probability": "Confident"
+              },
+              "StartDate": {
+                "Date": "2015-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "EndDate": {
+                "Date": "2017-12-31",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "JobType": "directHire",
+              "JobLevel": "Experienced (non-manager)",
+              "TaxonomyPercentage": 0
+            },
+            {
+              "Id": "POS-3",
+              "Employer": {
+                "Name": {
+                  "Probability": "Confident",
+                  "Raw": "GNT COMPANY",
+                  "Normalized": "GNT COMPANY"
+                }
+              },
+              "IsSelfEmployed": false,
+              "IsCurrent": false,
+              "JobTitle": {
+                "Raw": "Developer Mobile Game and iOS App",
+                "Normalized": "Developer Mobile Game and iOS App",
+                "Probability": "Confident"
+              },
+              "StartDate": {
+                "Date": "2013-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "EndDate": {
+                "Date": "2015-12-31",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "JobType": "directHire",
+              "JobLevel": "Entry Level",
+              "TaxonomyPercentage": 0
+            }
+          ]
+        },
+        "SkillsData": [
+          {
+            "Root": "Sovren",
+            "Taxonomies": [
+              {
+                "Id": "10",
+                "Name": "Information Technology",
+                "PercentOfOverall": 93,
+                "SubTaxonomies": [
+                  {
+                    "SubTaxonomyId": "552",
+                    "SubTaxonomyName": "Mobile Applications",
+                    "PercentOfOverall": 90,
+                    "PercentOfParent": 97,
+                    "Skills": [
+                      {
+                        "Id": "5520503",
+                        "Name": "Android",
+                        "FoundIn": [
+                          {
+                            "SectionType": "PROJECT_HEADERS"
+                          },
+                          {
+                            "SectionType": "WORK HISTORY"
+                          }
+                        ],
+                        "ExistsInText": true
+                      },
+                      {
+                        "Id": "5520545",
+                        "Name": "IOS",
+                        "FoundIn": [
+                          {
+                            "SectionType": "PROJECT_HEADERS"
+                          },
+                          {
+                            "SectionType": "WORK HISTORY",
+                            "Id": "POS-3"
+                          }
+                        ],
+                        "ExistsInText": true,
+                        "MonthsExperience": {
+                          "Value": 36
+                        },
+                        "LastUsed": {
+                          "Value": "2015-12-31"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "SubTaxonomyId": "731",
+                    "SubTaxonomyName": "User Interface",
+                    "PercentOfOverall": 3,
+                    "PercentOfParent": 3,
+                    "Skills": [
+                      {
+                        "Id": "7310008",
+                        "Name": "Android",
+                        "FoundIn": [
+                          {
+                            "SectionType": "PROJECT_HEADERS"
+                          },
+                          {
+                            "SectionType": "WORK HISTORY"
+                          }
+                        ],
+                        "ExistsInText": true
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Id": "20",
+                "Name": "Sales",
+                "PercentOfOverall": 7,
+                "SubTaxonomies": [
+                  {
+                    "SubTaxonomyId": "105",
+                    "SubTaxonomyName": "General",
+                    "PercentOfOverall": 7,
+                    "PercentOfParent": 100
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "LanguageCompetencies": [
+          {
+            "Language": "English",
+            "LanguageCode": "en",
+            "FoundInContext": "• English: Intermediate"
+          }
+        ],
+        "ResumeMetadata": {
+          "FoundSections": [
+            {
+              "FirstLineNumber": 56,
+              "LastLineNumber": 58,
+              "SectionType": "LANGUAGES",
+              "HeaderTextFound": "Languages"
+            },
+            {
+              "FirstLineNumber": 59,
+              "LastLineNumber": 69,
+              "SectionType": "WORK HISTORY",
+              "HeaderTextFound": "WORKING HISTORY"
+            },
+            {
+              "FirstLineNumber": 70,
+              "LastLineNumber": 87,
+              "SectionType": "PROJECT_HEADERS",
+              "HeaderTextFound": "PROJECTS"
+            },
+            {
+              "FirstLineNumber": 88,
+              "LastLineNumber": 91,
+              "SectionType": "EDUCATION",
+              "HeaderTextFound": "EDUCATION"
+            }
+          ],
+          "ResumeQuality": [
+            {
+              "Level": "Major Issues Found",
+              "Findings": [
+                {
+                  "QualityCode": "300",
+                  "Message": "You should not use the PDF format for your resume. Due to inherent limitations with text extraction from PDFs, you are less likely to get a job when using a PDF resume."
+                },
+                {
+                  "QualityCode": "303",
+                  "SectionIdentifiers": [
+                    {
+                      "SectionType": "PROJECT_HEADERS",
+                      "Id": "2"
+                    }
+                  ],
+                  "Message": "These sections are longer than the work history and education sections combined. This may indicate a problem with section headers, formatting, or content."
+                }
+              ]
+            },
+            {
+              "Level": "Data Missing",
+              "Findings": [
+                {
+                  "QualityCode": "211",
+                  "Message": "An email address was not found in the contact information. A resume should always include an email address."
+                },
+                {
+                  "QualityCode": "212",
+                  "Message": "A phone number was not found in the contact information. A resume should always include a phone number."
+                },
+                {
+                  "QualityCode": "213",
+                  "Message": "A street level address was not found in the contact information. A full contact address should always be included in a resume as it allows for location based searches."
+                },
+                {
+                  "QualityCode": "231",
+                  "SectionIdentifiers": [
+                    {
+                      "SectionType": "DEG-1"
+                    }
+                  ],
+                  "Message": "Every degree in a resume should have a name or type associated with it, such as 'B.S.' or 'M.S.'."
+                }
+              ]
+            },
+            {
+              "Level": "Suggested Improvements",
+              "Findings": [
+                {
+                  "QualityCode": "124",
+                  "Message": "Date of birth information should not be included in a resume (for most cultures)."
+                },
+                {
+                  "QualityCode": "151",
+                  "SectionIdentifiers": [
+                    {
+                      "SectionType": "LANGUAGES",
+                      "Id": "0"
+                    }
+                  ],
+                  "Message": "Every section should have a clear, unambiguous, commonly-used header on a separate line directly above the content associated with it."
+                }
+              ]
+            }
+          ],
+          "ReservedData": {
+            "Names": [
+              "Dang Ngoc Vu",
+              "Full Name: Dang Ngoc Vu"
+            ],
+            "Urls": [
+              "Muaban.Net"
+            ],
+            "OtherData": [
+              "Date of Birth: Aug 28th 1991",
+              "Wednesday, August 28, 1991",
+              "Gender: Male"
+            ]
+          },
+          "PlainText": "FORDONOR\n(Senior) Mobile Developer\n\n\nCANDIDATE INFORMATION\n\nFull Name: Dang Ngoc Vu\n\nDate of Birth: Aug 28th 1991\n\nGender: Male\n\nASSESSMENT BY PEOPLE PROFILERS\n\nWith the skills and experiences of more than 6 years developing mobile apps, Mr. Vu is confident that his\nhard-working attitude and inquiring mind will help him encounter the challenges and make a valuable\ncontribution to the profitability of the company\n\n•   Technical skills:\n- Strong in mobile app architecture design pattern, (both iOS and Android), such as: RIBs (uber),\nVIPER, MVVM, Clean architecture, MVP, Bloc for Flutter. Specifically, in-depth understanding\nand using RIBs architecture, it is a cross-platform mobile architecture for iOS and Android\n(based on VIPER and Clean architecture).\n- Strong in using most popular libs for mobile app, such as: RxSwift, RxCocoa, RxJava, RxDart,\nDart Stream, Realm, Dependency Injection tools (Dagger, Needle,\t), Firebase (Auth, Firestore,\nDatabase, Dynamic link   ), Google Maps (Static maps, DirectionAPI, Place API, Geocode API,\ndraw map with marker, polyline, poligon   ). And so on,\n- Strong in research and quickly apply new techniques to mobile applications.\n- Strong in build layout using Auto Layout with multi ways: using Storyboard, XIB, programming\nwith code\n- In-depth understanding and apply SOLID Principles to programming to clean code and make\nit easy to understand.\n- In-depth understanding OOP, POP (Protocol Oriented Programming)\n- Experiences in using CI tools for development, such as: App Center of Microsoft.\n- Experiences in using Github and its tools to control and manage source code: Git board, Git\nPull Request, Git Actions,\n- Experience in using SSL Pinning to prevent capture http requests from apps. Using Proguard\nto security source code (Android)\n- In addition, I have experience at Futter for building Web app, cross platform mobile apps.\n\n•   Independently working skills:\n- Collected information from many sources: library, teaching books and internet to serve my\nstudy and enrich my knowledge.\n- Well reading English documents.\n\n•   Team working skills:\n-   Complete projects and jobs before the deadline.\n-   Support the other members when needed.\n-   Good cooperation with members of teams.\n-   Good at working with the SCRUM model.\n\n•   Computer skills: Good\n- Good at programming some following languages: Swift, Objective-C, Dart, Java, Kotlin, SQL.\n- Had some knowledge about computer architecture.\n- Operating System: Windows, Linux (Ubuntu), Mac OS, iOS, Android.\n\n➢ Languages:\n• English: Intermediate\n\nWORKING HISTORY\n\n2017 - Present\tVISERVICE COMPANY\nLeader, Technical Mobile App\n\n2015 - 2017\tMUABAN COMPANY\nSenior Mobile App\n\n2013 - 2015\tGNT COMPANY\nDeveloper Mobile Game and iOS App\n\nPROJECTS\n\n➢ Project viService:\n• About project: This app support user find motor, car, taxi, delivery quickly and convenient (just like\nUber, Grab)\n• Position: Mobile technical (both iOS and Android)\n• Link app: iOS Rider, iOS Driver, Android Rider, Android Driver\n\n➢ Project Muaban.Net\n• About project: app support for people who want to sell or buy any products. It's just like Chotot.\n• Position: Leader (both iOS and Android)\n• Link app: iOS, Android\n\n➢ Project Muaban.Net\n• About project: app like a market for sell and buy products for lifestyle. (Just like Shopee, Lazada)\n• Position: Senior (both iOS and Android)\n• Link app: no longer support\n\nEDUCATION\n\n2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10",
+          "DocumentLanguage": "en",
+          "DocumentCulture": "en-US",
+          "ParserSettings": "Coverage.PersonalAttributes = True; Coverage.Training = True; Culture.CountryCodeForUnitedKingdomIsUK = True; Culture.DefaultCountryCode = US; Culture.Language = English; Culture.PreferEnglishVersionIfTwoLanguagesInDocument = False; Data.UserDefinedParsing = False; OutputFormat.AssumeCompanyNameFromPrecedingJob = False; OutputFormat.ContactMethod.PackStyle = Split; OutputFormat.DateOutputStyle = ExplicitlyKnownDateInfoOnly; OutputFormat.NestJobsBasedOnDateRanges = True; OutputFormat.NormalizeRegions = False; OutputFormat.SkillsStyle = Default; OutputFormat.StripParsedDataFromPositionHistoryDescription = True; OutputFormat.TelcomNumber.Style = Raw; OutputFormat.XmlFormat = HrXmlResume25",
+          "DocumentLastModified": "2021-08-14",
+          "SovrenSignature": [
+            "q8EBAAAAAAA="
+          ]
+        }
+      },
+      "RedactedResumeData": {
+        "ContactInformation": {},
+        "Education": {
+          "EducationDetails": [
+            {
+              "Id": "DEG-1",
+              "Text": "2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10",
+              "SchoolName": {
+                "Raw": "UNIVERSITY OF TECHNOLOGY, HCMC",
+                "Normalized": "UNIVERSITY OF TECHNOLOGY HCMC"
+              },
+              "SchoolType": "university",
+              "Degree": {},
+              "GPA": {
+                "Score": "7.87",
+                "ScoringSystem": "GPA",
+                "MaxScore": "10",
+                "MinimumScore": "0",
+                "NormalizedScore": 0.787
+              },
+              "LastEducationDate": {
+                "Date": "2014-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              }
+            }
+          ]
+        },
+        "EmploymentHistory": {
+          "ExperienceSummary": {
+            "Description": "   ~~~~~~~   is experienced in:  Information Technology (Mobile Applications).    ~~~~~~~   has 9 years of work experience, with 5 years of management experience, including a low-level position.",
+            "MonthsOfWorkExperience": 103,
+            "MonthsOfManagementExperience": 55,
+            "ExecutiveType": "NONE",
+            "AverageMonthsPerEmployer": 34,
+            "FulltimeDirectHirePredictiveIndex": 85,
+            "ManagementStory": "Current position is a low-level management role: Leader, Technical Mobile App\nStarting on 1/1/2017, the candidate held the following low-level management position for 4 years and 8 months:\n\tTitle: Leader, Technical Mobile App for VISERVICE COMPANY",
+            "CurrentManagementLevel": "low-level",
+            "ManagementScore": 20
+          },
+          "Positions": [
+            {
+              "Id": "POS-1",
+              "Employer": {
+                "Name": {
+                  "Probability": "Confident",
+                  "Raw": "VISERVICE COMPANY",
+                  "Normalized": "VISERVICE COMPANY"
+                }
+              },
+              "IsSelfEmployed": false,
+              "IsCurrent": true,
+              "JobTitle": {
+                "Raw": "Leader, Technical Mobile App",
+                "Normalized": "Leader Technical Mobile App",
+                "Probability": "Confident",
+                "Variations": [
+                  "Leader"
+                ]
+              },
+              "StartDate": {
+                "Date": "2017-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "EndDate": {
+                "Date": "2021-08-14",
+                "IsCurrentDate": true,
+                "FoundYear": true,
+                "FoundMonth": true,
+                "FoundDay": false
+              },
+              "JobType": "directHire",
+              "JobLevel": "Experienced (non-manager)",
+              "TaxonomyPercentage": 0
+            },
+            {
+              "Id": "POS-2",
+              "Employer": {
+                "Name": {
+                  "Probability": "Confident",
+                  "Raw": "MUABAN COMPANY",
+                  "Normalized": "MUABAN COMPANY"
+                }
+              },
+              "IsSelfEmployed": false,
+              "IsCurrent": false,
+              "JobTitle": {
+                "Raw": "Senior Mobile App",
+                "Normalized": "Senior Mobile App",
+                "Probability": "Confident"
+              },
+              "StartDate": {
+                "Date": "2015-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "EndDate": {
+                "Date": "2017-12-31",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "JobType": "directHire",
+              "JobLevel": "Experienced (non-manager)",
+              "TaxonomyPercentage": 0
+            },
+            {
+              "Id": "POS-3",
+              "Employer": {
+                "Name": {
+                  "Probability": "Confident",
+                  "Raw": "GNT COMPANY",
+                  "Normalized": "GNT COMPANY"
+                }
+              },
+              "IsSelfEmployed": false,
+              "IsCurrent": false,
+              "JobTitle": {
+                "Raw": "Developer Mobile Game and iOS App",
+                "Normalized": "Developer Mobile Game and iOS App",
+                "Probability": "Confident"
+              },
+              "StartDate": {
+                "Date": "2013-01-01",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "EndDate": {
+                "Date": "2015-12-31",
+                "IsCurrentDate": false,
+                "FoundYear": true,
+                "FoundMonth": false,
+                "FoundDay": false
+              },
+              "JobType": "directHire",
+              "JobLevel": "Entry Level",
+              "TaxonomyPercentage": 0
+            }
+          ]
+        },
+        "SkillsData": [
+          {
+            "Root": "Sovren",
+            "Taxonomies": [
+              {
+                "Id": "10",
+                "Name": "Information Technology",
+                "PercentOfOverall": 93,
+                "SubTaxonomies": [
+                  {
+                    "SubTaxonomyId": "552",
+                    "SubTaxonomyName": "Mobile Applications",
+                    "PercentOfOverall": 90,
+                    "PercentOfParent": 97,
+                    "Skills": [
+                      {
+                        "Id": "5520503",
+                        "Name": "Android",
+                        "FoundIn": [
+                          {
+                            "SectionType": "PROJECT_HEADERS"
+                          },
+                          {
+                            "SectionType": "WORK HISTORY"
+                          }
+                        ],
+                        "ExistsInText": true
+                      },
+                      {
+                        "Id": "5520545",
+                        "Name": "IOS",
+                        "FoundIn": [
+                          {
+                            "SectionType": "PROJECT_HEADERS"
+                          },
+                          {
+                            "SectionType": "WORK HISTORY",
+                            "Id": "POS-3"
+                          }
+                        ],
+                        "ExistsInText": true,
+                        "MonthsExperience": {
+                          "Value": 36
+                        },
+                        "LastUsed": {
+                          "Value": "2015-12-31"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "SubTaxonomyId": "731",
+                    "SubTaxonomyName": "User Interface",
+                    "PercentOfOverall": 3,
+                    "PercentOfParent": 3,
+                    "Skills": [
+                      {
+                        "Id": "7310008",
+                        "Name": "Android",
+                        "FoundIn": [
+                          {
+                            "SectionType": "PROJECT_HEADERS"
+                          },
+                          {
+                            "SectionType": "WORK HISTORY"
+                          }
+                        ],
+                        "ExistsInText": true
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Id": "20",
+                "Name": "Sales",
+                "PercentOfOverall": 7,
+                "SubTaxonomies": [
+                  {
+                    "SubTaxonomyId": "105",
+                    "SubTaxonomyName": "General",
+                    "PercentOfOverall": 7,
+                    "PercentOfParent": 100
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "LanguageCompetencies": [
+          {
+            "Language": "English",
+            "LanguageCode": "en",
+            "FoundInContext": "• English: Intermediate"
+          }
+        ],
+        "ResumeMetadata": {
+          "FoundSections": [
+            {
+              "FirstLineNumber": 56,
+              "LastLineNumber": 58,
+              "SectionType": "LANGUAGES",
+              "HeaderTextFound": "Languages"
+            },
+            {
+              "FirstLineNumber": 59,
+              "LastLineNumber": 69,
+              "SectionType": "WORK HISTORY",
+              "HeaderTextFound": "WORKING HISTORY"
+            },
+            {
+              "FirstLineNumber": 70,
+              "LastLineNumber": 87,
+              "SectionType": "PROJECT_HEADERS",
+              "HeaderTextFound": "PROJECTS"
+            },
+            {
+              "FirstLineNumber": 88,
+              "LastLineNumber": 91,
+              "SectionType": "EDUCATION",
+              "HeaderTextFound": "EDUCATION"
+            }
+          ],
+          "ResumeQuality": [
+            {
+              "Level": "Major Issues Found",
+              "Findings": [
+                {
+                  "QualityCode": "300",
+                  "Message": "You should not use the PDF format for your resume. Due to inherent limitations with text extraction from PDFs, you are less likely to get a job when using a PDF resume."
+                },
+                {
+                  "QualityCode": "303",
+                  "SectionIdentifiers": [
+                    {
+                      "SectionType": "PROJECT_HEADERS",
+                      "Id": "2"
+                    }
+                  ],
+                  "Message": "These sections are longer than the work history and education sections combined. This may indicate a problem with section headers, formatting, or content."
+                }
+              ]
+            },
+            {
+              "Level": "Data Missing",
+              "Findings": [
+                {
+                  "QualityCode": "211",
+                  "Message": "An email address was not found in the contact information. A resume should always include an email address."
+                },
+                {
+                  "QualityCode": "212",
+                  "Message": "A phone number was not found in the contact information. A resume should always include a phone number."
+                },
+                {
+                  "QualityCode": "213",
+                  "Message": "A street level address was not found in the contact information. A full contact address should always be included in a resume as it allows for location based searches."
+                },
+                {
+                  "QualityCode": "231",
+                  "SectionIdentifiers": [
+                    {
+                      "SectionType": "DEG-1"
+                    }
+                  ],
+                  "Message": "Every degree in a resume should have a name or type associated with it, such as 'B.S.' or 'M.S.'."
+                }
+              ]
+            },
+            {
+              "Level": "Suggested Improvements",
+              "Findings": [
+                {
+                  "QualityCode": "124",
+                  "Message": "Date of birth information should not be included in a resume (for most cultures)."
+                },
+                {
+                  "QualityCode": "151",
+                  "SectionIdentifiers": [
+                    {
+                      "SectionType": "LANGUAGES",
+                      "Id": "0"
+                    }
+                  ],
+                  "Message": "Every section should have a clear, unambiguous, commonly-used header on a separate line directly above the content associated with it."
+                }
+              ]
+            }
+          ],
+          "PlainText": "FORDONOR\n(Senior) Mobile Developer\n\n\nCANDIDATE INFORMATION\n\n   ~~~~~~~~~~~~~~~~~~  \n\n   ~~~~~~~~~~~~~~~~~~~~~~~  \n\n   ~~~~~~~  \n\nASSESSMENT BY PEOPLE PROFILERS\n\nWith the skills and experiences of more than 6 years developing mobile apps, Mr. Vu is confident that his\nhard-working attitude and inquiring mind will help him encounter the challenges and make a valuable\ncontribution to the profitability of the company\n\n•   Technical skills:\n- Strong in mobile app architecture design pattern, (both iOS and Android), such as: RIBs (uber),\nVIPER, MVVM, Clean architecture, MVP, Bloc for Flutter. Specifically, in-depth understanding\nand using RIBs architecture, it is a cross-platform mobile architecture for iOS and Android\n(based on VIPER and Clean architecture).\n- Strong in using most popular libs for mobile app, such as: RxSwift, RxCocoa, RxJava, RxDart,\nDart Stream, Realm, Dependency Injection tools (Dagger, Needle,\t), Firebase (Auth, Firestore,\nDatabase, Dynamic link   ), Google Maps (Static maps, DirectionAPI, Place API, Geocode API,\ndraw map with marker, polyline, poligon   ). And so on,\n- Strong in research and quickly apply new techniques to mobile applications.\n- Strong in build layout using Auto Layout with multi ways: using Storyboard, XIB, programming\nwith code\n- In-depth understanding and apply SOLID Principles to programming to clean code and make\nit easy to understand.\n- In-depth understanding OOP, POP (Protocol Oriented Programming)\n- Experiences in using CI tools for development, such as: App Center of Microsoft.\n- Experiences in using Github and its tools to control and manage source code: Git board, Git\nPull Request, Git Actions,\n- Experience in using SSL Pinning to prevent capture http requests from apps. Using Proguard\nto security source code (Android)\n- In addition, I have experience at Futter for building Web app, cross platform mobile apps.\n\n•   Independently working skills:\n- Collected information from many sources: library, teaching books and internet to serve my\nstudy and enrich my knowledge.\n- Well reading English documents.\n\n•   Team working skills:\n-   Complete projects and jobs before the deadline.\n-   Support the other members when needed.\n-   Good cooperation with members of teams.\n-   Good at working with the SCRUM model.\n\n•   Computer skills: Good\n- Good at programming some following languages: Swift, Objective-C, Dart, Java, Kotlin, SQL.\n- Had some knowledge about computer architecture.\n- Operating System: Windows, Linux (Ubuntu), Mac OS, iOS, Android.\n\n➢ Languages:\n• English: Intermediate\n\nWORKING HISTORY\n\n2017 - Present\tVISERVICE COMPANY\nLeader, Technical Mobile App\n\n2015 - 2017\tMUABAN COMPANY\nSenior Mobile App\n\n2013 - 2015\tGNT COMPANY\nDeveloper Mobile Game and iOS App\n\nPROJECTS\n\n➢ Project viService:\n• About project: This app support user find motor, car, taxi, delivery quickly and convenient (just like\nUber, Grab)\n• Position: Mobile technical (both iOS and Android)\n• Link app: iOS Rider, iOS Driver, Android Rider, Android Driver\n\n➢ Project    ~~~~~  \n• About project: app support for people who want to sell or buy any products. It's just like Chotot.\n• Position: Leader (both iOS and Android)\n• Link app: iOS, Android\n\n➢ Project    ~~~~~  \n• About project: app like a market for sell and buy products for lifestyle. (Just like Shopee, Lazada)\n• Position: Senior (both iOS and Android)\n• Link app: no longer support\n\nEDUCATION\n\n2009 - 2014\tUNIVERSITY OF TECHNOLOGY, HCMC\nGPA: 7.87/10",
+          "DocumentLanguage": "en",
+          "DocumentCulture": "en-US",
+          "ParserSettings": "Coverage.PersonalAttributes = True; Coverage.Training = True; Culture.CountryCodeForUnitedKingdomI¬sUK = True; Culture.DefaultCountryCode = US; Culture.Language = English; Culture.PreferEnglishVersionIfTwoLanguagesInDocument = False; Data.UserDefinedParsing = False; OutputFormat.AssumeCompanyNameFromPrecedingJob = False; OutputFormat.ContactMethod.PackStyle = Split; OutputFormat.DateOutputStyle = ExplicitlyKnownDateInfoOnly; OutputFormat.NestJobsBasedOnDateRanges = True; OutputFormat.NormalizeRegions = False; OutputFormat.SkillsStyle = Default; OutputFormat.StripParsedDataFromPositionHistoryDescription = True; OutputFormat.TelcomNumber.Style = Raw; OutputFormat.XmlFormat = HrXmlResume25",
+          "DocumentLastModified": "2021-08-14",
+          "SovrenSignature": [
+            "XTsAAAAAAAA="
+          ]
+        }
+      },
+      "ConversionMetadata": {
+        "DetectedType": "Pdf",
+        "SuggestedFileExtension": "pdf",
+        "OutputValidityCode": "ovIsProbablyValid",
+        "ElapsedMilliseconds": 546,
+        "DocumentHash": "887A81C68E46E467AC9529A99367681C"
+      },
+      "ParsingMetadata": {
+        "ElapsedMilliseconds": 421,
+        "TimedOut": false
+      }
+    }
+  },
+  "message": "resume_uploaded_successful",
+  "status": 200
+}

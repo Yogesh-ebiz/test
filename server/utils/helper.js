@@ -192,7 +192,8 @@ const convertToCandidate = (user) => {
     url: user.shareUrl?user.shareUrl:user.url?user.url:null,
     flag: user.flag,
     resumes: user.resumes?user.resumes:[],
-    skills: user.skills?user.skills: []
+    skills: user.skills?user.skills: [];
+    preferences: user.preferences?user.preferences: null
   };
 }
 

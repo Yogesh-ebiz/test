@@ -3,6 +3,7 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const User = require('../models/user.model');
+const JobPreference = require("../models/jobpreferences.model");
 
 
 const form = Joi.object({
@@ -17,6 +18,15 @@ const form = Joi.object({
   productId: Joi.string().allow('').optional()
 });
 
+const jobPreferenceSchema = Joi.object({
+  jobTitles: Joi.array().optional(),
+  jobTypes: Joi.array().optional(),
+  jobLocations: Joi.array().required().optional(),
+  openToRelocate: Joi.boolean().optional(),
+  openToJob: Joi.boolean().optional(),
+  openToRemote: Joi.boolean().optional(),
+  startDate: Joi.string().allow(''),
+});
 
 async function register(form) {
 
@@ -54,14 +64,40 @@ async function getUserLast5Resumes(userId) {
   }
 
   let user  = await User.findOne({userId: userId}).populate('resumes').sort({createdDate: -1}).limit(5);
-  console.log(user)
   return _.orderBy(user.resumes, ['createdDate'], ['desc']);
 
+}
+
+async function updateJobPreferences(userId, jobPreferences) {
+
+  if(!userId || !jobPreferences){
+    return;
+  }
+
+  jobPreferences = await Joi.validate(jobPreferences, jobPreferenceSchema, {abortEarly: false});
+  let user  = await User.findOne({userId: userId});
+  user.preferences = jobPreferences;
+  user = await user.save();
+
+  return user.preferences;
+
+}
+
+
+async function getJobPreferences(userId) {
+  if(!userId){
+    return;
+  }
+
+  let user  = await User.findOne({userId: userId});
+  return user.preferences;
 }
 
 
 module.exports = {
   register:register,
   findByUserId:findByUserId,
-  getUserLast5Resumes:getUserLast5Resumes
+  getUserLast5Resumes:getUserLast5Resumes,
+  updateJobPreferences: updateJobPreferences,
+  getJobPreferences: getJobPreferences
 }

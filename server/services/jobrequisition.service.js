@@ -969,6 +969,7 @@ async function search(currentUserId, query, filter, sort, locale) {
   // }
 
 
+  filter.status = [statusEnum.ACTIVE];
 
   if(sort && sort.sortBy=='popular'){
     aSort = { $sort: { noOfViews: direction} };
@@ -1150,7 +1151,6 @@ async function talentSearch(member, query, filter, sort, locale) {
 
   if(filter.hasSaved){
     let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.JOB);
-    console.log(jobSubscribed, _.map(jobSubscribed, 'subject'));
     aList.push({ $match: {_id: {$in: _.map(jobSubscribed, 'subject')}} });
   }
 

@@ -148,6 +148,9 @@ const CandidateSchema = new mongoose.Schema({
   certifications: {
     type: Array
   },
+  preferences: {
+    type: Object
+  },
   experiences: [{ type: Schema.Types.ObjectId, ref: 'Experience' }],
   educations: [{ type: Schema.Types.ObjectId, ref: 'Education' }],
   resumes: [{ type: Schema.Types.ObjectId, ref: 'File' }],

@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
 const ObjectID = require('mongodb').ObjectID;
+const { ApplicationExist } = require('../middleware/baseError');
 
 const {jobMinimal, convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');
@@ -879,6 +880,14 @@ async function applyJobById(currentUserId, jobId, application ) {
       let candidate = null;
       let job = await JobRequisition.findOne({jobId: jobId }).populate('createdBy').populate('company');
       if(job) {
+
+        let exists = await applicationService.findApplicationByEmailAndJobId(application.email, job._id);
+        if (exists) {
+          throw new ApplicationExist(500, `User already applied`);
+
+        }
+
+
         let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, job.company.companyId);
         if(!candidate){
           currentParty.skills = null;
@@ -907,26 +916,13 @@ async function applyJobById(currentUserId, jobId, application ) {
         application.partyId = currentParty.id;
         application.company = job.company.companyId;
 
-        let foundApplication = await findApplicationByUserIdAndJobId(candidate._id, job._id);
-        if (!foundApplication) {
-
-          // if (application.resumeId) {
-          //   let resume = await feedService.getResumeById(currentUserId, application.resumeId);
-          //   if (resume) {
-          //     application.resume = {filename: resume.name, fileType: resume.fileType}
-          //   }
-          // }
-
-
-          if (application.source) {
-
-            // application.sources.push(source);
-            delete application.source;
-          }
-
-
-          savedApplication = await applicationService.apply(application);
+        if (application.source) {
+          // application.sources.push(source);
+          delete application.source;
         }
+
+        savedApplication = await applicationService.apply(application);
+
       }
     }
 
