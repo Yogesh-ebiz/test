@@ -8,6 +8,9 @@ const AnswerSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
+  createdBy: {
+    type: Number
+  },
   answer: {
     type: String
   },

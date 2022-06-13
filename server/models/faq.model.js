@@ -2,16 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const QuestionSchema = new mongoose.Schema({
+const FaqSchema = new mongoose.Schema({
   createdAt: {
     type: Number,
     default: Date.now
   },
   createdBy: {
     type: Number
-  },
-  category: {
-    type: String,
   },
   type: {
     type: String,
@@ -21,9 +18,13 @@ const QuestionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  default: {
+    type: Boolean,
+    default: false
+  },
   required: {
     type: Boolean,
-    default: true
+    default: false
   },
   options: {
     type: Array
@@ -37,16 +38,14 @@ const QuestionSchema = new mongoose.Schema({
   description: {
     type: String
   },
-  isDefault: {
-    type: Boolean,
-    default: false
-  },
+  answers: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
 }, {
   versionKey: false
 });
-QuestionSchema.plugin(mongoosePaginate);
+
+FaqSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('Question', QuestionSchema);
+module.exports = mongoose.model('Faq', FaqSchema);
 
 

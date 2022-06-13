@@ -924,7 +924,7 @@ async function getJobsEndingSoon(company) {
 
 
 async function search(currentUserId, query, filter, sort, locale) {
-  if(!currentUserId || !filter || !sort){
+  if(!filter || !sort){
     return null;
   }
 

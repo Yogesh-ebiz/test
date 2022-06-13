@@ -26,10 +26,15 @@ router.route('/plans/:id').delete(asyncHandler(deletePlan));
 
 router.route('/products').get(asyncHandler(getProducts));
 router.route('/products').post(asyncHandler(addProduct));
-router.route('/products/:id').get(asyncHandler(getById));
+router.route('/products/:id').get(asyncHandler(getProductById));
 router.route('/products/:id').put(asyncHandler(updateProduct));
 router.route('/products/:id').delete(asyncHandler(deleteProduct));
 
+router.route('/questions').get(asyncHandler(getQuestions));
+router.route('/questions').post(asyncHandler(addQuestion));
+router.route('/questions/:id').get(asyncHandler(getQuestionById));
+router.route('/questions/:id').put(asyncHandler(updateQuestion));
+router.route('/questions/:id').delete(asyncHandler(deleteQuestion));
 
 async function addPipelineTemplate(req, res) {
 
@@ -144,7 +149,7 @@ async function addProduct(req, res) {
 }
 
 
-async function getById(req, res) {
+async function getProductById(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let id = req.params.id;
@@ -171,4 +176,54 @@ async function updateProduct(req, res) {
   let id = req.params.id;
   let data = await adminCtl.updateProduct(currentUserId, id, req.body);
   res.json(new Response(data, data?'product_updated_successful':'not_found', res));
+}
+
+
+//******************* Questions ****************************
+
+async function getQuestions(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let sort = req.query;
+  let filter = req.body;
+  let data = await adminCtl.getQuestions(currentUserId, filter, sort, res.locale);
+
+  res.json(new Response(data, data?'questions_retrieved_successful':'not_found', res));
+}
+
+
+async function addQuestion(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await adminCtl.addQuestion(currentUserId, req.body);
+  res.json(new Response(data, data?'question_created_successful':'not_found', res));
+}
+
+
+async function getQuestionById(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await adminCtl.getQuestionById(currentUserId, id, res.locale);
+
+  res.json(new Response(data, data?'question_retrieved_successful':'not_found', res));
+}
+
+
+
+async function deleteQuestion(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await adminCtl.deleteQuestion(currentUserId, id);
+
+
+  res.json(new Response(data, data?'question_removed_successful':'not_found', res));
+}
+
+
+async function updateQuestion(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await adminCtl.updateQuestion(currentUserId, id, req.body);
+  res.json(new Response(data, data?'question_updated_successful':'not_found', res));
 }

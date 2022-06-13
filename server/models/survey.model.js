@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const QuestionSchema = new mongoose.Schema({
+const SurveySchema = new mongoose.Schema({
   createdAt: {
     type: Number,
     default: Date.now
@@ -10,29 +10,13 @@ const QuestionSchema = new mongoose.Schema({
   createdBy: {
     type: Number
   },
-  category: {
-    type: String,
-  },
   type: {
     type: String,
     required: true
   },
-  text: {
+  name: {
     type: String,
     required: true
-  },
-  required: {
-    type: Boolean,
-    default: true
-  },
-  options: {
-    type: Array
-  },
-  noMaxSelection: {
-    type: Number
-  },
-  hint: {
-    type: String
   },
   description: {
     type: String
@@ -41,12 +25,13 @@ const QuestionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
 }, {
   versionKey: false
 });
-QuestionSchema.plugin(mongoosePaginate);
+SurveySchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('Question', QuestionSchema);
+module.exports = mongoose.model('Survey', SurveySchema);
 
 

@@ -17,6 +17,7 @@ router.route('/:id').get(asyncHandler(getCompany));
 router.route('/:id/sync').post(asyncHandler(sync));
 router.route('/:id/sync/avatar').post(asyncHandler(syncAvatar));
 
+router.route('/:id/jobs/latest').get(asyncHandler(getCompanyLatestJobs));
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
@@ -105,6 +106,13 @@ async function adminCompanyJobs(req, res) {
 //   let data = await companyCtl.getCompanyJobs(currentUserId, company, req.locale);
 //   res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
 // }
+
+
+async function getCompanyLatestJobs(req, res) {
+  let companyId = parseInt(req.params.id);
+  let data = await companyCtl.getCompanyLatestJobs(companyId, res.locale);
+  res.json(new Response(data, data?'company_jobs_retrieved_successful':'not_found', res));
+}
 
 async function getCompanyJobs(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

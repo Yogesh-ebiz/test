@@ -137,6 +137,7 @@ module.exports = {
   sync,
   register,
   getCompany,
+  getCompanyLatestJobs,
   getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
@@ -228,6 +229,20 @@ async function getCompany(currentUserId, companyId, locale) {
   let company = companyService.findById(companyId)
 
   return company;
+
+}
+
+
+async function getCompanyLatestJobs(companyId, locale) {
+
+  if(!companyId){
+    return null;
+  }
+
+  let filter = { company: [companyId], status: [statusEnum.ACTIVE]};
+  let result = await jobService.getNewJobs(filter);
+
+  return result;
 
 }
 

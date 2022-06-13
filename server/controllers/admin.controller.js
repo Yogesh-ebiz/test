@@ -9,6 +9,7 @@ const planService = require('../services/plan.service');
 const productService = require('../services/product.service');
 const pipelineTemplateService = require('../services/pipelineTemplate.service');
 const pipelineService = require('../services/pipeline.service');
+const questionService = require('../services/question.service');
 
 module.exports = {
   addPipelineTemplate,
@@ -24,7 +25,12 @@ module.exports = {
   getProductById,
   addProduct,
   deleteProduct,
-  updateProduct
+  updateProduct,
+  getQuestions,
+  getQuestionById,
+  addQuestion,
+  deleteQuestion,
+  updateQuestion
 }
 
 
@@ -292,4 +298,93 @@ async function updateProduct(currentUserId, productId, form) {
   return result;
 }
 
+
+
+async function getQuestions(currentUserId, filter, sort, locale) {
+
+  if(!currentUserId || !filter || !sort){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await questionService.getQuestions(filter, sort);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return new Pagination(result);
+}
+
+
+async function getQuestionById(currentUserId, productId) {
+
+  if(!currentUserId || productId){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await questionService.findById(productId);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function addQuestion(currentUserId, form) {
+
+  if(!currentUserId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await questionService.add(form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function deleteQuestion(currentUserId, productId) {
+
+  if(!currentUserId || !productId){
+    return null;
+  }
+
+  let result;
+  try {
+    let product = await questionService.findById(productId);
+
+    if(product) {
+      result = await product.delete();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function updateQuestion(currentUserId, productId, form) {
+
+  if(!currentUserId || !productId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await questionService.update(productId, form)
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
 

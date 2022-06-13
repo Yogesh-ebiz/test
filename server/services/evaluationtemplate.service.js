@@ -86,7 +86,7 @@ async function add(form) {
 
   for (let question of questions) {
     question._id = new ObjectID();
-    question = await questionService.addQuestion(question)
+    question = await questionService.add(question)
   }
 
   template.questions = questions;
@@ -128,7 +128,7 @@ async function update(id, form) {
 
       } else {
         question._id = new ObjectID();
-        question = await questionService.addQuestion(question)
+        question = await questionService.add(question)
       }
       questions.push(question._id);
     }
