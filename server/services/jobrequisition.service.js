@@ -786,7 +786,10 @@ function getNewJobs(filter) {
 
   let search = new SearchParam(filter);
 
-  let res = JobRequisition.find(search).limit(10);
+  let res = JobRequisition.find(search).populate({
+    path: 'company',
+    model: 'Company',
+  }).limit(10);
 
   return res;
 }
