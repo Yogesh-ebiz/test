@@ -239,7 +239,7 @@ async function getCompanyLatestJobs(companyId, locale) {
     return null;
   }
 
-  let filter = { company: [companyId], status: [statusEnum.ACTIVE]};
+  let filter = { companyId: [companyId], status: [statusEnum.ACTIVE]};
   let result = await jobService.getNewJobs(filter);
 
   return result;

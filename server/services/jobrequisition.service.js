@@ -3,7 +3,10 @@ const ObjectID = require('mongodb').ObjectID;
 const {convertToCompany, convertToAvatar} = require('../utils/helper');
 
 const _ = require('lodash');
+
+let SearchParam = require('../const/searchParam');
 const statusEnum = require('../const/statusEnum');
+const dateEnum = require('../const/dateEnum');
 const subjectType = require('../const/subjectType');
 const actionEnum = require('../const/actionEnum');
 const labelType = require('../const/labelType');
@@ -26,7 +29,6 @@ const labelService = require('../services/label.service');
 const companyService = require('../services/company.service');
 const applicationProgressService = require('../services/applicationprogress.service');
 
-let SearchParam = require('../const/searchParam');
 
 
 
@@ -774,15 +776,12 @@ function getJobCount(filter) {
 function getNewJobs(filter) {
   let data = null;
 
-  // if(filter==null){
-  //   return;
-  // }
+  if(!filter){
+    return;
+  }
 
-  // var twoWeeksAgo = new Date(Date.now() - 12096e5);
-  var date = new Date();
-  date.setDate(date.getDate()-30);
-  // filter = {createdDate: {$gte: twoWeeksAgo.getTime()},level: filter.level, jobFunction: filter.jobFunction, industry: filter.industry, city: filter.city, state: filter.state, country: filter.country, company: filter.company};
-  filter = {createdDate: {$gte: date.getTime()}};
+
+  filter.publishedDate = dateEnum.PASTMONTH;
 
   let search = new SearchParam(filter);
 
