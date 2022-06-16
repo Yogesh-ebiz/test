@@ -1042,5 +1042,5 @@ module.exports = {
   groupSalaryByJobFunctions:groupSalaryByJobFunctions,
   groupSalaryByLocations:groupSalaryByLocations,
   groupSalaryByGender: groupSalaryByGender,
-  getCompanyLatestSalaries:getCompanyLatestSalaries
+  getCompanyLatestSalaries:getCompanyLatestSalaries,
 }

@@ -256,5 +256,7 @@
 	"companysalarygroupgender_retrieved_successful": "companysalarygroupgender_retrieved_successful",
 	"jobPreferences_retrieved_successful": "jobPreferences_retrieved_successful",
 	"jobPreferences_updated_successful": "jobPreferences_updated_successful",
-	"question_created_successful": "question_created_successful"
+	"question_created_successful": "question_created_successful",
+	"add interest_successful": "add interest_successful",
+	"add_interest_successful": "add_interest_successful"
 }

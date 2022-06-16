@@ -65,6 +65,7 @@ router.route('/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
 router.route('/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
 router.route('/:id/labels').get(asyncHandler(getCompanyLabels));
 
+router.route('/:id/interests').post(asyncHandler(addInterest));
 
 async function getCompany(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -536,4 +537,11 @@ async function getCompanyLabels(req, res) {
 
   let data = await companyCtl.getCompanyLabels(company, type, currentUserId, res.locale);
   res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
+}
+async function addInterest(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await companyCtl.addInterest(company, currentUserId);
+  res.json(new Response(data, data?'add_interest_successful':'not_found', res));
 }

@@ -26,6 +26,7 @@ const companyService = require('../services/company.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const salaryReactionService = require('../services/salaryreaction.service');
+const interestService = require('../services/interest.service');
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
@@ -174,7 +175,7 @@ module.exports = {
   getCompanyLabels,
   updateCompanyLabel,
   deleteCompanyLabel,
-
+  addInterest
 
 }
 
@@ -1266,3 +1267,14 @@ async function getCompanyLabels(company, type, currentUserId, locale) {
 }
 
 
+async function addInterest(company, currentUserId) {
+
+  if(!company || !currentUserId){
+    return null;
+  }
+
+  let result = await interestService.addInterest({company, user: currentUserId});
+
+  return result;
+
+}
