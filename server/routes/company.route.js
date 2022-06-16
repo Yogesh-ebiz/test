@@ -21,6 +21,7 @@ router.route('/:id/jobs/latest').get(asyncHandler(getCompanyLatestJobs));
 router.route('/:id/jobs/search').post(asyncHandler(getCompanyJobs));
 router.route('/:id/salaries').post(asyncHandler(addNewSalary));
 router.route('/:id/salaries').get(asyncHandler(getCompanySalaries));
+router.route('/:id/salaries/latest').get(asyncHandler(getCompanyLatestSalaries));
 router.route('/:id/salaries/jobfunctions').get(asyncHandler(getCompanySalariesGroupByJobFunctions));
 router.route('/:id/salaries/locations').get(asyncHandler(getCompanySalariesGroupByLocations));
 router.route('/:id/salaries/locations/top5').get(asyncHandler(getCompanySalariesTop5Locations));
@@ -143,6 +144,14 @@ async function getCompanySalaries(req, res) {
   filter.size = req.query.size?parseInt(req.query.size):0;
   filter.page = req.query.page?parseInt(req.query.page):0;
   let data = await companyCtl.getCompanySalaries(currentUserId, filter, req.locale);
+  res.json(new Response(data, data?'companysalaries_retrieved_successful':'not_found', res));
+}
+
+
+async function getCompanyLatestSalaries(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let company = parseInt(req.params.id);
+  let data = await companyCtl.getCompanyLatestSalaries(currentUserId, company, req.locale);
   res.json(new Response(data, data?'companysalaries_retrieved_successful':'not_found', res));
 }
 

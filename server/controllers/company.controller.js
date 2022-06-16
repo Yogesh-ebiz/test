@@ -141,6 +141,7 @@ module.exports = {
   getCompanyJobs,
   addNewSalary,
   getCompanySalaries,
+  getCompanyLatestSalaries,
   getCompanySalariesGroupByJobFunctions,
   getCompanySalariesGroupByLocations,
   getCompanySalaryByEmploymentTitle,
@@ -351,6 +352,59 @@ async function getCompanySalaries(currentUserId, filter, locale) {
   return result;
 }
 
+async function getCompanyLatestSalaries(currentUserId, company, locale) {
+  if(!currentUserId || !company){
+    return [];
+  }
+
+  let result = [];
+  try {
+    let currentParty = await findByUserId(currentUserId);
+
+    result = await companyService.getCompanyLatestSalaries(company);
+    console.log(result)
+    let listOfCurrencies = _.reduce(result, function(res, item){
+      let preferredCurrency = currentParty && currentParty.preferredCurrency?currentParty.preferredCurrency:'USD';
+      res.push({src: item.currency, target: preferredCurrency});
+      return res;
+    }, []);
+
+    // let currencies = await findCurrencyRate(currentParty.preferredCurrency);
+    let loadCurrencies = listOfCurrencies.map(currency => findCurrencyRate(currency.src, currency.target));
+    let currencies = await Promise.all(loadCurrencies);
+
+    result = _.reduce(result, function (res, item) {
+      let currency = _.find(currencies, {currency: item.currency+currentParty.preferredCurrency});
+      let avgBaseSalary = 0;
+
+      /* temporary commenting out
+      switch (item.basePayPeriod){
+        case 'ANNUALLY':
+          avgBaseSalary = item.avgBaseSalary * currency.rate;
+          break;
+        case 'MONTHLY':
+          avgBaseSalary = item.avgBaseSalary * currency.rate;
+          break;
+        case 'WEEKLY':
+          avgBaseSalary = item.avgBaseSalary * currency.rate;
+          break;
+      }
+      */
+
+      item.hasLiked = false;
+      item.avgBaseSalary =  Math.floor(item.avgBaseSalary * currency.rate, 0);
+      item.displayCurrency = currentParty.preferredCurrency;
+
+      res.push(item);
+      return res;
+    }, [])
+
+  } catch (e) {
+    console.log('getCompanySalaries: Error', e);
+  }
+
+  return result;
+}
 
 async function getCompanySalariesGroupByJobFunctions(companyId, locale) {
   if(!companyId){
