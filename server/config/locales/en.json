@@ -258,5 +258,7 @@
 	"jobPreferences_updated_successful": "jobPreferences_updated_successful",
 	"question_created_successful": "question_created_successful",
 	"add interest_successful": "add interest_successful",
-	"add_interest_successful": "add_interest_successful"
+	"add_interest_successful": "add_interest_successful",
+	"benefits_updated_successful": "benefits_updated_successful",
+	"benefits_retrieved_successful": "benefits_retrieved_successful"
 }

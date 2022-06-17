@@ -116,7 +116,6 @@ async function register(currentParty, form) {
     }
 
     member = await memberService.addMember(member);
-    console.log(member)
   }
 
   return savedCompany;

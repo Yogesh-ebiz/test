@@ -3,47 +3,41 @@ const Schema = mongoose.Schema;
 let mongoosePaginate = require('mongoose-aggregate-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
-const ActivitySchema = new mongoose.Schema({
-  createdAt: {
+const BenefitSchema = new mongoose.Schema({
+  createdDate: {
     type: Number,
     default: Date.now
   },
-  causer: {
-    type: Object,
+  isDefault: {
+    type: Boolean,
+    default: false
+  },
+  companyId: {
+    type: Number,
     required: false
   },
-  causerType: {
+  type: {
     type: String,
     required: true
   },
-  causerId: {
-    type: Object
-  },
-  action: {
-    type: String,
-    required: true
-  },
-  subject: {
-    type: Object,
-    required: true
-  },
-  subjectType: {
-    type: String,
-    required: true
-  },
-  subjectId: {
+  name: {
     type: String
   },
-  meta: {
-    type: Object
+  shortCode: {
+    type: String,
+    required: true
+  },
+  available: {
+    type: Boolean,
+    required: true
   }
 }, {
   versionKey: false
 });
 
-ActivitySchema.plugin(mongoosePaginate);
+BenefitSchema.plugin(mongoosePaginate);
 
 
-module.exports = mongoose.model('Activity', ActivitySchema);
+module.exports = mongoose.model('Benefit', BenefitSchema);
 
 

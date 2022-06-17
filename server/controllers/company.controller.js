@@ -27,6 +27,7 @@ const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const salaryReactionService = require('../services/salaryreaction.service');
 const interestService = require('../services/interest.service');
+const benefitService = require('../services/benefit.service');
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
@@ -176,8 +177,9 @@ module.exports = {
   getCompanyLabels,
   updateCompanyLabel,
   deleteCompanyLabel,
-  addInterest
-
+  addInterest,
+  getBenefits,
+  updateBenefits
 }
 
 
@@ -1297,4 +1299,40 @@ async function addInterest(company, currentUserId) {
 
   return result;
 
+}
+
+
+async function getBenefits(company) {
+  if(!company){
+    return null;
+  }
+
+  let result = [];
+
+  try {
+    result = await benefitService.findByCompanyId(company);
+
+  } catch(e){
+    console.log('getBenefits: Error', e);
+  }
+
+  return result;
+}
+
+async function updateBenefits(company, benefits, currentUserId) {
+  if(!company || !currentUserId || !benefits){
+    return null;
+  }
+
+  let result = [];
+
+  try {
+    result = await benefitService.update(company, benefits);
+
+  } catch(e){
+    console.log('updateCompanyBenefits: Error', e);
+  }
+
+
+  return result;
 }
