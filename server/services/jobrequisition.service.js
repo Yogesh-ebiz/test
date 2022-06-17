@@ -28,6 +28,7 @@ const activityService = require('../services/activity.service');
 const labelService = require('../services/label.service');
 const companyService = require('../services/company.service');
 const applicationProgressService = require('../services/applicationprogress.service');
+const CompanySalary = require("../models/companysalary.model");
 
 
 
@@ -1275,6 +1276,42 @@ async function removePipeline(pipeline) {
 
 
 
+async function getCompanyJobsJobFunctions(company, locale) {
+  let data = null;
+
+  if(!company){
+    return [];
+  }
+
+
+  let result = [];
+  data = await JobRequisition.aggregate([
+    {$match: {companyId: company}},
+    {$group: {_id: {jobFunction: '$jobFunction'}, jobFunction: {$first: '$jobFunction'}, count: {'$sum': 1}}},
+    {$project: {_id: 0, jobFunction: 1, count: 1}}
+  ]);
+
+  if(data.length) {
+
+    let jobFunctions = await feedService.findJobfunction('', _.map(data, 'jobFunction'), locale);
+
+    result = _.reduce(data, function (res, val, key) {
+      console.log(val)
+      if(val.jobFunction===null){
+        res.push({name: 'Other', shortCode: '', count: val.count});
+      } else {
+        let found = _.find(jobFunctions, {shortCode: val.jobFunction});
+        if(found){
+          res.push({name: found.name, shortCode: found.shortCode, count: val.count});
+        }
+      }
+      return res;
+    }, []);
+  }
+  return result;
+}
+
+
 module.exports = {
   addJob:addJob,
   updateJob:updateJob,
@@ -1306,4 +1343,5 @@ module.exports = {
   search:search,
   talentSearch:talentSearch,
   removePipeline:removePipeline,
+  getCompanyJobsJobFunctions:getCompanyJobsJobFunctions
 }
