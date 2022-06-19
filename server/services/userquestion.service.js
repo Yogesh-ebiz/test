@@ -19,8 +19,29 @@ const questionSchema = Joi.object({
   department: Joi.string().allow('').optional(),
 });
 
+async function findById(id) {
+  if(!id){
+    return;
+  }
 
-async function add(companyId, question) {
+  let question = await UserQuestion.findById(id);
+
+  return question;
+}
+
+async function getQuestionResponse(id, pagination) {
+  if(!id || !pagination){
+    return;
+  }
+
+  let answers = await UserAnswer.aggregate([
+    {$match: {questionId: id}}
+  ]);
+
+  return answers;
+}
+
+async function addQuestion(companyId, question) {
 
   if(!companyId || !question){
     return;
@@ -34,7 +55,28 @@ async function add(companyId, question) {
   return question;
 }
 
+async function addResponse(company, response) {
 
+  if(!company || !response){
+    return;
+  }
+
+  let result;
+  let question = await UserQuestion.findById(ObjectID(response.question));
+  if(question) {
+    if(question.isDefault){
+      let newQuestion = {companyId: company, text: question.text, feature: question.feature, sequence: question.sequence};
+      question = await new UserQuestion(newQuestion).save();
+      console.log('new', question)
+    }
+    result = await new UserAnswer(response).save();
+    if (result) {
+      question.answers.push(result._id);
+      await question.save();
+    }
+  }
+  return result;
+}
 
 async function findByCompanyId(companyId) {
   if(!companyId){
@@ -42,7 +84,7 @@ async function findByCompanyId(companyId) {
   }
 
   let questions = await UserQuestion.find({companyId: companyId});
-  if(!questions){
+  if(!questions.length){
     questions = await UserQuestion.find({isDefault: true});
   }
 
@@ -50,7 +92,10 @@ async function findByCompanyId(companyId) {
 }
 
 module.exports = {
-  add:add,
+  findById: findById,
+  getQuestionResponse:getQuestionResponse,
+  addQuestion:addQuestion,
+  addResponse:addResponse,
   findByCompanyId:findByCompanyId
 
 }

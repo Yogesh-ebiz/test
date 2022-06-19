@@ -17,8 +17,13 @@ const UserQuestionSchema = new mongoose.Schema({
     required: false
   },
   userId: {
-    type: Number,
-    required: true
+    type: Number
+  },
+  feature: {
+    type: Boolean
+  },
+  sequence: {
+    type: Number
   },
   department: {
     type: String

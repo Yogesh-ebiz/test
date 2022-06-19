@@ -73,6 +73,9 @@ router.route('/:id/benefits').post(asyncHandler(updateBenefits));
 
 router.route('/:id/questions').get(asyncHandler(getQuestions));
 router.route('/:id/questions').post(asyncHandler(addQuestion));
+router.route('/:id/questions/:questionId').get(asyncHandler(getQuestion));
+router.route('/:id/questions/:questionId/responses').post(asyncHandler(addQuestionResponse));
+router.route('/:id/questions/:questionId/responses').get(asyncHandler(getQuestionResponses));
 
 async function getCompany(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
@@ -581,8 +584,8 @@ async function updateBenefits(req, res) {
 async function getQuestions(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-
-  let data = await companyCtl.getQuestions(company);
+  let pagination = req.query;
+  let data = await companyCtl.getQuestions(company, pagination);
   res.json(new Response(data, data?'questions_retrieved_successful':'not_found', res));
 }
 
@@ -593,4 +596,32 @@ async function addQuestion(req, res) {
 
   let data = await companyCtl.addQuestion(company, question, currentUserId);
   res.json(new Response(data, data?'question_added_successful':'not_found', res));
+}
+
+async function getQuestion(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionId = ObjectID(req.params.questionId);
+  let data = await companyCtl.getQuestion(company, questionId);
+  res.json(new Response(data, data?'question_retrieved_successful':'not_found', res));
+}
+
+async function getQuestionResponses(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionId = ObjectID(req.params.questionId);
+  let pagination = req.query;
+  let data = await companyCtl.getQuestionResponses(company, questionId, pagination);
+  res.json(new Response(data, data?'question_retrieved_successful':'not_found', res));
+}
+
+async function addQuestionResponse(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let question = ObjectID(req.params.questionId);
+  let questionResponse = req.body;
+  questionResponse.question = question;
+
+  let data = await companyCtl.addQuestionResponse(company, questionResponse);
+  res.json(new Response(data, data?'answer_added_successful':'not_found', res));
 }

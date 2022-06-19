@@ -181,8 +181,11 @@ module.exports = {
   addInterest,
   getBenefits,
   updateBenefits,
+  addQuestion,
   getQuestions,
-  addQuestion
+  getQuestion,
+  getQuestionResponses,
+  addQuestionResponse
 }
 
 
@@ -1341,6 +1344,26 @@ async function updateBenefits(company, benefits, currentUserId) {
 }
 
 
+async function addQuestion(company, question, currentUserId) {
+  if(!company || !currentUserId || !question){
+    return null;
+  }
+
+  let result;
+
+  try {
+    question.companyId = company;
+    question.userId = currentUserId;
+    result = await userQuestionService.addQuestion(company, question);
+
+  } catch(e){
+    console.log('addQuestion: Error', e);
+  }
+
+
+  return result;
+}
+
 
 async function getQuestions(company) {
   if(!company){
@@ -1359,22 +1382,54 @@ async function getQuestions(company) {
   return result;
 }
 
-async function addQuestion(company, question, currentUserId) {
-  if(!company || !currentUserId || !question){
+async function getQuestion(company, id) {
+  if(!id){
     return null;
   }
 
   let result;
 
   try {
-    question.companyId = company;
-    question.userId = currentUserId;
-    result = await userQuestionService.add(company, question);
+    console.log(id)
+    result = await userQuestionService.findById(id);
 
   } catch(e){
-    console.log('updateCompanyBenefits: Error', e);
+    console.log('getQuestion: Error', e);
   }
 
+  return result;
+}
+
+async function getQuestionResponses(company, id, pagination) {
+  if(!id || !pagination){
+    return null;
+  }
+
+  let result;
+
+  try {
+    result = await userQuestionService.getQuestionResponses(id, pagination);
+
+  } catch(e){
+    console.log('getQuestionResponses: Error', e);
+  }
+
+  return result;
+}
+
+async function addQuestionResponse(company, response) {
+  if(!company || !response){
+    return null;
+  }
+
+  let result;
+
+  try {
+    result = await userQuestionService.addResponse(company, response);
+
+  } catch(e){
+    console.log('addQuestionResponse: Error', e);
+  }
 
   return result;
 }

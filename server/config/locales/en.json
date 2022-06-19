@@ -260,5 +260,7 @@
 	"add interest_successful": "add interest_successful",
 	"add_interest_successful": "add_interest_successful",
 	"benefits_updated_successful": "benefits_updated_successful",
-	"benefits_retrieved_successful": "benefits_retrieved_successful"
+	"benefits_retrieved_successful": "benefits_retrieved_successful",
+	"question_retrieved_successful": "question_retrieved_successful",
+	"answer_added_successful": "answer_added_successful"
 }
