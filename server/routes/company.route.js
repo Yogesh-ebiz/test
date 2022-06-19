@@ -71,6 +71,9 @@ router.route('/:id/interests').post(asyncHandler(addInterest));
 router.route('/:id/benefits').get(asyncHandler(getBenefits));
 router.route('/:id/benefits').post(asyncHandler(updateBenefits));
 
+router.route('/:id/questions').get(asyncHandler(getQuestions));
+router.route('/:id/questions').post(asyncHandler(addQuestion));
+
 async function getCompany(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
@@ -572,4 +575,22 @@ async function updateBenefits(req, res) {
 
   let data = await companyCtl.updateBenefits(company, benefits, currentUserId);
   res.json(new Response(data, data?'benefits_updated_successful':'not_found', res));
+}
+
+
+async function getQuestions(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+
+  let data = await companyCtl.getQuestions(company);
+  res.json(new Response(data, data?'questions_retrieved_successful':'not_found', res));
+}
+
+async function addQuestion(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let question = req.body;
+
+  let data = await companyCtl.addQuestion(company, question, currentUserId);
+  res.json(new Response(data, data?'question_added_successful':'not_found', res));
 }
