@@ -69,6 +69,8 @@ async function addResponse(company, response) {
       question = await new UserQuestion(newQuestion).save();
       console.log('new', question)
     }
+
+    response.question = question._id;
     result = await new UserAnswer(response).save();
     if (result) {
       question.answers.push(result._id);
