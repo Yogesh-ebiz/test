@@ -106,17 +106,22 @@ async function findByCompanyId(company, sort) {
   };
 
 
-  let aList = [];
+
   let aLookup = [];
   let aMatch = { $match: {companyId: company}};
   let aSort = { $sort: {createdDate: direction} };
+  let aList = [aMatch, aSort];
 
-  aList.push(aMatch);
-  aList.push(aSort);
+  let aggregate = UserQuestion.aggregate(aList);
+  let result = await UserQuestion.aggregatePaginate(aggregate, options);
 
-  const aggregate = UserQuestion.aggregate(aList);
-
-  return await UserQuestion.aggregatePaginate(aggregate, options);;
+  if(!result.docs.length){
+    aMatch = { $match: {isDefault: true}};
+    aggregate = UserQuestion.aggregate([aMatch, aSort]);
+    result = await UserQuestion.aggregatePaginate(aggregate, options);
+  }
+  
+  return result;
 }
 
 module.exports = {
