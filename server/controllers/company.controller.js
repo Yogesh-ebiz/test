@@ -1365,21 +1365,21 @@ async function addQuestion(company, question, currentUserId) {
 }
 
 
-async function getQuestions(company) {
-  if(!company){
+async function getQuestions(company, pagination) {
+  if(!company || !pagination){
     return null;
   }
 
   let result = [];
 
   try {
-    result = await userQuestionService.findByCompanyId(company);
+    result = await userQuestionService.findByCompanyId(company, pagination);
 
   } catch(e){
     console.log('getBenefits: Error', e);
   }
 
-  return result;
+  return new Pagination(result);;
 }
 
 async function getQuestion(company, id) {

@@ -9,6 +9,8 @@ const UserQuestion = require('../models/userquestion.model');
 const UserAnswer = require('../models/useranswer.model');
 const File = require("../models/file.model");
 const Benefit = require("../models/benefit.model");
+const CandidateParam = require("../const/candidateParam");
+const Candidate = require("../models/candidate.model");
 
 
 
@@ -80,17 +82,41 @@ async function addResponse(company, response) {
   return result;
 }
 
-async function findByCompanyId(companyId) {
-  if(!companyId){
+async function findByCompanyId(company, sort) {
+  if(!company || !sort){
     return;
   }
 
-  let questions = await UserQuestion.find({companyId: companyId});
-  if(!questions.length){
-    questions = await UserQuestion.find({isDefault: true});
-  }
+  // let questions = await UserQuestion.find({companyId: companyId});
+  // if(!questions.length){
+  //   questions = await UserQuestion.find({isDefault: true});
+  // }
 
-  return questions;
+
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? parseInt(sort.size):20;
+  let page = (sort.page && sort.page==0) ? 1:parseInt(sort.page)+1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+
+
+  const options = {
+    page: page,
+    limit: limit,
+  };
+
+
+  let aList = [];
+  let aLookup = [];
+  let aMatch = { $match: {companyId: company}};
+  let aSort = { $sort: {createdDate: direction} };
+
+  aList.push(aMatch);
+  aList.push(aSort);
+
+  const aggregate = UserQuestion.aggregate(aList);
+
+  return await UserQuestion.aggregatePaginate(aggregate, options);;
 }
 
 module.exports = {
