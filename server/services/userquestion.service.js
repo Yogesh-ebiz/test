@@ -31,16 +31,27 @@ async function findById(id) {
   return question;
 }
 
-async function getQuestionResponse(id, pagination) {
-  if(!id || !pagination){
+async function getQuestionResponses(id, sort) {
+  if(!id || !sort){
     return;
   }
 
-  let answers = await UserAnswer.aggregate([
-    {$match: {questionId: id}}
-  ]);
+  let select = '';
+  let limit = (sort.size && sort.size>0) ? parseInt(sort.size):20;
+  let page = (sort.page && sort.page==0) ? 1:parseInt(sort.page)+1;
+  let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
+  const options = {
+    page: page,
+    limit: limit,
+  };
 
-  return answers;
+  let aMatch = { $match: {questionId: id}};
+  let aSort = { $sort: {createdDate: direction} };
+
+  let aList = [aMatch, aSort];
+
+  let aggregate = UserAnswer.aggregate(aList);
+  return await UserAnswer.aggregatePaginate(aggregate, options);
 }
 
 async function addQuestion(companyId, question) {
@@ -110,7 +121,22 @@ async function findByCompanyId(company, sort) {
   let aLookup = [];
   let aMatch = { $match: {companyId: company}};
   let aSort = { $sort: {createdDate: direction} };
+
   let aList = [aMatch, aSort];
+  aList.push({
+    $addFields: {
+      "totalCount": {$count: "answers"}
+    }
+  });
+  // aList.push(
+  //   {$lookup:{
+  //     from:"useranswers",
+  //     let:{answers: '$answers'},
+  //     pipeline:[
+  //       {$match:{$expr:{$eq:["$$answers","$_id"]}}},
+  //     ],
+  //     as: 'answers'
+  //   }});
 
   let aggregate = UserQuestion.aggregate(aList);
   let result = await UserQuestion.aggregatePaginate(aggregate, options);
@@ -120,13 +146,19 @@ async function findByCompanyId(company, sort) {
     aggregate = UserQuestion.aggregate([aMatch, aSort]);
     result = await UserQuestion.aggregatePaginate(aggregate, options);
   }
-  
+
+  const mostResponses = _.maxBy(result.docs, 'answers');
+  console.log(mostResponses)
+  for(q of result.docs){
+    // console.log(q)
+  }
+
   return result;
 }
 
 module.exports = {
   findById: findById,
-  getQuestionResponse:getQuestionResponse,
+  getQuestionResponses:getQuestionResponses,
   addQuestion:addQuestion,
   addResponse:addResponse,
   findByCompanyId:findByCompanyId

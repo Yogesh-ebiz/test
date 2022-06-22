@@ -1379,7 +1379,7 @@ async function getQuestions(company, pagination) {
     console.log('getBenefits: Error', e);
   }
 
-  return new Pagination(result);;
+  return new Pagination(result);
 }
 
 async function getQuestion(company, id) {
@@ -1431,5 +1431,5 @@ async function addQuestionResponse(company, response) {
     console.log('addQuestionResponse: Error', e);
   }
 
-  return result;
+  return new Pagination(result);
 }

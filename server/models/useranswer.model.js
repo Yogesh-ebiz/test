@@ -13,6 +13,10 @@ const UserAnswerSchema = new mongoose.Schema({
   },
   text: {
     type: String
+  },
+  votes: {
+    type: Number,
+    default: 0
   }
 }, {
   versionKey: false

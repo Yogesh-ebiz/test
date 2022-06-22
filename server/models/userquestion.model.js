@@ -31,6 +31,7 @@ const UserQuestionSchema = new mongoose.Schema({
   text: {
     type: String
   },
+  topAnswer: { type: Schema.Types.ObjectId, ref: 'UserAnswer' },
   answers: [{ type: Schema.Types.ObjectId, ref: 'UserAnswer' }]
 }, {
   versionKey: false

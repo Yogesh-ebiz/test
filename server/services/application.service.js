@@ -1197,7 +1197,7 @@ async function getCandidatesSourceByCompanyId(company, duration) {
     { $project:{_id: 0, user: '$user.userId', sources: '$user.sources'}},
   ]);
 
-  console.log(candidateSources)
+
   if(candidateSources){
     let total = 0;
     let data = {};
