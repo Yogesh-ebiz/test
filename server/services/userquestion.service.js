@@ -45,7 +45,7 @@ async function getQuestionResponses(id, sort) {
     limit: limit,
   };
 
-  let aMatch = { $match: {questionId: id}};
+  let aMatch = { $match: {question: id}};
   let aSort = { $sort: {createdDate: direction} };
 
   let aList = [aMatch, aSort];
