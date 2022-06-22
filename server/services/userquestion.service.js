@@ -123,11 +123,11 @@ async function findByCompanyId(company, sort) {
   let aSort = { $sort: {createdDate: direction} };
 
   let aList = [aMatch, aSort];
-  aList.push({
+ /* aList.push({
     $addFields: {
       "totalCount": {$count: "answers"}
     }
-  });
+  });*/
   // aList.push(
   //   {$lookup:{
   //     from:"useranswers",
