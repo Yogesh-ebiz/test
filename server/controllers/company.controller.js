@@ -1414,7 +1414,7 @@ async function getQuestionResponses(company, id, pagination) {
     console.log('getQuestionResponses: Error', e);
   }
 
-  return result;
+  return new Pagination(result);
 }
 
 async function addQuestionResponse(company, response) {
@@ -1431,5 +1431,5 @@ async function addQuestionResponse(company, response) {
     console.log('addQuestionResponse: Error', e);
   }
 
-  return new Pagination(result);
+  return result;
 }
