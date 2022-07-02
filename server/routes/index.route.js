@@ -27,6 +27,7 @@ const policyRoutes = require('./policy.route');
 const subscriptionRoutes = require('./subscription.route');
 const roleRoutes = require('./role.route');
 const salaryRoutes = require('./salary.route');
+const webhookRoutes = require('./webhook.route');
 
 
 
@@ -65,6 +66,7 @@ router.use('/talent', talentRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/users', userRoutes);
 router.use('/workflows', workflowRoutes);
+router.use('/webhooks', webhookRoutes);
 
 
 module.exports = router;
