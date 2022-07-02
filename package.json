@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^8.2.14",
     "@angular/platform-browser-dynamic": "^8.2.14",
     "@angular/router": "^8.2.14",
+    "@aws-sdk/client-s3": "^3.121.0",
     "async": "^3.2.1",
     "aws-sdk": "^2.603.0",
     "axios": "^0.19.2",
@@ -79,6 +80,7 @@
     "swagger-editor": "^3.8.0",
     "swagger-ui-express": "^3.0.9",
     "textract": "^2.5.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
