@@ -28,7 +28,7 @@ const applicationService = require('../services/application.service');
 const jobviewService = require('../services/jobview.service');
 
 
-const {getListofSkillTypes} = require('../services/skilltype.service');
+const {getListofSkills} = require('../services/skill.service');
 const {findApplicationByUserIdAndJobId, findByApplicationId, applyJob, findAppliedCountByJobId} = require('../services/application.service');
 const {findApplicationByCurrentStatus, findApplicationProgresssById, addApplicationProgress} = require('../services/applicationprogress.service');
 const {findApplicationHistoryById, addApplicationHistory} = require('../services/applicationhistory.service');
@@ -52,7 +52,7 @@ const stageService = require('../services/stage.service');
 
 
 const JobRequisition = require('../models/jobrequisition.model');
-const Skilltype = require('../models/skilltype.model');
+const Skill = require('../models/skill.model');
 const JobFunction = require('../models/jobfunctions.model');
 const Bookmark = require('../models/bookmark.model');
 const PartySkill = require('../models/partyskill.model');
@@ -130,7 +130,7 @@ module.exports = {
 async function importJobs(type, jobs) {
   job = await Joi.validate(job, jobRequisitionSchema, { abortEarly: false });
   // if(job) {
-  //   job.skills = await Skilltype.find({id: {$in: job.skills}});
+  //   job.skills = await Skill.find({id: {$in: job.skills}});
   // }
   return await new JobRequisition(job).save();
 }
@@ -1023,7 +1023,7 @@ async function searchCandidates(currentUserId, jobId, filter, locale) {
   let docs = [];
 
   let skills = _.uniq(_.flatten(_.map(result.docs, 'skills')));
-  let listOfSkills = await Skilltype.find({ skillTypeId: { $in: skills } });
+  let listOfSkills = await Skill.find({ skillId: { $in: skills } });
   let employmentTypes = await getEmploymentTypes(_.uniq(_.map(result.docs, 'employmentType')), locale);
   let experienceLevels = await getExperienceLevels(_.uniq(_.map(result.docs, 'level')), locale);
   let industries = await findIndustry('', _.uniq(_.flatten(_.map(result.docs, 'industry'))), locale);

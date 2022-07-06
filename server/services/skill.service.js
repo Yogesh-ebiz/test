@@ -1,10 +1,10 @@
 const _ = require('lodash');
 const confirmEnum = require('../const/confirmEnum');
 const statusEnum = require('../const/statusEnum');
-const Skilltype = require('../models/skilltype.model');
+const Skill = require('../models/skill.model');
 
 
-function getListofSkillTypes(list, locale) {
+function getListofSkills(list, locale) {
   let localeStr = locale? locale.toLowerCase() : 'en';
   let data = null;
 
@@ -13,11 +13,11 @@ function getListofSkillTypes(list, locale) {
   }
 
   let propLocale = '$locale.'+localeStr;
-  let match = { skillTypeId: {$in: list} };
+  let match = { skillId: {$in: list} };
   // match['name.'+localeStr] = { $regex: keyword, $options: 'i'};
-  data = Skilltype.aggregate([
+  data = Skill.aggregate([
     { $match: match },
-    { $project: {parent: 1, skillTypeId: 1, description: 1, icon: 1, name: propLocale, type: 1 } }
+    { $project: {parent: 1, skillId: 1, description: 1, icon: 1, name: propLocale, type: 1 } }
   ]);
 
 
@@ -25,19 +25,19 @@ function getListofSkillTypes(list, locale) {
 }
 
 
-function addSkillType(skillType, locale) {
+function addSkill(skill, locale) {
   let localeStr = locale? locale.toLowerCase() : 'en';
 
-  if(!skillType){
+  if(!skill){
     return null;
   }
 
 
-  return new Skilltype(skillType).save();
+  return new Skill(skill).save();
 }
 
 
 module.exports = {
-  getListofSkillTypes: getListofSkillTypes,
-  addSkillType:addSkillType
+  getListofSkills: getListofSkills,
+  addSkill:addSkill
 }
