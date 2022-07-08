@@ -550,6 +550,7 @@ async function getSimilarJobList(jobId) {
   if(job) {
     data = await JobRequisition.aggregate([
       { $match: {
+          status: statusEnum.ACTIVE,
           $text: {
             $search: job.title,
             $diacriticSensitive: true,
@@ -599,6 +600,7 @@ async function getSimilarJobsByTitle(title) {
 
   data = await JobRequisition.aggregate([
     { $match: {
+        status: statusEnum.ACTIVE,
         $text: {
           $search: title,
           $diacriticSensitive: true,
