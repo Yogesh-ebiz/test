@@ -6,7 +6,6 @@ const config = require('../config/config');
 const statusEnum = require('../const/statusEnum');
 const Skill = require('../models/skill.model');
 const s3Service = require('../services/aws/s3/s3.service');
-const webscraperioService = require('../services/webscraperio.service');
 
 const parseWorkbookFromFile = (file, opts) => {
   const workbook = XLSX.readFile(`${process.env.PWD}/migrations/jobs/jobs.xlsx`, opts);
@@ -86,7 +85,7 @@ async function webscraperio(data) {
   const bodyContents = await s3Service.getFile();
   // var workbook = parseWorkbookFromBuffer(bodyContents, {});
 
-  var workbook = webscraperioService.parseWorkbookFromFile('jobs.xlsx', {});
+  var workbook = parseWorkbookFromFile('jobs.xlsx', {});
   // var workbook = XLSX.stream.to_json(data.Body);
   // var ws = workbook.Sheets["Sheet1"];
 

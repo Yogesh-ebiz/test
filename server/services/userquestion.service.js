@@ -148,7 +148,6 @@ async function findByCompanyId(company, sort) {
   }
 
   const mostResponses = _.maxBy(result.docs, 'answers');
-  console.log(mostResponses)
   for(q of result.docs){
     // console.log(q)
   }
