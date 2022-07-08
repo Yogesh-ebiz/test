@@ -6,7 +6,7 @@ const asyncHandler = require('express-async-handler');
 const industryCtl = require('../controllers/industry.controller')
 const experienceLevelCtl = require('../controllers/experiencelevel.controller');
 const employmentTypeCtl = require('../controllers/employmenttypes.controller');
-const skillTypeCtl = require('../controllers/skilltype.controller');
+const skillCtl = require('../controllers/skill.controller');
 const jobFunctionCtl = require('../controllers/jobfunction.controller');
 const jobRequisitionCtl = require('../controllers/jobrequisition.controller');
 const filterService = require('../services/filter.service');
@@ -38,7 +38,7 @@ router.route('/experiencelevels/search').get(asyncHandler(getAllExperienceLevels
 router.route('/employmenttypes/search').get(asyncHandler(getAllEmploymentTypes));
 router.route('/employmenttypes/:id').get(asyncHandler(getEmploymentTypeById));
 
-router.route('/skilltypes/search').get(asyncHandler(getAllSkillTypes));
+router.route('/skills/search').get(asyncHandler(getAllSkills));
 
 router.route('/jobfunctions/search', getAllJobFunctions);
 router.route('/jobfunctions/:id').get(asyncHandler(getJobFunctionById));
@@ -172,11 +172,11 @@ async function getEmploymentTypeById(req, res) {
 }
 
 
-async function getAllSkillTypes(req, res) {
+async function getAllSkills(req, res) {
   let filter = req.query;
-  let data = await skillTypeCtl.getSkillTypes(filter, res.locale);
+  let data = await skillCtl.getSkills(filter, res.locale);
 
-  res.json(new Response(data, data?'skilltypes_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'skills_retrieved_successful':'not_found', res));
 }
 
 

@@ -3,7 +3,7 @@ const authRoutes = require('./auth.route');
 const jobRequisitionRoutes = require('./jobrequisition.route');
 const jobFunctionsRoutes = require('./jobfunction.route');
 const experienceLevelRoutes = require('./experiencelevel.route');
-const skillTypeRoutes = require('./skilltypes.route');
+const skillRoutes = require('./skill.route');
 const industryRoutes = require('./industry.route');
 const categoryRoutes = require('./category.route');
 const employmentTypeRoutes = require('./employmenttypes.route');
@@ -27,6 +27,7 @@ const policyRoutes = require('./policy.route');
 const subscriptionRoutes = require('./subscription.route');
 const roleRoutes = require('./role.route');
 const salaryRoutes = require('./salary.route');
+const webhookRoutes = require('./webhook.route');
 
 
 
@@ -52,7 +53,7 @@ router.use('/industries', industryRoutes);
 router.use('/jobs', jobRequisitionRoutes);
 router.use('/jobfunctions', jobFunctionsRoutes);
 router.use('/promotion', promotionRoutes);
-router.use('/skilltypes', skillTypeRoutes);
+router.use('/skills', skillRoutes);
 router.use('/suggestions', suggestionRoutes);
 router.use('/parser', parserRoutes);
 router.use('/policies', policyRoutes);
@@ -65,6 +66,7 @@ router.use('/talent', talentRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/users', userRoutes);
 router.use('/workflows', workflowRoutes);
+router.use('/webhooks', webhookRoutes);
 
 
 module.exports = router;

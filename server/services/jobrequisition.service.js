@@ -82,7 +82,7 @@ const jobSchema = Joi.object({
 
 
 async function addJob(companyId, member, form) {
-  if(!companyId || !member || !form){
+  if(!companyId || !form){
     return;
   }
 
@@ -92,35 +92,49 @@ async function addJob(companyId, member, form) {
     form.department = ObjectID(form.department);
   }
 
+  const company = await companyService.findByCompanyId(companyId);
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
-  let company = await companyService.findByCompanyId(companyId);
-
-  let pipeline = await pipelineService.getDefaultTemplate();
-  form.pipeline = pipeline._id;
-  form.company = company._id;
   form.companyId = companyId;
-  form.members = [member._id];
-  form.createdBy = member._id;
 
-
-  let tags = [];
-  for (let tag of form.tags) {
-    if(!tag._id) {
-      tag.company = companyId;
-      tag.type = labelType.KEYWORD;
-      tag = await labelService.addLabel(tag);
-      tags.push(tag._id);
-    } else {
-
-      tags.push(ObjectID(tag._id));
-    }
+  if(company){
+    form.company = company._id;
   }
-  form.tags = tags;
+
+  if(!form.pipeline){
+    let pipeline = await pipelineService.getDefaultTemplate();
+    form.pipeline = pipeline._id;
+  }
+
+  if(member){
+    form.members = [member._id];
+    form.createdBy = member._id;
+  }
+
+  if(form.tags){
+    let tags = [];
+    for (let tag of form.tags) {
+      if(!tag._id) {
+        tag.company = companyId;
+        tag.type = labelType.KEYWORD;
+        tag = await labelService.addLabel(tag);
+        tags.push(tag._id);
+      } else {
+
+        tags.push(ObjectID(tag._id));
+      }
+    }
+    form.tags = tags;
+  }
+
   form.isExternal = form.externalUrl?true:false;
   result = await new JobRequisition(form).save();
-  let subscription = {member: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subject: result._id};
-  await memberService.subscribe(subscription);
+
+  if(result && member){
+    let subscription = {member: member._id, createdBy: member.userId, subjectType: subjectType.JOB, subject: result._id};
+    await memberService.subscribe(subscription);
+  }
+
 
   return result;
 

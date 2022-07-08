@@ -1374,9 +1374,8 @@ async function getQuestions(company, pagination) {
 
   try {
     result = await userQuestionService.findByCompanyId(company, pagination);
-
   } catch(e){
-    console.log('getBenefits: Error', e);
+    console.log('getQuestions: Error', e);
   }
 
   return new Pagination(result);

@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^8.2.14",
     "@angular/platform-browser-dynamic": "^8.2.14",
     "@angular/router": "^8.2.14",
+    "@aws-sdk/client-s3": "^3.121.0",
     "async": "^3.2.1",
     "aws-sdk": "^2.603.0",
     "axios": "^0.19.2",
@@ -48,6 +49,7 @@
     "html-pdf": "^3.0.1",
     "http-errors": "^1.6.3",
     "i18n": "^0.8.4",
+    "iconv": "^3.0.1",
     "install": "^0.13.0",
     "ip": "^1.1.5",
     "iso-639-1": "^2.1.1",
@@ -65,6 +67,7 @@
     "multer": "^1.4.2",
     "mysql": "^2.18.1",
     "newsapi": "^2.4.0",
+    "node-xlsx": "^0.21.0",
     "nodemon": "^1.17.5",
     "npm": "^6.13.6",
     "passport": "^0.4.0",
@@ -79,6 +82,8 @@
     "swagger-editor": "^3.8.0",
     "swagger-ui-express": "^3.0.9",
     "textract": "^2.5.0",
+    "utf8": "^3.0.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {

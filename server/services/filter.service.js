@@ -7,7 +7,7 @@ const ExperienceLevel = require('../models/experiencelevel.model');
 const JobFunction = require('../models/jobfunctions.model');
 const EmploymentTypes = require('../models/employmenttypes.model');
 const Industry = require('../models/industry.model');
-const SkillType = require('../models/skilltype.model');
+const Skill = require('../models/skill.model');
 const EmploymentType = require('../models/employmenttypes.model');
 const JobRequisition = require('../models/jobrequisition.model');
 const FieldStudy = require('../models/fieldstudy.model');
@@ -281,7 +281,7 @@ async function getAllFeedIndustries(filter, locale) {
 //   return data;
 // }
 
-function getAllSkillTypes(filter, locale) {
+function getAllSkills(filter, locale) {
   let localeStr = locale? locale : 'en';
   let keyword=(typeof filter.query=='undefined' || filter.query=='')? null: filter.query;
   let data = null;
@@ -289,13 +289,13 @@ function getAllSkillTypes(filter, locale) {
   if(keyword) {
     let match = {};
     match['locale.'+localeStr] = { $regex: keyword, $options: 'i'};
-    data = SkillType.aggregate([
+    data = Skill.aggregate([
       { $match: match },
-      {$project: {skillTypeId: 1, description: 1, parent: 1, sequence: 1, createdDate: 1, name: propLocale}}
+      {$project: {skillId: 1, description: 1, parent: 1, sequence: 1, createdDate: 1, name: propLocale}}
     ]);
   } else {
-    data = SkillType.aggregate([
-      {$project: {skillTypeId: 1, description: 1, parent: 1, sequence: 1, createdDate: 1, name: propLocale}}
+    data = Skill.aggregate([
+      {$project: {skillId: 1, description: 1, parent: 1, sequence: 1, createdDate: 1, name: propLocale}}
     ]);
   }
   return data;
@@ -366,7 +366,7 @@ module.exports = {
   getAllEmploymentTypes: getAllEmploymentTypes,
   getAllIndustries: getAllIndustries,
   getAllFeedIndustries:getAllFeedIndustries,
-  getAllSkillTypes: getAllSkillTypes,
+  getAllSkills: getAllSkills,
   getAllFieldStudy:getAllFieldStudy,
   getAllCategories:getAllCategories,
   getFieldOfStudyListByShortCode:getFieldOfStudyListByShortCode

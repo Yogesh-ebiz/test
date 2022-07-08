@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 
-const SkillTypeSchema = new mongoose.Schema({
-  skillTypeId: {
+const SkillSchema = new mongoose.Schema({
+  skillId: {
     type: Number,
     required: true
   },
@@ -44,11 +44,11 @@ const SkillTypeSchema = new mongoose.Schema({
 });
 
 
-SkillTypeSchema.plugin(autoIncrement, {
-  model: 'SkillType',
-  field: 'skillTypeId',
+SkillSchema.plugin(autoIncrement, {
+  model: 'Skill',
+  field: 'skillId',
   startAt: 100000,
   incrementBy: 1
 });
 
-module.exports = mongoose.model('SkillType', SkillTypeSchema);
+module.exports = mongoose.model('Skill', SkillSchema);

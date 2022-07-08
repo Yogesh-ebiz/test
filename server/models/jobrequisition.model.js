@@ -38,6 +38,10 @@ const JobRequisitionSchema = new mongoose.Schema({
     type: String,
     default: statusEnum.DRAFT
   },
+  hasImported: {
+    type: Boolean,
+    default: false
+  },
   description: {
     type: String,
     required: false,

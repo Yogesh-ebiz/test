@@ -13,7 +13,7 @@ const Application = require('../models/application.model');
 const Bookmark = require('../models/bookmark.model');
 const JobAlert = require('../models/job_alert.model');
 const PartySKill = require('../models/partyskill.model');
-const Skilltype = require('../models/skilltype.model');
+const Skill = require('../models/skill.model');
 const JobView = require('../models/jobview.model');
 const CompanySalary = require('../models/companysalary.model');
 const Endorsement = require('../models/endorsement.model');
@@ -42,7 +42,7 @@ const {addCompany} = require('../services/api/party.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
 const {findJobIds, findJob_Ids} = require('../services/jobrequisition.service');
 const {findBookByUserId} = require('../services/bookmark.service');
-const {getListofSkillTypes, addSkillType} = require('../services/skilltype.service');
+const {getListofSkills, addSkill} = require('../services/skill.service');
 const {getEmploymentTypes} = require('../services/employmenttype.service');
 const {getExperienceLevels} = require('../services/experiencelevel.service');
 const {getIndustry} = require('../services/industry.service');
@@ -321,7 +321,7 @@ async function getUserDetail(currentUserId, userId, locale) {
       //Skills-----------------------------------------------------
       let partySkills = await findTop3PartySkillsByUserId(foundUser.id);
       let skills = _.uniq(_.flatten(_.map(partySkills, 'skillTypeId')));
-      let listOfSkills = await getListofSkillTypes(_.uniq(_.flatten(_.map(partySkills, 'skillTypeId'))), locale);
+      let listOfSkills = await getListofSkills(_.uniq(_.flatten(_.map(partySkills, 'skillTypeId'))), locale);
 
 
       let partySkillIds = _.uniq(_.flatten(_.map(partySkills, 'partySkillId')));
@@ -1107,7 +1107,7 @@ async function getPartySkillsByUserId(currentUserId, userId, filter, locale) {
       partySkills = _.orderBy(partySkills, ['endorsements'], ['desc']);
 
       let skills = _.uniq(_.flatten(_.map(partySkills, 'skillTypeId')));
-      let listOfSkills = await getListofSkillTypes(skills, locale);
+      let listOfSkills = await getListofSkills(skills, locale);
 
       result.topSkills  = _.reduce(partySkills.splice(0, 3), function(res, skill) {
 
