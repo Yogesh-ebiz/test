@@ -589,7 +589,7 @@ async function getJobLanding(currentUserId, locale) {
     // }, [])
     // result.categories = industryFull;
 
-    result.categories = await jobfunctionService.getJobFunctionsAndJobCount(locale);
+    result.categories = await jobfunctionService.getPopularJobFunctions(locale);
     result.popularCompanies = popularCompanies;
 
   } catch (error) {

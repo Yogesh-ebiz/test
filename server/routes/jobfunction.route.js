@@ -7,24 +7,16 @@ let Response = require('../const/response');
 const router = express.Router();
 module.exports = router;
 
-//router.use(passport.authenticate('jwt', { session: false }))
-
-// router.route('/').post(asyncHandler(add));
 router.route('/search').get(asyncHandler(getAllJobFunctions));
 router.route('/:id').get(asyncHandler(getJobFunctionById));
 
 
 
-// async function add(req, res) {
-//   let data = await jobFunctionCtl.add(req.body);
-//
-//   res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
-// }
-
-
 
 async function getAllJobFunctions(req, res) {
-  let data = await jobFunctionCtl.getAllJobFunctions(req.query, res.locale);
+  const query = req.query?req.query:'';
+  const locale = res.locale? res.locale : 'en';
+  let data = await jobFunctionCtl.getAllJobFunctions(query, locale);
 
   res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
 }
@@ -32,7 +24,8 @@ async function getAllJobFunctions(req, res) {
 
 
 async function getJobFunctionById(req, res) {
-  let data = await jobFunctionCtl.getJobFunctionById(req.params.id, res.locale);
+  const locale = res.locale? res.locale : 'en';
+  let data = await jobFunctionCtl.getJobFunctionById(req.params.id, locale);
   res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
 }
 

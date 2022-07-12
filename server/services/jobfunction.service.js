@@ -17,50 +17,6 @@ const jobFunctionSchema = Joi.object({
 });
 
 
-async function getJobfunctions() {
-  let data = [];
-  data = JobFunction.find({});
-  return data;
-}
-
-function findById(id) {
-  let data = null;
-
-  if(!id){
-    return;
-  }
-
-  return JobFunction.findById(id);
-}
-
-
-async function getJobFunctionsAndJobCount(locale) {
-  let data = [];
-  data = await JobFunction.aggregate([
-    {
-      $lookup: {
-        let:{shortCode: '$shortCode'},
-        from: "jobrequisitions",
-        pipeline: [
-          { $match: {$expr: {$eq: ["$jobFunction", "$$shortCode"]}} },
-          { $group: {_id: {shortCode: '$jobFunction'}, count: {$sum: 1} }},
-        ],
-        as: "count"
-      }
-    },
-    { $project:
-        {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
-  ])
-
-  data = _.reduce(data, function(res, i){
-    i.name = i.name[locale]?i.name[locale]:i.name.en;
-    res.push(i);
-    return res;
-
-  }, []);
-  return data;
-}
-
 function findById(id) {
   let data = null;
 
@@ -113,10 +69,110 @@ async function update(id, form) {
 
 
 
+
+async function getJobFunctions(query, locale) {
+  let data = [];
+  data = await JobFunction.aggregate([
+    {
+      $lookup: {
+        let:{shortCode: '$shortCode'},
+        from: "jobrequisitions",
+        pipeline: [
+          { $match: {$expr: {$eq: ["$jobFunction", "$$shortCode"]}} },
+          { $group: {_id: {shortCode: '$jobFunction'}, count: {$sum: 1} }},
+        ],
+        as: "count"
+      }
+    },
+    { $project: {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+    { $sort : { 'name.en' : 1 } },
+  ])
+
+  data = _.reduce(data, function(res, i){
+    i.name = i.name[locale]?i.name[locale]:i.name.en;
+    res.push(i);
+    return res;
+
+  }, []);
+  return data;
+}
+
+
+
+function findById(id) {
+  let data = null;
+
+  if(!id){
+    return;
+  }
+
+  return JobFunction.findById(id);
+}
+
+
+async function getJobFunctionsAndJobCount(locale) {
+  let data = [];
+  data = await JobFunction.aggregate([
+    {
+      $lookup: {
+        let:{shortCode: '$shortCode'},
+        from: "jobrequisitions",
+        pipeline: [
+          { $match: {$expr: {$eq: ["$jobFunction", "$$shortCode"]}} },
+          { $group: {_id: {shortCode: '$jobFunction'}, count: {$sum: 1} }},
+        ],
+        as: "count"
+      }
+    },
+    { $project:
+        {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+  ])
+
+  data = _.reduce(data, function(res, i){
+    i.name = i.name[locale]?i.name[locale]:i.name.en;
+    res.push(i);
+    return res;
+
+  }, []);
+  return data;
+}
+
+async function getPopularJobFunctions(locale) {
+  let data = [];
+  data = await JobFunction.aggregate([
+    {
+      $lookup: {
+        let:{shortCode: '$shortCode'},
+        from: "jobrequisitions",
+        pipeline: [
+          { $match: {$expr: {$eq: ["$jobFunction", "$$shortCode"]}} },
+          { $group: {_id: {shortCode: '$jobFunction'}, count: {$sum: 1} }},
+        ],
+        as: "count"
+      }
+    },
+    { $project: {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+    { $sort : { count : -1 } },
+    { $limit : 8 }
+  ])
+
+  data = _.reduce(data, function(res, i){
+    i.name = i.name[locale]?i.name[locale]:i.name.en;
+    res.push(i);
+    return res;
+
+  }, []);
+  return data;
+}
+
+
+
+
 module.exports = {
-  getJobfunctions:getJobfunctions,
-  getJobFunctionsAndJobCount:getJobFunctionsAndJobCount,
-  findById:findById,
   add:add,
+  findById:findById,
+  getJobFunctions:getJobFunctions,
+  getJobFunctionsAndJobCount:getJobFunctionsAndJobCount,
+  getPopularJobFunctions:getPopularJobFunctions,
   update:update
 }
