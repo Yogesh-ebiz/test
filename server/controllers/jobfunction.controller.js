@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 var mongoose = require('mongoose');
-const JobFunction = require('../models/jobfunctions.model');
+const JobFunction = require('../models/jobfunction.model');
 const filterService = require('../services/filter.service');
 
 
@@ -11,13 +11,13 @@ const jobFunctionSchema = Joi.object({
 
 
 module.exports = {
-  insert,
+  add,
   getAllJobFunctions,
   getJobFunctionById
 }
 
-async function insert(jobfunction) {
-  return await new Industry(jobfunction).save();
+async function add(jobfunction) {
+  return await new JobFunction(jobfunction).save();
 }
 
 

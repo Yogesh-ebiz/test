@@ -10,6 +10,7 @@ const productService = require('../services/product.service');
 const pipelineTemplateService = require('../services/pipelineTemplate.service');
 const pipelineService = require('../services/pipeline.service');
 const questionService = require('../services/question.service');
+const jobfunctionService = require('../services/jobfunction.service');
 
 module.exports = {
   addPipelineTemplate,
@@ -30,7 +31,12 @@ module.exports = {
   getQuestionById,
   addQuestion,
   deleteQuestion,
-  updateQuestion
+  updateQuestion,
+  getJobfunctions,
+  getJobfunctionById,
+  addJobfunction,
+  deleteJobfunction,
+  updateJobfunction
 }
 
 
@@ -317,15 +323,15 @@ async function getQuestions(currentUserId, filter, sort, locale) {
 }
 
 
-async function getQuestionById(currentUserId, productId) {
+async function getQuestionById(currentUserId, id) {
 
-  if(!currentUserId || productId){
+  if(!currentUserId || id){
     return null;
   }
 
   let result;
   try {
-    result = await questionService.findById(productId);
+    result = await questionService.findById(id);
   } catch (error) {
     console.log(error);
   }
@@ -350,15 +356,15 @@ async function addQuestion(currentUserId, form) {
   return result;
 }
 
-async function deleteQuestion(currentUserId, productId) {
+async function deleteQuestion(currentUserId, id) {
 
-  if(!currentUserId || !productId){
+  if(!currentUserId || !id){
     return null;
   }
 
   let result;
   try {
-    let product = await questionService.findById(productId);
+    let product = await questionService.findById(id);
 
     if(product) {
       result = await product.delete();
@@ -372,15 +378,102 @@ async function deleteQuestion(currentUserId, productId) {
   return result;
 }
 
-async function updateQuestion(currentUserId, productId, form) {
+async function updateQuestion(currentUserId, id, form) {
 
-  if(!currentUserId || !productId || !form){
+  if(!currentUserId || !id || !form){
     return null;
   }
 
   let result;
   try {
-    result = await questionService.update(productId, form)
+    result = await questionService.update(id, form)
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+
+async function getJobfunctions(locale) {
+
+
+  let result;
+  try {
+    result = await jobfunctionService.getJobfunctions();
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function getJobfunctionById(currentUserId, id) {
+
+  if(!currentUserId || id){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await jobfunctionService.findById(id);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function addJobfunction(currentUserId, form) {
+
+  if(!currentUserId || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await jobfunctionService.add(form);
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function deleteJobfunction(currentUserId, id) {
+
+  if(!currentUserId || !id){
+    return null;
+  }
+
+  let result;
+  try {
+    let product = await jobfunctionService.findById(id);
+
+    if(product) {
+      result = await product.delete();
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function updateJobfunction(currentUserId, id, form) {
+
+  if(!currentUserId || !id || !form){
+    return null;
+  }
+
+  let result;
+  try {
+    result = await jobfunctionService.update(id, form)
   } catch (error) {
     console.log(error);
   }

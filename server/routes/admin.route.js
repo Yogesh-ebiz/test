@@ -36,6 +36,13 @@ router.route('/questions/:id').get(asyncHandler(getQuestionById));
 router.route('/questions/:id').put(asyncHandler(updateQuestion));
 router.route('/questions/:id').delete(asyncHandler(deleteQuestion));
 
+
+router.route('/jobfunctions').get(asyncHandler(getJobfunctions));
+router.route('/jobfunctions').post(asyncHandler(addJobfunction));
+router.route('/jobfunctions/:id').get(asyncHandler(getJobfunctionById));
+router.route('/jobfunctions/:id').put(asyncHandler(updateJobfunction));
+router.route('/jobfunctions/:id').delete(asyncHandler(deleteJobFunction));
+
 async function addPipelineTemplate(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
@@ -226,4 +233,54 @@ async function updateQuestion(req, res) {
   let id = req.params.id;
   let data = await adminCtl.updateQuestion(currentUserId, id, req.body);
   res.json(new Response(data, data?'question_updated_successful':'not_found', res));
+}
+
+
+
+
+//******************* Jobfunctions ****************************
+
+async function getJobfunctions(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await adminCtl.getJobfunctions(currentUserId, res.locale);
+
+  res.json(new Response(data, data?'jobfunctions_retrieved_successful':'not_found', res));
+}
+
+
+async function addJobfunction(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await adminCtl.addJobfunction(currentUserId, req.body);
+  res.json(new Response(data, data?'jobfunction_created_successful':'not_found', res));
+}
+
+
+async function getJobfunctionById(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await adminCtl.getJobfunctionById(currentUserId, id, res.locale);
+
+  res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
+}
+
+
+
+async function deleteJobFunction(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await adminCtl.deleteJobFunction(currentUserId, id);
+
+
+  res.json(new Response(data, data?'jobfunction_removed_successful':'not_found', res));
+}
+
+
+async function updateJobfunction(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let id = req.params.id;
+  let data = await adminCtl.updateJobfunction(currentUserId, id, req.body);
+  res.json(new Response(data, data?'jobfunction_updated_successful':'not_found', res));
 }

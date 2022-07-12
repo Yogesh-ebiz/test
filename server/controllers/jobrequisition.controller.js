@@ -26,7 +26,7 @@ const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignServiceStage = require('../services/emailcampaignstage.service');
 const applicationService = require('../services/application.service');
 const jobviewService = require('../services/jobview.service');
-
+const jobfunctionService = require('../services/jobfunction.service');
 
 const {getListofSkills} = require('../services/skill.service');
 const {findApplicationByUserIdAndJobId, findByApplicationId, applyJob, findAppliedCountByJobId} = require('../services/application.service');
@@ -53,7 +53,7 @@ const stageService = require('../services/stage.service');
 
 const JobRequisition = require('../models/jobrequisition.model');
 const Skill = require('../models/skill.model');
-const JobFunction = require('../models/jobfunctions.model');
+const JobFunction = require('../models/jobfunction.model');
 const Bookmark = require('../models/bookmark.model');
 const PartySkill = require('../models/partyskill.model');
 const Application = require('../models/application.model');
@@ -577,18 +577,19 @@ async function getJobLanding(currentUserId, locale) {
 
 
 
-    let industryFull = await findIndustry('', _.reduceRight(industries, function(res, item){res.push(item.shortCode); return res}, []), locale);
-    industryFull = _.reduceRight(industryFull, function(res, item){
-      let found = _.find(industries, { 'shortCode': item.shortCode });
-      if(found){
-        item.noOfItems = found.count;
-        res.push(convertIndustry(item));
-      }
+    // let industryFull = await findIndustry('', _.reduceRight(industries, function(res, item){res.push(item.shortCode); return res}, []), locale);
+    // industryFull = _.reduceRight(industryFull, function(res, item){
+    //   let found = _.find(industries, { 'shortCode': item.shortCode });
+    //   if(found){
+    //     item.noOfItems = found.count;
+    //     res.push(convertIndustry(item));
+    //   }
+    //
+    //   return res;
+    // }, [])
+    // result.categories = industryFull;
 
-      return res;
-    }, [])
-
-    result.categories = industryFull;
+    result.categories = await jobfunctionService.getJobFunctionsAndJobCount(locale);
     result.popularCompanies = popularCompanies;
 
   } catch (error) {

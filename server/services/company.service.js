@@ -13,7 +13,7 @@ const CompanyReview = require('../models/companyreview.model');
 const CompanyReviewHistory = require('../models/companyreviewhistory.model');
 const CompanyReviewReport = require('../models/companyreviewreport.model');
 const CompanyReviewReaction = require('../models/companyreviewreaction.model');
-const JobFunction = require('../models/jobfunctions.model');
+const JobFunction = require('../models/jobfunction.model');
 
 const feedService = require('../services/api/feed.service.api');
 const memberService = require('../services/member.service');

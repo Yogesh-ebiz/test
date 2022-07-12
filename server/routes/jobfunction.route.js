@@ -9,30 +9,30 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 
-router.route('/').post(asyncHandler(insert));
+// router.route('/').post(asyncHandler(add));
 router.route('/search').get(asyncHandler(getAllJobFunctions));
 router.route('/:id').get(asyncHandler(getJobFunctionById));
 
 
 
-async function insert(req, res) {
-  let data = await jobFunctionCtl.insert(req.body);
-
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
-}
+// async function add(req, res) {
+//   let data = await jobFunctionCtl.add(req.body);
+//
+//   res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
+// }
 
 
 
 async function getAllJobFunctions(req, res) {
   let data = await jobFunctionCtl.getAllJobFunctions(req.query, res.locale);
 
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
 }
 
 
 
 async function getJobFunctionById(req, res) {
   let data = await jobFunctionCtl.getJobFunctionById(req.params.id, res.locale);
-  res.json(new Response(data, data?'event_retrieved_successful':'not_found', res));
+  res.json(new Response(data, data?'jobfunction_retrieved_successful':'not_found', res));
 }
 

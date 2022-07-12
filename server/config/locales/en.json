@@ -262,5 +262,6 @@
 	"benefits_updated_successful": "benefits_updated_successful",
 	"benefits_retrieved_successful": "benefits_retrieved_successful",
 	"question_retrieved_successful": "question_retrieved_successful",
-	"answer_added_successful": "answer_added_successful"
+	"answer_added_successful": "answer_added_successful",
+	"jobfunction_created_successful": "jobfunction_created_successful"
 }

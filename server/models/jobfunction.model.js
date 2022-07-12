@@ -3,9 +3,8 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
 
 const JobFunctionSchema = new mongoose.Schema({
-  jobFunctionId: {
-    type: Number,
-    required: true
+  id: {
+    type: Number
   },
   name: {
     type: Object,

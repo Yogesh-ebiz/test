@@ -10,5 +10,6 @@
 	"event_added_successful": "Sự kiện được thêm thành công",
 	"event_updated_successful": "Sự kiện được cập nhật thành công",
 	"event_deleted_successful": "Sự kiện đã được xóa thành công",
-	"experiencelevels_retrieved_successful": "experiencelevels_retrieved_successful"
+	"experiencelevels_retrieved_successful": "experiencelevels_retrieved_successful",
+	"jobs_retrieved_successful": "jobs_retrieved_successful"
 }

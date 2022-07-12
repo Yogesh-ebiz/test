@@ -4,7 +4,7 @@ const {convertIndustry} = require('../utils/helper');
 const feedService = require('../services/api/feed.service.api');
 
 const ExperienceLevel = require('../models/experiencelevel.model');
-const JobFunction = require('../models/jobfunctions.model');
+const JobFunction = require('../models/jobfunction.model');
 const EmploymentTypes = require('../models/employmenttypes.model');
 const Industry = require('../models/industry.model');
 const Skill = require('../models/skill.model');
