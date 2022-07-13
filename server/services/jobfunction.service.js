@@ -84,7 +84,7 @@ async function getJobFunctions(query, locale) {
         as: "count"
       }
     },
-    { $project: {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+    { $project: {name: 1, shortCode: 1, id: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
     { $sort : { 'name.en' : 1 } },
   ])
 
@@ -125,7 +125,7 @@ async function getJobFunctionsAndJobCount(locale) {
       }
     },
     { $project:
-        {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+        {name: 1, shortCode: 1, id: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
   ])
 
   data = _.reduce(data, function(res, i){
@@ -151,7 +151,7 @@ async function getPopularJobFunctions(locale) {
         as: "count"
       }
     },
-    { $project: {name: 1, shortCode: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+    { $project: {name: 1, shortCode: 1, id: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
     { $sort : { count : -1 } },
     { $limit : 8 }
   ])
