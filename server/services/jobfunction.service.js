@@ -84,12 +84,13 @@ async function getJobFunctions(query, locale) {
         as: "count"
       }
     },
-    { $project: {name: 1, shortCode: 1, id: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+    { $project: {name: 1, shortCode: 1, id: 1, icon: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
     { $sort : { 'name.en' : 1 } },
   ])
 
   data = _.reduce(data, function(res, i){
     i.name = i.name[locale]?i.name[locale]:i.name.en;
+    i.icon = `${process.env.CDN}/images/jobfunctions/${i.id}/${i.icon}`;
     res.push(i);
     return res;
 
@@ -125,11 +126,12 @@ async function getJobFunctionsAndJobCount(locale) {
       }
     },
     { $project:
-        {name: 1, shortCode: 1, id: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+        {name: 1, shortCode: 1, id: 1, icon: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
   ])
 
   data = _.reduce(data, function(res, i){
     i.name = i.name[locale]?i.name[locale]:i.name.en;
+    i.icon = `${process.env.CDN}/images/jobfunctions/${i.id}/${i.icon}`;
     res.push(i);
     return res;
 
@@ -151,13 +153,14 @@ async function getPopularJobFunctions(locale) {
         as: "count"
       }
     },
-    { $project: {name: 1, shortCode: 1, id: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
+    { $project: {name: 1, shortCode: 1, id: 1, icon: 1, count: { $cond: [ { $eq: ["$count", []] }, 0, { $first: "$count.count" }] } } },
     { $sort : { count : -1 } },
     { $limit : 8 }
   ])
 
   data = _.reduce(data, function(res, i){
     i.name = i.name[locale]?i.name[locale]:i.name.en;
+    i.icon = `${process.env.CDN}/images/jobfunctions/${i.id}/${i.icon}`;
     res.push(i);
     return res;
 
