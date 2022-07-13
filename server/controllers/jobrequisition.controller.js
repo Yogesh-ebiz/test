@@ -497,7 +497,7 @@ async function getJobLanding(currentUserId, locale) {
   try {
     let industries = await getTopIndustry();
     let viewed = await findJobViewByUserId(currentUserId, 4);
-    let saved = await bookmarkService.findBookByUserId(currentUserId, 4);
+    let saved = await bookmarkService.findBookByUserId(currentUserId);
     let highlight = await JobRequisition.find({}).sort({createdDate: -1}).limit(10);
     let newJobs = await jobService.getNewJobs();
     let popularJobs = await findMostViewed();
@@ -520,6 +520,7 @@ async function getJobLanding(currentUserId, locale) {
       job.applicationForm= null;
       job.members = [];
       job.tags = [];
+      job.hasSaved = _.find(saved, function(o){console.log(o.jobId.equals(job._id)); return o.jobId.equals(job._id)})?true:false;
 
       res.push(job);
       return res;
@@ -539,13 +540,13 @@ async function getJobLanding(currentUserId, locale) {
       return res;
     }, []);
 
-    result.savedJobs = _.reduce(saved, function(res, item){
+    result.savedJobs = _.slice(_.reduce(saved, function(res, item){
       let job = _.find(jobs, {_id: item.jobId});
       if(job){
         res.push(job);
       }
       return res;
-    }, []);
+    }, []), 0, 8);
 
     result.popularJobs = _.reduce(popularJobs, function(res, item){
       let job = _.find(jobs, {_id: item._id});

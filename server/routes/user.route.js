@@ -308,7 +308,7 @@ async function getApplicationListByUserId(req, res) {
 
 async function getBookmarksByUserId(req, res) {
 
-  let currentUserId = parseInt(req.header('UserId'));
+  let currentUserId = parseInt(req.params.userId);
   let filter = req.query;
   let data = await userCtl.getBookmarksByUserId(currentUserId, filter, res.locale);
 
