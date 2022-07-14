@@ -25,8 +25,8 @@ const UserQuestionSchema = new mongoose.Schema({
   sequence: {
     type: Number
   },
-  department: {
-    type: String
+  target: {
+    type: Object
   },
   text: {
     type: String

@@ -18,7 +18,7 @@ const questionSchema = Joi.object({
   companyId: Joi.number(),
   userId: Joi.number(),
   text: Joi.string(),
-  department: Joi.string().allow('').optional(),
+  target: Joi.object().optional(),
 });
 
 async function findById(id) {
