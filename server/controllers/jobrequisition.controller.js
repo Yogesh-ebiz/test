@@ -123,7 +123,8 @@ module.exports = {
   searchCandidates,
   submitJobQuestionaires,
   getJobQuestionaires,
-  getJobSkills
+  getJobSkills,
+  getSponsorJobs
 }
 
 
@@ -1137,6 +1138,36 @@ async function getJobQuestionaires(jobId) {
 async function getJobSkills(jobId, locale) {
 
   if(!jobId){
+    return null;
+  }
+
+
+  let result = [];
+  try {
+
+    let job;
+    if(isNaN(jobId)){
+      job = await JobRequisition.findById(ObjectID(jobId));
+    } else {
+      job = await JobRequisition.findOne({jobId: parseInt(jobId)});
+    }
+
+    console.log('skills', job.skills)
+    if(job.skills) {
+      result = await feedService.findSkillsById(job.skills);
+    }
+  } catch (error) {
+    console.log(error);
+    return result;
+  }
+
+  return result;
+}
+
+
+async function getSpnsorJobs(currentUserId, form, locale) {
+
+  if(!currentUserId, form){
     return null;
   }
 
