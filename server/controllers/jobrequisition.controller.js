@@ -1165,9 +1165,9 @@ async function getJobSkills(jobId, locale) {
 }
 
 
-async function getSpnsorJobs(currentUserId, form, locale) {
+async function getSponsorJobs(currentUserId, filter, locale) {
 
-  if(!currentUserId, form){
+  if(!currentUserId || !filter){
     return null;
   }
 
