@@ -49,6 +49,7 @@ router.route('/:id/questionaires').get(asyncHandler(getJobQuestionaires));
 router.route('/:id/skills').get(asyncHandler(getJobSkills));
 
 router.route('/category').get(asyncHandler(getCategories));
+router.route('/sponsor').post(asyncHandler(getSponsorJobs));
 
 //
 // async function insert(req, res) {
@@ -307,6 +308,16 @@ async function getCategories(req, res) {
 
   let currentUserId = parseInt(req.header('UserId'));
   let data = await jobRequisitionCtl.getCategories(res.locale);
+
+  res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getSponsorJobs(req, res) {
+  let currentUserId = parseInt(req.header('UserId'));
+  let form = req.query;
+  let data = await jobRequisitionCtl.getSponsorJobs(currentUserId, form, res.locale);
 
   res.json(new Response(data, data?'job_retrieved_successful':'not_found', res));
 }
