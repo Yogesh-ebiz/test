@@ -1175,17 +1175,40 @@ async function getSponsorJobs(currentUserId, filter, locale) {
   let result = [];
   try {
 
-    let job;
-    if(isNaN(jobId)){
-      job = await JobRequisition.findById(ObjectID(jobId));
-    } else {
-      job = await JobRequisition.findOne({jobId: parseInt(jobId)});
-    }
 
-    console.log('skills', job.skills)
-    if(job.skills) {
-      result = await feedService.findSkillsById(job.skills);
-    }
+    result = await JobRequisition.find({status: statusEnum.ACTIVE}).populate('company').limit(20);
+    let allCompanies = await feedService.lookupCompaniesIds(_.map(result, 'company.companyId'));
+    let hasSaves = [];
+
+    result = _.reduce(result, function(res, job){
+      let company = _.find(allCompanies, {id: job.companyId});
+      job.company = _.merge(job.company, company);
+      job.createdBy = job.createdBy?convertToAvatar(job.createdBy):null;
+      job.shareUrl = 'https://www.accessed.co/jobs/view/'+job.jobId;
+
+      job.skills=[];
+      job.industry=[];
+      job.members=[];
+      job.responsibilities=[];
+      job.qualifications = [];
+      job.minimumQualifications=[];
+      job.description = null;
+      job.applicationForm = null;
+      // job.isHot = _.reduce(job.ads, function(res, ad){
+      //   if(_.includes(ad.targeting.adPositions, adPosition.hottag)){
+      //     if(ad.startTime < today && ad.endTime > today){
+      //       res = true;
+      //     }
+      //
+      //   }
+      //   return res;
+      // }, false);
+      job.ads = [];
+      res.push(job);
+      return res;
+    }, []);
+
+
   } catch (error) {
     console.log(error);
     return result;
