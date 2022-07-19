@@ -202,6 +202,7 @@ const convertToCompany = (company) => {
     return;
   }
 
+  console.log(company)
   let primaryAddress = (company.primaryAddress)?{
     name: company.primaryAddress.name,
     address1: company.primaryAddress.address1,
