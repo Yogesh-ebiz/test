@@ -203,8 +203,8 @@ async function getJobById(currentUserId, jobId, isMinimal, locale) {
             jobSkills = await findSkillsById(job.skills);
           }
 
-          let noApplied = await findAppliedCountByJobId(job.jobId);
-          job.noApplied = noApplied;
+          let noOfApplied = await applicationService.findAppliedCountByJob(job._id);
+          job.noOfApplied = noOfApplied;
 
           if(job.industry) {
             let industry = await findIndustry('', job.industry, locale);

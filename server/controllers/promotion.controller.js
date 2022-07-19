@@ -144,8 +144,8 @@ async function getPromotionById(currentUserId, jobId, locale) {
         job.hasApplied = (hasApplied)?true:false;
 
 
-        let noApplied = await findAppliedCountByJobId(job.jobId);
-        job.noApplied = noApplied;
+        let noOfApplied = await findAppliedCountByJobId(job.jobId);
+        job.noOfApplied = noOfApplied;
 
         let employmentType = await getEmploymentTypes(_.map(job, 'employmentType'), locale);
         job.employmentType = employmentType[0];

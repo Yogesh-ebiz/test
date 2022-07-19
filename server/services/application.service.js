@@ -569,6 +569,15 @@ async function findByJobId(jobId) {
 
 }
 
+function findAppliedCountByJob(job) {
+  let data = null;
+
+  if(job==null){
+    return;
+  }
+
+  return Application.find({job: job}).count();
+}
 
 function findAppliedCountByJobId(jobId) {
   let data = null;
@@ -1698,6 +1707,7 @@ module.exports = {
   findApplicationByUserIdAndJobId: findApplicationByUserIdAndJobId,
   findApplicationByEmailAndJobId: findApplicationByEmailAndJobId,
   findApplicationByIdAndUserId:findApplicationByIdAndUserId,
+  findAppliedCountByJob:findAppliedCountByJob,
   findAppliedCountByJobId: findAppliedCountByJobId,
   findCandidatesByCompanyId:findCandidatesByCompanyId,
   findApplicationsByUserId:findApplicationsByUserId,
