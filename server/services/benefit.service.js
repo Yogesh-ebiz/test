@@ -60,8 +60,17 @@ async function findByCompanyId(companyId) {
   return benefits;
 }
 
+async function getDefaultBenefits() {
+
+  let benefits = await Benefit.find({isDefault: true});
+
+  return benefits;
+}
+
+
 module.exports = {
   update:update,
-  findByCompanyId:findByCompanyId
+  findByCompanyId:findByCompanyId,
+  getDefaultBenefits:getDefaultBenefits
 
 }

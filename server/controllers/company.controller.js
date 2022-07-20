@@ -1317,6 +1317,9 @@ async function getBenefits(company) {
 
   try {
     result = await benefitService.findByCompanyId(company);
+    if(!result.length){
+      result = await benefitService.getDefaultBenefits();
+    }
 
   } catch(e){
     console.log('getBenefits: Error', e);
