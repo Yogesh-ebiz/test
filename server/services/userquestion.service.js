@@ -31,6 +31,13 @@ async function findById(id) {
   return question;
 }
 
+async function getDefaultQuestions() {
+
+  let questions = await UserQuestion.find({isDefault: true});
+
+  return questions;
+}
+
 async function getQuestionResponses(id, sort) {
   if(!id || !sort){
     return;
@@ -157,6 +164,7 @@ async function findByCompanyId(company, sort) {
 
 module.exports = {
   findById: findById,
+  getDefaultQuestions:getDefaultQuestions,
   getQuestionResponses:getQuestionResponses,
   addQuestion:addQuestion,
   addResponse:addResponse,

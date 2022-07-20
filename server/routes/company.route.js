@@ -73,6 +73,7 @@ router.route('/:id/benefits').post(asyncHandler(updateBenefits));
 
 router.route('/:id/questions').get(asyncHandler(getQuestions));
 router.route('/:id/questions').post(asyncHandler(addQuestion));
+router.route('/:id/questions/default').get(asyncHandler(getDefaultQuestions));
 router.route('/:id/questions/:questionId').get(asyncHandler(getQuestion));
 router.route('/:id/questions/:questionId/responses').post(asyncHandler(addQuestionResponse));
 router.route('/:id/questions/:questionId/responses').get(asyncHandler(getQuestionResponses));
@@ -580,6 +581,12 @@ async function updateBenefits(req, res) {
   res.json(new Response(data, data?'benefits_updated_successful':'not_found', res));
 }
 
+async function getDefaultQuestions(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let data = await companyCtl.getDefaultQuestions();
+  res.json(new Response(data, data?'questions_retrieved_successful':'not_found', res));
+}
+
 
 async function getQuestions(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -597,6 +604,12 @@ async function addQuestion(req, res) {
   let data = await companyCtl.addQuestion(company, question, currentUserId);
   res.json(new Response(data, data?'question_added_successful':'not_found', res));
 }
+
+async function getDefaultQuestion(req, res) {
+  let data = await companyCtl.getDefaultQuestion();
+  res.json(new Response(data, data?'question_retrieved_successful':'not_found', res));
+}
+
 
 async function getQuestion(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

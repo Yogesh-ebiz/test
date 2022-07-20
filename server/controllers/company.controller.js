@@ -182,6 +182,7 @@ module.exports = {
   getBenefits,
   updateBenefits,
   addQuestion,
+  getDefaultQuestions,
   getQuestions,
   getQuestion,
   getQuestionResponses,
@@ -1367,6 +1368,19 @@ async function addQuestion(company, question, currentUserId) {
   return result;
 }
 
+
+async function getDefaultQuestions() {
+
+  let result = [];
+
+  try {
+    result = await userQuestionService.getDefaultQuestions();
+  } catch(e){
+    console.log('getQuestions: Error', e);
+  }
+
+  return result;
+}
 
 async function getQuestions(company, pagination) {
   if(!company || !pagination){

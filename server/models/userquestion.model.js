@@ -31,6 +31,16 @@ const UserQuestionSchema = new mongoose.Schema({
   text: {
     type: String
   },
+  type: {
+    type: String,
+    default: 'MULTILINE'
+  },
+  noMaxSelection: {
+    type: Number
+  },
+  options: {
+    type: Array
+  },
   topAnswer: { type: Schema.Types.ObjectId, ref: 'UserAnswer' },
   answers: [{ type: Schema.Types.ObjectId, ref: 'UserAnswer' }]
 }, {
