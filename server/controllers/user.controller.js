@@ -36,7 +36,7 @@ const memberService = require('../services/member.service');
 const companyService = require('../services/company.service');
 const roleService = require('../services/role.service');
 const jobPreferenceService = require('../services/jobPreference.service');
-
+const jobAlertService = require('../services/jobalert.service');
 
 const {addCompany} = require('../services/api/party.service.api');
 const {getPartyById, getCompanyById,  isPartyActive, getPartySkills, searchParties, populateParties, populatePerson, populateParty, populateCompany, populateInstitute} = require('../services/party.service');
@@ -86,26 +86,6 @@ const partySkillSchema = Joi.object({
 
 
 
-const jobAlertSchema = Joi.object({
-  jobId: Joi.number().optional(),
-  partyId: Joi.number().optional(),
-  title: Joi.string().allow('').optional(),
-  city: Joi.string().allow('').optional(),
-  state: Joi.string().allow('').optional(),
-  country: Joi.string().allow('').optional(),
-  level: Joi.string().allow('').optional(),
-  industry: Joi.string().allow('').optional(),
-  jobFunction: Joi.string().allow('').optional(),
-  employmentType: Joi.string().allow('').optional(),
-  distance: Joi.string().allow('').optional(),
-  company: Joi.string().allow('').optional(),
-  companySize: Joi.string().allow('').optional(),
-  repeat: Joi.string().allow('').optional(),
-  notification: Joi.array().optional(),
-  status: Joi.string().optional(),
-  remote: Joi.boolean().optional()
-
-});
 
 const employmentSchema = Joi.object({
   employmentId: Joi.number().optional(),
@@ -378,7 +358,6 @@ async function getUserDetail(currentUserId, userId, locale) {
       employments = _.reduce(employments, function(res, item){
         let found = _.find(listOfJobFunctions, {shortCode: item.jobFunction});
 
-        console.log('item', item.jobFunction, found)
         if(found){
           item.jobFunction = found;
         }
@@ -446,7 +425,6 @@ async function uploadResume(currentUserId, files, name) {
         //------------Upload CV----------------
 
         if(files.file) {
-          console.log(files.file[0], type)
           let cv = files.file[0];
           let fileName = name ? name.split('.') : cv.originalname.split('.');
           let fileExt = files.file[0].originalname.split('.').pop();
@@ -468,11 +446,9 @@ async function uploadResume(currentUserId, files, name) {
 
           }
 
-          console.log(fileExt)
           let file = await fileService.addFile({filename: name, fileType: type, path: path, createdBy: currentUserId});
 
           if(file){
-            console.log(file, user)
             user.resumes = user.resumes?user.resumes:[];
             user.resumes.push(file._id);
             await user.save();
@@ -1763,50 +1739,44 @@ async function getAlertsByUserId(currentUserId, filter) {
   let result = null;
   try {
 
-    let currentParty = await feedService.findByUserId(currentUserId);
+    let select = '';
+    let limit = (filter.size && filter.size > 0) ? filter.size : 20;
+    let page = (filter.page && filter.page == 0) ? filter.page : 1;
+    let sortBy = {};
+    filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
+    filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
+    sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
 
-    if(isPartyActive(currentParty)) {
-      let select = '';
-      let limit = (filter.size && filter.size > 0) ? filter.size : 20;
-      let page = (filter.page && filter.page == 0) ? filter.page : 1;
-      let sortBy = {};
-      filter.sortBy = (filter.sortyBy) ? filter.sortyBy : 'createdDate';
-      filter.direction = (filter.direction && filter.direction=="ASC") ? "ASC" : 'DESC';
-      sortBy[filter.sortBy] = (filter.direction == "DESC") ? -1 : 1;
+    let options = {
+      select: select,
+      sort: sortBy,
+      lean: true,
+      limit: limit,
+      page: parseInt(filter.page) + 1
+    };
 
-      let options = {
-        select: select,
-        sort: sortBy,
-        lean: true,
-        limit: limit,
-        page: parseInt(filter.page) + 1
-      };
+    filter.partyId=currentUserId;
 
-      filter.partyId=currentParty.id;
+    result = await JobAlert.paginate(new SearchParam(filter), options);
 
-      result = await JobAlert.paginate(new SearchParam(filter), options);
+    let companyIds = _.map(result.docs, 'company');
+    let res = await searchParties(companyIds, partyEnum.COMPANY);
+    let foundCompanies = res.data.data.content;
 
-      let companyIds = _.map(result.docs, 'company');
-      let res = await searchParties(companyIds, partyEnum.COMPANY);
-      let foundCompanies = res.data.data.content;
+    // _.forEach(result.docs, function(alert) {
+    //   alert.company = _.find(foundCompanies, {id: alert.company});
+    //
+    //   alert.noJobs = await getAlertCount(filter);
+    // })
 
-      // _.forEach(result.docs, function(alert) {
-      //   alert.company = _.find(foundCompanies, {id: alert.company});
-      //
-      //   alert.noJobs = await getAlertCount(filter);
-      // })
+    const loadPromises = result.docs.map(alert => getJobCount(alert));
+    let count = await Promise.all(loadPromises);
 
-      const loadPromises = result.docs.map(alert => getJobCount(alert));
-      let count = await Promise.all(loadPromises);
+    _.forEach(result.docs, function(alert, idx) {
+      // alert.company = _.find(foundCompanies, {id: alert.company});
 
-      _.forEach(result.docs, function(alert, idx) {
-        // alert.company = _.find(foundCompanies, {id: alert.company});
-
-        alert.noJobs = count[idx];
-      })
-
-    }
-
+      alert.noJobs = count[idx];
+    })
 
   } catch (error) {
     console.log(error);
@@ -1817,7 +1787,7 @@ async function getAlertsByUserId(currentUserId, filter) {
 }
 
 async function addPartyAlert(currentUserId, alert) {
-  alert = await Joi.validate(alert, jobAlertSchema, { abortEarly: false });
+
 
   if(currentUserId==null || alert==null){
     return null;
@@ -1827,18 +1797,7 @@ async function addPartyAlert(currentUserId, alert) {
   let result;
   try {
 
-    let currentParty = await feedService.findByUserId(currentUserId);
-    // console.log('currentParty', currentParty)
-
-    //Security Check if user is part of meeting attendees that is ACTIVE.
-    if (isPartyActive(currentParty)) {
-
-      alert.partyId = currentParty.id;
-      result = await addAlertByUserId(currentParty.id, alert);
-
-
-    }
-
+    result = await jobAlertService.add(alert);
 
   } catch (error) {
     console.log(error);
@@ -1857,22 +1816,14 @@ async function removePartyAlert(currentUserId, alertId) {
 
   let result;
   try {
+    let found = await findJobAlertById(alertId);
+    if(found){
+      let deleted = await jobAlertService.removeAlertById(alertId);
 
-    let currentParty = await feedService.findByUserId(currentUserId);
-
-    if (isPartyActive(currentParty)) {
-
-      let found = await findJobAlertById(alertId);
-
-      if(found){
-        let deleted = await removeAlertById(alertId);
-
-        if(deleted && deleted.deletedCount==1){
-          found.status = statusEnum.DELETED;
-          result = found;
-        }
+      if(deleted && deleted.deletedCount==1){
+        found.status = statusEnum.DELETED;
+        result = found;
       }
-
     }
 
   } catch (error) {
@@ -1896,7 +1847,7 @@ async function updatePartyAlert(currentUserId, alertId, alert) {
     let currentParty = await feedService.findByUserId(currentUserId);
 
     if (isPartyActive(currentParty)) {
-      found = await findJobAlertById(alertId);
+      found = await jobAlertService.findJobAlertById(alertId);
       if(found){
         found.title = alert.title?alert.title:found.title;
         found.company = alert.company?alert.company:found.company;
@@ -2049,7 +2000,6 @@ async function addPartyPublication(currentUserId, publication) {
 
 
       if(!found){
-        console.log('add new')
         result = await addPublicationByUserId(publication);
       } else {
         let lastUpdatedDate = Date.now();

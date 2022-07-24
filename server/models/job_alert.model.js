@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const { autoIncrement } = require('mongoose-plugin-autoinc');
+const alertEnum = require("../const/alertEnum");
 
 const JobAlertSchema = new mongoose.Schema({
   id: {
@@ -26,7 +27,7 @@ const JobAlertSchema = new mongoose.Schema({
     default: ''
   },
   company: {
-    type: String,
+    type: Number,
     required: false,
     default: ''
   },
@@ -80,12 +81,12 @@ const JobAlertSchema = new mongoose.Schema({
   repeat: {
     type: String,
     required: false,
-    default: ''
+    default: alertEnum.DAILY
   },
   notification: {
     type: Array,
     required: false,
-    default: []
+    default: [alertEnum.EMAIL, alertEnum.NOTIFICATION]
   },
   noJobs: {
     type: Number,

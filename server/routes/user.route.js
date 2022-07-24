@@ -338,6 +338,7 @@ async function addPartyAlert(req, res) {
 
   let currentUserId = parseInt(req.params.userId);
   let alert = req.body;
+  console.log(alert)
   let data = await userCtl.addPartyAlert(currentUserId, alert);
 
   res.json(new Response(data, data?'alert_added_successful':'not_found', res));
