@@ -8,7 +8,9 @@ const {convertToCandidate, convertToCompany} = require('../utils/helper');
 let CandidateParam = require('../const/candidateParam');
 const statusEnum = require('../const/statusEnum');
 const Candidate = require('../models/candidate.model');
+const User = require('../models/user.model');
 
+const userService = require('../services/user.service');
 const evaluationService = require('../services/evaluation.service');
 const applicationService = require('../services/application.service');
 const poolService = require('../services/pool.service');
@@ -56,7 +58,7 @@ const candidateSchema = Joi.object({
 });
 
 
-async function addCandidate(companyId, user, isApplied, isImported) {
+async function addCandidate(currentUserId, companyId, user, isApplied, isImported) {
   if(!companyId || !user){
     return;
   }
@@ -128,7 +130,10 @@ async function addCandidate(companyId, user, isApplied, isImported) {
   candidate.hasImported = isImported?true:false;
   candidate.hasApplied = isApplied?true:false;
   candidate = await new Candidate(candidate).save();
-
+  let newUser = await userService.findByUserId(user.id);
+  if(!newUser){
+    newUser = await userService.add({firstName:user.firstName, lastName: user.lastName, userId: user.id, resumes: user.resumes, createdBy: currentUserId});
+  }
 
 
   return candidate;
@@ -346,81 +351,79 @@ async function search(filter, sort) {
   let page = (sort.page && sort.page==0) ? 1:parseInt(sort.page)+1;
   let direction = (sort.direction && sort.direction=="DESC") ? -1:1;
 
-
-
   const options = {
     page: page,
     limit: limit,
   };
 
+  filter.status = filter.status?filter.status:[statusEnum.ACTIVE];
   let aList = [];
   let aLookup = [];
   let aMatch = { $match: new CandidateParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
-
   aList.push(aMatch);
 
-  aList.push({$match: {status: statusEnum.ACTIVE}});
-  aList.push(
-    {$lookup:{
-        from:"applications",
-        let:{user:"$_id"},
-        pipeline:[
-          {$match:{$expr:{$eq:["$user","$$user"]}}},
-          {$lookup:{
-              from:"applicationprogresses",
-              let:{currentProgress:"$currentProgress"},
-              pipeline:[
-                {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-                {$lookup:{
-                    from:"stages",
-                    let:{stage:"$stage"},
-                    pipeline:[
-                      {$match:{$expr:{$eq:["$_id","$$stage"]}}},
-
-                    ],
-                    as: 'stage'
-                  }},
-                { $unwind: '$stage'}
-              ],
-              as: 'currentProgress'
-            }
-          },
-          { $unwind: '$currentProgress'}
-        ],
-        as: 'applications'
-      },
-    })
-
-    if(filter.job) {
-      aList.push({$match: {'applications.job': ObjectID(filter.job)}})
-    }
-
-    aList.push({$lookup: {from: 'evaluations', localField: 'userId', foreignField: 'partyId', as: 'evaluations' } })
-    aList.push(
-    { $addFields:
-        {
-          rating: {$round: [{$avg: "$evaluations.rating"}, 1]},
-          evaluations: []
-        }
-    });
-
-
-  if(filter.stages.length){
-    aList.push({ $match: {'applications.currentProgress.stage.type': {$in: filter.stages} } });
-  }
-
-  if(filter.sources.length){
-    filter.sources = _.reduce(filter.sources, function (res, source) {
-      res.push(ObjectID(source));
-      return res;
-    }, []);
-
-    aList.push(
-      {$lookup: {from: 'labels', localField: 'sources', foreignField: '_id', as: 'sources' } },
-      // { $match: {'sources': {$in: filter.sources} } }
-    );
-  }
+  // aList.push({$match: {status: statusEnum.ACTIVE}});
+  // aList.push(
+  //   {$lookup:{
+  //       from:"applications",
+  //       let:{user:"$_id"},
+  //       pipeline:[
+  //         {$match:{$expr:{$eq:["$user","$$user"]}}},
+  //         {$lookup:{
+  //             from:"applicationprogresses",
+  //             let:{currentProgress:"$currentProgress"},
+  //             pipeline:[
+  //               {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+  //               {$lookup:{
+  //                   from:"stages",
+  //                   let:{stage:"$stage"},
+  //                   pipeline:[
+  //                     {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+  //
+  //                   ],
+  //                   as: 'stage'
+  //                 }},
+  //               { $unwind: '$stage'}
+  //             ],
+  //             as: 'currentProgress'
+  //           }
+  //         },
+  //         { $unwind: '$currentProgress'}
+  //       ],
+  //       as: 'applications'
+  //     },
+  //   })
+  //
+  //   if(filter.job) {
+  //     aList.push({$match: {'applications.job': ObjectID(filter.job)}})
+  //   }
+  //
+  //   aList.push({$lookup: {from: 'evaluations', localField: 'userId', foreignField: 'partyId', as: 'evaluations' } })
+  //   aList.push(
+  //   { $addFields:
+  //       {
+  //         rating: {$round: [{$avg: "$evaluations.rating"}, 1]},
+  //         evaluations: []
+  //       }
+  //   });
+  //
+  //
+  // if(filter.stages.length){
+  //   aList.push({ $match: {'applications.currentProgress.stage.type': {$in: filter.stages} } });
+  // }
+  //
+  // if(filter.sources.length){
+  //   filter.sources = _.reduce(filter.sources, function (res, source) {
+  //     res.push(ObjectID(source));
+  //     return res;
+  //   }, []);
+  //
+  //   aList.push(
+  //     {$lookup: {from: 'labels', localField: 'sources', foreignField: '_id', as: 'sources' } },
+  //     // { $match: {'sources': {$in: filter.sources} } }
+  //   );
+  // }
 
   if(sort && sort.sortBy=='rating'){
     aSort = { $sort: { rating: direction} };

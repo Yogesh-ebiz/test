@@ -3525,7 +3525,7 @@ async function addCandidate(currentUserId, companyId, form) {
     return null;
   }
 
-  let candidate = await candidateService.addCandidate(companyId, form, false, true);
+  let candidate = await candidateService.addCandidate(currentUserId, companyId, form, false, true);
   return candidate
 }
 
@@ -3693,6 +3693,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
   }
 
   result = await candidateService.search(filter, sort);
+
   let people = await feedService.lookupCandidateIds(_.map(result.docs, 'userId'));
   let pools = await poolService.findByCompany(companyId);
 
@@ -4925,7 +4926,7 @@ async function updatePeoplePool(companyId, currentUserId, userId, poolIds) {
         user.skills = null;
         user.experiences = null;
         user.educations = null;
-        candidate = await candidateService.addCandidate(companyId, user, false, false);
+        candidate = await candidateService.addCandidate(currentUserId, companyId, user, false, false);
         candidateId = candidate._id;
     }
   } else {

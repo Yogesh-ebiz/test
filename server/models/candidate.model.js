@@ -149,7 +149,16 @@ const CandidateSchema = new mongoose.Schema({
     type: Array
   },
   preferences: {
-    type: Object
+    type: Object,
+    default: {
+      openToRelocate: true,
+      openToRemote: true,
+      openToJob: true,
+      jobTitles: [],
+      jobLocations: [],
+      jobTypes: [],
+      startDate: "IMMEDIATE"
+    }
   },
   experiences: [{ type: Schema.Types.ObjectId, ref: 'Experience' }],
   educations: [{ type: Schema.Types.ObjectId, ref: 'Education' }],

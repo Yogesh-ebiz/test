@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const statusEnum = require('../const/statusEnum');
+
 
 const UserSchema = new mongoose.Schema({
   userId: {
@@ -12,7 +14,7 @@ const UserSchema = new mongoose.Schema({
   },
   createdDate: {
     type: Number,
-    required:false
+    default: Date.now
   },
   lastApplied: {
     type: Number,
@@ -20,21 +22,30 @@ const UserSchema = new mongoose.Schema({
   },
   status: {
     type: String,
+    default: statusEnum.ACTIVE
   },
   firstName: {
     type: String,
-    required:false
+    required:true
   },
   lastName: {
     type: String,
-    required:false
+    required:true
   },
   middleName: {
     type: String,
-    required:false
   },
   preferences: {
-    type: Object
+    type: Object,
+    default: {
+      openToRelocate: true,
+      openToRemote: true,
+      openToJob: true,
+      jobTitles: [],
+      jobLocations: [],
+      jobTypes: [],
+      startDate: "IMMEDIATE"
+    }
   },
   resumes: [{ type: Schema.Types.ObjectId, ref: 'File' }]
 }, {

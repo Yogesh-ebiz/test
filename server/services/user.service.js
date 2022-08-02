@@ -5,6 +5,15 @@ const statusEnum = require('../const/statusEnum');
 const User = require('../models/user.model');
 const JobPreference = require("../models/jobpreferences.model");
 
+const userSchema = Joi.object({
+  userId: Joi.number(),
+  firstName: Joi.string(),
+  middleName: Joi.string().allow('').optional(),
+  lastName: Joi.string(),
+  resumes: Joi.array().optional(),
+  preferences: Joi.object().optional(),
+  createdBy: Joi.number().optional()
+});
 
 const form = Joi.object({
   name: Joi.string(),
@@ -28,6 +37,7 @@ const jobPreferenceSchema = Joi.object({
   startDate: Joi.string().allow(''),
 });
 
+
 async function register(form) {
 
   if(!form){
@@ -43,6 +53,19 @@ async function register(form) {
   // return user;
 
 }
+
+async function add(user) {
+
+  if(!user){
+    return;
+  }
+
+  user = await Joi.validate(user, userSchema, {abortEarly: false});
+  user = await new User(user).save();
+  return user;
+
+}
+
 
 async function findByUserId(userId) {
 
@@ -95,6 +118,7 @@ async function getJobPreferences(userId) {
 
 
 module.exports = {
+  add:add,
   register:register,
   findByUserId:findByUserId,
   getUserLast5Resumes:getUserLast5Resumes,
