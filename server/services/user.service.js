@@ -90,7 +90,7 @@ async function getJobPreferences(userId) {
   }
 
   let user  = await User.findOne({userId: userId});
-  return user.preferences;
+  return user?.preferences;
 }
 
 

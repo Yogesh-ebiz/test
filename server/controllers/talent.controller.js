@@ -3787,9 +3787,9 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
   }
 
 
-
   if(candidate) {
     candidate = _.merge({}, candidate);
+
     let people = await feedService.findCandidateById(candidate.userId);
     if(people){
       candidate.skills = people.skills;
