@@ -140,6 +140,7 @@ module.exports = {
   sync,
   register,
   getCompany,
+  deactivateCompanyJobs,
   getCompanyLatestJobs,
   getCompanyJobs,
   addNewSalary,
@@ -244,6 +245,19 @@ async function getCompany(currentUserId, companyId, locale) {
 
 }
 
+
+
+async function deactivateCompanyJobs(companyId) {
+
+  if(!companyId){
+    return null;
+  }
+
+  let result = await jobService.deactivateJobs({companyId: companyId});
+
+  return result;
+
+}
 
 async function getCompanyLatestJobs(companyId, locale) {
 

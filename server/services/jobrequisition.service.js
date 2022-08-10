@@ -1328,6 +1328,19 @@ async function getCompanyJobsJobFunctions(company, locale) {
 }
 
 
+async function deactivateJobs(filter) {
+  let data = null;
+
+  if(!filter){
+    return null;
+  }
+
+
+  let result = await JobRequisition.updateMany(new SearchParam(filter), {$set: {status: statusEnum.DEACTIVATED}});
+  return result;
+}
+
+
 module.exports = {
   addJob:addJob,
   updateJob:updateJob,
@@ -1359,5 +1372,6 @@ module.exports = {
   search:search,
   talentSearch:talentSearch,
   removePipeline:removePipeline,
-  getCompanyJobsJobFunctions:getCompanyJobsJobFunctions
+  getCompanyJobsJobFunctions:getCompanyJobsJobFunctions,
+  deactivateJobs: deactivateJobs
 }
