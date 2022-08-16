@@ -9,6 +9,7 @@ const axiosInstance = require('../services/api.service');
 const {findCandidateById, lookupUserIds, createJobFeed, followCompany, findSkillsById, findIndustry, findJobfunction, findUserSkillsById, findByUserId, findCompanyById, searchCompany, searchPopularCompany} = require('../services/api/feed.service.api');
 
 const statusEnum = require('../const/statusEnum');
+const contactType = require('../const/contactType');
 const partyEnum = require('../const/partyEnum');
 const applicationEnum = require('../const/applicationEnum');
 const notificationType = require('../const/notificationType');
@@ -898,7 +899,9 @@ async function applyJobById(currentUserId, jobId, application ) {
           currentParty.educations = null;
           currentParty.primaryEmail = {value: application.email};
           currentParty.primaryPhone = {value: application.phoneNumber};
-          candidate = await candidateService.addCandidate(job.company.companyId, currentParty, true, false);
+          currentParty.emails = [{isPrimary: contactType.MOBILE, value: application.phoneNumber}];
+          currentParty.phoneNumbers = [{contactType: contactType.MOBILE, value: application.phoneNumber}];
+          candidate = await candidateService.addCandidate(null, job.company.companyId, currentParty, true, false);
         } else {
           candidate.status = statusEnum.ACTIVE;
           candidate.email = application.email;

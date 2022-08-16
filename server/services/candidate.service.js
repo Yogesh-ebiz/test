@@ -54,7 +54,9 @@ const candidateSchema = Joi.object({
   skills: Joi.array().optional(),
   experiences: Joi.array().optional(),
   educations: Joi.array().optional(),
-  languages: Joi.array().optional()
+  languages: Joi.array().optional(),
+  emails: Joi.array().optional(),
+  phoneNumbers: Joi.array().optional()
 });
 
 
@@ -62,7 +64,7 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   if(!companyId || !user){
     return;
   }
-
+  
   let firstName = user.firstName?user.firstName:'';
   let lastName = user.lastName?user.lastName:'';
   let middleName = user.middleName?user.middleName:'';
@@ -70,14 +72,18 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   let about = user.about?user.about:'';
   let email = user.email?user.email:(user.primaryEmail && user.primaryEmail.value)?user.primaryEmail.value:'';
   let phone = user.phoneNumber?user.phoneNumber:(user.primaryPhone && user.primaryPhone.value)?user.primaryPhone.value:'';
+  let emails = user.emails;
+  let phoneNumbers = user.phoneNumbers;
   let primaryAddress = user.primaryAddress?{address1: user.primaryAddress.address1, address2: user.primaryAddress.address2, district: user.primaryAddress.district, city: user.primaryAddress.city, state: user.primaryAddress.state, country: user.primaryAddress.country}:null
   let links = user.links?user.links:[];
 
   let candidate = {company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
-    jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone,
+    jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone, emails: emails, phoneNumbers: phoneNumbers,
     primaryAddress: primaryAddress, links: links,
     about: about, gender: gender, marital: user.marital
   }
+
+  // console.log(candidate)
 
   if(user.id){
     candidate.userId = user.id;

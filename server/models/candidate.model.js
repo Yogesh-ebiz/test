@@ -49,8 +49,16 @@ const CandidateSchema = new mongoose.Schema({
     type: String,
     required:false
   },
+  emails: {
+    type: Array,
+    required:false
+  },
   phoneNumber: {
     type: String,
+    required:false
+  },
+  phoneNumbers: {
+    type: Array,
     required:false
   },
   avatar: {
