@@ -54,6 +54,10 @@ const MemberSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isOwner: {
+    type: Boolean,
+    default: false
+  },
   language: {
     type: String,
     required:false

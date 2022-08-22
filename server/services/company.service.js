@@ -112,7 +112,8 @@ async function register(currentParty, form) {
       timezone: currentParty.timezone?currentParty.timezone:'',
       preferTimeFormat: '',
       userId: currentParty.id,
-      role: role._id
+      role: role._id,
+      isOwner: true
     }
 
     member = await memberService.addMember(member);

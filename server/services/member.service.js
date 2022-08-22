@@ -24,7 +24,8 @@ const memberSchema = Joi.object({
   currency: Joi.string().allow('').optional(),
   userId: Joi.number().optional(),
   role: Joi.object().optional(),
-  avatar: Joi.string().optional()
+  avatar: Joi.string().optional(),
+  isOwner: Joi.boolean().optional(),
 });
 
 const subscriptionSchema = Joi.object({

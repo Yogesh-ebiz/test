@@ -64,7 +64,7 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   if(!companyId || !user){
     return;
   }
-  
+
   let firstName = user.firstName?user.firstName:'';
   let lastName = user.lastName?user.lastName:'';
   let middleName = user.middleName?user.middleName:'';
