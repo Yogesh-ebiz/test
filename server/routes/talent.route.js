@@ -1840,7 +1840,7 @@ async function deleteCompanyMember(req, res) {
   let company = parseInt(req.params.id);
   let roleId = req.params.roleId;
 
-  let data = await talentCtrl.deleteCompanyRole(company, roleId, currentUserId);
+  let data = await talentCtrl.deleteCompanyMember(company, roleId, currentUserId);
   res.json(new Response(data, data?'role_deleted_successful':'not_found', res));
 }
 
@@ -1987,9 +1987,9 @@ async function updateCompanyMemberRole(req, res) {
 async function deleteCompanyMember(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let memberId = req.params.memberId;
-
-  let data = await talentCtrl.deleteCompanyMember(company, memberId, currentUserId);
+  let memberId = ObjectID(req.params.memberId);
+  console.log(memberId)
+  let data = await talentCtrl.deleteCompanyMember(company, currentUserId, memberId);
   res.json(new Response(data, data?'member_deleted_successful':'not_found', res));
 }
 

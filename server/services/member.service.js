@@ -288,6 +288,21 @@ async function updateMemberRole(memberId, role) {
 }
 
 
+async function removeMember(memberId) {
+  if(!memberId){
+    return;
+  }
+
+
+  let member = await findById(memberId);
+
+  if(member){
+    member = await member.delete();
+  }
+  return member;
+
+}
+
 
 
 async function followJob(memberId, jobId) {
@@ -682,6 +697,7 @@ module.exports = {
   addMemberFromInvitation:addMemberFromInvitation,
   updateMember:updateMember,
   updateMemberRole:updateMemberRole,
+  removeMember:removeMember,
   followJob: followJob,
   unfollowJob: unfollowJob,
   subscribe:subscribe,

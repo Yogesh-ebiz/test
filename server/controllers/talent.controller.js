@@ -5788,7 +5788,7 @@ async function updateCompanyMemberRole(companyId, memberId, currentUserId, role)
   return result
 }
 
-async function deleteCompanyMember(companyId, memberId, currentUserId) {
+async function deleteCompanyMember(companyId, currentUserId, memberId) {
   if(!companyId || !currentUserId || !memberId){
     return null;
   }
@@ -5801,7 +5801,7 @@ async function deleteCompanyMember(companyId, memberId, currentUserId) {
   let result = null;
 
   try {
-      result = await member.delete();
+      result = await memberService.removeMember(memberId)
       if(result){
         result = {deleted: 1};
       }
