@@ -157,7 +157,7 @@ const convertToCandidate = (user) => {
     firstName: user.firstName,
     middleName: user.middleName,
     lastName: user.lastName,
-    avatar: user.avatar?user.avatar:'',
+    avatar: buildUserUrl(user),
     email: user.email,
     emails: user.emails?user.emails:[],
     phoneNumber: user.phoneNumber,
@@ -346,13 +346,19 @@ const buildCompanyUrl = (company) => {
 }
 
 const buildUserUrl = (user) => {
-  if(user && user.avatar && user.avatar.indexOf('http')>-1){
-    return user.avatar;
+  if(!user){
+    return null;
+  }
+
+  let avatar = user.avatar?user.avatar:user._avatar;
+  if(!avatar){
+    return null;
+  } else if(avatar.indexOf('http')>-1){
+    return avatar;
   }
 
   let id = user.id?user.id:user._id?user.userId:null;
-  let avatar = user.avatar?user.avatar:'';
-  return avatar?config.cdn + '/user/' + id + '/avatar/' + avatar:'';
+  return config.cdn + '/user/' + id + '/avatar/' + avatar;
 }
 
 const buildCandidateUrl = (candidate) => {

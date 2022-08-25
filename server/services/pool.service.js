@@ -76,6 +76,7 @@ async function getPoolCandidates(poolId) {
     { $project:
         {
           _id:'$candidates._id',
+          _avatar: '$candidates._avatar',
           status: '$candidates.status',
           rating: '$candidates.rating',
           level: '$candidates.level',
