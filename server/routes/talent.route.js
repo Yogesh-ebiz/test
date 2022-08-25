@@ -218,6 +218,7 @@ router.route('/company/:id/members/:memberId/notifications/preference').put(asyn
 
 router.route('/company/:id/pools').get(asyncHandler(getCompanyPools));
 router.route('/company/:id/pools').post(asyncHandler(addCompanyPool));
+router.route('/company/:id/pools/:poolId').get(asyncHandler(getCompanyPoolById));
 router.route('/company/:id/pools/:poolId').put(asyncHandler(updateCompanyPool));
 router.route('/company/:id/pools/:poolId').delete(asyncHandler(deleteCompanyPool));
 router.route('/company/:id/pools/:poolId/candidates').get(asyncHandler(getPoolCandidates));
@@ -2051,6 +2052,15 @@ async function getCompanyPools(req, res) {
   res.json(new Response(data, data?'pools_retrieved_successful':'not_found', res));
 }
 
+
+async function getCompanyPoolById(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let poolId = ObjectID(req.params.poolId);
+
+  let data = await talentCtrl.getCompanyPoolById(company, currentUserId, poolId, res.locale);
+  res.json(new Response(data, data?'pool_retrieved_successful':'not_found', res));
+}
 
 async function addCompanyPool(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

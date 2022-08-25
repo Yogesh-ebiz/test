@@ -265,5 +265,6 @@
 	"answer_added_successful": "answer_added_successful",
 	"jobfunction_created_successful": "jobfunction_created_successful",
 	"jobfunction_retrieved_successful": "jobfunction_retrieved_successful",
-	"company_jobs_deactivated_successful": "company_jobs_deactivated_successful"
+	"company_jobs_deactivated_successful": "company_jobs_deactivated_successful",
+	"pool_retrieved_successful": "pool_retrieved_successful"
 }

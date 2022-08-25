@@ -276,6 +276,7 @@ module.exports = {
   updateNotificationPreference,
   searchTasks,
   getCompanyPools,
+  getCompanyPoolById,
   addCompanyPool,
   updateCompanyPool,
   deleteCompanyPool,
@@ -6010,6 +6011,18 @@ async function getCompanyPools(company, currentUserId, query, candidateId, userI
   return result;
 
 }
+
+async function getCompanyPoolById(company, currentUserId, poolId, locale) {
+
+  if(!poolId){
+    return null;
+  }
+
+  let result = await poolService.findPoolBy_Id(poolId);
+  return result;
+
+}
+
 
 async function addCompanyPool(companyId, form, currentUserId) {
   if(!companyId || !form){
