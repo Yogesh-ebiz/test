@@ -33,27 +33,27 @@ function findDepartmentsByCompany(company) {
 }
 
 
-function addDepartment(department) {
+async function add(form) {
   let data = null;
 
-  if(department==null){
+  if(!form){
     return;
   }
 
-  const randomColor = Math.floor(Math.random()*16777215).toString(16);
-  department.background = "#" + randomColor;
-  department = new CompanyDepartment(department).save();
-  return department;
+  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  form.background = form.background?form.background:'#' + Math.floor(Math.random()*16777215).toString(16);
+  data = new CompanyDepartment(form).save();
+  return data;
 
 }
 
 
 async function update(form) {
-  let data = null;
+
   if(!form){
     return;
   }
-  
+
   form = await Joi.validate(form, departmentSchema, { abortEarly: false });
   let department = await CompanyDepartment.findById(form._id);
 
@@ -83,6 +83,6 @@ module.exports = {
   getDepartments:getDepartments,
   findDepartmentsByCompany:findDepartmentsByCompany,
   getDepartmentsByList:getDepartmentsByList,
-  addDepartment:addDepartment,
+  add:add,
   update: update
 }

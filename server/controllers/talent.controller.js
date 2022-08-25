@@ -5006,7 +5006,7 @@ async function getPeopleFlagged(companyId, currentUserId, sort) {
 
 /************************** DEPARTMENTS *****************************/
 async function addCompanyDepartment(companyId, currentUserId, form) {
-  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  // form = await Joi.validate(form, departmentSchema, { abortEarly: false });
   if(!companyId || !currentUserId || !form){
     return null;
   }
@@ -5020,7 +5020,7 @@ async function addCompanyDepartment(companyId, currentUserId, form) {
 
 
   try {
-    result = await addDepartment(form);
+    result = await companyDepartmentService.add(form);
 
   } catch(e){
     console.log('addCompanyDepartment: Error', e);
