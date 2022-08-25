@@ -375,10 +375,11 @@ async function addCompanyDepartment(req, res) {
 async function updateCompanyDepartment(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let departmentId = req.params.departmentId;
+  let departmentId = ObjectID(req.params.departmentId);
   let department = req.body;
   department.company = company;
-  department.createdBy = currentUserId;
+  department._id = departmentId;
+  department.updatedBy = currentUserId;
 
   let data = await companyCtl.updateCompanyDepartment(company, departmentId, currentUserId, department);
   res.json(new Response(data, data?'department_updated_successful':'not_found', res));

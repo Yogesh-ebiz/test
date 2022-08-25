@@ -29,6 +29,7 @@ const salaryReactionService = require('../services/salaryreaction.service');
 const interestService = require('../services/interest.service');
 const benefitService = require('../services/benefit.service');
 const userQuestionService = require('../services/userquestion.service');
+const companyDepartmentService = require('../services/companydepartment.service');
 
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
@@ -104,11 +105,7 @@ const companyReviewReactionSchema = Joi.object({
   reactionType: Joi.string().required()
 });
 
-const departmentSchema = Joi.object({
-  name: Joi.string().required(),
-  company: Joi.number().required(),
-  createdBy: Joi.number().required()
-});
+
 
 const pipelineSchema = Joi.object({
   name: Joi.string().required(),
@@ -949,7 +946,7 @@ async function addCompanyDepartment(company, currentUserId, form) {
 }
 
 async function updateCompanyDepartment(company, departmentId, currentUserId, form) {
-  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  // form = await Joi.validate(form, departmentSchema, { abortEarly: false });
   if(!company || !currentUserId || !departmentId || !form){
     return null;
   }
@@ -961,13 +958,16 @@ async function updateCompanyDepartment(company, departmentId, currentUserId, for
   try {
     if (isPartyActive(currentParty)) {
 
-      let department = await CompanyDepartment.findById(departmentId);
-      if(department){
-        department.name = form.name;
-        department.updatedBy = currentUserId;
-        result = await department.save();
-      }
-
+      // let department = await CompanyDepartment.findById(departmentId);
+      // console.log(department)
+      // if(department){
+      //   department.name = form.name;
+      //   department.updatedBy = currentUserId;
+      //   department.background = form.background;
+      //   result = await department.save();
+      // }
+      console.log(form)
+      result = await companyDepartmentService.update(form);
     }
   } catch(e){
     console.log('updateCompanyDepartment: Error', e);

@@ -1,7 +1,16 @@
 const _ = require('lodash');
+const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const CompanyDepartment = require('../models/companydepartment.model');
 
+const departmentSchema = Joi.object({
+  _id: Joi.object().optional(),
+  name: Joi.string().required(),
+  company: Joi.number().required(),
+  background: Joi.string().allow('').optional(),
+  createdBy: Joi.number().optional(),
+  updatedBy: Joi.number().optional()
+});
 
 function getDepartments(company, query) {
   let data = null;
@@ -38,6 +47,26 @@ function addDepartment(department) {
 
 }
 
+
+async function update(form) {
+  let data = null;
+  if(!form){
+    return;
+  }
+  
+  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  let department = await CompanyDepartment.findById(form._id);
+
+  if(department){
+    department.name = form.name;
+    department.background = form.background;
+    department.updatedBy = form.updatedBy;
+    department = await department.save();
+  }
+  return department;
+
+}
+
 function getDepartmentsByList(departments) {
   let data = null;
 
@@ -54,5 +83,6 @@ module.exports = {
   getDepartments:getDepartments,
   findDepartmentsByCompany:findDepartmentsByCompany,
   getDepartmentsByList:getDepartmentsByList,
-  addDepartment:addDepartment
+  addDepartment:addDepartment,
+  update: update
 }

@@ -80,7 +80,7 @@ const checkoutService = require('../services/checkout.service');
 const paymentProvider = require('../services/api/payment.service.api');
 const calendarService = require('../services/api/calendar.service.api');
 const parserService = require('../services/api/sovren.service.api');
-
+const companyDepartmentService = require('../services/companydepartment.service');
 
 const {findCurrencyRate} = require('../services/currency.service');
 
@@ -5031,7 +5031,7 @@ async function addCompanyDepartment(companyId, currentUserId, form) {
 }
 
 async function updateCompanyDepartment(companyId, departmentId, currentUserId, form) {
-  form = await Joi.validate(form, departmentSchema, { abortEarly: false });
+  // form = await Joi.validate(form, departmentSchema, { abortEarly: false });
   if(!companyId || !currentUserId || !departmentId || !form){
     return null;
   }
@@ -5046,12 +5046,14 @@ async function updateCompanyDepartment(companyId, departmentId, currentUserId, f
 
   try {
 
-    let department = await Department.findById(departmentId);
-    if(department){
-      department.name = form.name;
-      department.updatedBy = currentUserId;
-      result = await department.save();
-    }
+    // let department = await Department.findById(departmentId);
+    // if(department){
+    //   department.name = form.name;
+    //   department.updatedBy = currentUserId;
+    //   department.background = form.background;
+    //   result = await department.save();
+    // }
+    result = await companyDepartmentService.update(form);
 
   } catch(e){
     console.log('updateCompanyDepartment: Error', e);
