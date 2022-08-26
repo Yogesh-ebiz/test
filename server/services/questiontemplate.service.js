@@ -36,24 +36,15 @@ function getQuestionTemplates(company, query) {
 }
 
 
-// async function addQuestionTemplate(form) {
-//   let data = null;
-//
-//   if(form==null){
-//     return;
-//   }
-//
-//   form = await Joi.validate(form, questionTemplateSchema, { abortEarly: false });
-//
-//   for (let question of form.questions) {
-//     await Joi.validate(question, questionSchema, { abortEarly: false });
-//   }
-//
-//
-//   let template = new QuestionTemplate(form).save();
-//   return template;
-//
-// }
+async function findById(id) {
+  if(!id){
+    return;
+  }
+
+  const template = await QuestionTemplate.findById(id);
+  return template;
+
+}
 
 async function addQuestionTemplate(form) {
   let data = null;
@@ -175,6 +166,7 @@ async function activate(id, member) {
 }
 
 module.exports = {
+  findById: findById,
   addQuestionTemplate:addQuestionTemplate,
   updateQuestionTemplate:updateQuestionTemplate,
   deleteQuestionTemplate:deleteQuestionTemplate,
