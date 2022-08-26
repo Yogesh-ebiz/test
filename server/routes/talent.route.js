@@ -1853,7 +1853,16 @@ async function getCompanyMembers(req, res) {
   res.json(new Response(data, data?'roles_retrieved_successful':'not_found', res));
 }
 
+/************************** LABELS *****************************/
+async function getLabels(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let query = req.query.query;
+  let types = req.query.type.split(',');
 
+  let data = await talentCtrl.getLabels(query, types, res.locale);
+  res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
+}
 
 async function addCompanyLabel(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -1887,15 +1896,6 @@ async function deleteCompanyLabel(req, res) {
   res.json(new Response(data, data?'label_deleted_successful':'not_found', res));
 }
 
-async function getLabels(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
-  let query = req.query.query;
-  let type = req.query.type;
-
-  let data = await talentCtrl.getLabels(query, type, res.locale);
-  res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
-}
 
 
 

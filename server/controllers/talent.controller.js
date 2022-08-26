@@ -5603,10 +5603,10 @@ async function deleteCompanyLabel(companyId, labelId, currentUserId) {
   return result
 }
 
-async function getLabels(query, type, locale) {
+async function getLabels(query, types, locale) {
 
 
-  let result = await labelService.getLabels(query, type);
+  let result = await labelService.getLabels(query, types);
 
   return result;
 
