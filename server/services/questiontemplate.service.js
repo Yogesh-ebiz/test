@@ -55,6 +55,17 @@ function getQuestionTemplates(company, query) {
 //
 // }
 
+async function findById(id) {
+  if(!id){
+    return;
+  }
+
+  let template = await QuestionTemplate.findById(id).populate('questions');
+  return template;
+
+}
+
+
 async function addQuestionTemplate(form) {
   let data = null;
 
@@ -175,6 +186,7 @@ async function activate(id, member) {
 }
 
 module.exports = {
+  findById:findById,
   addQuestionTemplate:addQuestionTemplate,
   updateQuestionTemplate:updateQuestionTemplate,
   deleteQuestionTemplate:deleteQuestionTemplate,

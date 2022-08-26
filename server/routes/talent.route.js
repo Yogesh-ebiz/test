@@ -169,6 +169,7 @@ router.route('/company/:id/departments').get(asyncHandler(getCompanyDepartments)
 
 
 router.route('/company/:id/questions/templates').post(asyncHandler(addCompanyQuestionTemplate));
+router.route('/company/:id/questions/templates/:questionTemplateId').get(asyncHandler(getCompanyQuestionTemplate));
 router.route('/company/:id/questions/templates/:questionTemplateId').put(asyncHandler(updateCompanyQuestionTemplate));
 router.route('/company/:id/questions/templates/:questionTemplateId').delete(asyncHandler(deleteCompanyQuestionTemplate));
 router.route('/company/:id/questions/templates/:questionTemplateId/disable').post(asyncHandler(deactivateCompanyQuestionTemplate));
@@ -1629,6 +1630,15 @@ async function addCompanyQuestionTemplate(req, res) {
 
   let data = await talentCtrl.addCompanyQuestionTemplate(company, currentUserId, question);
   res.json(new Response(data, data?'question_added_successful':'not_found', res));
+}
+
+async function getCompanyQuestionTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let questionTemplateId = ObjectID(req.params.questionTemplateId);
+
+  let data = await talentCtrl.getCompanyQuestionTemplate(company, questionTemplateId, currentUserId);
+  res.json(new Response(data, data?'question_retrieved_successful':'not_found', res));
 }
 
 async function updateCompanyQuestionTemplate(req, res) {

@@ -239,6 +239,7 @@ module.exports = {
   deleteCompanyDepartment,
   getCompanyDepartments,
   addCompanyQuestionTemplate,
+  getCompanyQuestionTemplate,
   updateCompanyQuestionTemplate,
   deleteCompanyQuestionTemplate,
   deactivateCompanyQuestionTemplate,
@@ -5130,6 +5131,30 @@ async function addCompanyQuestionTemplate(companyId, currentUserId, form) {
 
   } catch(e){
     console.log('addCompanyQuestionTemplate: Error', e);
+  }
+
+
+  return result
+}
+
+
+async function getCompanyQuestionTemplate(companyId, questionId, currentUserId) {
+  if(!companyId || !currentUserId || !questionId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = null;
+
+  try {
+    result = await questionTemplateService.findById(questionId);
+
+  } catch(e){
+    console.log('getCompanyQuestionTemplate: Error', e);
   }
 
 
