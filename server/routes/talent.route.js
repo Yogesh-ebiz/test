@@ -1632,7 +1632,6 @@ async function addCompanyQuestionTemplate(req, res) {
   res.json(new Response(data, data?'question_added_successful':'not_found', res));
 }
 
-
 async function getCompanyQuestionTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -1641,6 +1640,7 @@ async function getCompanyQuestionTemplate(req, res) {
   let data = await talentCtrl.getCompanyQuestionTemplate(company, questionTemplateId, currentUserId);
   res.json(new Response(data, data?'question_retrieved_successful':'not_found', res));
 }
+
 async function updateCompanyQuestionTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
