@@ -20,11 +20,13 @@ const questionSchema = Joi.object({
 });
 
 const evaluationTemplateSchema = Joi.object({
+  _id: Joi.string().optional(),
   name: Joi.string().required(),
   questions: Joi.array().required(),
   company: Joi.object().optional(),
   createdBy: Joi.number().optional(),
-  updatedBy: Joi.number().optional()
+  updatedBy: Joi.number().optional(),
+  status: Joi.string().optional()
 });
 
 

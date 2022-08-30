@@ -1810,7 +1810,6 @@ async function enableCompanyRole(req, res) {
   let data = await talentCtrl.enableCompanyRole(company, currentUserId, roleId);
   res.json(new Response(data, data?'role_updated_successful':'not_found', res));
 }
-
 async function getCompanyRoles(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -2329,7 +2328,7 @@ async function updateCompanyEvaluationTemplate(req, res) {
   let company = parseInt(req.params.id);
   let templateId = req.params.templateId;
   let template = req.body;
-
+  template.company = ObjectID(template.company);
   let data = await talentCtrl.updateCompanyEvaluationTemplate(company, templateId, currentUserId, template);
   res.json(new Response(data, data?'evaluation_updated_successful':'not_found', res));
 }

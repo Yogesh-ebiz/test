@@ -18,11 +18,13 @@ const questionSchema = Joi.object({
 });
 
 const questionTemplateSchema = Joi.object({
+  _id: Joi.string().optional(),
   name: Joi.string().required(),
   questions: Joi.array().required(),
   company: Joi.number().required(),
   createdBy: Joi.number().optional(),
-  updatedBy: Joi.number().optional()
+  updatedBy: Joi.number().optional(),
+  status: Joi.string().optional()
 });
 
 function getQuestionTemplates(company, query) {
@@ -109,6 +111,7 @@ async function updateQuestionTemplate(id, form) {
           found.hint = question.hint;
           found.noMaxSelection = question.noMaxSelection;
           found.options = question.options;
+          found.status = question.status?question.status:found.status;
           question = await found.save();
         }
 
