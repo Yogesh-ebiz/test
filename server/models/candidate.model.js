@@ -51,6 +51,11 @@ const CandidateSchema = new mongoose.Schema({
   },
   emails: {
     type: Array,
+    required:false,
+    default: []
+  },
+  primaryEmail: {
+    type: Object,
     required:false
   },
   phoneNumber: {
@@ -59,6 +64,11 @@ const CandidateSchema = new mongoose.Schema({
   },
   phoneNumbers: {
     type: Array,
+    required:false,
+    default: []
+  },
+  primaryPhone: {
+    type: Object,
     required:false
   },
   avatar: {
