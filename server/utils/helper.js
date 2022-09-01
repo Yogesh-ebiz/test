@@ -145,7 +145,7 @@ const convertToCandidate = (user) => {
   }
 
   let match = Math.random() * (100 - 30) + 30;
-  
+
   let primaryPhone, primaryEmail;
   if(user.phoneNumbers){
     primaryPhone =_.find(user.phoneNumbers, {isPrimary: true}) || user.phoneNumbers[0];

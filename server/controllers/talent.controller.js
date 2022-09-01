@@ -3863,7 +3863,9 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
     candidate.firstName = form.firstName;
     candidate.lastName = form.lastName;
     candidate.email = form.email;
+    candidate.emails = form.emails;
     candidate.phoneNumber = form.phoneNumber;
+    candidate.phoneNumbers = form.phoneNumbers;
     candidate.about = form.about;
     candidate.gender = form.gender;
     candidate.maritalStatus = form.maritalStatus;
