@@ -4699,7 +4699,6 @@ async function updateCandidateNote(companyId, currentUserId, candidateId, noteId
 /************************** CANDIDATE TAGS *****************************/
 
 async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
-
   if(!companyId || !currentUserId || !candidateId || !tags){
     return null;
   }
@@ -4709,10 +4708,9 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
     return null;
   }
 
-  let result;
+  let result=[];
   try {
     let candidate = await candidateService.findById(candidateId);
-
 
     if(candidate) {
       for(index in tags){
@@ -4721,6 +4719,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
           newLabel = await labelService.addLabel(newLabel);
           if(newLabel){
             tags[index]._id = newLabel._id;
+            result.push(newLabel);
           }
         }
       };
@@ -4731,7 +4730,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
       }, []);
 
       candidate.tags = tagIds;
-      result = await candidate.save();
+      await candidate.save();
 
     }
 
@@ -4739,6 +4738,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
     console.log(error);
   }
 
+  console.log(result)
   return result;
 }
 
