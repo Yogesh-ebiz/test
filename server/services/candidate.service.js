@@ -83,7 +83,7 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
     about: about, gender: gender, marital: user.marital
   }
 
-  // console.log(candidate)
+  console.log(candidate)
 
   if(user.id){
     candidate.userId = user.id;
@@ -368,6 +368,7 @@ async function search(filter, sort) {
   let aMatch = { $match: new CandidateParam(filter)};
   let aSort = { $sort: {createdDate: direction} };
   aList.push(aMatch);
+  console.log(aMatch)
 
   // aList.push({$match: {status: statusEnum.ACTIVE}});
   // aList.push(
