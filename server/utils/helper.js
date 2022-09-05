@@ -155,6 +155,7 @@ const convertToCandidate = (user) => {
     primaryEmail =_.find(user.emails, {isPrimary: true}) || user.emails[0];
   }
 
+  console.log(user.sources)
   return {
     id: user.id?user.id:user._id,
     userId: user.userId?user.userId:null,

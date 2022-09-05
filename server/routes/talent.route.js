@@ -191,11 +191,10 @@ router.route('/company/:id/roles/:roleId').delete(asyncHandler(deleteCompanyRole
 router.route('/company/:id/roles/:roleId/disable').post(asyncHandler(disableCompanyRole));
 router.route('/company/:id/roles/:roleId/enable').post(asyncHandler(enableCompanyRole));
 
-
+router.route('/company/:id/labels').get(asyncHandler(getCompanyLabels));
 router.route('/company/:id/labels').post(asyncHandler(addCompanyLabel));
 router.route('/company/:id/labels/:labelId').put(asyncHandler(updateCompanyLabel));
 router.route('/company/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLabel));
-router.route('/company/:id/labels').get(asyncHandler(getLabels));
 
 router.route('/company/:id/members/invites').post(asyncHandler(inviteMembers));
 router.route('/company/:id/members/invites').get(asyncHandler(getCompanyMemberInvitations));
@@ -1186,6 +1185,8 @@ async function searchCandidates(req, res) {
   let filter = {...req.body, company: [company]};
   let sort = req.query;
   filter.query = req.query.query;
+  filter.tags = _.reduce(filter.tags, function(res, item){res.push(ObjectID(item)); return res;}, []);
+  filter.sources = _.reduce(filter.sources, function(res, item){res.push(ObjectID(item)); return res;}, []);
   let data = await talentCtrl.searchCandidates(currentUserId, company, filter, sort, res.locale);
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
@@ -1863,13 +1864,13 @@ async function getCompanyMembers(req, res) {
 }
 
 /************************** LABELS *****************************/
-async function getLabels(req, res) {
+async function getCompanyLabels(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let query = req.query.query;
   let types = req.query.type.split(',');
 
-  let data = await talentCtrl.getLabels(query, types, res.locale);
+  let data = await talentCtrl.getCompanyLabels(company, query, types, res.locale);
   res.json(new Response(data, data?'labels_retrieved_successful':'not_found', res));
 }
 

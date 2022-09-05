@@ -10,12 +10,7 @@ function CandidateParam(filter) {
 
 
 
-  if(filter.hasApplied) {
-    this.query.hasApplied = true;
-  } else {
-    this.query.hasApplied = false;
-  }
-
+  this.query.hasApplied = (filter.hasApplied)?true:false;
 
   // this.query.hasApplied =  filter.hasApplied?true:false;
   // this.query.hasImported =  filter.hasImported?true:false;
@@ -75,15 +70,15 @@ function CandidateParam(filter) {
   }
 
   if (filter.city && filter.city.length) {
-    this.query.city =  { $in: filter.city};
+    this.query['primaryAddress.city'] =  { $in: filter.city};
   }
 
   if (filter.state && filter.state.length) {
-    this.query.state =  { $in: filter.state};
+    this.query['primaaryAddress.state'] =  { $in: filter.state};
   }
 
   if (filter.country && filter.country.length) {
-    this.query.country =  { $in: filter.country};
+    this.query['primaryAddress.country'] =  { $in: filter.country};
   }
 
 

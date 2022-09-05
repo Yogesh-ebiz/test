@@ -28,6 +28,8 @@ const emailCampaignServiceStage = require('../services/emailcampaignstage.servic
 const applicationService = require('../services/application.service');
 const jobviewService = require('../services/jobview.service');
 const jobfunctionService = require('../services/jobfunction.service');
+const labelService = require('../services/label.service');
+
 
 const {getListofSkills} = require('../services/skill.service');
 const {findApplicationByUserIdAndJobId, findByApplicationId, applyJob, findAppliedCountByJobId} = require('../services/application.service');
@@ -887,7 +889,7 @@ async function applyJobById(currentUserId, jobId, application ) {
 
         let exists = await applicationService.findApplicationByEmailAndJobId(application.email, job._id);
         if (exists) {
-          throw new ApplicationExist(500, `User already applied`);
+          throw new Error(`User already applied`);
 
         }
 
@@ -901,6 +903,15 @@ async function applyJobById(currentUserId, jobId, application ) {
           currentParty.primaryPhone = {value: application.phoneNumber};
           currentParty.emails = [{isPrimary: contactType.MOBILE, value: application.phoneNumber}];
           currentParty.phoneNumbers = [{contactType: contactType.MOBILE, value: application.phoneNumber}];
+
+          let source;
+          if(application.source){
+            source = await labelService.findOneBy({name: application.source, type:'SOURCE', company:job.companyId});
+          } else {
+            source = await labelService.findOneBy({name:'Accessed', type:'SOURCE', default:true});
+          }
+
+          currentParty.sources = [source?._id];
           candidate = await candidateService.addCandidate(null, job.company.companyId, currentParty, true, false);
         } else {
           candidate.status = statusEnum.ACTIVE;

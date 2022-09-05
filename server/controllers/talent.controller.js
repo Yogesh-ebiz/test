@@ -259,7 +259,7 @@ module.exports = {
   disableCompanyRole,
   enableCompanyRole,
   addCompanyLabel,
-  getLabels,
+  getCompanyLabels,
   updateCompanyLabel,
   deleteCompanyLabel,
   inviteMembers,
@@ -3713,6 +3713,16 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
       }
     }
 
+    const applications = [];
+    for (let application of candidate.applications) {
+      application.currentProgress.stage = _.pick(application.currentProgress.stage, ['name', 'type', 'createdAt', 'updatedAt']);
+      application.currentProgress = _.pick(application.currentProgress, ['_id', 'stage']);
+      application = _.pick(application, ['_id', 'jobTitle', 'currentProgress']);
+
+      applications.push(application);
+    }
+    candidate.applications = applications;
+
     let found = _.find(people, {id: candidate.userId});
     if(found)
     {
@@ -5629,10 +5639,10 @@ async function deleteCompanyLabel(companyId, labelId, currentUserId) {
   return result
 }
 
-async function getLabels(query, types, locale) {
+async function getCompanyLabels(companyId, query, types, locale) {
 
 
-  let result = await labelService.getLabels(query, types);
+  let result = await labelService.getLabelByCompany(companyId, query, types);
 
   return result;
 

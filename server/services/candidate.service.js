@@ -56,7 +56,8 @@ const candidateSchema = Joi.object({
   educations: Joi.array().optional(),
   languages: Joi.array().optional(),
   emails: Joi.array().optional(),
-  phoneNumbers: Joi.array().optional()
+  phoneNumbers: Joi.array().optional(),
+  sources: Joi.array().optional()
 });
 
 
@@ -80,7 +81,7 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   let candidate = {company: companyId, firstName: firstName, middleName: middleName, lastName: lastName,
     jobTitle: user.jobTitle?user.jobTitle:'', email: email, phoneNumber: phone, emails: emails, phoneNumbers: phoneNumbers,
     primaryAddress: primaryAddress, links: links,
-    about: about, gender: gender, marital: user.marital
+    about: about, gender: gender, marital: user.marital, sources: user.sources
   }
 
   console.log(candidate)
@@ -362,6 +363,8 @@ async function search(filter, sort) {
     limit: limit,
   };
 
+  const {stages, sources} = filter;
+
   filter.status = filter.status?filter.status:[statusEnum.ACTIVE];
   let aList = [];
   let aLookup = [];
@@ -371,36 +374,62 @@ async function search(filter, sort) {
   console.log(aMatch)
 
   // aList.push({$match: {status: statusEnum.ACTIVE}});
-  // aList.push(
-  //   {$lookup:{
-  //       from:"applications",
-  //       let:{user:"$_id"},
-  //       pipeline:[
-  //         {$match:{$expr:{$eq:["$user","$$user"]}}},
-  //         {$lookup:{
-  //             from:"applicationprogresses",
-  //             let:{currentProgress:"$currentProgress"},
-  //             pipeline:[
-  //               {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-  //               {$lookup:{
-  //                   from:"stages",
-  //                   let:{stage:"$stage"},
-  //                   pipeline:[
-  //                     {$match:{$expr:{$eq:["$_id","$$stage"]}}},
-  //
-  //                   ],
-  //                   as: 'stage'
-  //                 }},
-  //               { $unwind: '$stage'}
-  //             ],
-  //             as: 'currentProgress'
-  //           }
-  //         },
-  //         { $unwind: '$currentProgress'}
-  //       ],
-  //       as: 'applications'
-  //     },
-  //   })
+  aList.push(
+    {$lookup:{
+        from:"applications",
+        let:{user:"$_id"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$user","$$user"]}}},
+          {$lookup:{
+              from:"applicationprogresses",
+              let:{currentProgress:"$currentProgress"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
+                {$lookup:{
+                    from:"stages",
+                    let:{stage:"$stage"},
+                    pipeline:[
+                      {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+
+                    ],
+                    as: 'stage'
+                  }},
+                { $unwind: '$stage'}
+              ],
+              as: 'currentProgress'
+            }
+          },
+          { $unwind: '$currentProgress'}
+        ],
+        as: 'applications'
+      },
+    }
+  );
+
+  if(stages.length){
+    aList.push(
+      { $match: {'applications.currentProgress.stage.type': {$in: stages}} }
+    );
+  }
+
+  if(sources.length) {
+    aList.push(
+      {
+        $lookup: {
+          from: 'labels',
+          localField: 'sources',
+          foreignField: '_id',
+          as: 'sources',
+        },
+      }
+    );
+    aList.push(
+      { $match: {'sources._id': {$in: sources}} }
+    );
+    console.log(sources)
+  }
+
+
   //
   //   if(filter.job) {
   //     aList.push({$match: {'applications.job': ObjectID(filter.job)}})

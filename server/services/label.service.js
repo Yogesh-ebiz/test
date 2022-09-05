@@ -17,19 +17,26 @@ function findById(labelId) {
 }
 
 
+async function findOneBy(params) {
+  let data = null;
+  return await Label.findOne(params);
+}
+
+
+
 async function getLabels(query, types) {
   let data = null;
 
 
   let match = {name: { $regex: query, $options: "si" }};
 
-  console.log(types)
   if(types){
     match.type = {$in: types};
   }
 
   return Label.find(match);
 }
+
 
 
 function addLabel(label) {
@@ -45,9 +52,25 @@ function addLabel(label) {
 }
 
 
+async function getLabelByCompany(company, query, types) {
+  let data = null;
+
+
+  let match = {name: { $regex: query, $options: "si" }, $or: [{company: company}, {default: true}]};
+
+  if(types){
+    match.type = {$in: types};
+  }
+
+  console.log(match)
+  return Label.find(match);
+}
+
 
 module.exports = {
-  findById:findById,
-  getLabels:getLabels,
-  addLabel:addLabel
+  findById,
+  findOneBy,
+  getLabels,
+  addLabel,
+  getLabelByCompany
 }
