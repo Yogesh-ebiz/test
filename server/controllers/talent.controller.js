@@ -260,7 +260,7 @@ module.exports = {
   disableCompanyRole,
   enableCompanyRole,
   addCompanyLabel,
-  getLabels,
+  getCompanyLabels,
   updateCompanyLabel,
   deleteCompanyLabel,
   inviteMembers,
@@ -3714,6 +3714,16 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
       }
     }
 
+    const applications = [];
+    for (let application of candidate.applications) {
+      application.currentProgress.stage = _.pick(application.currentProgress.stage, ['name', 'type', 'createdAt', 'updatedAt']);
+      application.currentProgress = _.pick(application.currentProgress, ['_id', 'stage']);
+      application = _.pick(application, ['_id', 'jobTitle', 'currentProgress']);
+
+      applications.push(application);
+    }
+    candidate.applications = applications;
+
     let found = _.find(people, {id: candidate.userId});
     if(found)
     {
@@ -3864,7 +3874,9 @@ async function updateCandidateById(currentUserId, companyId, candidateId, form) 
     candidate.firstName = form.firstName;
     candidate.lastName = form.lastName;
     candidate.email = form.email;
+    candidate.emails = form.emails;
     candidate.phoneNumber = form.phoneNumber;
+    candidate.phoneNumbers = form.phoneNumbers;
     candidate.about = form.about;
     candidate.gender = form.gender;
     candidate.maritalStatus = form.maritalStatus;
@@ -4698,7 +4710,6 @@ async function updateCandidateNote(companyId, currentUserId, candidateId, noteId
 /************************** CANDIDATE TAGS *****************************/
 
 async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
-
   if(!companyId || !currentUserId || !candidateId || !tags){
     return null;
   }
@@ -4708,10 +4719,9 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
     return null;
   }
 
-  let result;
+  let result=[];
   try {
     let candidate = await candidateService.findById(candidateId);
-
 
     if(candidate) {
       for(index in tags){
@@ -4720,6 +4730,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
           newLabel = await labelService.addLabel(newLabel);
           if(newLabel){
             tags[index]._id = newLabel._id;
+            result.push(newLabel);
           }
         }
       };
@@ -4730,7 +4741,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
       }, []);
 
       candidate.tags = tagIds;
-      result = await candidate.save();
+      await candidate.save();
 
     }
 
@@ -4738,6 +4749,7 @@ async function addCandidateTag(companyId, currentUserId, candidateId, tags) {
     console.log(error);
   }
 
+  console.log(result)
   return result;
 }
 
@@ -5664,10 +5676,10 @@ async function deleteCompanyLabel(companyId, labelId, currentUserId) {
   return result
 }
 
-async function getLabels(query, types, locale) {
+async function getCompanyLabels(companyId, query, types, locale) {
 
 
-  let result = await labelService.getLabels(query, types);
+  let result = await labelService.getLabelByCompany(companyId, query, types);
 
   return result;
 

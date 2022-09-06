@@ -11,6 +11,10 @@ const LabelSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  default: {
+    type: Boolean,
+    default: false
+  },
   company: {
     type: Object,
     required: true

@@ -17,7 +17,7 @@ const CandidateSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  createdBy: { type: Schema.Types.ObjectId, ref: 'Member' },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'Member', required: false },
   status: {
     type: String,
     default: statusEnum.ACTIVE
@@ -51,6 +51,11 @@ const CandidateSchema = new mongoose.Schema({
   },
   emails: {
     type: Array,
+    required:false,
+    default: []
+  },
+  primaryEmail: {
+    type: Object,
     required:false
   },
   phoneNumber: {
@@ -59,6 +64,11 @@ const CandidateSchema = new mongoose.Schema({
   },
   phoneNumbers: {
     type: Array,
+    required:false,
+    default: []
+  },
+  primaryPhone: {
+    type: Object,
     required:false
   },
   avatar: {

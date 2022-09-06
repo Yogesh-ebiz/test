@@ -144,8 +144,18 @@ const convertToCandidate = (user) => {
     past.employer = convertToCompany(past.employer);
   }
 
-  let match = Math.random() * (100 - 30) + 30;;
+  let match = Math.random() * (100 - 30) + 30;
 
+  let primaryPhone, primaryEmail;
+  if(user.phoneNumbers){
+    primaryPhone =_.find(user.phoneNumbers, {isPrimary: true}) || user.phoneNumbers[0];
+  }
+
+  if(user.emails){
+    primaryEmail =_.find(user.emails, {isPrimary: true}) || user.emails[0];
+  }
+
+  console.log(user.sources)
   return {
     id: user.id?user.id:user._id,
     userId: user.userId?user.userId:null,
@@ -162,6 +172,8 @@ const convertToCandidate = (user) => {
     emails: user.emails?user.emails:[],
     phoneNumber: user.phoneNumber,
     phoneNumbers: user.phoneNumbers?user.phoneNumbers:[],
+    primaryPhone: primaryPhone,
+    primaryEmail: primaryEmail,
     primaryAddress: user.primaryAddress?user.primaryAddress:null,
     isOnline: user.isOnline,
     partyType: user.partyType?user.partyType:'',
