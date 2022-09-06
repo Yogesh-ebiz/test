@@ -129,7 +129,8 @@ router.route('/company/:id/candidates/:candidateId/notes').post(asyncHandler(add
 router.route('/company/:id/candidates/:candidateId/notes/:noteId').delete(asyncHandler(removeCandidateNote));
 router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
 router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
-router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSource));
+router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSources));
+router.route('/company/:id/candidates/:candidateId/sources/add').post(asyncHandler(addCandidateSource));
 router.route('/company/:id/candidates/:candidateId/sources/:sourceId').delete(asyncHandler(removeCandidateSource));
 router.route('/company/:id/candidates/:candidateId/pools').post(asyncHandler(updateCandidatePool));
 router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getCandidateEvaluations));
@@ -1288,13 +1289,25 @@ async function removeCandidateTag(req, res) {
 
 
 
-async function addCandidateSource(req, res) {
+async function addCandidateSources(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
   let candidateId = ObjectID(req.params.candidateId);
   let sources = req.body.sources;
 
-  let data = await talentCtrl.addCandidateSource(companyId, currentUserId, candidateId, sources);
+  let data = await talentCtrl.addCandidateSources(companyId, currentUserId, candidateId, sources);
+
+  res.json(new Response(data, data?'tag_added_successful':'not_found', res));
+}
+
+
+async function addCandidateSource(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let candidateId = ObjectID(req.params.candidateId);
+  let source = ObjectID(req.body.source);
+
+  let data = await talentCtrl.addCandidateSource(companyId, currentUserId, candidateId, source);
 
   res.json(new Response(data, data?'tag_added_successful':'not_found', res));
 }

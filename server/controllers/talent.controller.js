@@ -230,6 +230,7 @@ module.exports = {
   addCandidateTag,
   removeCandidateTag,
   addCandidateSource,
+  addCandidateSources,
   removeCandidateSource,
   updateCandidatePool,
   updatePeoplePool,
@@ -4773,8 +4774,8 @@ async function removeCandidateTag(companyId, currentUserId, candidateId, tagId) 
 
 /************************** CANDIDATE SOURCE *****************************/
 
-async function addCandidateSource(companyId, currentUserId, userId, sources) {
-  if(!companyId || !currentUserId || !userId || !sources){
+async function addCandidateSource(companyId, currentUserId, userId, newSource) {
+  if(!companyId || !currentUserId || !userId || !newSource){
     return null;
   }
 
@@ -4785,26 +4786,62 @@ async function addCandidateSource(companyId, currentUserId, userId, sources) {
 
   let result;
   try {
-    let candidate = await candidateService.findById(userId, companyId);
-
-
+    let candidate = await candidateService.findById(userId);
     if(candidate) {
-      for(index in sources){
-        if(!sources[index]._id){
-          let newLabel = {name: sources[index].name, type: 'SOURCE', company: companyId, createdBy: currentUserId  };
+      if(!_.some(candidate.sources, {_id: newSource})){
+        const source = await labelService.findById(newSource);
+        if(source){
+          candidate.sources.push(source._id);
+          await candidate.save();
+          result = source;
+        }
+
+      }
+
+
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+
+async function addCandidateSources(companyId, currentUserId, userId, sourceList) {
+  if(!companyId || !currentUserId || !userId || !sourceList){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let candidate = await candidateService.findById(userId);
+    const sources = [];
+    if(candidate) {
+      for(index in sourceList){
+        if(!sourceList[index]._id){
+          let newLabel = {name: sourceList[index].name, type: 'SOURCE', company: companyId, createdBy: currentUserId  };
           newLabel = await labelService.addLabel(newLabel);
           if(newLabel){
-            sources[index]._id = newLabel._id;
+            sources.push(newLabel._id);
           }
+        } else {
+          sources.push(sourceList[index]);
         }
       };
 
-      let sourceIds = _.reduce(sources, function(res, source){
-        res.push(source._id);
-        return res;
-      }, []);
+      // let sourceIds = _.reduce(sources, function(res, source){
+      //   res.push(source._id);
+      //   return res;
+      // }, []);
 
-      candidate.sources = sourceIds;
+      candidate.sources = sources;
       result = await candidate.save();
 
     }

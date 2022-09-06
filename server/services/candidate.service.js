@@ -228,7 +228,7 @@ function findById(id) {
     return;
   }
 
-  return Candidate.findOne({_id: id, status: statusEnum.ACTIVE});
+  return Candidate.findById(id);
 }
 
 

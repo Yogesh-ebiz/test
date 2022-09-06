@@ -5,14 +5,12 @@ const Label = require('../models/label.model');
 
 
 function findById(labelId) {
-  let data = null;
 
-  if(labelId==null){
+if(!labelId){
     return;
   }
 
-  data = Label.findById(labelId);
-  return data;
+  return Label.findById(labelId);
 
 }
 
