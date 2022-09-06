@@ -127,26 +127,34 @@ router.route('/company/:id/candidates/:candidateId').delete(asyncHandler(removeC
 router.route('/company/:id/candidates/:candidateId/notes').get(asyncHandler(getCandidateNotes));
 router.route('/company/:id/candidates/:candidateId/notes').post(asyncHandler(addCandidateNote));
 router.route('/company/:id/candidates/:candidateId/notes/:noteId').delete(asyncHandler(removeCandidateNote));
+
 router.route('/company/:id/candidates/:candidateId/tags').post(asyncHandler(addCandidateTag));
 router.route('/company/:id/candidates/:candidateId/tags/:tagId').delete(asyncHandler(removeCandidateTag));
+
 router.route('/company/:id/candidates/:candidateId/sources').post(asyncHandler(addCandidateSources));
 router.route('/company/:id/candidates/:candidateId/sources/add').post(asyncHandler(addCandidateSource));
 router.route('/company/:id/candidates/:candidateId/sources/:sourceId').delete(asyncHandler(removeCandidateSource));
 router.route('/company/:id/candidates/:candidateId/pools').post(asyncHandler(updateCandidatePool));
+
 router.route('/company/:id/candidates/:candidateId/evaluations').post(asyncHandler(getCandidateEvaluations));
 router.route('/company/:id/candidates/:candidateId/evaluations/stats').post(asyncHandler(getCandidateEvaluationsStats));
 router.route('/company/:id/candidates/:candidateId/evaluations/:evaluationId').get(asyncHandler(getCandidateEvaluationById));
+
 router.route('/company/:id/candidates/:candidateId/similar').get(asyncHandler(getCandidatesSimilar));
 router.route('/company/:id/candidates/:candidateId/activities').get(asyncHandler(getCandidateActivities));
 
 router.route('/company/:id/candidates/:candidateId/experiences').post(asyncHandler(addCandidateExperience));
 router.route('/company/:id/candidates/:candidateId/experiences').get(asyncHandler(getCandidateExperiences));
 router.route('/company/:id/candidates/:candidateId/experiences/:experienceId').delete(asyncHandler(removeCandidateExperience));
+
 router.route('/company/:id/candidates/:candidateId/educations').post(asyncHandler(addCandidateEducation));
 router.route('/company/:id/candidates/:candidateId/educations').get(asyncHandler(getCandidateEducations));
 router.route('/company/:id/candidates/:candidateId/educations/:educationId').delete(asyncHandler(removeCandidateEducation));
-router.route('/company/:id/candidates/:candidateId/skills').post(asyncHandler(addCandidateSkills));
+
 router.route('/company/:id/candidates/:candidateId/skills').get(asyncHandler(getCandidateSkills));
+router.route('/company/:id/candidates/:candidateId/skills').post(asyncHandler(addCandidateSkills));
+router.route('/company/:id/candidates/:candidateId/skills/:skillId').post(asyncHandler(removeCandidateSkill));
+
 router.route('/company/:id/candidates/:candidateId/accomplishments').get(asyncHandler(getCandidateAccomplishments));
 router.route('/company/:id/candidates/:candidateId/languages').post(asyncHandler(addCandidateLanguages));
 
@@ -1445,6 +1453,16 @@ async function removeCandidateEducation(req, res) {
   res.json(new Response(data, data?'educations_deleted_successful':'not_found', res));
 }
 
+
+async function getCandidateSkills(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let candidateId = ObjectID(req.params.candidateId);
+
+  let data = await talentCtrl.getCandidateSkills(company, currentUserId, candidateId);
+  res.json(new Response(data, data?'skills_retrieved_successful':'not_found', res));
+}
+
 async function addCandidateSkills(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
@@ -1462,16 +1480,16 @@ async function addCandidateSkills(req, res) {
   res.json(new Response(data, data?'skills_added_successful':'not_found', res));
 }
 
-
-async function getCandidateSkills(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let company = parseInt(req.params.id);
+async function removeCandidateSkill(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
   let candidateId = ObjectID(req.params.candidateId);
+  let skillId = req.params.skillId;
 
-  let data = await talentCtrl.getCandidateSkills(company, currentUserId, candidateId);
-  res.json(new Response(data, data?'skills_retrieved_successful':'not_found', res));
+  let data = await talentCtrl.removeCandidateSkill(companyId, currentUserId, candidateId, sourceId);
+
+  res.json(new Response(data, data?'skill_removed_successful':'not_found', res));
 }
-
 
 async function getCandidateAccomplishments(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
@@ -1500,7 +1518,7 @@ async function addCandidateLanguages(req, res) {
   let form = req.body;
 
   let data = await talentCtrl.addCandidateLanguages(company, currentUserId, candidateId, form);
-  res.json(new Response(data, data?'skills_added_successful':'not_found', res));
+  res.json(new Response(data, data?'languages_added_successful':'not_found', res));
 }
 
 

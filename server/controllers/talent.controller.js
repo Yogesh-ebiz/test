@@ -213,8 +213,9 @@ module.exports = {
   addCandidateEducation,
   getCandidateEducations,
   removeCandidateEducation,
-  addCandidateSkills,
   getCandidateSkills,
+  addCandidateSkills,
+  removeCandidateSkill,
   getCandidateAccomplishments,
   addCandidateLanguages,
   uploadAvatar,
@@ -4224,23 +4225,6 @@ async function removeCandidateEducation(companyId, currentUserId, candidateId, e
 
 
 
-async function addCandidateSkills(companyId, currentUserId, candidateId, form) {
-  if(!companyId || !currentUserId || !candidateId || !form){
-    return null;
-  }
-
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
-    return null;
-  }
-
-  let result;
-  result = await candidateService.addSkills(candidateId, form);
-
-  return result;
-}
-
-
 async function getCandidateSkills(companyId, currentUserId, candidateId) {
   if(!companyId || !currentUserId || !candidateId){
     return null;
@@ -4288,6 +4272,51 @@ async function getCandidateSkills(companyId, currentUserId, candidateId) {
   return result;
 }
 
+async function addCandidateSkills(companyId, currentUserId, candidateId, form) {
+  if(!companyId || !currentUserId || !candidateId || !form){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  result = await candidateService.addSkills(candidateId, form);
+
+  return result;
+}
+
+
+async function removeCandidateSkill(companyId, currentUserId, candidateId, skillId) {
+
+  if(!companyId || !currentUserId || !candidateId || !skillId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result;
+  try {
+    let candidate = await candidateService.findById(candidateId);
+
+    for(const [i, skill] of candidate.skills.entries()){
+      if(skill==skillId){
+        candidate.skills.splice(i, 1);
+        await candidate.save();
+        result = {success: true};
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
 
 async function getCandidateAccomplishments(companyId, currentUserId, candidateId) {
   if(!companyId || !currentUserId || !candidateId){

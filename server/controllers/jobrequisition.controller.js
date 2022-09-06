@@ -903,7 +903,8 @@ async function applyJobById(currentUserId, jobId, application ) {
           currentParty.primaryPhone = {value: application.phoneNumber};
           currentParty.emails = [{isPrimary: contactType.MOBILE, value: application.phoneNumber}];
           currentParty.phoneNumbers = [{contactType: contactType.MOBILE, value: application.phoneNumber}];
-
+          currentParty.languages = _.reduce(currentParty.languages, function(res, i){res.push({language: i.language, name: i.name, level: i.level}); return res}, []);
+      
           let source;
           if(application.source){
             source = await labelService.findOneBy({name: application.source, type:'SOURCE', company:job.companyId});
@@ -911,7 +912,7 @@ async function applyJobById(currentUserId, jobId, application ) {
             source = await labelService.findOneBy({name:'Accessed', type:'SOURCE', default:true});
           }
 
-          currentParty.sources = [source?._id];
+          currentParty.sources = source?[source._id]:[];
           candidate = await candidateService.addCandidate(null, job.company.companyId, currentParty, true, false);
         } else {
           candidate.status = statusEnum.ACTIVE;
