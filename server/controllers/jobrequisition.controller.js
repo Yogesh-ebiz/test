@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const _ = require('lodash');
+const localeCodes = require('locale-codes');
 const ObjectID = require('mongodb').ObjectID;
 const { ApplicationExist } = require('../middleware/baseError');
 
@@ -868,7 +869,7 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
 }
 
-async function applyJobById(currentUserId, jobId, application ) {
+async function applyJobById(currentUserId, jobId, application, locale ) {
 
   if(currentUserId==null || !jobId || application==null){
     return null;
@@ -903,8 +904,15 @@ async function applyJobById(currentUserId, jobId, application ) {
           currentParty.primaryPhone = {value: application.phoneNumber};
           currentParty.emails = [{isPrimary: contactType.MOBILE, value: application.phoneNumber}];
           currentParty.phoneNumbers = [{contactType: contactType.MOBILE, value: application.phoneNumber}];
-          currentParty.languages = _.reduce(currentParty.languages, function(res, i){res.push({language: i.language, name: i.name, level: i.level}); return res}, []);
-      
+
+          let languages = _.reduce(currentParty.languages, function(res, i){res.push({language: i.language, name: i.name, level: i.level}); return res}, []);
+          console.log(languages)
+          if(languages.length===0){
+            languages.push({language: locale, name: localeCodes.getByTag(locale).name, level: null});
+          }
+          console.log(languages);
+          currentParty.languages = languages;
+
           let source;
           if(application.source){
             source = await labelService.findOneBy({name: application.source, type:'SOURCE', company:job.companyId});

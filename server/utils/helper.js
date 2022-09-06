@@ -207,7 +207,8 @@ const convertToCandidate = (user) => {
     flag: user.flag,
     resumes: user.resumes?user.resumes:[],
     skills: user.skills?user.skills: [],
-    preferences: user.preferences?user.preferences: null
+    preferences: user.preferences?user.preferences: null,
+    languages: user.languages?user.languages:[],
   };
 }
 

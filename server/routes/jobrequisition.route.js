@@ -209,12 +209,12 @@ async function getSimilarCompany(req, res) {
 async function  applyJobById(req, res) {
   // console.log('currentUserId: ', req.header('UserId'))
   // console.log('JobID: ', req.params.id)
-  // console.log('locale', res.locale);
+  console.log('locale', res.locale);
   let currentUserId = parseInt(req.header('UserId'));
   let jobId = parseInt(req.params.id);
   let application = req.body;
   application.jobId=jobId;
-  let data = await jobRequisitionCtl.applyJobById(currentUserId, jobId, application);
+  let data = await jobRequisitionCtl.applyJobById(currentUserId, jobId, application, res.locale);
 
   res.json(new Response(data, data?'application_submit_successful':'not_found', res));
 }

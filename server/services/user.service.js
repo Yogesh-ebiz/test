@@ -12,7 +12,7 @@ const userSchema = Joi.object({
   lastName: Joi.string(),
   resumes: Joi.array().optional(),
   preferences: Joi.object().optional(),
-  createdBy: Joi.number().optional()
+  createdBy: Joi.number().allow(null).optional()
 });
 
 const form = Joi.object({
