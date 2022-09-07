@@ -3778,6 +3778,10 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
       {
         path: 'flag',
         model: 'Flag'
+      },
+      {
+        path: 'resumes',
+        model: 'File'
       }
     ]);
   } else {
@@ -3797,6 +3801,10 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
       {
         path: 'flag',
         model: 'Flag'
+      },
+      {
+        path: 'resumes',
+        model: 'File'
       }
     ]);
   }

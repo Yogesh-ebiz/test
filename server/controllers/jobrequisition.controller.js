@@ -902,8 +902,8 @@ async function applyJobById(currentUserId, jobId, application, locale ) {
           currentParty.educations = null;
           currentParty.primaryEmail = {value: application.email};
           currentParty.primaryPhone = {value: application.phoneNumber};
-          currentParty.emails = [{isPrimary: contactType.MOBILE, value: application.phoneNumber}];
-          currentParty.phoneNumbers = [{contactType: contactType.MOBILE, value: application.phoneNumber}];
+          currentParty.emails = [{isPrimary: true, contactType: contactType.PERSONALEMAIL, value: application.email}];
+          currentParty.phoneNumbers = [{isPrimary: true, contactType: contactType.MOBILE, value: application.phoneNumber}];
 
           let languages = _.reduce(currentParty.languages, function(res, i){res.push({language: i.language, name: i.name, level: i.level}); return res}, []);
           console.log(languages)

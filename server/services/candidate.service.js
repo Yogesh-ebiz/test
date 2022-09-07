@@ -83,7 +83,7 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   let sources = user.sources;
   let jobTitle = user.jobTitle || '';
 
-  let candidate = {middleName, lastName, email, phoneNumber, emails, phoneNumbers, primaryAddress, links, languages, about, gender, marital, sources: user.sources, jobTitle,
+  let candidate = {firstName, middleName, lastName, email, phoneNumber, emails, phoneNumbers, primaryAddress, links, languages, about, gender, marital, sources: user.sources, jobTitle,
     company: companyId
   }
 

@@ -155,7 +155,16 @@ const convertToCandidate = (user) => {
     primaryEmail =_.find(user.emails, {isPrimary: true}) || user.emails[0];
   }
 
-  console.log(user.sources)
+  if(user.resumes){
+    resumes =_.reduce(user.resumes, function(res, resume){
+      if(typeof resume==='object'){
+        resume.path = process.env.CDN + '/' + resume.path;
+      }
+      res.push(resume);
+      return res;
+    }, []);
+  }
+
   return {
     id: user.id?user.id:user._id,
     userId: user.userId?user.userId:null,
@@ -205,7 +214,7 @@ const convertToCandidate = (user) => {
     educations: user.educations?_.reduce(user.educations, function(res, i){ i.institute = convertToCompany(i.institute); res.push(i);  return res;}, []):[],
     url: user.shareUrl?user.shareUrl:user.url?user.url:null,
     flag: user.flag,
-    resumes: user.resumes?user.resumes:[],
+    resumes: resumes,
     skills: user.skills?user.skills: [],
     preferences: user.preferences?user.preferences: null,
     languages: user.languages?user.languages:[],
