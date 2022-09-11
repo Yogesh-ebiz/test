@@ -155,8 +155,9 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: []
   },
   education: {
-    type: Object,
-    required: false
+    type: String,
+    required: false,
+    default: ''
   },
   category: {
     type: Object,
