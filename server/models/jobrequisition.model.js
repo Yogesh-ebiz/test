@@ -123,11 +123,13 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   level: {
     type: Object,
-    required: false
+    required: false,
+    default: ''
   },
   jobFunction: {
     type: Object,
-    required: false
+    required: false,
+    default: ''
   },
   responsibilities: {
     type: Array,
@@ -147,7 +149,8 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   employmentType: {
     type: Object,
-    required: true
+    required: true,
+    default: ''
   },
   industry: {
     type: Array,
@@ -186,19 +189,23 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   district: {
     type: String,
-    required: false
+    required: false,
+    default: ''
   },
   city: {
     type: String,
-    required: false
+    required: false,
+    default: ''
   },
   state: {
     type: String,
-    required: false
+    required: false,
+    default: ''
   },
   country: {
     type: String,
-    required: true
+    required: true,
+    default: ''
   },
   postalCode: {
     type: String,
