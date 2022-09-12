@@ -211,7 +211,81 @@ async function search(candidateId, companyId, applicationId, progressId, sort) {
 }
 
 
-async function findByCandidate(userId, filter, sort) {
+async function findByCandidateId(candidateId, filter, sort) {
+  if(!candidateId || !sort){
+    return;
+  }
+
+
+  let limit = (sort.size && sort.size>0) ? sort.size:20;
+  let page = (sort.page && sort.page==0) ? sort.page:1;
+  let sortBy = {};
+  sortBy[sort.sortBy] = (sort.direction && sort.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(sort.page)+1
+  };
+
+  let aList = [{
+    $match: {candidateId: candidateId}
+  },
+    {
+      $lookup: {
+        from: 'members',
+        localField: 'createdBy',
+        foreignField: '_id',
+        as: 'createdBy',
+      },
+    },
+    { $unwind: '$createdBy' },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
+
+
+  if(filter.stages && filter.stages.length){
+    aList.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
+  }
+
+  const aggregate = Evaluation.aggregate(aList);
+
+  return await Evaluation.aggregatePaginate(aggregate, options);
+
+}
+
+async function findByPartyId(userId, filter, sort) {
+  
   if(!userId || !sort){
     return;
   }
@@ -284,7 +358,7 @@ async function findByCandidate(userId, filter, sort) {
 
 }
 
-async function findByCandidateAndCompany(userId, filter, sort) {
+async function findByPartyIdAndCompany(userId, filter, sort) {
   if(!userId || !filter || !sort){
     return;
   }
@@ -356,7 +430,7 @@ async function findByCandidateAndCompany(userId, filter, sort) {
 
 }
 
-async function findByCandidateAndApplicationId(userId, filter, sort) {
+async function findByPartyIdAndApplicationId(userId, filter, sort) {
   if(!userId || !filter || !sort){
     return;
   }
@@ -599,9 +673,10 @@ module.exports = {
   remove:remove,
   findByUserIdAndProgressId:findByUserIdAndProgressId,
   search:search,
-  findByCandidate:findByCandidate,
-  findByCandidateAndCompany:findByCandidateAndCompany,
-  findByCandidateAndApplicationId:findByCandidateAndApplicationId,
+  findByCandidateId:findByCandidateId,
+  findByPartyId:findByPartyId,
+  findByPartyIdAndCompany:findByPartyIdAndCompany,
+  findByPartyIdAndApplicationId:findByPartyIdAndApplicationId,
   getCandidateEvaluationsStats:getCandidateEvaluationsStats,
   getCandidateEvaluations:getCandidateEvaluations,
   getEvaluationsByCandidateList:getEvaluationsByCandidateList,

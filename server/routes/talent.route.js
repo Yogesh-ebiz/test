@@ -53,7 +53,7 @@ router.route('/company/:id/jobs/:jobId/comments/:commentId').put(asyncHandler(up
 router.route('/company/:id/jobs/:jobId/insights').get(asyncHandler(getJobInsights));
 router.route('/company/:id/jobs/:jobId/activities').get(asyncHandler(getJobActivities));
 router.route('/company/:id/jobs/:jobId/candidates/suggestions').post(asyncHandler(searchPeopleSuggestions));
-router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchApplications));
+
 
 router.route('/company/:id/jobs/:jobId/pipeline').post(asyncHandler(updateJobPipeline));
 router.route('/company/:id/jobs/:jobId/pipeline').get(asyncHandler(getJobPipeline));
@@ -77,6 +77,7 @@ router.route('/company/:id/jobs/:jobId/feed').get(asyncHandler(getJobAds));
 router.route('/company/:id/jobs/:jobId/publish').post(asyncHandler(publishJob));
 router.route('/company/:id/jobs/:jobId/pay').post(asyncHandler(payJob));
 
+router.route('/company/:id/jobs/:jobId/applications').post(asyncHandler(searchApplications));
 router.route('/company/:id/applications').post(asyncHandler(addApplication));
 router.route('/company/:id/applications/endingsoon').get(asyncHandler(getAllApplicationsEndingSoon));
 router.route('/company/:id/applications/:applicationId').get(asyncHandler(getApplicationById));
@@ -1355,9 +1356,10 @@ async function updateCandidatePool(req, res) {
 async function getCandidateEvaluations(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = isNaN(req.params.candidateId)?ObjectID(req.params.candidateId):parseInt(req.params.candidateId);
   let filter = req.body;
   let sort = req.query;
+  console.log(req.params.candidateId)
 
   let data = await talentCtrl.getCandidateEvaluations(companyId, currentUserId, candidateId, filter, sort);
 

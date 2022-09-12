@@ -3934,13 +3934,14 @@ async function getCandidateEvaluations(companyId, currentUserId, candidateId, fi
 
   let result;
   try {
-
-    if(filter.companyId) {
-      result = await evaluationService.findByCandidateAndCompany(candidateId, filter, sort);
+    if(isNaN(candidateId)) {
+      result = await evaluationService.findByCandidateId(candidateId, filter, sort);
+    } else if(filter.companyId) {
+      result = await evaluationService.findByPartyIdAndCompany(candidateId, filter, sort);
     } else if(filter.applicationId) {
-      result = await evaluationService.findByCandidateAndApplicationId(candidateId, filter, sort);
+      result = await evaluationService.findByPartyIdAndApplicationId(candidateId, filter, sort);
     } else {
-      result = await evaluationService.findByCandidate(candidateId, filter, sort);
+      result = await evaluationService.findByPartyId(candidateId, filter, sort);
     }
 
     let userIds = _.reduce(result.docs, function(res, item){res.push(item.createdBy.userId); return res;}, []);

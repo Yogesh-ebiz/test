@@ -947,6 +947,7 @@ async function applyJobById(currentUserId, jobId, application, locale ) {
           delete application.source;
         }
 
+        console.log('applying..........')
         savedApplication = await applicationService.apply(application);
 
       }
