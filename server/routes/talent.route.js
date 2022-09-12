@@ -444,9 +444,13 @@ async function createJob(req, res) {
 
 async function updateJob(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
-  let jobId = req.params.jobId;
+  let jobId = ObjectID(req.params.jobId);
   let companyId = parseInt(req.params.id);
   let job = req.body;
+  console.log(job.department)
+  job.department = job.department?ObjectID(job.department):null;
+  job.pipeline = job.pipeline?ObjectID(job.pipeline):null;
+
   let data = await talentCtrl.updateJob(companyId, currentUserId, jobId, job);
   res.json(new Response(data, data?'job_updated_successful':'not_found', res));
 }

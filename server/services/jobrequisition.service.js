@@ -149,10 +149,6 @@ async function updateJob(jobId, member, form) {
 
   let result;
 
-  if(form.department) {
-    form.department = ObjectID(form.department);
-  }
-
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
 
   let job = await findJob_Id(jobId);
@@ -174,6 +170,7 @@ async function updateJob(jobId, member, form) {
     job.responsibilities=  form.responsibilities;
     job.qualifications = form.qualifications;
     job.minimumQualifications = form.minimumQualifications;
+    job.maxMonthExperience = form.maxMonthExperience;
     job.skills = form.skills;
     job.employmentType = form.employmentType;
     job.education = form.education;
@@ -279,7 +276,7 @@ function findJobId(jobId, locale) {
 async function findJob_Id(jobId, locale) {
   let data = null;
 
-  if(jobId==null){
+  if(!jobId){
     return;
   }
   data = await JobRequisition.findById(jobId).populate('department').populate('tags').populate('members').populate('createdBy');

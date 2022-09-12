@@ -59,12 +59,12 @@ const JobRequisitionSchema = new mongoose.Schema({
   minMonthExperience: {
     type: Number,
     required: false,
-    default: null
+    default: 0
   },
   maxMonthExperience: {
     type: Number,
     required: false,
-    default: null
+    default: 0
   },
   noOfResources: {
     type: Number,
