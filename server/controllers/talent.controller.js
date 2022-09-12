@@ -3976,8 +3976,11 @@ async function getCandidateEvaluationsStats(companyId, currentUserId, candidateI
 
   let result;
   try {
-    result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, filter);
-
+    if(isNaN(candidateId)){
+      result = await evaluationService.getCandidateEvaluationsStats(candidateId, companyId, filter);
+    } else {
+      result = await evaluationService.getCandidateEvaluationsStatsByPartyId(candidateId, companyId, filter);
+    }
 
   } catch (error) {
     console.log(error);

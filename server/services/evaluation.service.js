@@ -285,7 +285,7 @@ async function findByCandidateId(candidateId, filter, sort) {
 }
 
 async function findByPartyId(userId, filter, sort) {
-  
+
   if(!userId || !sort){
     return;
   }
@@ -503,7 +503,121 @@ async function findByPartyIdAndApplicationId(userId, filter, sort) {
 }
 
 
-async function getCandidateEvaluationsStats(userId, companyId, filter) {
+async function getCandidateEvaluationsStats(candidateId, companyId, filter) {
+  if(!candidateId || !companyId || !filter){
+    return;
+  }
+
+  let result = {internal: {}, external: {}};
+  let $match = {candidateId: candidateId};
+  if(filter.type==='INTERNAL'){
+    $match.companyId = companyId;
+  } else if(filter.type==='EXTERNAL'){
+    $match.companyId = {$ne: companyId };
+  }
+
+  if(filter.applicationId){
+    $match.applicationId = filter.applicationId;
+  }
+
+  let aggregate = [{
+    $match: $match
+  },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
+
+  if(filter.stages.length){
+    aggregate.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
+  }
+  let evaluations = await Evaluation.aggregate(aggregate);
+
+  if(evaluations) {
+    let data = _.reduce(evaluations, function (res, evaluation) {
+      let assessment = _.omit(evaluation.assessment, ['_id', 'createdBy', 'createdDate', 'candidateId'])
+
+
+      for (const prop in assessment) {
+
+        if (res.group[evaluation.companyId] && res.group[evaluation.companyId][prop]) {
+          res.group[evaluation.companyId][prop] += evaluation.assessment[prop];
+        } else {
+          if(!res.group[evaluation.companyId]){
+            res.group[evaluation.companyId] = {};
+          }
+
+          res.group[evaluation.companyId][prop] = {};
+          res.group[evaluation.companyId][prop] = evaluation.assessment[prop];
+        }
+      }
+
+      res.rating += evaluation.rating;
+      return res;
+    }, {rating: 0, group: {}});
+
+    result.rating = Math.round(data.rating / evaluations.length * 10)/10;
+    delete data.rating;
+    for (const company in data.group) {
+      let external = {};
+      if(company==companyId){
+        result.internal = data.group[company];
+
+        for (const prop in result.internal) {
+          result.internal[prop] = result.internal[prop] / evaluations.length;
+        }
+      } else {
+        for (const prop in data.group[company]) {
+          if(result.external[data.group[company][prop]]){
+            result.external[prop] += data.group[company][prop];
+          } else {
+            result.external[prop] = data.group[company][prop];
+          }
+        }
+
+        for (const prop in result.external) {
+          result.external[prop] = result.external[prop] / evaluations.length;
+        }
+
+      }
+
+      if (filter.type==='INTERNAL') {
+        result.external = null;
+      } else if (filter.type==='EXTERNAL'){
+        result.internal = null;
+      }
+    }
+  }
+  return result;
+
+}
+
+
+async function getCandidateEvaluationsStatsByPartyId(userId, companyId, filter) {
   if(!userId || !companyId || !filter){
     return;
   }
@@ -678,6 +792,7 @@ module.exports = {
   findByPartyIdAndCompany:findByPartyIdAndCompany,
   findByPartyIdAndApplicationId:findByPartyIdAndApplicationId,
   getCandidateEvaluationsStats:getCandidateEvaluationsStats,
+  getCandidateEvaluationsStatsByPartyId:getCandidateEvaluationsStatsByPartyId,
   getCandidateEvaluations:getCandidateEvaluations,
   getEvaluationsByCandidateList:getEvaluationsByCandidateList,
   getFilters:getFilters

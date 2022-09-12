@@ -1584,7 +1584,7 @@ async function checkCandidateEmail(req, res) {
 async function getCandidateEvaluationsStats(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
+  let candidateId = isNaN(req.params.candidateId)?ObjectID(req.params.candidateId):parseInt(req.params.candidateId);
   let filter = req.body;
 
   let data = await talentCtrl.getCandidateEvaluationsStats(companyId, currentUserId, candidateId, filter);
