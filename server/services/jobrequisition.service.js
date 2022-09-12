@@ -178,6 +178,7 @@ async function updateJob(jobId, member, form) {
     // job.tags = form.tags;
     job.allowRemote=form.allowRemote;
     job.isExternal = form.externalUrl?true:false;
+    job.skills = form.skills;
 
     let tags = [];
     for (let tag of form.tags) {
