@@ -580,6 +580,7 @@ async function getCandidateEvaluationsStats(candidateId, companyId, filter) {
       return res;
     }, {rating: 0, group: {}});
 
+    result.noOfEvaluations = evaluations.length;
     result.rating = Math.round(data.rating / evaluations.length * 10)/10;
     delete data.rating;
     for (const company in data.group) {

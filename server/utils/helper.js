@@ -384,6 +384,7 @@ const buildUserUrl = (user) => {
 }
 
 const buildCandidateUrl = (candidate) => {
+  console.log(candidate.avatar)
   if(candidate && candidate.avatar && candidate.avatar.indexOf('http')>-1){
     return candidate.avatar;
   }

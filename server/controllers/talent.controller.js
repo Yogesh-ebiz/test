@@ -3732,6 +3732,7 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
       candidate.past = found.past;
       candidate.experiences = found.experiences;
       candidate.educations = found.educations;
+      candidate.avatar = candidate.avatar || found.avatar;
     }
     candidate.firstName = candidate.firstName?candidate.firstName:candidate.email;
     candidate.hasSaved=hasSaved;
@@ -3784,6 +3785,7 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
         model: 'File'
       }
     ]);
+
   } else {
     candidate = await candidateService.findByUserIdAndCompanyId(parseInt(candidateId), companyId).populate([
       {
@@ -3813,12 +3815,17 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
   if(candidate) {
     candidate = _.merge({}, candidate);
 
-    let people = await feedService.findCandidateById(candidate.userId);
-    if(people){
-      candidate.skills = people.skills;
-      candidate.experiences = people.experiences;
-      candidate.educations = people.educations;
+    if(candidate.userId){
+      let people = await feedService.findCandidateById(candidate.userId);
+      console.log(people.avatar)
+      if(people){
+        candidate.skills = people.skills;
+        candidate.experiences = people.experiences;
+        candidate.educations = people.educations;
+        candidate.avatar = candidate.avatar || people.avatar;
+      }
     }
+
 
     let preferences = await userService.getJobPreferences(candidate.userId);
     candidate.preferences = preferences;
@@ -3845,7 +3852,7 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
     // if (partyLink) {
     //   candidate.links = partyLink.links;
     // }
-    candidate.avatar = buildCandidateUrl(candidate);
+    // candidate.avatar = buildCandidateUrl(candidate);
     result = convertToCandidate(candidate);
   } else {
     let people = await feedService.findCandidateById(candidateId);
