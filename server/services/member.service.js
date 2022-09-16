@@ -80,6 +80,18 @@ async function findByUserId(userId) {
   return Member.findOne({userId: userId}).populate('role');
 }
 
+
+async function findByEmail(email) {
+  let data = null;
+
+  if(!email){
+    return;
+  }
+
+  return Member.findOneBy({email});
+}
+
+
 async function findAllByUserId(userId) {
   let data = null;
 
@@ -696,6 +708,7 @@ module.exports = {
   sync:sync,
   findByUserId:findByUserId,
   findAllByUserId:findAllByUserId,
+  findByEmail:findByEmail,
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   cancelMemberInvitation:cancelMemberInvitation,
