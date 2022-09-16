@@ -209,10 +209,11 @@ router.route('/company/:id/labels/:labelId').delete(asyncHandler(deleteCompanyLa
 router.route('/company/:id/members/invites').post(asyncHandler(inviteMembers));
 router.route('/company/:id/members/invites').get(asyncHandler(getCompanyMemberInvitations));
 router.route('/company/:id/members/invites/:invitationId').delete(asyncHandler(cancelMemberInvitation));
+router.route('/company/:id/members/invites/:invitationId/accept').post(asyncHandler(acceptMemberInvitation));
 
 
 router.route('/company/:id/members').get(asyncHandler(getCompanyMembers));
-router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
+// router.route('/company/:id/members').post(asyncHandler(addCompanyMember));
 router.route('/company/:id/members/:memberId').get(asyncHandler(getCompanyMember));
 
 router.route('/company/:id/members/:memberId').put(asyncHandler(updateCompanyMember));
@@ -1973,6 +1974,18 @@ async function cancelMemberInvitation(req, res) {
 
   let data = await talentCtrl.cancelMemberInvitation(company, currentUserId, invitationId);
   res.json(new Response(data, data?'members_retrieved_successful':'not_found', res));
+}
+
+
+async function acceptMemberInvitation(req, res) {
+  let company = parseInt(req.params.id);
+  let member = req.body;
+  let invitationId = req.query.invitationId;
+  member.company = company;
+
+
+  let data = await talentCtrl.acceptMemberInvitation(company, member, invitationId);
+  res.json(new Response(data, data?'member_accepted_successful':'not_found', res));
 }
 
 

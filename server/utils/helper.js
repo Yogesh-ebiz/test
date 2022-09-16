@@ -65,6 +65,7 @@ const convertToTalentUser = (user) => {
   }: null;
 
   return {
+    _id: user._id,
     id: user.id,
     name: user.name,
     firstName: user.firstName,
@@ -75,10 +76,11 @@ const convertToTalentUser = (user) => {
     primaryEmail: primaryEmail,
     primaryPhone: primaryPhone,
     currency: user.currency,
-    timezone: user.timezone,
     language: user.language,
     userId: user.userId,
-    preferredCompany: user.preferredCompany
+    preferredCompany: user.preferredCompany,
+    preferTimeFormat: user.preferTimeFormat,
+    timezone: user.timezone,
   };
 }
 

@@ -267,8 +267,8 @@ module.exports = {
   inviteMembers,
   getCompanyMemberInvitations,
   cancelMemberInvitation,
+  acceptMemberInvitation,
   getCompanyMembers,
-  addCompanyMember,
   getCompanyMember,
   updateCompanyMember,
   updateCompanyMemberRole,
@@ -5770,7 +5770,6 @@ async function getCompanyMemberInvitations(companyId, currentUserId, query) {
 }
 
 
-
 async function cancelMemberInvitation(companyId, currentUserId, invitationId) {
 
   if(!companyId || !currentUserId || !invitationId){
@@ -5820,7 +5819,7 @@ async function getCompanyMembers(companyId, query, currentUserId, locale) {
 }
 
 
-async function addCompanyMember(companyId, form, invitationId) {
+async function acceptMemberInvitation(companyId, form, invitationId) {
   if(!companyId || !form || !invitationId){
     return null;
   }

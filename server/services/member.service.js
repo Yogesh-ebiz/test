@@ -202,6 +202,18 @@ function findByUserIdAndCompany(userId, company) {
 }
 
 
+function findByEmail(email) {
+  let data = null;
+
+  if(!email){
+    return;
+  }
+
+  let member = Member.findOne({email: email});
+  return member
+}
+
+
 async function addMember(member) {
   if(!member){
     return;
@@ -692,6 +704,7 @@ module.exports = {
   findById:findById,
   findMemberByUserId:findMemberByUserId,
   findByUserIdAndCompany:findByUserIdAndCompany,
+  findByEmail:findByEmail,
   addMember:addMember,
   addMemberFromInvitation:addMemberFromInvitation,
   updateMember:updateMember,
