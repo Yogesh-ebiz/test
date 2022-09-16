@@ -5741,7 +5741,7 @@ async function inviteMembers(companyId, currentUserId, form) {
     return null;
   }
 
-
+  console.log(form)
   let result = await memberService.inviteMembers(companyId, currentUserId, form.emails, form.role);
 
 

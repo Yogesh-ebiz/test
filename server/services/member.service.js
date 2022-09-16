@@ -11,7 +11,7 @@ const feedService = require('../services/api/feed.service.api');
 
 const memberSchema = Joi.object({
   createdBy: Joi.number().required(),
-  company: Joi.number().required(),
+  company: Joi.number().optional(),
   firstName: Joi.string().required(),
   middleName: Joi.string().allow('').optional(),
   lastName: Joi.string().required(),
@@ -56,7 +56,6 @@ async function sync(user) {
     form.phone= user.primaryPhone.value;
   }
 
-  console.log(form)
   await Member.updateMany({userId: user.id}, {$set: form});
 }
 
