@@ -97,6 +97,7 @@ app.use(passport.initialize());
 
 app.use(i18n);
 
+app.use(express.static(__dirname + '/assets'));
 
 
 var options = {
