@@ -417,6 +417,7 @@ async function uploadCompanyAvatar(companyId, currentUserId, req) {
   return result;
 }
 
+
 async function getUserSession(currentUserId, preferredCompany) {
 
   if(!currentUserId){
@@ -425,39 +426,29 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   let result;
   let user;
-  let allAccounts = await memberService.findMemberByUserId(currentUserId);
-  // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
-  let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
+  let member = await memberService.findByUserId(currentUserId);
 
-  if(allAccounts.length>1) {
-    if (preferredCompany) {
-      preferredCompany = _.some(companies, {companyId: preferredCompany}) ? preferredCompany : companies.length ? companies[0].companyId : null;
-      user = convertToTalentUser(_.find(allAccounts, {company: preferredCompany}));
-    } else {
-      user = convertToTalentUser(allAccounts[0]);
-      preferredCompany = companies[0].companyId;
-    }
-  } else {
-    user = await feedService.findUserByIdFull(currentUserId);
-    user = convertToTalentUser(user);
-    if(companies.length) {
-      preferredCompany = companies[0].companyId;
-    }
+  if(!member){
+    return;
   }
 
-  companies = _.reduce(companies, function (res, item) {
-    let found = _.find(allAccounts, {company: item.companyId});
-    // item = convertToCompany(item);
-    item.avatar = buildCompanyUrl(item);
-    item.role = roleMinimal(found.role);
-    item.memberId = found._id;
-    res.push(item)
+  user = member.toJSON();
+  let companies = await companyService.findAllCompanyByMemberId(member._id);
+
+  user.company = _.reduce(companies, function(res, company){
+    const role = _.find(member.roles, {company: company.companyId});
+    console.log(role)
+
+    let comp = company.toJSON();
+    comp.role = role;
+    comp.benefits = [];
+    comp.noOfMembers = comp.members.length;
+    comp.members = [];
+    res.push(comp);
     return res;
-  }, [])
-
-  user.company = companies;
+  }, []);
   user.preferredCompany = preferredCompany;
-
+  delete user.roles;
 
   return user;
 

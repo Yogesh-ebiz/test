@@ -77,7 +77,7 @@ async function findByUserId(userId) {
     return;
   }
 
-  return Member.findOne({userId: userId}).populate('role');
+  return Member.findOne({userId: userId}).populate('role').populate('roles');
 }
 
 
@@ -221,7 +221,7 @@ function findByEmail(email) {
     return;
   }
 
-  let member = Member.findOne({email: email});
+  let member = Member.findOne({email: email}).populate('roles');
   return member
 }
 

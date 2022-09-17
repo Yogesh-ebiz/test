@@ -50,6 +50,7 @@ const CompanySchema = new mongoose.Schema({
     type: Object
   },
   benefits: [{ type: Schema.Types.ObjectId, ref: 'Benefit' }],
+  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
   talentSubscription: {
     type: Object
   },

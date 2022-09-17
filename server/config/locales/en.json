@@ -267,5 +267,6 @@
 	"jobfunction_retrieved_successful": "jobfunction_retrieved_successful",
 	"company_jobs_deactivated_successful": "company_jobs_deactivated_successful",
 	"pool_retrieved_successful": "pool_retrieved_successful",
-	"invitation_retrieved_successful": "invitation_retrieved_successful"
+	"invitation_retrieved_successful": "invitation_retrieved_successful",
+	"invitation_accepted_successful": "invitation_accepted_successful"
 }

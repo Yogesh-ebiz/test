@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
+const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const _ = require('lodash');
 const Industry = require('../models/industry.model');
 const memberService = require('../services/member.service');
 const memberInvitationService = require('../services/memberinvitation.service');
+const roleService = require('../services/role.service');
 
 const industrySchema = Joi.object({
   name: Joi.string().required(),
@@ -13,7 +15,8 @@ const industrySchema = Joi.object({
 })
 
 module.exports = {
-  getInvitationById
+  getInvitationById,
+  acceptInvitation
 }
 
 
@@ -28,4 +31,20 @@ async function getInvitationById(id, locale) {
     result.userId = member.userId;
   }
   return result;
+}
+
+
+async function acceptInvitation(id, locale) {
+  let result, member;
+  const invitation = await memberInvitationService.findById(id);
+
+  if(invitation){
+    member = await memberService.findByEmail(invitation.email);
+    if(member){
+      member.roles.push(ObjectID(invitation.role));
+      await member.save();
+      invitation.delete();
+    }
+  }
+  return member;
 }

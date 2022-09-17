@@ -649,6 +649,20 @@ async function findAllCompanySalaryJobFunctions(company, locale) {
 
 
 
+async function findAllCompanyByMemberId(memberId) {
+  let data = null;
+
+  if(!memberId){
+    return;
+  }
+
+  data = await Company.find({members: {$in: [memberId]}});
+
+  return data;
+}
+
+
+
 function addCompanyReview(review) {
 
   if(!review){
@@ -1032,6 +1046,7 @@ module.exports = {
   findAllCompanySalaryTop5Locations:findAllCompanySalaryTop5Locations,
   findAllCompanySalaryEmploymentTitles:findAllCompanySalaryEmploymentTitles,
   findAllCompanySalaryJobFunctions:findAllCompanySalaryJobFunctions,
+  findAllCompanyByMemberId:findAllCompanyByMemberId,
   addCompanyReview:addCompanyReview,
   findAllCompanyReviewLocations:findAllCompanyReviewLocations,
   findCompanyReviewHistoryByCompanyId:findCompanyReviewHistoryByCompanyId,
