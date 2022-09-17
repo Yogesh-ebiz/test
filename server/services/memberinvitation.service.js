@@ -26,7 +26,7 @@ const memberInvitationSchema = Joi.object({
   isOwner: Joi.boolean().optional(),
 });
 
-async function findById(id) {
+function findById(id) {
   let data = null;
 
   if(!id){

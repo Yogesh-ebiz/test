@@ -1,11 +1,12 @@
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
+const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const subjectType = require('../const/subjectType');
 const Member = require('../models/member.model');
+const Company = require('../models/company.model');
 const MemberInvitation = require('../models/memberInvitation.model');
 const MemberSubscribe = require('../models/membersubscribe.model');
-const ObjectID = require('mongodb').ObjectID;
-const Joi = require('joi');
 const feedService = require('../services/api/feed.service.api');
 
 
@@ -102,24 +103,28 @@ async function findAllByUserId(userId) {
   return Member.find({userId: userId}).populate('role');
 }
 
-async function inviteMembers(company, currentUserId, emails, role) {
+async function inviteMembers(companyId, currentUserId, emails, role) {
   let data = null;
 
-  if(!company || !emails || !role){
+  if(!companyId || !emails || !role){
     return;
   }
+  console.log(companyId)
+  let invitations = [];
+  const company = await Company.findOne({companyId: 106});
+  if(company) {
+    console.log(company._id)
+    emails.forEach(function (email) {
+      let member = {};
+      member.email = email;
+      member.createdBy = currentUserId;
+      member.company = company._id;
+      member.role = role;
+      invitations.push(member);
+    });
 
-  let newMembers = [];
-  emails.forEach(function(email){
-    let member = {};
-    member.email = email;
-    member.createdBy = currentUserId;
-    member.company = company;
-    member.role = role;
-    newMembers.push(member);
-  });
-
-  let invitations = await MemberInvitation.insertMany(newMembers);
+    invitations = await MemberInvitation.insertMany(invitations);
+  }
   return invitations;
 }
 

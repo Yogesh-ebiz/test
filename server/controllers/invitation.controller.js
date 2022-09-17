@@ -22,7 +22,7 @@ module.exports = {
 
 async function getInvitationById(id, locale) {
   let result, member;
-  const data = await memberInvitationService.findById(id);
+  const data = await memberInvitationService.findById(id).populate('company');
 
   if(data){
     member = await memberService.findByEmail(data.email);
@@ -36,14 +36,16 @@ async function getInvitationById(id, locale) {
 
 async function acceptInvitation(id, locale) {
   let result, member;
-  const invitation = await memberInvitationService.findById(id);
+  const invitation = await memberInvitationService.findById(id).populate('company');
 
   if(invitation){
     member = await memberService.findByEmail(invitation.email);
     if(member){
-      member.roles.push(ObjectID(invitation.role));
-      await member.save();
-      invitation.delete();
+      member.roles.push(invitation.role);
+      member = await member.save();
+      invitation.company.members.push(member._id);
+      await invitation.company.save();
+      await invitation.delete();
     }
   }
   return member;

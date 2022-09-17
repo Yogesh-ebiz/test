@@ -12,10 +12,6 @@ const MemberInvitationSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  company: {
-    type: Number,
-    required:true
-  },
   status: {
     type: String,
     default: statusEnum.ACTIVE
@@ -28,6 +24,7 @@ const MemberInvitationSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  company: { type: Schema.Types.ObjectId, ref: 'Company' },
   role: { type: Schema.Types.ObjectId, ref: 'Role' }
 }, {
   versionKey: false
