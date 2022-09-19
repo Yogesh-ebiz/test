@@ -37,10 +37,13 @@ async function getInvitationById(id, locale) {
 async function acceptInvitation(id, locale) {
   let result, member;
   const invitation = await memberInvitationService.findById(id).populate('company');
-
   if(invitation){
+
     member = await memberService.findByEmail(invitation.email);
-    if(member){
+    const alreadyMember = _.find(member.roles, {company: invitation.company.companyId});
+    console.log(invitation)
+    console.log(member.roles)
+    if(member && !alreadyMember){
       member.roles.push(invitation.role);
       member = await member.save();
       invitation.company.members.push(member._id);

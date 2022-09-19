@@ -109,11 +109,10 @@ async function inviteMembers(companyId, currentUserId, emails, role) {
   if(!companyId || !emails || !role){
     return;
   }
-  console.log(companyId)
   let invitations = [];
-  const company = await Company.findOne({companyId: 106});
-  if(company) {
-    console.log(company._id)
+  const company = await Company.findOne({companyId: companyId});
+  if(company && _.find(company.roles, function(o){ return o.equals(role)})) {
+
     emails.forEach(function (email) {
       let member = {};
       member.email = email;

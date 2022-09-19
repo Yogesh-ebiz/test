@@ -5740,9 +5740,11 @@ async function inviteMembers(companyId, currentUserId, form) {
     return null;
   }
 
-  console.log(form)
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
   let result = await memberService.inviteMembers(companyId, currentUserId, form.emails, form.role);
-
 
   return result;
 
@@ -5760,7 +5762,8 @@ async function getCompanyMemberInvitations(companyId, currentUserId, query) {
     return null;
   }
 
-  let result = await memberService.getMemberInvitations(companyId, query);
+  let company = await companyService.findByCompanyId(companyId);
+  let result = await memberService.getMemberInvitations(company?._id, query);
   result.forEach(function(member){
     member.role = roleMinimal(member.role);
   });
