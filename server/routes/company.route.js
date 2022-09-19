@@ -15,6 +15,7 @@ router.route('/register').post(asyncHandler(register));
 router.route('/:id').get(asyncHandler(getCompany));
 
 router.route('/:id/sync').post(asyncHandler(sync));
+router.route('/:id/leave').post(asyncHandler(leave));
 router.route('/:id/sync/avatar').post(asyncHandler(syncAvatar));
 
 router.route('/:id/jobs/deactivate').post(asyncHandler(deactivateCompanyJobs));
@@ -90,6 +91,13 @@ async function sync(req, res) {
   let company = req.body;
   let data = await companyCtl.sync(company);
   res.json(new Response(data, data?'company_synced_successful':'not_found', res));
+}
+
+async function leave(req, res) {
+  let companyId = parseInt(req.params.id);
+  let currentUserId = parseInt(req.header('UserId'));
+  let data = await companyCtl.leave(currentUserId, companyId);
+  res.json(new Response(data, data?'company_removed_successful':'not_found', res));
 }
 
 async function syncAvatar(req, res) {

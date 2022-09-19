@@ -394,8 +394,6 @@ async function uploadCompanyAvatar(companyId, currentUserId, req) {
 
     const thisForm = new FormData();
     const { body } = req;
-
-    console.log(body)
     const { buffer } = files.file[0];
 
     thisForm.append('file', buffer, files.file[0].originalname);
@@ -444,6 +442,7 @@ async function getUserSession(currentUserId, preferredCompany) {
     comp.benefits = [];
     comp.noOfMembers = comp.members.length;
     comp.members = [];
+    comp.isOwner = company.createdBy===currentUserId?true:false;
     res.push(comp);
     return res;
   }, []);
@@ -468,7 +467,7 @@ async function getSubscriptions(companyId, currentUserId) {
 
   let subscriptions = [];
   try {
-    let company = await companyService.findByCompanyId(companyId);
+    let company = await companyService.findByCompanyId(companyId).populate('subscription');
     subscriptions = await paymentService.getCustomerSubscriptions(company.customerId);
 
   } catch (error) {
@@ -840,7 +839,6 @@ async function searchCompany(currentUserId, filter, sort) {
   }
 
   let result = await memberService.searchCompanyByUserId(currentUserId, filter, sort);
-  console.log(_.map(result.docs, 'company'))
   let companies = await companyService.findByCompanyIds(_.map(result.docs, 'company'), true);
 
 
@@ -1570,7 +1568,7 @@ async function payJob(companyId, currentUserId, jobId, form) {
   let job = await jobService.getJobAds(jobId)
 
   if(job) {
-    let company = await companyService.findByCompanyId(companyId);
+    let company = await companyService.findByCompanyId(companyId).populate('subscription');
     form.customer = {id: company.customerId};
     if(company.customerId) {
       let checkout = await checkoutService.payJob(member, form);
@@ -5534,6 +5532,11 @@ async function addCompanyRole(companyId, currentUserId, form) {
   let result = null;
   form.createdBy = member.userId;
   result = await roleService.add(form);
+  if(result){
+    const company = await companyService.findByCompanyId(companyId);
+    company.roles.push(result._id);
+    await company.save();
+  }
 
   return result
 }
@@ -5565,12 +5568,17 @@ async function deleteCompanyRole(companyId, currentUserId, roleId) {
     return null;
   }
 
-  let result = await roleService.remove(roleId);
-  if(result){
-    result = {success: true}
+  const company = await companyService.findByCompanyId(companyId).populate('roles');
+  const role = _.find(company.roles, function(o){ return o._id.equals(roleId)});
+  if(role){
+    await role.delete();
+    company.roles = _.reject(company.roles, function(o) { return o._id.equals(roleId); });
+    await company.save();
+    // let result = await roleService.remove(roleId);
+
   }
 
-  return result
+  return {success: true};
 }
 
 

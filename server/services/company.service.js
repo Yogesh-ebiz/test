@@ -168,13 +168,13 @@ async function findById(id) {
 }
 
 
-async function findByCompanyId(companyId) {
+function findByCompanyId(companyId) {
 
   if(!companyId){
     return;
   }
 
-  let company = await Company.findOne({companyId: companyId}).populate('subscription');
+  let company = Company.findOne({companyId});
 
   return company;
 

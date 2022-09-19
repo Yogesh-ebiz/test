@@ -23,6 +23,7 @@ const {getGroupOfCompanyJobs} = require('../services/jobrequisition.service');
 const {getDepartments, addDepartment} = require('../services/companydepartment.service');
 const {getPipelines, addPipeline} = require('../services/pipeline.service');
 const companyService = require('../services/company.service');
+const memberService = require('../services/member.service');
 const roleService = require('../services/role.service');
 const labelService = require('../services/label.service');
 const salaryReactionService = require('../services/salaryreaction.service');
@@ -30,12 +31,12 @@ const interestService = require('../services/interest.service');
 const benefitService = require('../services/benefit.service');
 const userQuestionService = require('../services/userquestion.service');
 const companyDepartmentService = require('../services/companydepartment.service');
-
+const jobService = require('../services/jobrequisition.service');
 const {addCompanySalary, findCompanySalaryByEmploymentTitle, findEmploymentTitlesCountByCompanyId, findSalariesByCompanyId, addCompanyReview,
   findCompanyReviewHistoryByCompanyId, addCompanyReviewReport, findAllCompanySalaryLocations, findAllCompanyReviewLocations, findAllCompanySalaryEmploymentTitles, findAllCompanySalaryJobFunctions, findTop3Highlights} = require('../services/company.service');
 const {findBookById, addBookById, removeBookById, findBookByUserId, findMostBookmarked} = require('../services/bookmark.service');
-const memberService = require('../services/member.service');
-const jobService = require('../services/jobrequisition.service');
+
+
 
 
 const Company = require('../models/company.model');
@@ -135,6 +136,7 @@ const labelSchema = Joi.object({
 
 module.exports = {
   sync,
+  leave,
   register,
   getCompany,
   deactivateCompanyJobs,
@@ -229,6 +231,31 @@ async function register(currentUserId, form) {
 
 }
 
+async function leave(currentUserId, companyId) {
+  if(!currentUserId || !companyId){
+    return null;
+  }
+
+  try {
+    const company = await companyService.findByCompanyId(companyId).populate('members');
+    const member = _.find(company.members, {userId: currentUserId});
+
+    if(member){
+      console.log(_.map(company.members, '_id'))
+      company.members = _.reject(company.members, function(o) { return o._id.equals(member._id) });
+      console.log(_.map(company.members, '_id'))
+      await company.save();
+
+      member.roles = _.reject(member.roles, function(o) { return _.some(company.roles, function(o2){return o2.equals(o);}) });
+      await member.save();
+      return { noOfCompanies: member.roles.length };
+
+    }
+  } catch(e){
+    console.log('sync: Error', e);
+  }
+
+}
 
 async function getCompany(currentUserId, companyId, locale) {
 

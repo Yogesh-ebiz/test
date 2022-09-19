@@ -268,5 +268,6 @@
 	"company_jobs_deactivated_successful": "company_jobs_deactivated_successful",
 	"pool_retrieved_successful": "pool_retrieved_successful",
 	"invitation_retrieved_successful": "invitation_retrieved_successful",
-	"invitation_accepted_successful": "invitation_accepted_successful"
+	"invitation_accepted_successful": "invitation_accepted_successful",
+	"company_removed_successful": "company_removed_successful"
 }

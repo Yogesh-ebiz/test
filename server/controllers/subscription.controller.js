@@ -49,7 +49,7 @@ async function addSubscription(currentUserId, form) {
 
   let subscription = null;
   try {
-    let company = await companyService.findByCompanyId(parseInt(form.customer.partyId));
+    let company = await companyService.findByCompanyId(parseInt(form.customer.partyId)).populate('subscription');
 
     form.defaultPaymentMethod = form.payment.paymentMethodId;
     form.createdBy = currentUserId;
@@ -114,7 +114,7 @@ async function updateSubscription(currentUserId, id, form) {
     form.updatedBy = currentUserId;
     subscription = await paymentService.updateSubscription(id, form);
     if(subscription){
-      let company = await companyService.findByCompanyId(parseInt(form.customer.partyId));
+      let company = await companyService.findByCompanyId(parseInt(form.customer.partyId)).populate('subscription');
       company.talentSubscription = subscription.id;
       await company.save();
     }
@@ -137,7 +137,7 @@ async function cancelSubscription(currentUserId, id, form) {
 
   let subscription = null;
   try {
-    let company = await companyService.findByCompanyId(parseInt(form.company));
+    let company = await companyService.findByCompanyId(parseInt(form.company)).populate('subscription');
     if(company && company.talentSubscription==id) {
       subscription = await paymentService.cancelSubscription(id, form);
     }
@@ -161,7 +161,7 @@ async function activateSubscription(currentUserId, id, form) {
 
   let subscription = null;
   try {
-    let company = await companyService.findByCompanyId(parseInt(form.company));
+    let company = await companyService.findByCompanyId(parseInt(form.company)).populate('subscription');
     if(company && company.talentSubscription==id) {
       subscription = await paymentService.activateSubscription(id);
     }

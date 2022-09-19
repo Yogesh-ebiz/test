@@ -49,7 +49,7 @@ async function compose(form, companyId) {
   let email, inmailCredit = 0;
   let result = {threadId: null, emails: []};
 
-  let company = await companyService.findByCompanyId(companyId);
+  let company = await companyService.findByCompanyId(companyId).populate('subscription');
   let contacts = _.reduce(form.to, function(res, contact){
     if(!contact.email){
       res.push(contact.id)
