@@ -25,13 +25,30 @@ async function generate(currentUserId, locale) {
       job: null
     };
 
-    const filePathName = path.resolve(__dirname, '../templates/resumes/template1/resume.html');
+    const filePathName = path.resolve(__dirname, '../templates/resumes/template2/resume.html');
     const htmlString = fs.readFileSync(filePathName).toString();
-    let  options = { format: 'Letter', "height": "10.5in", "width": "8in", "border": "0",  };
+    let  options = {
+      "format": "A4",
+      "orientation": "portrait",
+      "dpi": 200,
+      "quality": 80,
+      "border": {
+        "left": ".5cm",
+        "right": ".5cm",
+        "top": ".5cm",
+        "bottom": ".5cm"
+      },
+      "header": {
+        "height": "10mm"
+      },
+      "footer": {
+        "height": "10mm"
+      }
+    }
     const ejsData = ejs.render(htmlString, data);
 
     console.log(ejsData)
-    pdf.create(ejsData, options).toFile('export/resume.pdf',(err, response) => {
+    pdf.create(ejsData, options).toFile('export/resume2.pdf',(err, response) => {
       if (err) reject(err);
       resolve(response);
     });
