@@ -126,6 +126,10 @@ function getRoles(company, all) {
 }
 
 
+function getDefaultAdminRole() {
+  return Role.findOne({default: true, company: {$exists: false}});
+}
+
 function getAdminRole() {
   let data = null;
 
@@ -164,6 +168,7 @@ module.exports = {
   disable:disable,
   enable:enable,
   getRoles:getRoles,
+  getDefaultAdminRole:getDefaultAdminRole,
   getAdminRole:getAdminRole,
   getRoleByRole:getRoleByRole,
   getRoleByName:getRoleByName

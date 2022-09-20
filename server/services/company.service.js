@@ -80,6 +80,7 @@ async function register(currentParty, form) {
   form = await Joi.validate(form, feedCompanySchema, {abortEarly: false});
   let company = null;
 
+
   if(form.partyType==='COMPANY'){
     company = await feedService.registerCompany(currentParty.id, form);
   } else {
@@ -88,6 +89,7 @@ async function register(currentParty, form) {
 
   let savedCompany;
   if(company){
+    let role = await roleService.getDefaultAdminRole();
 
     savedCompany = await new Company({
       name: company.name,
@@ -99,24 +101,22 @@ async function register(currentParty, form) {
       primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
     }).save();
 
-    let role = await roleService.getRoleByRole(roleType.ADMIN);
+    // let member = {
+    //   createdBy: currentParty.id,
+    //   company: company.id,
+    //   firstName: currentParty.firstName,
+    //   middleName: currentParty.middleName,
+    //   lastName: currentParty.lastName,
+    //   phone: currentParty.primaryPhone?currentParty.primaryPhone.value:'',
+    //   email: currentParty.primaryEmail?currentParty.primaryEmail.value:'',
+    //   timezone: currentParty.timezone?currentParty.timezone:'',
+    //   preferTimeFormat: '',
+    //   userId: currentParty.id,
+    //   role: role._id,
+    //   isOwner: true
+    // }
 
-    let member = {
-      createdBy: currentParty.id,
-      company: company.id,
-      firstName: currentParty.firstName,
-      middleName: currentParty.middleName,
-      lastName: currentParty.lastName,
-      phone: currentParty.primaryPhone?currentParty.primaryPhone.value:'',
-      email: currentParty.primaryEmail?currentParty.primaryEmail.value:'',
-      timezone: currentParty.timezone?currentParty.timezone:'',
-      preferTimeFormat: '',
-      userId: currentParty.id,
-      role: role._id,
-      isOwner: true
-    }
-
-    member = await memberService.addMember(member);
+    // member = await memberService.addMember(member);
   }
 
   return savedCompany;

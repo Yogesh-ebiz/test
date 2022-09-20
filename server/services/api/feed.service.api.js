@@ -2,8 +2,8 @@ const ApiClient = require('../apiManager');
 const _ = require('lodash');
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:5000/api');
+// let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient(`${process.env.FEEDAPI}`);
 
 
 async function addContact(contact){

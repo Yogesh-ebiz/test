@@ -122,10 +122,11 @@ const labelSchema = Joi.object({
 
 
 module.exports = {
+  getUserSession,
+  registerNewUser,
   getCompany,
   updateCompany,
   uploadCompanyAvatar,
-  getUserSession,
   getSubscriptions,
   getMarketSalary,
   getCompanyInsights,
@@ -324,6 +325,78 @@ function getRandomInt(min, max) {
 }
 
 
+async function getUserSession(currentUserId, preferredCompany) {
+
+  if(!currentUserId){
+    return null;
+  }
+
+  let result;
+  let user;
+  let member = await memberService.findByUserId(currentUserId);
+
+  if(!member){
+    return;
+  }
+
+  user = member.toJSON();
+  let companies = await companyService.findAllCompanyByMemberId(member._id);
+
+  user.company = _.reduce(companies, function(res, company){
+    const role = _.find(member.roles, {company: company.companyId});
+    console.log(role)
+
+    let comp = company.toJSON();
+    comp.role = role;
+    comp.benefits = [];
+    comp.noOfMembers = comp.members.length;
+    comp.members = [];
+    comp.isOwner = company.createdBy===currentUserId?true:false;
+    res.push(comp);
+    return res;
+  }, []);
+  user.preferredCompany = preferredCompany;
+  delete user.roles;
+
+  return user;
+
+}
+
+
+async function registerNewUser(form) {
+
+  if(!form ){
+    return null;
+  }
+
+  let result, member;
+  let user = await feedService.register({...form, primaryAddress: {...form.company.primaryAddress, type: 'BUSINESS'}});
+
+  // let newMember = {
+  //   createdBy: user.id,
+  //   company: company.id,
+  //   firstName: form.firstName,
+  //   middleName: form.middleName,
+  //   lastName: form.lastName,
+  //   phone: form.phone,
+  //   email: form.email,
+  //   timezone: currentParty.timezone?currentParty.timezone:'',
+  //   preferTimeFormat: '',
+  //   userId: user.id,
+  //   isOwner: true
+  // }
+  //
+  // member = await memberService.addMember(newMember);
+
+
+
+  // let companies = await companyService.findAllCompanyByMemberId(member._id);
+
+
+  return member;
+
+}
+
 
 async function getCompany(currentUserId, companyId, locale) {
 
@@ -414,45 +487,6 @@ async function uploadCompanyAvatar(companyId, currentUserId, req) {
 
   return result;
 }
-
-
-async function getUserSession(currentUserId, preferredCompany) {
-
-  if(!currentUserId){
-    return null;
-  }
-
-  let result;
-  let user;
-  let member = await memberService.findByUserId(currentUserId);
-
-  if(!member){
-    return;
-  }
-
-  user = member.toJSON();
-  let companies = await companyService.findAllCompanyByMemberId(member._id);
-
-  user.company = _.reduce(companies, function(res, company){
-    const role = _.find(member.roles, {company: company.companyId});
-    console.log(role)
-
-    let comp = company.toJSON();
-    comp.role = role;
-    comp.benefits = [];
-    comp.noOfMembers = comp.members.length;
-    comp.members = [];
-    comp.isOwner = company.createdBy===currentUserId?true:false;
-    res.push(comp);
-    return res;
-  }, []);
-  user.preferredCompany = preferredCompany;
-  delete user.roles;
-
-  return user;
-
-}
-
 
 async function getSubscriptions(companyId, currentUserId) {
   if(!currentUserId || !companyId){

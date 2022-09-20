@@ -114,12 +114,12 @@ async function inviteMembers(companyId, currentUserId, emails, role) {
   if(company && _.find(company.roles, function(o){ return o.equals(role)})) {
 
     emails.forEach(function (email) {
-      let member = {};
-      member.email = email;
-      member.createdBy = currentUserId;
-      member.company = company._id;
-      member.role = role;
-      invitations.push(member);
+      let invitation = {email, role, company: company._id, createdBy: currentUserId};
+      // invitation.email = email;
+      // invitation.createdBy = currentUserId;
+      // invitation.company = company._id;
+      // invitation.role = role;
+      invitations.push(invitation);
     });
 
     invitations = await MemberInvitation.insertMany(invitations);

@@ -13,6 +13,7 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('/session').get(asyncHandler(getUserSession));
+router.route('/register').post(asyncHandler(registerNewUser));
 
 router.route('/market/salary').get(asyncHandler(getMarketSalary));
 
@@ -277,6 +278,23 @@ router.route('/company/:id/sources').post(asyncHandler(searchSources));
 router.route('/company/:id/sources/:sourceId').delete(asyncHandler(removeSources));
 router.route('/company/:id/sources').delete(asyncHandler(removeSources));
 
+
+async function getUserSession(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let preferredCompany = req.query.company?parseInt(req.query.company):null;
+
+  let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
+  res.json(new Response(data, data?'get_session_successful':'not_found', res));
+}
+
+
+async function registerNewUser(req, res) {
+  const form = req.body;
+  let data = await talentCtrl.registerNewUser(form);
+  res.json(new Response(data, data?'get_session_successful':'not_found', res));
+}
+
+
 async function getCompany(req, res) {
   let currentUserId = parseInt(req.header('UserId'));
   let companyId = parseInt(req.params.id);
@@ -298,17 +316,6 @@ async function uploadCompanyAvatar(req, res) {
   let data = await talentCtrl.uploadCompanyAvatar(companyId, currentUserId, req);
   res.json(new Response(data, data?'company_updated_successful':'not_found', res));
 }
-
-
-async function getUserSession(req, res) {
-  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
-  let preferredCompany = req.query.company?parseInt(req.query.company):null;
-
-  let data = await talentCtrl.getUserSession(currentUserId, preferredCompany);
-  res.json(new Response(data, data?'get_session_successful':'not_found', res));
-}
-
-
 
 async function getSubscriptions(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

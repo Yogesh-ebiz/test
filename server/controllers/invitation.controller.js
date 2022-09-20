@@ -36,20 +36,26 @@ async function getInvitationById(id, locale) {
 
 async function acceptInvitation(id, locale) {
   let result, member;
+  if(!id){
+    return null;
+  }
+
   const invitation = await memberInvitationService.findById(id).populate('company');
   if(invitation){
 
+    console.log(invitation.company)
     member = await memberService.findByEmail(invitation.email);
-    const alreadyMember = _.find(member.roles, {company: invitation.company.companyId});
-    console.log(invitation)
-    console.log(member.roles)
-    if(member && !alreadyMember){
-      member.roles.push(invitation.role);
-      member = await member.save();
-      invitation.company.members.push(member._id);
-      await invitation.company.save();
-      await invitation.delete();
+    const alreadyMember = _.find(invitation.company.members, function(o){ return o.equals(member._id)});
+    if(!member || alreadyMember) {
+      return null;
     }
+
+    member.roles.push(invitation.role);
+    member = await member.save();
+    invitation.company.members.push(member._id);
+    await invitation.company.save();
+    await invitation.delete();
+
   }
   return member;
 }
