@@ -89,8 +89,7 @@ async function register(member, form) {
 
   let savedCompany;
   if(company){
-    let role = await roleService.getDefaultAdminRole();
-    console.log('role', role)
+
     savedCompany = await new Company({
       name: company.name,
       companyId: company.id,
@@ -99,6 +98,7 @@ async function register(member, form) {
       createdBy: member.userId,
       email:member.email,
       members: [member._id],
+      admins: [member._id],
       primaryAddress: form.primaryAddress
     }).save();
 

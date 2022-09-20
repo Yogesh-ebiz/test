@@ -341,10 +341,15 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   user = member.toJSON();
   let companies = await companyService.findAllCompanyByMemberId(member._id);
-
+  let adminRole = await roleService.getAdminRole();
   user.company = _.reduce(companies, function(res, company){
-    const role = _.find(member.roles, {company: company.companyId});
-    console.log(role)
+
+
+    let role = _.find(member.roles, {company: company.companyId});
+
+    if(_.some(company.admins, function(o){ return o.equals(member._id);})){
+      role = adminRole;
+    }
 
     let comp = company.toJSON();
     comp.role = role;
