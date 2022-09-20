@@ -15,6 +15,11 @@ const roleSchema = Joi.object({
   createdBy: Joi.number().optional()
 });
 
+
+function findById(id) {
+  return Role.findById(id);
+}
+
 async function add(form) {
   if(!form){
     return;
@@ -163,6 +168,7 @@ function getRoleByName(name) {
 
 module.exports = {
   add:add,
+  findById:findById,
   update:update,
   remove:remove,
   disable:disable,

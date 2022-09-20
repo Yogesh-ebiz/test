@@ -448,44 +448,52 @@ async function uploadCompanyAvatar(companyId, currentUserId, req) {
     return null;
   }
 
+  console.log(companyId, currentUserId)
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  console.log(member)
   if(!member){
     return null;
   }
 
   let result;
   try {
-
+    // create formData for your request:
+    // console.log(req.files)
+    const thisForm = new FormData();
+    const { files } = req;
+    const { buffer } = files.file[0];
     // var formData = {
     //   name: 'file',
     //   file: {
-    //     value:  fs.createReadStream(file.path),
+    //     value:  fs.createReadStream(files.file[0].path),
     //     options: {
-    //       filename: file.originalname,
+    //       filename: files.file[0].originalname,
     //       contentType: 'image/png'
     //     }
     //   }
     // };
 
-    // result = await feedService.uploadCompanyAvatar(25, currentUserId, formData);
+    // thisForm.append('file', files.file[0]);
+    // for (let i = 0; i < files.length; i++) {
+    //   thisForm.append(files[i].name, files[i])
+    // }
+    // result = await feedService.uploadCompanyAvatar(companyId, currentUserId, thisForm);
 
-    // create formData for your request:
 
-    const thisForm = new FormData();
-    const { body } = req;
-    const { buffer } = files.file[0];
 
-    thisForm.append('file', buffer, files.file[0].originalname);
-    result = await feedService.uploadCompanyAvatar(25, currentUserId, thisForm);
+    // thisForm.append('file', files.file[0]);
+    // result = await feedService.uploadCompanyAvatar(25, currentUserId, thisForm);
 
     // passing a file buffer:
-    const fileBuffer = Buffer.from(file.originalname, 'utf-8');
-    thisForm.append('file', fileBuffer, file.originalname);
+    const fileBuffer = Buffer.from(files.file[0].originalname, 'utf-8');
+    thisForm.append('file', files.file[0]);
 
-    const response = await axios.post(`http://localhost:5000/api/company/${companyId}/upload/avatar`, thisForm, {
-      // must getHeaders() from "formData" to define the boundaries of the appended data:
-      headers: { ...thisForm.getHeaders() },
-    });
+    // const response = await axios.post(`http://localhost:5000/api/company/${companyId}/upload/avatar`, thisForm, {
+    //   // must getHeaders() from "formData" to define the boundaries of the appended data:
+    //   headers: { ...thisForm.getHeaders() },
+    // });
+
+    result = await feedService.uploadCompanyAvatar(25, currentUserId, thisForm);
 
   } catch (error) {
     console.log(error);
@@ -5929,28 +5937,27 @@ async function updateCompanyMember(companyId, memberId, currentUserId, form) {
   return result
 }
 
-async function updateCompanyMemberRole(companyId, memberId, currentUserId, role) {
-  if(!companyId || !currentUserId || !memberId || !role){
+async function updateCompanyMemberRole(companyId, memberId, currentUserId, roleId) {
+  if(!companyId || !currentUserId || !memberId || !roleId){
     return null;
   }
 
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  // console.log(member)
   if(!member){
     return null;
   }
 
-
+  let updateMember;
   let result = null;
   try {
-
-    result = await memberService.updateMemberRole(memberId, role);
-
+    updateMember = await memberService.updateMemberRole(memberId, companyId, roleId);
   } catch(e){
-    console.log('updateCompanyMember: Error', e);
+    console.log('updateCompanyMemberRole: Error', e);
   }
 
 
-  return result
+  return updateMember;
 }
 
 async function deleteCompanyMember(companyId, currentUserId, memberId) {

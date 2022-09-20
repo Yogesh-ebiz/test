@@ -8,6 +8,8 @@ const Company = require('../models/company.model');
 const MemberInvitation = require('../models/memberInvitation.model');
 const MemberSubscribe = require('../models/membersubscribe.model');
 const feedService = require('../services/api/feed.service.api');
+const roleService = require("./role.service");
+const companyService = require("./company.service");
 
 
 const memberSchema = Joi.object({
@@ -182,7 +184,7 @@ async function searchMembers(company, query) {
   return result
 }
 
-async function findById(memberId) {
+function findById(memberId) {
   let data = null;
 
   if(memberId==null){
@@ -205,14 +207,25 @@ async function findMemberByUserId(userId) {
 }
 
 
-function findByUserIdAndCompany(userId, company) {
+async function findByUserIdAndCompany(userId, companyId) {
   let data = null;
 
-  if(!userId || !company){
+  if(!userId || !companyId){
     return;
   }
 
-  let member = Member.findOne({userId: userId, company: company}).populate('role');
+  // let member = await Member.findOne({userId: userId, company: company}).populate('role');
+  const company = await Company.findOne({companyId: companyId}).populate({
+    path: 'members',
+    model: 'Member',
+    populate: {
+      path: 'roles',
+      model: 'Role'
+    }
+  });
+
+  const member = _.find(company.members, {userId: userId});
+
   return member
 }
 
@@ -297,17 +310,32 @@ async function updateMember(memberId, form) {
 }
 
 
-async function updateMemberRole(memberId, role) {
-  if(!memberId || !role){
+async function updateMemberRole(memberId, companyId, roleId) {
+  if(!memberId || !companyId || !roleId){
     return;
   }
+  const member = await findById(memberId);
+  if(member) {
 
+    const role = await roleService.findById(roleId);
+    const company = await Company.findOne({companyId}).populate('roles');
+    member.roles = _.reduce(member.roles, function(res, r){
+      console.log(r, _.find(company.roles, function(o){return o._id.equals(r)}))
+      if(!_.find(company.roles, function(o){return o._id.equals(r)})){
+        res.push(r);
+      }
+      return res;
+    }, []);
+    if (role.default) {
+      company.admins.push(member._id);
+      await company.save();
+    } else {
+      member.roles.push(role._id);
+      await member.save();
 
-  let member = await findById(memberId);
-
-  if(member){
-    member.role = role;
-    result = await member.save();
+      company.admins = _.reject(company.admins, function(o){ return o.equals(member._id)});
+      await company.save();
+    }
   }
   return member;
 
