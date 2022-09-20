@@ -14,10 +14,6 @@ const MemberSchema = new mongoose.Schema({
     type: Number,
     default: Date.now
   },
-  company: {
-    type: Number,
-    required:true
-  },
   status: {
     type: String,
     default: statusEnum.ACTIVE

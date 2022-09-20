@@ -12,7 +12,6 @@ const feedService = require('../services/api/feed.service.api');
 
 const memberSchema = Joi.object({
   createdBy: Joi.number().required(),
-  company: Joi.number().optional(),
   firstName: Joi.string().required(),
   middleName: Joi.string().allow('').optional(),
   lastName: Joi.string().required(),

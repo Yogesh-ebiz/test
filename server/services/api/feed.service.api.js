@@ -3,7 +3,18 @@ const _ = require('lodash');
 
 const options = { headers: {'userId': null } };
 // let client = new ApiClient('http://accessed-feed-service.us-west-2.elasticbeanstalk.com/api');
-let client = new ApiClient(`${process.env.FEEDAPI}`);
+let client = new ApiClient(`http://localhost:5000/api`);
+
+
+async function register(user){
+  if(!user){
+    return null;
+  }
+
+  user.type = "EMAIL";
+  let response = await client.post(`/user/register`, user, null);
+  return response.data.data;
+};
 
 
 async function addContact(contact){
@@ -29,16 +40,6 @@ async function createJobFeed(jobId, partyType, partyId, text, userId){
   let response = await client.post(`/feeds`, data, options);
   return response.data.data;
 
-};
-
-async function register(user){
-    if(!user){
-    return null;
-  }
-
-  user.type = "EMAIL";
-  let response = await client.post(`/user/register`, user, null);
-  return response.data
 };
 
 

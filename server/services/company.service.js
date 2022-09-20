@@ -71,9 +71,9 @@ async function add(newCompany) {
 
 }
 
-async function register(currentParty, form) {
+async function register(member, form) {
 
-  if(!currentParty || !form){
+  if(!member || !form){
     return;
   }
 
@@ -82,23 +82,24 @@ async function register(currentParty, form) {
 
 
   if(form.partyType==='COMPANY'){
-    company = await feedService.registerCompany(currentParty.id, form);
+    company = await feedService.registerCompany(member.userId, form);
   } else {
-    company = await feedService.registerInstitute(currentParty.id, form);
+    company = await feedService.registerInstitute(member.userId, form);
   }
 
   let savedCompany;
   if(company){
     let role = await roleService.getDefaultAdminRole();
-
+    console.log('role', role)
     savedCompany = await new Company({
       name: company.name,
       companyId: company.id,
       partyType: company.partyType,
       type: company.type,
-      createdBy: currentParty.id,
-      email:currentParty.primaryEmail?currentParty.primaryEmail.value:'',
-      primaryAddress: {address1: company.primaryAddress.address1, address2: company.primaryAddress.address2, district: company.primaryAddress.district, city: company.primaryAddress.city, state: company.primaryAddress.state, country: company.primaryAddress.country }
+      createdBy: member.userId,
+      email:member.email,
+      members: [member._id],
+      primaryAddress: form.primaryAddress
     }).save();
 
     // let member = {

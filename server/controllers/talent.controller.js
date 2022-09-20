@@ -370,27 +370,28 @@ async function registerNewUser(form) {
   }
 
   let result, member;
-  let user = await feedService.register({...form, primaryAddress: {...form.company.primaryAddress, type: 'BUSINESS'}});
+  let response = await feedService.register({...form, primaryAddress: {...form.company.primaryAddress, type: 'BUSINESS'}});
+  const { user } = response;
+  if(user){
+    let newMember = {
+      createdBy: user.id,
+      firstName: form.firstName,
+      middleName: form.middleName,
+      lastName: form.lastName,
+      phone: form.phoneNumber,
+      email: form.email,
+      timezone: user.timezone?user.timezone:'',
+      preferTimeFormat: '',
+      userId: user.id
+    }
 
-  // let newMember = {
-  //   createdBy: user.id,
-  //   company: company.id,
-  //   firstName: form.firstName,
-  //   middleName: form.middleName,
-  //   lastName: form.lastName,
-  //   phone: form.phone,
-  //   email: form.email,
-  //   timezone: currentParty.timezone?currentParty.timezone:'',
-  //   preferTimeFormat: '',
-  //   userId: user.id,
-  //   isOwner: true
-  // }
-  //
-  // member = await memberService.addMember(newMember);
+    member = await memberService.addMember(newMember);
+    if(member){
+      const company = await companyService.register(member, {...form.company});
+      console.log(company)
+    }
 
-
-
-  // let companies = await companyService.findAllCompanyByMemberId(member._id);
+  }
 
 
   return member;

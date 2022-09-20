@@ -241,11 +241,8 @@ async function leave(currentUserId, companyId) {
     const member = _.find(company.members, {userId: currentUserId});
 
     if(member){
-      console.log(_.map(company.members, '_id'))
       company.members = _.reject(company.members, function(o) { return o._id.equals(member._id) });
-      console.log(_.map(company.members, '_id'))
       await company.save();
-
       member.roles = _.reject(member.roles, function(o) { return _.some(company.roles, function(o2){return o2.equals(o);}) });
       await member.save();
       return { noOfCompanies: member.roles.length };
