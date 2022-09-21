@@ -921,6 +921,7 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
     return null;
   }
 
+  console.log(member)
 
   filter.company = [companyId];
   filter.status = filter.status? filter.status:[statusEnum.ACTIVE, statusEnum.DRAFT];

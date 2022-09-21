@@ -215,18 +215,12 @@ async function findByUserIdAndCompany(userId, companyId) {
   }
 
   // let member = await Member.findOne({userId: userId, company: company}).populate('role');
-  const company = await Company.findOne({companyId: companyId}).populate({
-    path: 'members',
-    model: 'Member',
-    populate: {
-      path: 'roles',
-      model: 'Role'
-    }
-  });
+  const company = await Company.findOne( {companyId: companyId});
+  // const members = await Member.find({_id: {$in: [_.map(company.members, 'member')]}})
+  console.log(company, _.map(company.members, 'member'))
+  // const member = _.find(members, {userId: userId});
 
-  const member = _.find(company.members, {userId: userId});
-
-  return member
+  return member;
 }
 
 
