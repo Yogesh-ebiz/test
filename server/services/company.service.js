@@ -89,7 +89,8 @@ async function register(member, form) {
 
   let savedCompany;
   if(company){
-
+    const role = roleService.getDefaultAdminRole();
+    console.log(role)
     savedCompany = await new Company({
       name: company.name,
       companyId: company.id,
@@ -97,8 +98,7 @@ async function register(member, form) {
       type: company.type,
       createdBy: member.userId,
       email:member.email,
-      members: [member._id],
-      admins: [member._id],
+      members: [{role: role._id, member: member._id}],
       primaryAddress: form.primaryAddress
     }).save();
 
@@ -656,13 +656,46 @@ async function findAllCompanyByMemberId(memberId) {
   if(!memberId){
     return;
   }
-
-  data = await Company.find({members: {$in: [memberId]}});
+  console.log(memberId)
+  data = await Company.aggregate([
+    { $match: {'members.member': { $in: [memberId] }}},
+    {
+      $lookup: {
+        from: 'roles',
+        localField: 'members.role',
+        foreignField: '_id',
+        as: 'role',
+      },
+    },
+    {$unwind: '$role'},
+  ]);
 
   return data;
 }
 
 
+async function getMembers(companyId) {
+  let data = null;
+  if(!companyId){
+    return;
+  }
+  let members = [];
+  const company = await Company.findOne({companyId}).populate({
+    path: 'members.member',
+    model: 'Member'
+  }).populate({
+    path: 'members.role',
+    model: 'Role'
+  });
+
+  members = _.reduce(company.members, function (res, o){
+    o.member.role = o.role;
+    res.push(o.member);
+    return res;
+  }, []);
+
+  return  members;
+}
 
 function addCompanyReview(review) {
 
@@ -1038,6 +1071,7 @@ module.exports = {
   findById:findById,
   findByCompanyId:findByCompanyId,
   findByCompanyIds:findByCompanyIds,
+  getMembers:getMembers,
   getCreditRemaining:getCreditRemaining,
   addCompanySalary:addCompanySalary,
   findEmploymentTitlesCountByCompanyId:findEmploymentTitlesCountByCompanyId,

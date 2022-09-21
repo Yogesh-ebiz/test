@@ -30,6 +30,7 @@ const sourceService = require('../services/source.service');
 const emailCampaignService = require('../services/emailcampaign.service');
 const emailCampaignStageService = require('../services/emailcampaignstage.service');
 const fileService = require('../services/file.service');
+const companyService = require('../services/company.service');
 const memberService = require('../services/member.service');
 const userService = require('../services/user.service');
 
@@ -1671,7 +1672,7 @@ async function searchEmails(companyId, member, applicationId, sort) {
 
   let members = [];
   if(result.docs.length){
-    members = await memberService.getMembers(companyId);
+    members = await companyService.getMembers(companyId);
   }
 
   result.docs = _.reduce(result.docs, function(res, email){

@@ -160,17 +160,6 @@ async function cancelMemberInvitation(company, invitationId) {
 }
 
 
-async function getMembers(company) {
-  let data = null;
-  if(company==null){
-    return;
-  }
-
-  let members = Member.find({company: company}).populate('role');
-  return members
-}
-
-
 async function searchMembers(company, query) {
   let data = null;
 
@@ -216,16 +205,14 @@ async function findByUserIdAndCompany(userId, companyId) {
 
   // let member = await Member.findOne({userId: userId, company: company}).populate('role');
   const company = await Company.findOne({companyId: companyId}).populate({
-    path: 'members',
-    model: 'Member',
-    populate: {
-      path: 'roles',
-      model: 'Role'
-    }
+    path: 'members.member',
+    model: 'Member'
+  }).populate({
+    path: 'members.role',
+    model: 'Role'
   });
 
-  const member = _.find(company.members, {userId: userId});
-
+  const member = _.find(company.members, function(o){ return o.member.userId===userId});
   return member
 }
 
@@ -314,29 +301,20 @@ async function updateMemberRole(memberId, companyId, roleId) {
   if(!memberId || !companyId || !roleId){
     return;
   }
-  const member = await findById(memberId);
-  if(member) {
 
-    const role = await roleService.findById(roleId);
-    const company = await Company.findOne({companyId}).populate('roles');
-    member.roles = _.reduce(member.roles, function(res, r){
-      console.log(r, _.find(company.roles, function(o){return o._id.equals(r)}))
-      if(!_.find(company.roles, function(o){return o._id.equals(r)})){
-        res.push(r);
-      }
-      return res;
-    }, []);
-    if (role.default) {
-      company.admins.push(member._id);
-      await company.save();
-    } else {
-      member.roles.push(role._id);
-      await member.save();
+  let member = null;
+  const role = await roleService.findById(roleId);
+  let company = await Company.findOne({companyId});
 
-      company.admins = _.reject(company.admins, function(o){ return o.equals(member._id)});
-      await company.save();
-    }
-  }
+  company.members.forEach((m) => {
+    const update = _.clone(m);
+    update.role = role._id;
+    m = update;
+    console.log(m)
+  })
+  company = await company.save();
+  // console.log(company.members[0])
+  // member.role = role;member.role = role;
   return member;
 
 }
@@ -743,7 +721,6 @@ module.exports = {
   inviteMembers:inviteMembers,
   getMemberInvitations:getMemberInvitations,
   cancelMemberInvitation:cancelMemberInvitation,
-  getMembers:getMembers,
   searchMembers:searchMembers,
   findById:findById,
   findMemberByUserId:findMemberByUserId,

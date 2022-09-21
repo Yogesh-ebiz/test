@@ -37,7 +37,8 @@ const getClient = (baseUrl = null) => {
       if (error.response.status >= 500) {
         Raven.captureException(error);
       }
-
+      error.errors = error.response.data?.errors?error.response.data.errors:error.errors
+      error.message = error.response.data?.message?error.response.data.message:error.message;
       return Promise.reject(error);
     },
   );
