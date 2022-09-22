@@ -338,30 +338,21 @@ async function getUserSession(currentUserId, preferredCompany) {
   if(!member){
     return;
   }
-
+  console.log(member)
   user = member.toJSON();
   let companies = await companyService.findAllCompanyByMemberId(member._id);
-  let adminRole = await roleService.getAdminRole();
+  console.log(companies)
   user.company = _.reduce(companies, function(res, company){
 
-
-    let role = _.find(member.roles, {company: company.companyId});
-
-    if(_.some(company.admins, function(o){ return o.equals(member._id);})){
-      role = adminRole;
-    }
-
-    let comp = company.toJSON();
-    comp.role = role;
-    comp.benefits = [];
-    comp.noOfMembers = comp.members.length;
-    comp.members = [];
-    comp.isOwner = company.createdBy===currentUserId?true:false;
-    res.push(comp);
+    company.benefits = [];
+    company.noOfMembers = company.members.length;
+    company.members = [];
+    company.roles = [];
+    company.isOwner = company.createdBy===currentUserId?true:false;
+    res.push(company);
     return res;
   }, []);
   user.preferredCompany = preferredCompany;
-  delete user.roles;
 
   return user;
 
@@ -920,8 +911,6 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
   if(!member){
     return null;
   }
-
-  console.log(member)
 
   filter.company = [companyId];
   filter.status = filter.status? filter.status:[statusEnum.ACTIVE, statusEnum.DRAFT];
@@ -5851,19 +5840,17 @@ async function getCompanyMembers(companyId, query, currentUserId, locale) {
     return null;
   }
 
-  let result = await memberService.getMembers(companyId, query);
-  let userIds = _.map(result, 'userId');
-  let users = await feedService.lookupUserIds(userIds);
+  let result = await companyService.getMembers(companyId, query);
 
-  result.forEach(function(member){
-    let found = _.find(users, {id: member.userId});
-    if(found){
-      member.firstName = found.firstName;
-      member.lastName = found.lastName;
-      member.avatar = found.avatar;
-    }
-    member.role = roleMinimal(member.role);
-  });
+  // result.forEach(function(member){
+  //   let found = _.find(users, {id: member.userId});
+  //   if(found){
+  //     member.firstName = found.firstName;
+  //     member.lastName = found.lastName;
+  //     member.avatar = found.avatar;
+  //   }
+  //   member.role = roleMinimal(member.role);
+  // });
 
   return result;
 
@@ -5944,7 +5931,7 @@ async function updateCompanyMemberRole(companyId, memberId, currentUserId, roleI
   }
 
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  // console.log(member)
+
   if(!member){
     return null;
   }
