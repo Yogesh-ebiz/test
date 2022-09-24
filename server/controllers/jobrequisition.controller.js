@@ -906,11 +906,9 @@ async function applyJobById(currentUserId, jobId, application, locale ) {
           currentParty.phoneNumbers = [{isPrimary: true, contactType: contactType.MOBILE, value: application.phoneNumber}];
 
           let languages = _.reduce(currentParty.languages, function(res, i){res.push({language: i.language, name: i.name, level: i.level}); return res}, []);
-          console.log(languages)
           if(languages.length===0){
             languages.push({language: locale, name: localeCodes.getByTag(locale).name, level: null});
           }
-          console.log(languages);
           currentParty.languages = languages;
 
           let source;
@@ -948,6 +946,7 @@ async function applyJobById(currentUserId, jobId, application, locale ) {
         }
 
         console.log('applying..........')
+
         savedApplication = await applicationService.apply(application);
 
       }

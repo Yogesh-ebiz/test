@@ -386,14 +386,13 @@ const buildUserUrl = (user) => {
 }
 
 const buildCandidateUrl = (candidate) => {
-  console.log(candidate.avatar)
   if(candidate && candidate.avatar && candidate.avatar.indexOf('http')>-1){
     return candidate.avatar;
   }
 
   let avatar = candidate.avatar?candidate.avatar:candidate._avatar;
-  let path = candidate.avatar?'/candidates/' + candidate._id + '/images/':'/user/' + candidate.userId + '/avatar/';
-  return candidate?config.cdn + path + avatar:'';
+  let path = avatar.indexOf('http')>-1?avatar:`${process.env.CDN}/candidates/${candidate._id}/images/${avatar}`;
+  return avatar?path:'';
 }
 
 module.exports = {

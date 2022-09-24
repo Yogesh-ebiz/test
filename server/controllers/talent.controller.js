@@ -3403,6 +3403,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
           stage.applications = found.applications;
           for (let [i, item] of stage.applications.entries()) {
             item.hasFollowed = _.find(applicationSubscribed, {subject: item._id}) ? true : false;
+            console.log(item.user.avatar)
             item.user.avatar = buildCandidateUrl(item.user);
             if (item.currentProgress) {
               let completed = _.reduce(stage.tasks, function (res, item) {

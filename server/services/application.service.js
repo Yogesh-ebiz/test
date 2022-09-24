@@ -162,6 +162,7 @@ async function add(application, member) {
       await candidate.save();
       await job.save();
 
+
       await stageService.createTasksForStage(applyStage, job.title, taskMeta);
 
       savedApplication = await savedApplication.save();
@@ -294,7 +295,7 @@ async function apply(application) {
 
       candidate.applications.push(newApplication._id);
       await candidate.save();
-
+      console.log('here................')
       job.applications.push(newApplication._id);
       await job.save();
       await user.save();

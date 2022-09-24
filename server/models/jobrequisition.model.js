@@ -234,7 +234,6 @@ const JobRequisitionSchema = new mongoose.Schema({
   },
   companyId: {
     type: Number,
-    required: true
   },
   company: { type: Schema.Types.ObjectId, ref: 'Company' },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
