@@ -2737,9 +2737,9 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!member){
+  if(!memberRole){
     return null;
   }
 
@@ -2749,8 +2749,8 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
   if(application) {
     comment.subjectType = subjectType.APPLICATION;
     comment.subject = application;
-    comment.createdBy = member._id;
-    result = await commentService.addComment(comment, member);
+    comment.createdBy = memberRole.member._id;
+    result = await commentService.addComment(comment, memberRole.member);
     if(result){
       application.noOfComments++;
       await application.save();
@@ -2898,15 +2898,15 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!memberRole){
     return null;
   }
 
   let result;
   try {
 
-    let application = await applicationService.findApplicationBy_Id(applicationId).populate([
+    let application = await applicationService.findById(applicationId).populate([
       {
         path: 'currentProgress',
         model: 'ApplicationProgress',
@@ -2925,10 +2925,10 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
       }
     ]);
 
-
+    console.log(application)
     if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
-      form.createdBy = member._id;
+      form.createdBy = memberRole.member._id;
       form.applicationId=ObjectID(applicationId);
       form.applicationProgressId=ObjectID(applicationProgressId);
       form.candidateId = application.user._id;
@@ -2946,7 +2946,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
         let job = await jobService.findJob_Id(application.jobId);
 
         let activity = await activityService.addActivity({
-          causer: member._id,
+          causer: memberRole.member._id,
           causerType: subjectType.MEMBER,
           subjectType: subjectType.EVALUATION,
           subject: result._id,
