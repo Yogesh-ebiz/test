@@ -3842,12 +3842,22 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
   if(candidate) {
     candidate = _.merge({}, candidate);
-
+    if(candidate.skills) {
+      candidate.skills = await feedService.findSkillsById(candidate.skills);
+    }
     if(candidate.userId){
       let people = await feedService.findCandidateById(candidate.userId);
-      console.log(people.avatar)
       if(people){
-        candidate.skills = people.skills;
+        // console.log(candidate.skills)
+        // console.log(people.skills)
+        people.skills = _.reduce(people.skills, function(res, s){res.push({...s, _private: true}); return res;}, []);
+        const skills =_.reduce(candidate.skills, function(res, s){
+          if(!_.find(people.skills, {id: s.id})){
+            res.push(s);
+          }
+          return res;
+        }, people.skills);
+        candidate.skills = skills;
         candidate.experiences = people.experiences;
         candidate.educations = people.educations;
         candidate.avatar = candidate.avatar || people.avatar;
