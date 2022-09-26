@@ -2050,7 +2050,10 @@ async function addApplication(companyId, currentUserId, application ) {
   try {
     let foundApplication = await applicationService.findApplicationByCandidateIdAndJobId(application.user, application.jobId);
     if(!foundApplication) {
+
+      // ToDo: Need to be able to add manual candidate w/o application.user(candidateId)
       let candidate = await candidateService.findById(application.user);
+
       let job = await jobService.findById(application.jobId).populate('createdBy');
       if (job && candidate) {
         candidate.email = application.email;
@@ -2061,8 +2064,8 @@ async function addApplication(companyId, currentUserId, application ) {
 
         application.jobTitle = job.title;
         application.partyId = candidate.userId;
-        application.job = job;
-        application.user = candidate;
+        application.job = job._id;
+        application.user = candidate._id;
         application.company = companyId;
 
 
