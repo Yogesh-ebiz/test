@@ -2183,7 +2183,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
       return res;
     }, []);
 
-    let events = await calendarService.lookupEvents(eventIds);
+
 
     if (application) {
       let requiredEvaluation = false;
@@ -2206,13 +2206,21 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         }
 
         if (progress.event) {
-          let event = _.find(events, {eventId: progress.event});
-          if(event){
-            event.eventTopic = null;
-            event.meta = null;
-            progress.event = event;
+          let events;
+          try{
+            events = await calendarService.lookupEvents(eventIds);
+          } catch(err){
+            consoe.log(err)
           }
 
+          if(events){
+            let event = _.find(events, {eventId: progress.event});
+            if(event){
+              event.eventTopic = null;
+              event.meta = null;
+              progress.event = event;
+            }
+          }
         }
 
         hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
@@ -2254,7 +2262,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
       application.noOfEvaluations = noOfEvaluations;
       application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
 
-      application.user.avatar = buildCandidateUrl(application.user);
+      application.user = convertToCandidate(application.user);
     }
 
   } catch (error) {
