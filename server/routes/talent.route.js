@@ -7,6 +7,7 @@ const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
 
 let Response = require('../const/response');
+const {parse} = require("url");
 
 const router = express.Router();
 module.exports = router;
@@ -932,12 +933,9 @@ async function updateApplicationComment(req, res) {
 async function getApplicationEvaluations(req, res) {
   let companyId = parseInt(req.params.id);
   let currentUserId = parseInt(req.header('UserId'));
-  let candidateId = parseInt(req.params.candidateId);
-  let applicationId = req.query.applicationId;
-  let progressId = req.query.progressId;
-  let filter = req.body;
-
-  let data = await talentCtrl.getApplicationEvaluations(companyId, currentUserId, candidateId, applicationId, progressId, filter);
+  let applicationId = ObjectID(req.params.applicationId);
+  let pagination = req.query;
+  let data = await talentCtrl.getApplicationEvaluations(companyId, currentUserId, applicationId, pagination);
 
   res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
 }
@@ -1218,8 +1216,7 @@ async function getCandidateById(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let data;
   let company = parseInt(req.params.id);
-  let candidateId = req.params.candidateId;
-
+  let candidateId = isNaN(req.params.candidateId)?ObjectID(req.params.candidateId):parseInt(req.params.candidateId);
 
   data = await talentCtrl.getCandidateById(currentUserId, company, candidateId, res.locale);
   res.json(new Response(data, data?'candidate_retrieved_successful':'not_found', res));

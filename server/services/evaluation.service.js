@@ -502,6 +502,73 @@ async function findByPartyIdAndApplicationId(userId, filter, sort) {
   return evaluations;
 }
 
+async function findByApplicationId(applicationId, pagination) {
+  if(!applicationId || !pagination){
+    return;
+  }
+
+
+  let limit = (pagination.size && pagination.size>0) ? pagination.size:20;
+  let page = pagination.page? pagination.page:0;
+  let sortBy = {};
+  sortBy[pagination.sortBy] = (pagination.direction && pagination.direction=="DESC") ? -1:1;
+
+
+  let select = '';
+  let options = {
+    select:   select,
+    sort:     sortBy,
+    lean:     true,
+    limit:    limit,
+    page: parseInt(pagination.page)+1
+  };
+
+  let aList = [{
+    $match: {applicationId: applicationId}
+  },
+    {
+      $lookup: {
+        from: 'members',
+        localField: 'createdBy',
+        foreignField: '_id',
+        as: 'createdBy',
+      },
+    },
+    { $unwind: '$createdBy' },
+    {
+      $lookup: {
+        from: 'assessments',
+        localField: 'assessment',
+        foreignField: '_id',
+        as: 'assessment',
+      },
+    },
+    { $unwind: '$assessment' },
+    {$lookup:{
+        from:"applicationprogresses",
+        let:{applicationProgressId:"$applicationProgressId"},
+        pipeline:[
+          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}, status: statusEnum.ACTIVE}},
+          {$lookup:{
+              from:"stages",
+              let:{stage:"$stage"},
+              pipeline:[
+                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
+              ],
+              as: 'stage'
+            }},
+          { $unwind: '$stage'}
+        ],
+        as: 'applicationProgressId'
+      }},
+    { $unwind: '$applicationProgressId' }
+  ];
+
+  const aggregate = Evaluation.aggregate(aList);
+
+  let evaluations = await Evaluation.aggregatePaginate(aggregate, options);
+  return evaluations;
+}
 
 async function getCandidateEvaluationsStats(candidateId, companyId, filter) {
   if(!candidateId || !companyId || !filter){
@@ -792,6 +859,7 @@ module.exports = {
   findByPartyId:findByPartyId,
   findByPartyIdAndCompany:findByPartyIdAndCompany,
   findByPartyIdAndApplicationId:findByPartyIdAndApplicationId,
+  findByApplicationId:findByApplicationId,
   getCandidateEvaluationsStats:getCandidateEvaluationsStats,
   getCandidateEvaluationsStatsByPartyId:getCandidateEvaluationsStatsByPartyId,
   getCandidateEvaluations:getCandidateEvaluations,

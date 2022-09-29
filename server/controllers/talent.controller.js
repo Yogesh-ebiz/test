@@ -2189,6 +2189,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
 
     if (application) {
+      application = application.toJSON();
       let requiredEvaluation = false;
       let hasEvaluated = false
       let noOfEvaluations = 0;
@@ -2265,7 +2266,14 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
       application.noOfEvaluations = noOfEvaluations;
       application.rating = Math.round(rating / noOfEvaluations * 10) / 10;
 
-      application.user = convertToCandidate(application.user);
+      if(application.user.userId){
+        let user = await feedService.findCandidateById(application.user.userId);
+        const experiences = _.reduce(application.user.experiences, function(res, exp){res.push(exp); return res;}, user.experiences);
+        const educations = _.reduce(application.user.educations, function(res, edu){res.push(edu); return res;}, user.educations);
+        application.user = {...application.user, educations: educations, experiences: experiences};
+        application.user = convertToCandidate(application.user);
+      }
+      // application.user = convertToCandidate(application.user);
     }
 
   } catch (error) {
@@ -2849,9 +2857,9 @@ async function getEvaluationById(companyId, currentUserId, evaluationId) {
   return result;
 }
 
-async function getApplicationEvaluations(companyId, currentUserId, candidateId, applicationId, progressId, filter) {
+async function getApplicationEvaluations(companyId, currentUserId, applicationId, pagination) {
 
-  if(!companyId || !currentUserId || !candidateId || !filter){
+  if(!companyId || !currentUserId || !applicationId || !pagination){
     return null;
   }
 
@@ -2864,7 +2872,7 @@ async function getApplicationEvaluations(companyId, currentUserId, candidateId, 
   try {
 
 
-    result = await evaluationService.search(candidateId, companyId, applicationId, progressId, filter);
+    result = await evaluationService.findByApplicationId(applicationId, pagination);
     let userIds = _.map(result.docs, 'createdBy');
     let users = await feedService.lookupUserIds(userIds);
 
@@ -3801,8 +3809,10 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
   let candidate = null;
 
+  console.log(candidateId)
   if(isNaN(candidateId)) {
-    candidate = await candidateService.findById(ObjectID(candidateId)).populate([
+    console.log('isnan')
+    candidate = await candidateService.findById(candidateId).populate([
       {
         path: 'applications',
         model: 'Application'
@@ -3903,13 +3913,15 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
     // }
     // candidate.avatar = buildCandidateUrl(candidate);
     result = convertToCandidate(candidate);
-  } else {
+  } else if(!candidate && !isNaN(candidateId)) {
     let people = await feedService.findCandidateById(candidateId);
-    let preferences = await userService.getJobPreferences(candidate.userId);
-    people.preferences = preferences;
-    people.match = 78;
-    people.avatar = buildUserUrl(people);
-    result = convertToCandidate(people);
+    if(people){
+      let preferences = await userService.getJobPreferences(candidate.userId);
+      people.preferences = preferences;
+      people.match = 78;
+      people.avatar = buildUserUrl(people);
+      result = convertToCandidate(people);
+    }
   }
 
 
