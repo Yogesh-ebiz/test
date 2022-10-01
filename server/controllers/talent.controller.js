@@ -2857,9 +2857,9 @@ async function getEvaluationById(companyId, currentUserId, evaluationId) {
   return result;
 }
 
-async function getApplicationEvaluations(companyId, currentUserId, applicationId, pagination) {
+async function getApplicationEvaluations(companyId, currentUserId, applicationId) {
 
-  if(!companyId || !currentUserId || !applicationId || !pagination){
+  if(!companyId || !currentUserId || !applicationId){
     return null;
   }
 
@@ -2868,26 +2868,28 @@ async function getApplicationEvaluations(companyId, currentUserId, applicationId
     return null;
   }
 
-  let result;
+  let result, stats = {}, rating = 0;
   try {
 
+    result = await evaluationService.findByApplicationId(applicationId);
+    if(result){
+      const fields = _.keys(_.omit(result[0].assessment.toJSON(), ['_id', 'createdBy', 'candidateId', 'createdDate']));
+      stats = _.reduce(fields, function(res, field){
+        res[field] = _.meanBy(result, function(o) { return o.assessment[field]; });
+        return res;
+      }, {});
 
-    result = await evaluationService.findByApplicationId(applicationId, pagination);
-    let userIds = _.map(result.docs, 'createdBy');
-    let users = await feedService.lookupUserIds(userIds);
-
-    result.docs.forEach(function(evaluation){
-      let found = _.find(users, {id: evaluation.createdBy});
-      if(found){
-        evaluation.createdBy = convertToTalentUser(found);
-      }
-    });
+      rating = _.meanBy(result, function(o){ return o.rating});
+    }
+    // result.docs.forEach(function(evaluation){
+    //     evaluation.createdBy = convertToTalentUser(evaluation.createdBy);
+    // });
 
   } catch (error) {
     console.log(error);
   }
 
-  return new Pagination(result);
+  return {rating: rating, stats: stats, evaluations: result};
 }
 
 

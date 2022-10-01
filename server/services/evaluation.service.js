@@ -502,71 +502,30 @@ async function findByPartyIdAndApplicationId(userId, filter, sort) {
   return evaluations;
 }
 
-async function findByApplicationId(applicationId, pagination) {
-  if(!applicationId || !pagination){
+async function findByApplicationId(applicationId) {
+  if(!applicationId){
     return;
   }
 
-
-  let limit = (pagination.size && pagination.size>0) ? pagination.size:20;
-  let page = pagination.page? pagination.page:0;
-  let sortBy = {};
-  sortBy[pagination.sortBy] = (pagination.direction && pagination.direction=="DESC") ? -1:1;
-
-
-  let select = '';
-  let options = {
-    select:   select,
-    sort:     sortBy,
-    lean:     true,
-    limit:    limit,
-    page: parseInt(pagination.page)+1
-  };
-
-  let aList = [{
-    $match: {applicationId: applicationId}
-  },
+  const evaluations = await Evaluation.find({applicationId: applicationId}).populate([
     {
-      $lookup: {
-        from: 'members',
-        localField: 'createdBy',
-        foreignField: '_id',
-        as: 'createdBy',
-      },
+      path: 'createdBy',
+      model: 'Member'
     },
-    { $unwind: '$createdBy' },
     {
-      $lookup: {
-        from: 'assessments',
-        localField: 'assessment',
-        foreignField: '_id',
-        as: 'assessment',
-      },
+      path: 'assessment',
+      model: 'Assessment'
     },
-    { $unwind: '$assessment' },
-    {$lookup:{
-        from:"applicationprogresses",
-        let:{applicationProgressId:"$applicationProgressId"},
-        pipeline:[
-          {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}, status: statusEnum.ACTIVE}},
-          {$lookup:{
-              from:"stages",
-              let:{stage:"$stage"},
-              pipeline:[
-                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
-              ],
-              as: 'stage'
-            }},
-          { $unwind: '$stage'}
-        ],
-        as: 'applicationProgressId'
-      }},
-    { $unwind: '$applicationProgressId' }
-  ];
-
-  const aggregate = Evaluation.aggregate(aList);
-
-  let evaluations = await Evaluation.aggregatePaginate(aggregate, options);
+    {
+      path: 'applicationProgressId',
+      model: 'ApplicationProgress',
+      populate: [
+        {
+          path: 'stage',
+          model: 'Stage'
+        }
+      ]
+    }]);
   return evaluations;
 }
 
