@@ -3312,7 +3312,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
   }
   let boardStages = [];
   let pipelineStages;
-  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
+  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(memberRole.member._id, subjectType.APPLICATION);
   let job = await jobService.findJob_Id(jobId, locale);
   if(job.pipeline) {
     let pipeline = await pipelineService.findById(job.pipeline);
@@ -3421,7 +3421,6 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
           stage.applications = found.applications;
           for (let [i, item] of stage.applications.entries()) {
             item.hasFollowed = _.find(applicationSubscribed, {subject: item._id}) ? true : false;
-            console.log(item.user.avatar)
             item.user.avatar = buildCandidateUrl(item.user);
             if (item.currentProgress) {
               let completed = _.reduce(stage.tasks, function (res, item) {
