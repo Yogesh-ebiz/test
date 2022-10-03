@@ -333,15 +333,14 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   let result;
   let user;
-  let memberRole = await memberService.findByUserId(currentUserId);
+  let member = await memberService.findByUserId(currentUserId);
 
-  if(!memberRole){
+  if(!member){
     return;
   }
 
-  user = memberRole.member.toJSON();
-  let companies = await companyService.findAllCompanyByMemberId(memberRole.member._id);
-  console.log(companies)
+  user = member.toJSON();
+  let companies = await companyService.findAllCompanyByMemberId(member._id);
   user.company = _.reduce(companies, function(res, company){
 
     company.benefits = [];
