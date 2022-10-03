@@ -91,9 +91,9 @@ async function addPeopleToBlacklist(currentUserId, flag) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, flag.companyId);
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, flag.companyId);
 
-  if(!member){
+  if(!memberRole){
     return null;
   }
 
@@ -109,7 +109,7 @@ async function addPeopleToBlacklist(currentUserId, flag) {
     }
   }
 
-  flag.createdBy = member._id;
+  flag.createdBy = memberRole.member._id;
   flag.candidate = candidate;
   result = await flagService.add(flag);
   candidate.flag = result._id;
@@ -125,9 +125,9 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!member){
+  if(!memberRole){
     return null;
   }
 
@@ -138,7 +138,7 @@ async function removePeopleFromBlacklist(currentUserId, companyId, userId) {
   //   candidate.flag = null;
   //   await candidate.save();
 
-    await flagService.remove(companyId, userId, member);
+    await flagService.remove(companyId, userId, memberRole.member);
     result = {success: true}
 
   return result
@@ -150,9 +150,9 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!member){
+  if(!memberRole){
     return null;
   }
 
@@ -190,7 +190,7 @@ async function assignPeopleJobs(companyId, currentUserId, userId, jobIds) {
         return res;
       }, []);
 
-      result = await sourceService.addSources(candidate, sourcesAdding, member);
+      result = await sourceService.addSources(candidate, sourcesAdding, memberRole.member);
 
     }
 

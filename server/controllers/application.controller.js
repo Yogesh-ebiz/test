@@ -798,9 +798,9 @@ async function getFiles(company, currentUserId, applicationId) {
     return null;
   }
 
-  let member = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
+  let memberRole = await memberService.findMemberByUserIdAndCompany(currentUserId, companyId);
 
-  if(!member){
+  if(!memberRole){
     return null;
   }
 

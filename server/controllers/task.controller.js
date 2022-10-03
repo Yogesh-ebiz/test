@@ -32,12 +32,12 @@ async function addTask(companyId, currentUserId, task) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
 
-  task.owner = member._id;
+  task.owner = memberRole.member._id;
   let result = await taskService.add(task);
   return result;
 
@@ -51,8 +51,8 @@ async function getTask(companyId, currentUserId, taskId) {
   }
 
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!memberRole){
     return null;
   }
 
@@ -68,12 +68,12 @@ async function updateTask(companyId, currentUserId, taskId, task) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!memberRole){
     return null;
   }
 
-  task.updatedBy = member._id
+  task.updatedBy = memberRole.member._id
   let result = await taskService.update(taskId, task);
   return result;
 
@@ -86,12 +86,12 @@ async function markComplete(companyId, currentUserId, taskId) {
   }
 
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!memberRole){
     return null;
   }
 
-  let task = await taskService.markComplete(taskId, member._id);
+  let task = await taskService.markComplete(taskId, memberRole.member._id);
   if(task){
     result = {success: true}
   }
@@ -110,13 +110,13 @@ async function removeTask(companyId, currentUserId, taskId) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!memberRole){
     return null;
   }
 
 
-  let result = await taskService.remove(taskId,  member._id);
+  let result = await taskService.remove(taskId,  memberRole.member._id);
   result = {success: true}
 
 

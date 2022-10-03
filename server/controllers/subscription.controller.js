@@ -42,8 +42,8 @@ async function addSubscription(currentUserId, form) {
   if(!currentUserId || !form){
     return null;
   }
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
+  if(!memberRole){
     return null;
   }
 
@@ -103,9 +103,9 @@ async function updateSubscription(currentUserId, id, form) {
     return null;
   }
 
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, form.customer.partyId);
 
-  if(!member){
+  if(!memberRole){
     return null;
   }
 
@@ -129,8 +129,8 @@ async function cancelSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, form.company);
+  if(!memberRole){
     return null;
   }
 
@@ -153,8 +153,8 @@ async function activateSubscription(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, form.company);
+  if(!memberRole){
     return null;
   }
 
@@ -177,8 +177,8 @@ async function deleteSubscription(currentUserId, companyId, id) {
   if(!currentUserId || !companyId || !id){
     return null;
   }
-  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!memberRole){
     return null;
   }
 
@@ -204,8 +204,8 @@ async function updateSubscriptionPaymentMethod(currentUserId, id, form) {
   if(!currentUserId || !id || !form){
     return null;
   }
-  let member = await memberService.findByUserIdAndCompany(currentUserId, form.company);
-  if(!member){
+  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, form.company);
+  if(!memberRole){
     return null;
   }
 
