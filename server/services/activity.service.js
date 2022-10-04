@@ -307,8 +307,11 @@ async function findByApplicationId(companyId, applicationId, sort) {
   let limit = (sort.size && sort.size > 0) ? parseInt(sort.size) : 20;
   let page = (sort.page && sort.page == 0) ? 1 : parseInt(sort.page) + 1;
   let direction = (sort.direction && sort.direction == "DESC") ? -1 : 1;
+  let sortBy = {};
+  sortBy['createdAt'] = (sort.direction == "DESC") ? -1 : 1;
 
   const options = {
+    sort: sortBy,
     page: page,
     limit: limit,
   };
@@ -316,9 +319,7 @@ async function findByApplicationId(companyId, applicationId, sort) {
   let aList = [];
   let aLookup = [];
   let aMatch = {$match: {$or: [{'meta.application': applicationId}, {subject: applicationId}] }};
-  let aSort = {$sort: {createdDate: direction}};
 
-  console.log(aMatch)
   aList.push(aMatch);
   aList.push(
     {
@@ -326,18 +327,17 @@ async function findByApplicationId(companyId, applicationId, sort) {
         let: {causer: '$causer'},
         from: "candidates",
         pipeline: [
-          {$match: {company: companyId}},
+          {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
           {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1}},
           {
             $unionWith: {
               coll: "members",
               pipeline: [
-                {$match: {company: companyId}}
+                {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
+                {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1, isMember: true}}
               ]
             }
-          },
-          {$match: {$expr: {$eq: ["$_id", "$$causer"]}}},
-          {$project: {_id: 1, firstName: 1, lastName: 1, avatar: 1, _avatar: 1, company: 1, userId: 1, isMember: true}},
+          }
         ],
         as: "causer"
       }

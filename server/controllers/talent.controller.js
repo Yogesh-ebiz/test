@@ -3109,7 +3109,7 @@ async function disqualifyApplication(companyId, currentUserId, applicationId, di
   let result;
   try {
 
-    result = await applicationService.disqualify(applicationId, disqualification.reason, member);
+    result = await applicationService.disqualify(applicationId, disqualification.reason, memberRole.member);
 
   } catch (error) {
     console.log(error);
@@ -3133,7 +3133,7 @@ async function revertApplication(companyId, currentUserId, applicationId, disqua
   let result;
   try {
 
-    result = await applicationService.revert(applicationId, member);
+    result = await applicationService.revert(applicationId, memberRole.member);
 
   } catch (error) {
     console.log(error);
@@ -3158,7 +3158,7 @@ async function deleteApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await applicationService.deleteById(applicationId, member);
+    result = await applicationService.deleteById(applicationId, memberRole.member);
 
   } catch (error) {
     console.log(error);
@@ -3183,7 +3183,7 @@ async function acceptApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await applicationService.accept(applicationId, member);
+    result = await applicationService.accept(applicationId, memberRole.member);
 
   } catch (error) {
     console.log(error);
@@ -3207,7 +3207,7 @@ async function rejectApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await applicationService.reject(applicationId, member);
+    result = await applicationService.reject(applicationId, memberRole.member);
 
   } catch (error) {
     console.log(error);
@@ -3231,7 +3231,7 @@ async function subscribeApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    let subscription = {createdBy: currentUserId, member: member._id, subjectType: subjectType.APPLICATION, subject: ObjectID(applicationId)};
+    let subscription = {createdBy: currentUserId, member: memberRole.member._id, subjectType: subjectType.APPLICATION, subject: ObjectID(applicationId)};
     result = await memberService.subscribe(subscription);
 
   } catch (error) {
@@ -3257,7 +3257,7 @@ async function unsubscribeApplication(companyId, currentUserId, applicationId) {
   let result;
   try {
 
-    result = await memberService.unsubscribe(member._id, subjectType.APPLICATION, applicationId);
+    result = await memberService.unsubscribe(memberRole.member._id, subjectType.APPLICATION, applicationId);
 
   } catch (error) {
     console.log(error);
@@ -3807,7 +3807,6 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
   let candidate = null;
 
-  console.log(candidateId)
   if(isNaN(candidateId)) {
     console.log('isnan')
     candidate = await candidateService.findById(candidateId).populate([
