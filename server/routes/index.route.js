@@ -1,5 +1,6 @@
 const express = require('express');
 const authRoutes = require('./auth.route');
+const candidatesRoutes = require('./candidates.route');
 const jobRequisitionRoutes = require('./jobrequisition.route');
 const jobFunctionsRoutes = require('./jobfunction.route');
 const experienceLevelRoutes = require('./experiencelevel.route');
@@ -46,6 +47,7 @@ router.use('/ads', adRoutes);
 router.use('/admin', adminRoutes);
 
 router.use('/applications', applicationRoutes);
+router.use('/candidates', candidatesRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/company', companyRoutes);
 router.use('/emails', emailRoutes);

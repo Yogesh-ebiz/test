@@ -218,7 +218,7 @@ const convertToCandidate = (user) => {
     primaryAddress: user.primaryAddress?user.primaryAddress:null,
     progress: user.progress || [],
     rating: Math.round(user.rating * 10) /10,
-    resume: user.resume,
+    resumes: user.resumes,
     skills: user.skills || [],
     sources: user.sources || [],
     tagname: user.tagname,
