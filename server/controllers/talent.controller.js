@@ -38,6 +38,7 @@ const {buildFileUrl, buildCompanyUrl, buildUserUrl, buildCandidateUrl, jobMinima
 const feedService = require('../services/api/feed.service.api');
 const paymentService = require('../services/api/payment.service.api');
 const sovrenService = require('../services/api/sovren.service.api');
+const affindaService = require('../services/api/affinda.service.api');
 const userService = require('../services/user.service');
 
 const companyService = require('../services/company.service');
@@ -3592,132 +3593,129 @@ async function importResumes(companyId, currentUserId, files) {
   let result = {};
   let basePath = 'candidates/';
   try {
+    const allResumes = await affindaService.getAllResumes();
+    // result = await affindaService.createResume(files.file[0].path);
+    // console.log(result)
 
-    // let candidates = [];
-    // for(let [i, file] of files.file.entries()){
+    // const resume = new ResumeParser(files.file[0].path);
+    // //Convert to JSON Object
+    // let parsed = await resume.parseToJSON()
+    //   .then(data => {
+    //     return data;
     //
-    //   let candidate = await candidateService.addCandidateByResume(companyId, member, file);
-    //   candidates.push(candidate);
+    //   })
+    //   .catch(error => {
+    //     console.error(error);
+    //   });
+    //
+    // if(parsed.parts && parsed.parts.email) {
+    //   let candidate = await candidateService.findByEmailAndCompanyId(parsed.parts.email, companyId);
+    //   if (candidate) {
+    //
+    //     result.exist = {
+    //       id: candidate._id,
+    //       userId: candidate.userId,
+    //       email: candidate.email,
+    //       firstName: candidate.firstName,
+    //       lastName: candidate.lastName
+    //     }
+    //   }
     // }
 
-    const resume = new ResumeParser(files.file[0].path);
-    //Convert to JSON Object
-    let parsed = await resume.parseToJSON()
-      .then(data => {
-        return data;
 
-      })
-      .catch(error => {
-        console.error(error);
-      });
-
-    if(parsed.parts && parsed.parts.email) {
-      let candidate = await candidateService.findByEmailAndCompanyId(parsed.parts.email, companyId);
-      if (candidate) {
-
-        result.exist = {
-          id: candidate._id,
-          userId: candidate.userId,
-          email: candidate.email,
-          firstName: candidate.firstName,
-          lastName: candidate.lastName
-        }
-      }
-    }
-
-
-    result.parsed = {
-      "avatar": "https://accessed.s3.us-west-2.amazonaws.com/candidates/60feef853c173527d8f956d7/images/person_63_1603789806552.jpg",
-      "firstName": "John",
-      "middleName": "",
-      "lastName": "Doe",
-      "dob": "1968-07-05",
-      "email": "test@gmail.com",
-      "phoneNumber": "+1 5453453454",
-      "primaryAddress": {
-        "address1": null,
-        "address2": null,
-        "district": "Quan 1",
-        "city": "Ho Chi Minh",
-        "state": "Hồ Chí Minh",
-        "country": "Vietnam"
-      },
-      "partyType": "",
-      "jobTitle": "Sr. Java Develooper",
-      "about": "",
-      "gender": "M",
-      "marital": "MARRIED",
-      "noOfMonthExperiences": 35,
-      "level": "SENIOR",
-      "links": [
-        {type: "FACEBOOK", "url": "https://www.facebook.com/45345"},
-        {type: "LINKEDIN", "url": "https://www.linkedin.com/45345"},
-        {type: "TWITTER", "url": "https://www.twitter.com/45345"},
-        {type: "WEB", "url": "https://www.profile.com/45345"}
-      ],
-      "resumes": [
-        {
-          "_id": "611cd438c1a0aa1d052717d2"
-        }
-      ],
-      "experiences": [
-        {
-          "isCurrent": false,
-          "employmentTitle": "Android Developer",
-          "employmentType": "FREELANCE",
-          "description": "",
-          "terminationReason": "",
-          "terminationType": "",
-          "employer": {
-            "id": 25,
-            "name": "Hacker News"
-          },
-          "fromDate": 534859340,
-          "thruDate": 63465,
-          "city": "aaaa",
-          "state": "bbbb",
-          "country": "ccc"
-        }
-      ],
-      "educations": [
-        {
-          "fieldOfStudy": {"shortCode": "BUS"},
-          "degree": "MASTER",
-          "gpa": 4,
-          "fromDate": 1320123741111,
-          "thruDate": 1398920541111,
-          "hasGraduated": true,
-          "isCurrent": false,
-          "institute": {
-            "name": "San Diego University"
-          },
-          "city": "San Jose",
-          "state": "California",
-          "country": "US"
-        }
-      ],
-      "skills": [
-        {
-          "id": 9663,
-          "name": "Analytical Skills",
-          "noOfMonths": 90,
-          "rating": 0
-        },
-        {
-          "id": 7717,
-          "name": "Adobe Photoshop",
-          "noOfMonths": 12,
-          "rating": 0
-        }
-      ],
-      "languages": [
-        {
-          "language": "am",
-          "level": "PROFICIENT",
-          "name": "Amharic (አማርኛ)"
-        }
-      ]
-    }
+    // result = {
+    //   "_id": "62fc2efdd934f8f75663c0ce",
+    //   "avatar": "https://accessed.s3.us-west-2.amazonaws.com/candidates/60feef853c173527d8f956d7/images/person_63_1603789806552.jpg",
+    //   "firstName": "John",
+    //   "middleName": "",
+    //   "lastName": "Doe",
+    //   "dob": "1968-07-05",
+    //   "email": "test@gmail.com",
+    //   "phoneNumber": "+1 5453453454",
+    //   "primaryAddress": {
+    //     "address1": null,
+    //     "address2": null,
+    //     "district": "Quan 1",
+    //     "city": "Ho Chi Minh",
+    //     "state": "Hồ Chí Minh",
+    //     "country": "Vietnam"
+    //   },
+    //   "partyType": "",
+    //   "jobTitle": "Sr. Java Develooper",
+    //   "about": "",
+    //   "gender": "M",
+    //   "marital": "MARRIED",
+    //   "noOfMonthExperiences": 35,
+    //   "level": "SENIOR",
+    //   "links": [
+    //     {type: "FACEBOOK", "url": "https://www.facebook.com/45345"},
+    //     {type: "LINKEDIN", "url": "https://www.linkedin.com/45345"},
+    //     {type: "TWITTER", "url": "https://www.twitter.com/45345"},
+    //     {type: "WEB", "url": "https://www.profile.com/45345"}
+    //   ],
+    //   "resumes": [
+    //     {
+    //       "_id": "611cd438c1a0aa1d052717d2"
+    //     }
+    //   ],
+    //   "experiences": [
+    //     {
+    //       "isCurrent": false,
+    //       "employmentTitle": "Android Developer",
+    //       "employmentType": "FREELANCE",
+    //       "description": "",
+    //       "terminationReason": "",
+    //       "terminationType": "",
+    //       "employer": {
+    //         "id": 25,
+    //         "name": "Hacker News"
+    //       },
+    //       "fromDate": 534859340,
+    //       "thruDate": 63465,
+    //       "city": "aaaa",
+    //       "state": "bbbb",
+    //       "country": "ccc"
+    //     }
+    //   ],
+    //   "educations": [
+    //     {
+    //       "fieldOfStudy": {"shortCode": "BUS"},
+    //       "degree": "MASTER",
+    //       "gpa": 4,
+    //       "fromDate": 1320123741111,
+    //       "thruDate": 1398920541111,
+    //       "hasGraduated": true,
+    //       "isCurrent": false,
+    //       "institute": {
+    //         "name": "San Diego University"
+    //       },
+    //       "city": "San Jose",
+    //       "state": "California",
+    //       "country": "US"
+    //     }
+    //   ],
+    //   "skills": [
+    //     {
+    //       "id": 9663,
+    //       "name": "Analytical Skills",
+    //       "noOfMonths": 90,
+    //       "rating": 0
+    //     },
+    //     {
+    //       "id": 7717,
+    //       "name": "Adobe Photoshop",
+    //       "noOfMonths": 12,
+    //       "rating": 0
+    //     }
+    //   ],
+    //   "languages": [
+    //     {
+    //       "language": "am",
+    //       "level": "PROFICIENT",
+    //       "name": "Amharic (አማርኛ)"
+    //     }
+    //   ]
+    // }
 
 
   } catch (error) {

@@ -122,7 +122,7 @@ router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(
 
 
 router.route('/company/:id/candidates').post(asyncHandler(addCandidate));
-router.route('/company/:id/candidates/import/resumes').post(asyncHandler(importResumes));
+router.route('/company/:id/candidates/resumes').post(asyncHandler(importResumes));
 router.route('/company/:id/candidates/search').post(asyncHandler(searchCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
