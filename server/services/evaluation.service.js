@@ -61,10 +61,11 @@ async function add(form) {
 
   form = await Joi.validate(form, evaluationSchema, {abortEarly: false});
 
+  let assessment;
   if(form.assessment){
     form.assessment.candidateId = form.candidateId;
     form.assessment.createdBy = form.createdBy;
-    let assessment = await assessmentService.addAssessment(form.assessment);
+    assessment = await assessmentService.addAssessment(form.assessment);
     if(assessment){
       form.assessment = assessment._id;
     }
@@ -81,7 +82,8 @@ async function add(form) {
 
     }
   }
-  let evaluation = new Evaluation(form).save();
+  let evaluation = await new Evaluation(form).save();
+  evaluation.assessment = assessment;
   return evaluation;
 
 }

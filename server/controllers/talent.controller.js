@@ -2944,7 +2944,6 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
       }
     ]);
 
-    console.log(application)
     if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
       form.createdBy = memberRole.member._id;
@@ -2958,6 +2957,9 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
       result = await evaluationService.add(form);
 
       if(result){
+        result.applicationProgressId = application.currentProgress;
+        result.createdBy = memberRole.member;
+
         application.user.evaluations.push(result._id);
         application.currentProgress.evaluations.push(result._id);
         await application.currentProgress.save();
