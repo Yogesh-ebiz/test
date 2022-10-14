@@ -3399,6 +3399,8 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
             note: 1,
             user: 1,
             jobTitle: 1,
+            jobId: 1,
+            job: 1,
             currentProgress: 1,
             noOfComments: 1,
             noOfEvaluations: 1
