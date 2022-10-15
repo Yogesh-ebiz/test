@@ -10,7 +10,8 @@ const noteSchema = Joi.object({
   subject: Joi.object(),
   subjectType: Joi.string().required(),
   createdBy: Joi.object().required(),
-  message: Joi.string().required()
+  message: Joi.string().required(),
+  viewers: Joi.array().optional()
 });
 
 
@@ -74,18 +75,35 @@ async function getNotes(subjectType, subjectId, sort) {
 }
 
 
-async function addNote(note, member) {
+async function addNote(form, member) {
+  let data = null;
+
+  if(!form || !member){
+    return;
+  }
+
+  form = await Joi.validate(form, noteSchema, {abortEarly: false});
+  const note = await new Note(form).save()
+
+  return note;
+
+}
+
+async function update(form, member) {
   let data = null;
 
   if(!note || !member){
     return;
   }
 
-  note = await Joi.validate(note, noteSchema, {abortEarly: false});
-  note = await new Note(note).save()
+  let note = await Note.findById(form._id);
+  if(note){
+    note.message = form.message;
+    note.viewers = form.viewers;
+    note = await note.save();
+  }
 
   return note;
-
 }
 
 
@@ -93,5 +111,6 @@ async function addNote(note, member) {
 module.exports = {
   findBy_Id:findBy_Id,
   getNotes:getNotes,
-  addNote:addNote
+  addNote:addNote,
+  update:update
 }

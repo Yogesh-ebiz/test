@@ -30,8 +30,8 @@ const NoteSchema = new mongoose.Schema({
   lastUpdatedDate: {
     type: Number,
     required: false
-  }
-
+  },
+  viewers: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
 }, {
   versionKey: false
 });
