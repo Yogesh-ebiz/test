@@ -10,10 +10,9 @@ function CandidateParam(filter) {
 
 
 
-  this.query.hasApplied = (filter.hasApplied)?true:false;
-
-  // this.query.hasApplied =  filter.hasApplied?true:false;
+  // this.query.hasApplied = filter.hasApplied?true:false;
   // this.query.hasImported =  filter.hasImported?true:false;
+
 
   if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };
