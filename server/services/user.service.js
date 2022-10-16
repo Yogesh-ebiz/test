@@ -10,8 +10,8 @@ const userSchema = Joi.object({
   firstName: Joi.string(),
   middleName: Joi.string().allow('').optional(),
   lastName: Joi.string(),
-  email: Joi.string(),
-  phoneNumber: Joi.string().allow(null).optional(),
+  emails: Joi.array(),
+  phoneNumbers: Joi.array().allow(null).optional(),
   resumes: Joi.array().optional(),
   preferences: Joi.object().optional(),
   createdBy: Joi.number().allow(null).optional()

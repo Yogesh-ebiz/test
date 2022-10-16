@@ -31,12 +31,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required:true
   },
-  email: {
-    type: String,
-    required:true
+  emails: {
+    type: Array,
+    required:false,
+    default: []
   },
-  phoneNumber: {
-    type: String
+  phoneNumbers: {
+    type: Array,
+    required:false,
+    default: []
   },
   middleName: {
     type: String,

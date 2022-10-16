@@ -87,8 +87,6 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
     company: companyId
   }
 
-  console.log(candidate)
-
   if(user.id){
     candidate.userId = user.id;
   }
@@ -142,8 +140,7 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   candidate = await new Candidate(candidate).save();
   let newUser = await userService.findByUserId(user.id);
   if(!newUser){
-    let email = user.email?user.email:user.emails[0].value;
-    newUser = {firstName:user.firstName, lastName: user.lastName, email: email, userId: user.id, resumes: user.resumes, createdBy: currentUserId};
+    newUser = {firstName:user.firstName, lastName: user.lastName, emails: emails, phoneNumbers: user.phoneNumbers, userId: user.id, resumes: user.resumes, createdBy: currentUserId};
     newUser = await userService.add(newUser);
   }
 
