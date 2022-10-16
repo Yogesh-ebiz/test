@@ -31,7 +31,7 @@ const skillSchema = Joi.object({
 });
 
 const candidateSchema = Joi.object({
-  userId: Joi.number().allow('', null).optional(),
+  userId: Joi.number().optional(),
   company: Joi.number(),
   about: Joi.string().allow('').optional(),
   avatar: Joi.string().allow('').optional(),
@@ -142,7 +142,9 @@ async function addCandidate(currentUserId, companyId, user, isApplied, isImporte
   candidate = await new Candidate(candidate).save();
   let newUser = await userService.findByUserId(user.id);
   if(!newUser){
-    newUser = await userService.add({firstName:user.firstName, lastName: user.lastName, userId: user.id, resumes: user.resumes, createdBy: currentUserId});
+    let email = user.email?user.email:user.emails[0].value;
+    newUser = {firstName:user.firstName, lastName: user.lastName, email: email, userId: user.id, resumes: user.resumes, createdBy: currentUserId};
+    newUser = await userService.add(newUser);
   }
 
 

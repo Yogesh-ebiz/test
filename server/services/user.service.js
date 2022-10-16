@@ -6,10 +6,12 @@ const User = require('../models/user.model');
 const JobPreference = require("../models/jobpreferences.model");
 
 const userSchema = Joi.object({
-  userId: Joi.number(),
+  userId: Joi.number().allow(null).optional(),
   firstName: Joi.string(),
   middleName: Joi.string().allow('').optional(),
   lastName: Joi.string(),
+  email: Joi.string(),
+  phoneNumber: Joi.string().allow(null).optional(),
   resumes: Joi.array().optional(),
   preferences: Joi.object().optional(),
   createdBy: Joi.number().allow(null).optional()
@@ -54,14 +56,14 @@ async function register(form) {
 
 }
 
-async function add(user) {
+async function add(form) {
 
-  if(!user){
+  if(!form){
     return;
   }
 
-  user = await Joi.validate(user, userSchema, {abortEarly: false});
-  user = await new User(user).save();
+  form = await Joi.validate(form, userSchema, {abortEarly: false});
+  const user = await new User(form).save();
   return user;
 
 }

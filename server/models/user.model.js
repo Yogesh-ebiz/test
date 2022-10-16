@@ -5,8 +5,7 @@ const statusEnum = require('../const/statusEnum');
 
 const UserSchema = new mongoose.Schema({
   userId: {
-    type: Number,
-    required: true
+    type: Number
   },
   createdBy: {
     type: Number,
@@ -31,6 +30,13 @@ const UserSchema = new mongoose.Schema({
   lastName: {
     type: String,
     required:true
+  },
+  email: {
+    type: String,
+    required:true
+  },
+  phoneNumber: {
+    type: String
   },
   middleName: {
     type: String,
