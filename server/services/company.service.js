@@ -656,7 +656,7 @@ async function findAllCompanyByMemberId(memberId) {
   if(!memberId){
     return;
   }
-  console.log(memberId)
+
   data = await Company.aggregate([
     { $match: {'members.member': { $in: [memberId] }}},
     {
@@ -667,7 +667,7 @@ async function findAllCompanyByMemberId(memberId) {
         as: 'role',
       },
     },
-    {$unwind: '$role'},
+    {$unwind: {path: '$role', preserveNullAndEmptyArrays: true} },
   ]);
 
   return data;

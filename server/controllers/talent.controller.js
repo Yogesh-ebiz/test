@@ -335,13 +335,14 @@ async function getUserSession(currentUserId, preferredCompany) {
   let result;
   let user;
   let member = await memberService.findByUserId(currentUserId);
-
+  console.log(member)
   if(!member){
     return;
   }
 
   user = member.toJSON();
   let companies = await companyService.findAllCompanyByMemberId(member._id);
+  console.log(companies)
   user.company = _.reduce(companies, function(res, company){
 
     company.benefits = [];
@@ -352,7 +353,7 @@ async function getUserSession(currentUserId, preferredCompany) {
     res.push(company);
     return res;
   }, []);
-  user.preferredCompany = preferredCompany;
+  user.preferredCompany = _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length>0?companies[0].companyId:preferredCompany;
 
   return user;
 
