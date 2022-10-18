@@ -398,7 +398,7 @@ const buildCandidateUrl = (candidate) => {
   }
 
   let avatar = candidate.avatar?candidate.avatar:candidate._avatar;
-  let path = avatar.indexOf('http')>-1?avatar:`${process.env.CDN}/candidates/${candidate._id}/images/${avatar}`;
+  let path = avatar && avatar.indexOf('http')>-1?avatar:`${process.env.CDN}/candidates/${candidate._id}/images/${avatar}`;
   return avatar?path:'';
 }
 
