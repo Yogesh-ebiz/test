@@ -147,6 +147,8 @@ async function update(companyId, currentUserId, form) {
       company.name = form.name;
       company.legalName = form.legalName;
       company.type = form.type;
+      company.primaryAddress = form.primaryAddress;
+      company.website = form.website;
       company = await company.save();
     }
 

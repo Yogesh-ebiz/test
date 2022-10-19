@@ -40,6 +40,9 @@ const CompanySchema = new mongoose.Schema({
   avatar: {
     type: String
   },
+  website: {
+    type: String
+  },
   primaryAddress: {
     type: Object
   },
