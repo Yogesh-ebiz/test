@@ -341,7 +341,7 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   user = member.toJSON();
   let companies = await companyService.findAllCompanyByMemberId(member._id);
-  console.log(companies)
+
   user.company = _.reduce(companies, function(res, company){
     company.noOfMembers = company.members.length;
     company.members = [];
