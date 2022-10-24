@@ -335,7 +335,6 @@ async function getUserSession(currentUserId, preferredCompany) {
   let result;
   let user;
   let member = await memberService.findByUserId(currentUserId);
-  console.log(member)
   if(!member){
     return;
   }
@@ -344,8 +343,6 @@ async function getUserSession(currentUserId, preferredCompany) {
   let companies = await companyService.findAllCompanyByMemberId(member._id);
   console.log(companies)
   user.company = _.reduce(companies, function(res, company){
-
-    company.benefits = [];
     company.noOfMembers = company.members.length;
     company.members = [];
     company.roles = [];
