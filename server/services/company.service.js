@@ -1073,13 +1073,11 @@ async function updateBenefits(companyId, benefits) {
   }
 
 
+  let company = await Company.findOne({companyId: companyId});
+  company.benefits = benefits;
+  company = await company.save();
+  data = { benefits: benefits };
 
-  if(company){
-    let company = await Company.findOne({companyId: companyId});
-    company.benefits = benefits;
-    company = await company.save();
-    data = { benefits: benefits };
-  }
   return data;
 }
 
