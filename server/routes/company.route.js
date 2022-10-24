@@ -597,7 +597,7 @@ async function getBenefits(req, res) {
 async function updateBenefits(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let benefits = req.body;
+  const {benefits} = req.body;
 
   let data = await companyCtl.updateBenefits(company, benefits, currentUserId);
   res.json(new Response(data, data?'benefits_updated_successful':'not_found', res));

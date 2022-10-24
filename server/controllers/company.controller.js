@@ -1375,7 +1375,7 @@ async function updateBenefits(company, benefits, currentUserId) {
   let result = [];
 
   try {
-    result = await benefitService.update(company, benefits);
+    result = await companyService.updateBenefits(company, benefits);
 
   } catch(e){
     console.log('updateCompanyBenefits: Error', e);

@@ -1065,6 +1065,24 @@ function getCompanyLatestSalaries(company) {
   return data;
 }
 
+async function updateBenefits(companyId, benefits) {
+  let data = null;
+
+  if(!companyId){
+    return [];
+  }
+
+
+
+  if(company){
+    let company = await Company.findOne({companyId: companyId});
+    company.benefits = benefits;
+    company = await company.save();
+    data = { benefits: benefits };
+  }
+  return data;
+}
+
 
 module.exports = {
   add:add,
@@ -1095,4 +1113,5 @@ module.exports = {
   groupSalaryByLocations:groupSalaryByLocations,
   groupSalaryByGender: groupSalaryByGender,
   getCompanyLatestSalaries:getCompanyLatestSalaries,
+  updateBenefits:updateBenefits
 }
