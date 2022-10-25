@@ -248,7 +248,25 @@ const JobRequisitionSchema = new mongoose.Schema({
   applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }],
   applicationForm:{
     type: Object,
-    require: false
+    require: false,
+    default : {
+      resume : {
+        isDisplay: true,
+        isRequired: true
+      },
+      coverLetter: {
+        isDisplay: true,
+        isRequired: true
+      },
+      photo: {
+        isDisplay: true,
+        isRequired: true
+      },
+      email: {
+        isDisplay: true,
+        isRequired: true
+      }
+    },
   },
   autoConfirmationEmail: {
     type: Boolean,
