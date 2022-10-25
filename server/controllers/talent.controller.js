@@ -1315,16 +1315,19 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
 
     if(job) {
 
-
       let noOfApplied = await applicationService.findAppliedCountByJobId(job._id);
       job.noOfApplied = noOfApplied;
 
-      let industry = await feedService.findIndustry('', job.industry, locale);
-      job.industry = industry;
+      if(job.industry) {
+        const industry = await feedService.findIndustry('', job.industry, locale);
+        job.industry = industry;
+      }
 
-      let jobFunction = await feedService.findJobfunction('', job.jobFunction, locale);
-      if(jobFunction.length){
-        job.jobFunction = jobFunction[0];
+      if(job.joFunction) {
+        let jobFunction = await feedService.findJobfunction('', job.jobFunction, locale);
+        if (jobFunction.length) {
+          job.jobFunction = jobFunction[0];
+        }
       }
 
       if(job.category){
