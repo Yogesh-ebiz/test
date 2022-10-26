@@ -31,10 +31,11 @@ function getStage(id) {
 async function addStage(stage) {
   let data = null;
 
-  if(stage==null){
+  if(!stage){
     return;
   }
 
+  console.log(stage)
   stage = await Joi.validate(stage, stageSchema, { abortEarly: false });
 
   // for (let task of stage.tasks) {

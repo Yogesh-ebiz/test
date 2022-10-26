@@ -102,8 +102,8 @@ async function addJob(companyId, member, form) {
   }
 
   if(!form.pipeline){
-    let pipeline = await pipelineService.getDefaultTemplate();
-    form.pipeline = pipeline._id;
+    // let pipeline = await pipelineService.getDefaultTemplate();
+    // form.pipeline = pipeline._id;
   }
 
   if(member){
@@ -385,6 +385,7 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
 
         form.createdBy = currentUserId
         form.jobId = job._id;
+        console.log('adding pipeline')
         pipeline = await pipelineService.addPipeline(jobId, form);
         let oldPipeline = job.pipeline;
         console.log(oldPipeline);
