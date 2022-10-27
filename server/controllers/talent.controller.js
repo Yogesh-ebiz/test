@@ -1311,7 +1311,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     // job = await jobService.findJob_Id(jobId, locale);
-    job = await jobService.findById(jobId, locale).populate('department').populate('tags').populate('members').populate('createdBy').populate('ads');
+    job = await jobService.findById(jobId, locale).populate('department').populate('tags').populate('members').populate('createdBy').populate('ads').populate('pipeline');
 
     if(job) {
 
@@ -1381,11 +1381,7 @@ async function updateJobPipeline(companyId, jobId, currentUserId, form) {
     return null;
   }
 
-  form = await Joi.validate(form, pipelineSchema, { abortEarly: false });
-
-
   let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-
   if(!memberRole){
     return null;
   }

@@ -21,7 +21,7 @@ const QuestionTemplate = require('../models/questiontemplate.model');
 const Promotion = require('../models/promotion.model');
 const Pipeline = require('../models/pipeline.model');
 const pipelineService = require('../services/pipeline.service');
-const pipelineTemplate = require('../services/pipelineTemplate.service');
+const pipelineTemplateService = require('../services/pipelineTemplate.service');
 const memberService = require('../services/member.service');
 const feedService = require('../services/api/feed.service.api');
 const activityService = require('../services/activity.service');
@@ -102,8 +102,8 @@ async function addJob(companyId, member, form) {
   }
 
   if(!form.pipeline){
-    // let pipeline = await pipelineService.getDefaultTemplate();
-    // form.pipeline = pipeline._id;
+    let pipeline = await pipelineTemplateService.getDefaultTemplate();
+    form.pipeline = pipeline._id;
   }
 
   if(member){
@@ -316,93 +316,16 @@ async function updateJobPipeline(jobId, form, currentUserId, locale) {
     return;
   }
 
-  let pipeline=null;
 
 
-  let job = await JobRequisition.findById(jobId).populate(
-    {
-      path: 'pipeline',
-      model: 'Pipeline',
-      populate: {
-        path: 'stages',
-        model: 'Stage'
-      }
-    }
-  );
+  let job = await JobRequisition.findById(jobId);
+  const pipeline = await pipelineTemplateService.findById(ObjectID(form._id));
+  console.log(form._id, pipeline)
+  if(job && pipeline) {
+    console.log(pipeline)
+    job.pipeline = pipeline._id;
+    await job.save();
 
-  if(job) {
-    if(!job.pipeline) {
-      form.createdBy = currentUserId
-      form.jobId = job._id;
-      pipeline = await pipelineService.addPipeline(jobId, form);
-
-      if (pipeline) {
-        job.pipeline = pipeline._id;
-        await job.save();
-      }
-    } else {
-
-      let stageMigration = form.stageMigration;
-      delete form.stageMigration;
-
-      if(job.pipeline.pipelineTemplateId.equals(form.pipelineTemplateId)) {
-        for ([i, stage] of job.pipeline.stages.entries()) {
-
-          let foundStage = _.find(form.stages, {_id: stage._id.toString()});
-          if (foundStage) {
-            stage.timeLimit = foundStage.timeLimit;
-            stage.tasks=foundStage.tasks;
-            if (foundStage.tasks.length) {
-              // for([j, task] of stage.tasks.entries()){
-              //   let foundTask = _.find(foundStage.tasks, {type: task.type});
-              //   if(foundTask){
-              //     task.members = foundTask.members;
-              //     task.options = foundTask.options;
-              //     await task.save();
-              //   }
-              // }
-
-            }
-            await stage.save();
-
-          }
-
-        }
-        job.pipeline.autoRejectBlackList = form.autoRejectBlackList;
-        pipeline = job.pipeline.save();
-
-        // } else if(job.status == statusEnum.DRAFT) {
-      } else {
-        for(let [i, stages] in job.pipeline.stages.entries()){
-          if(!stage.default){
-            await stages.delete();
-          }
-        }
-
-        if(!job.pipeline.default){
-          job.pipeline.delete();
-        }
-
-        form.createdBy = currentUserId
-        form.jobId = job._id;
-        console.log('adding pipeline')
-        pipeline = await pipelineService.addPipeline(jobId, form);
-        let oldPipeline = job.pipeline;
-        console.log(oldPipeline);
-        console.log(pipeline)
-        if (pipeline) {
-          job.pipeline = pipeline._id;
-          await job.save();
-        }
-
-        if(stageMigration) {
-          for (let [i, stage] of stageMigration.entries()) {
-            await applicationProgressService.updateApplicationProgressStage(oldPipeline.stages[stage.old]._id, pipeline.stages[stage.new]);
-          }
-        }
-      }
-
-    }
   }
 
   return pipeline;
@@ -417,20 +340,20 @@ async function getJobPipeline(jobId) {
 
   let job = await JobRequisition.findById(jobId).populate({
     path: 'pipeline',
-    model: 'Pipeline',
-    populate:[{
-      path: 'stages',
-      populate:[
-        {
-          path: 'members',
-          model: 'Member'
-        },
-        {
-          path: 'tasks.members',
-          model: 'Member'
-        }
-      ]
-    }]
+    model: 'PipelineTemplate',
+    // populate:[{
+    //   path: 'stages',
+    //   populate:[
+    //     {
+    //       path: 'members',
+    //       model: 'Member'
+    //     },
+    //     {
+    //       path: 'tasks.members',
+    //       model: 'Member'
+    //     }
+    //   ]
+    // }]
   });
 
 

@@ -46,6 +46,10 @@ const PipelineTemplateSchema = new mongoose.Schema({
   company: {
     type: Object
   },
+  autoRejectBlackList: {
+    type: Boolean,
+    default: false
+  },
   noOfJobs: {
     type: Number
   },

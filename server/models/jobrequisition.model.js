@@ -273,8 +273,7 @@ const JobRequisitionSchema = new mongoose.Schema({
     default: false,
     required: false
   },
-  pipeline: { type: Schema.Types.ObjectId, ref: 'Pipeline' },
-  _pipeline: { type: Schema.Types.ObjectId, ref: 'Pipeline' },
+  pipeline: { type: Schema.Types.ObjectId, ref: 'PipelineTemplate' },
   searchAd: { type: Schema.Types.ObjectId, ref: 'Ad' },
   ads: [{ type: Schema.Types.ObjectId, ref: 'Ad' }]
 }, {
