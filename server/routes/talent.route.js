@@ -1129,9 +1129,9 @@ async function getJobMembers(req, res) {
 async function updateJobMembers(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let jobId = req.params.jobId;
-  let members = req.body.members;
-
+  let jobId = ObjectID(req.params.jobId);
+  let members = _.reduce(req.body.members, function(res, item){ res.push(ObjectID(item)); return res;},  []);
+  console.log(members)
   let data = await talentCtrl.updateJobMembers(companyId, currentUserId, jobId, members);
   res.json(new Response(data, data?'job_member_updated_successful':'not_found', res));
 }

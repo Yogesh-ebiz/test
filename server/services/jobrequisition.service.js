@@ -377,15 +377,9 @@ async function updateJobMembers(jobId, members, currentUserId, locale) {
 
   let pipeline=null;
 
-  let job = await JobRequisition.findById(jobId);
-  if(job) {
-    job.members = members
-    job.updatedBy = currentUserId;
-    data = await JobRequisition.update({_id: ObjectID(jobId)}, {$set: {members: members, updatedBy: currentUserId}});
-  }
+  let job = await JobRequisition.updateOne({_id: jobId}, {$set: {members: members}});
 
-
-  return data;
+  return job;
 }
 
 async function getJobMembers(jobId) {
