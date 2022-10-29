@@ -438,31 +438,20 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
     return;
   }
 
+  let updates = {};
 
-  let job = await JobRequisition.findById(jobId);
-  console.log(job)
-  if(job){
-    if(form.questionTemplateId) {
-      let questionTemplate = await QuestionTemplate.findById(form.questionTemplateId);
-
-      if (questionTemplate) {
-        job.questionTemplate = questionTemplate._id;
-        job.hasQuestions = true;
-      }
-    }
-
-    if (form.applicationForm) {
-      job.applicationForm = form.applicationForm;
-    }
-
-    if (!job.pipeLine) {
-      job.pipeLine = null;
-    }
-
-    job.updatedBy = currentUserId;
-    data = await job.save();
+  if(form.questionTemplateId) {
+    updates.questionTemplate = form.questionTemplateId;
   }
 
+  if (form.applicationForm) {
+    updates.applicationForm = form.applicationForm;
+  }
+
+  if(updates){
+    updates.updatedBy = currentUserId;
+    data = await JobRequisition.updateOne({_id: jobId}, updates);
+  }
 
   return data;
 }

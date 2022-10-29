@@ -1165,8 +1165,12 @@ async function unsubscribeJob(req, res) {
 async function updateJobApplicationForm(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
-  let jobId = req.params.jobId;
+  let jobId = ObjectID(req.params.jobId);
   let form = req.body;
+
+  if(form.questionTemplateId){
+    form.questionTemplateId = ObjectID(form.questionTemplateId);
+  }
 
   let data = await talentCtrl.updateJobApplicationForm(companyId, currentUserId, jobId, form);
   res.json(new Response(data, data?'job_applicationform_updated_successful':'not_found', res));
