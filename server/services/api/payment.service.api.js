@@ -5,8 +5,8 @@ const { PaymentError } = require('../../middleware/baseError');
 
 
 const options = { headers: {'userId': null } };
-let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/api');
-// let client = new ApiClient('http://localhost:5001/api');
+// let client = new ApiClient('http://accessed-ps.us-west-2.elasticbeanstalk.com/api');
+let client = new ApiClient('http://localhost:5001/api');
 
 
 async function addCustomer(form) {
@@ -175,7 +175,7 @@ async function addProduct(userId, form) {
 };
 
 
-async function getAdroducts() {
+async function getAdProducts() {
 
   let response = await client.get(`/products/providers?types=JOB`, null, null).catch(function (error) {
     if (error.response) {
@@ -523,7 +523,7 @@ module.exports = {
   charge:charge,
   pay:pay,
   addProduct:addProduct,
-  getAdroducts:getAdroducts,
+  getAdProducts:getAdProducts,
   addPaymentMethod:addPaymentMethod,
   getPaymentMethod:getPaymentMethod,
   getDefaultCard:getDefaultCard,

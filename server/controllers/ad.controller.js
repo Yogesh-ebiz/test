@@ -20,7 +20,7 @@ async function getAds(currentUserId, locale) {
 
   let result;
   try {
-    result = await paymentService.getAdroducts();
+    result = await paymentService.getAdProducts();
   } catch (error) {
     console.log(error);
   }

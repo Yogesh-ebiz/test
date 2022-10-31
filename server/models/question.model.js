@@ -41,6 +41,13 @@ const QuestionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  answer: {
+    type: Object
+  },
+  autoReject: {
+    type: Boolean,
+    default: false
+  },
 }, {
   versionKey: false
 });

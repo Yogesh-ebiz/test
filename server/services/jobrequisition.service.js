@@ -439,10 +439,7 @@ async function updateJobApplicationForm(jobId, form, currentUserId, locale) {
   }
 
   let updates = {};
-
-  if(form.questionTemplateId) {
-    updates.questionTemplate = form.questionTemplateId;
-  }
+  updates.questionTemplate = form.questionTemplateId?form.questionTemplateId:null;
 
   if (form.applicationForm) {
     updates.applicationForm = form.applicationForm;
