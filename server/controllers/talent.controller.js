@@ -1311,7 +1311,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     let localeStr = locale? locale : 'en';
     let propLocale = '$name.'+localeStr;
     // job = await jobService.findJob_Id(jobId, locale);
-    job = await jobService.findById(jobId, locale).populate('department').populate('tags').populate('members').populate('createdBy').populate('ads').populate('pipeline');
+    job = await jobService.findById(jobId, locale).populate('department').populate('tags').populate('members').populate('createdBy').populate('ads').populate('searchAd').populate('pipeline');
 
     if(job) {
 

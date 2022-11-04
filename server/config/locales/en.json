@@ -270,5 +270,6 @@
 	"invitation_retrieved_successful": "invitation_retrieved_successful",
 	"invitation_accepted_successful": "invitation_accepted_successful",
 	"company_removed_successful": "company_removed_successful",
-	"job_uploaded_successful": "job_uploaded_successful"
+	"job_uploaded_successful": "job_uploaded_successful",
+	"get_salary_successful": "get_salary_successful"
 }
