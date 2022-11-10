@@ -41,7 +41,8 @@ const AdSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  targeting: { type: Schema.Types.ObjectId, ref: 'Target' }
+  targeting: { type: Schema.Types.ObjectId, ref: 'Target' },
+  invoice: { type: Schema.Types.ObjectId, ref: 'Invoice' }
 }, {
   versionKey: false
 });

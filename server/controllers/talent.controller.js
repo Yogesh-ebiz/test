@@ -1601,14 +1601,19 @@ async function payJob(companyId, currentUserId, jobId, form) {
   let result = {success: false, verification: false};
   let job = await jobService.getJobAds(jobId)
 
+  console.log(form)
   if(job) {
     let company = await companyService.findByCompanyId(companyId).populate('subscription');
     form.customer = {id: company.customerId};
     if(company.customerId) {
-      let checkout = await checkoutService.payJob(memberRole.member, form);
-      if (checkout) {
-
-        if (form.dailyBudget) {
+      console.log('customerId', company.customerId)
+      if (form.dailyBudget) {
+        console.log('budget', form.dailyBudget)
+        if(job.searchAd){
+          job.searchAd.bidAmount = form.dailyBudget;
+          console.log('saving new budget', job.searchAd)
+          await job.searchAd.save();
+        } else {
           let startTime = new Date();
           let endTime = new Date();
           endTime.setDate(endTime.getDate() + 30);
@@ -1631,7 +1636,11 @@ async function payJob(companyId, currentUserId, jobId, form) {
           job.searchAd = ad;
         }
 
-        if (form.cart.items.length) {
+      }
+
+      if (form.cart.items.length) {
+        let checkout = await checkoutService.payJob(memberRole.member, form);
+        if (checkout) {
           let products = await paymentProvider.lookupProducts(_.map(form.cart.items, 'id'));
           for (const [i, product] of products.entries()) {
 
@@ -1657,9 +1666,9 @@ async function payJob(companyId, currentUserId, jobId, form) {
               }
             };
 
-            if(product.adPosition=='feed'){
+            if (product.adPosition == 'feed') {
               let feed = await feedService.createJobFeed(job.jobId, company.partyType, company.companyId, job.description, memberRole.member.userId);
-              if(feed){
+              if (feed) {
                 ad.feedId = feed.id;
               }
             }
@@ -1668,23 +1677,21 @@ async function payJob(companyId, currentUserId, jobId, form) {
             job.ads.push(ad);
           }
         }
-
-
-        job.status = statusEnum.ACTIVE;
-        job.publishedDate = Date.now();
-        job.type = jobType.PROMOTION;
-        job = await job.save();
-
-        await activityService.addActivity({
-          causer: memberRole.member._id,
-          causerType: subjectType.MEMBER,
-          subjectType: subjectType.JOB,
-          subject: job._id,
-          action: actionEnum.PUBLISHED,
-          meta: {type: jobType.PROMOTION, job: job._id}
-        });
       }
 
+      job.status = statusEnum.ACTIVE;
+      job.publishedDate = Date.now();
+      job.type = jobType.PROMOTION;
+      job = await job.save();
+
+      await activityService.addActivity({
+        causer: memberRole.member._id,
+        causerType: subjectType.MEMBER,
+        subjectType: subjectType.JOB,
+        subject: job._id,
+        action: actionEnum.PROMOTED,
+        meta: {type: jobType.PROMOTION, job: job._id}
+      });
       result = {success: true, verification: false};
     }
     // } else {
