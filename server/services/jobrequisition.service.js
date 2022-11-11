@@ -149,6 +149,7 @@ async function updateJob(jobId, member, form) {
 
   let result;
 
+  console.log(form)
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
 
   let job = await findJob_Id(jobId);
@@ -170,6 +171,7 @@ async function updateJob(jobId, member, form) {
     job.responsibilities=  form.responsibilities;
     job.qualifications = form.qualifications;
     job.minimumQualifications = form.minimumQualifications;
+    job.minMonthExperience = form.minMonthExperience;
     job.maxMonthExperience = form.maxMonthExperience;
     job.skills = form.skills;
     job.employmentType = form.employmentType;
@@ -203,6 +205,7 @@ async function updateJob(jobId, member, form) {
     job.updatedBy = member;
     job.updatedDate = Date.now();
 
+    console.log(job);
     result = await job.save();
 
     let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.JOB, subject: job._id, action: actionEnum.UPDATED, meta: {job: job._id, jobTitle: job.title}});

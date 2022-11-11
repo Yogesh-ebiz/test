@@ -1312,7 +1312,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     let propLocale = '$name.'+localeStr;
     // job = await jobService.findJob_Id(jobId, locale);
     job = await jobService.findById(jobId, locale).populate('department').populate('tags').populate('members').populate('createdBy').populate('ads').populate('searchAd').populate('pipeline');
-
+    console.log(job)
     if(job) {
 
       let noOfApplied = await applicationService.findAppliedCountByJobId(job._id);
