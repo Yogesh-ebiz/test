@@ -1,6 +1,7 @@
 const ApiClient = require('../apiManager');
 const productType = require('../../const/productType');
 const { PaymentError } = require('../../middleware/baseError');
+const Error400 = require('../../middleware/error/Error400');
 
 
 
@@ -375,8 +376,8 @@ async function updateSubscription(id, form) {
   let response = await client.put(`/subscriptions/${id}`, form, null).catch(function (error) {
     if (error.response) {
       // Request made and server responded
-      throw new PaymentError(error.response.data.status, error.response.data.message);
-
+      // throw new PaymentError(error.response.data.status, error.response.data.message);
+      throw new Error400(error.response.data.message)
     } else if (error.request) {
       // The request was made but no response was received
       console.log(error.request);
