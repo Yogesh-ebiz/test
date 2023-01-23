@@ -342,12 +342,19 @@ async function getUserSession(currentUserId, preferredCompany) {
   user = member.toJSON();
   let companies = await companyService.findAllCompanyByMemberId(member._id);
 
-  user.company = _.reduce(companies, function(res, company){
-    company.noOfMembers = company.members.length;
-    company.members = [];
-    company.roles = [];
+  user.company = _.reduce(companies, function(res, co){
+    let company = _.clone(co);
+    const members = co.members;
+    const found = _.find(members, { 'member': member._id});
+    if(found){
+      company.messengerId = found.messengerId;
+    }
+    company.noOfMembers = members.length;
+    // company.members = [];
+    company.roles = []
     company.isOwner = company.createdBy===currentUserId?true:false;
-    res.push(company);
+    company.role = _.omit(company.role, 'description');
+    res.push(_.omit(company, ['members', 'roles']));
     return res;
   }, []);
   user.preferredCompany = _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length>0?companies[0].companyId:preferredCompany;
