@@ -142,7 +142,7 @@ async function cancelSubscription(currentUserId, id, form) {
       subscription = await paymentService.cancelSubscription(id, form);
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 
   return subscription;

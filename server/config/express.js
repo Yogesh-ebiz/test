@@ -15,6 +15,7 @@ const config = require('./config');
 const passport = require('./passport');
 // const multipart = require('connect-multiparty');
 const multer = require('multer');
+const { logError, returnError } = require('../middleware/error/errorHandler')
 
 const handleErrors = require('../middleware/handleErrors');
 const { BadRequest, BaseError} = require('../middleware/baseError');
@@ -123,6 +124,9 @@ app.use((req, res, next) => {
 // error handler, send stacktrace only during development
 // app.use(handleErrors);
 
+
+app.use(logError)
+app.use(returnError)
 
 app.use((err, req, res, next) => {
 

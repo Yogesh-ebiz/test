@@ -86,6 +86,7 @@
     "swagger-ui-express": "^3.0.9",
     "textract": "^2.5.0",
     "utf8": "^3.0.0",
+    "winston-logsene": "^2.1.1",
     "xlsx": "^0.18.5",
     "zone.js": "~0.9.1"
   },
