@@ -334,31 +334,39 @@ async function getUserSession(currentUserId, preferredCompany) {
 
   let result;
   let user;
-  let member = await memberService.findByUserId(currentUserId);
-  console.log(member)
-  if(!member){
-    return;
+  let allAccounts = await memberService.findMemberByUserId(currentUserId);
+  // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
+  let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
+
+  if(allAccounts.length>1) {
+    if (preferredCompany) {
+      preferredCompany = _.some(companies, {companyId: preferredCompany}) ? preferredCompany : companies.length ? companies[0].companyId : null;
+      user = convertToTalentUser(_.find(allAccounts, {company: preferredCompany}));
+    } else {
+      user = convertToTalentUser(allAccounts[0]);
+      preferredCompany = companies[0].companyId;
+    }
+  } else {
+    user = await feedService.findUserByIdFull(currentUserId);
+    user = convertToTalentUser(user);
+    if(companies.length) {
+      preferredCompany = companies[0].companyId;
+    }
   }
 
-  // user = member.toJSON();
-  // let companies = await companyService.findAllCompanyByMemberId(member._id);
-
-  user.company = _.reduce(companies, function(res, co){
-    let company = _.clone(co);
-    const members = co.members;
-    const found = _.find(members, { 'member': member._id});
-    if(found){
-      company.messengerId = found.messengerId;
-    }
-    company.noOfMembers = members.length;
-    // company.members = [];
-    company.roles = []
-    company.isOwner = company.createdBy===currentUserId?true:false;
-    company.role = _.omit(company.role, 'description');
-    res.push(_.omit(company, ['members', 'roles']));
+  companies = _.reduce(companies, function (res, item) {
+    let found = _.find(allAccounts, {company: item.companyId});
+    // item = convertToCompany(item);
+    item.avatar = buildCompanyUrl(item);
+    item.role = roleMinimal(found.role);
+    item.memberId = found._id;
+    res.push(item)
     return res;
-  }, []);
-  user.preferredCompany = _.some(companies, {companyId: preferredCompany})?preferredCompany:companies.length>0?companies[0].companyId:preferredCompany;
+  }, [])
+
+  user.company = companies;
+  user.preferredCompany = preferredCompany;
+
 
   return user;
 
