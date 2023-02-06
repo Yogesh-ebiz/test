@@ -1,4 +1,4 @@
-const { BaseError } = require('./baseError');
+const { BaseError } = require('./error/baseError');
 
 const handleErrors = function(err, req, res, next) {
   if (err instanceof BaseError) {

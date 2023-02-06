@@ -79,7 +79,7 @@ async function findByUserId(userId) {
     return;
   }
 
-  return Member.findOne({userId: userId}).populate('role').populate('roles');
+  return Member.find({userId: userId}).populate('role').populate('company');
 }
 
 

@@ -80,6 +80,7 @@ const MemberSchema = new mongoose.Schema({
     type: Number,
     required:true
   },
+  company: { type: Schema.Types.ObjectId, ref: 'Company' },
   role: { type: Schema.Types.ObjectId, ref: 'Role' },
   notificationPreference: { type: Schema.Types.ObjectId, ref: 'NotificationPreference' },
   followedJobs: [{ type: Schema.Types.ObjectId, ref: 'JobRequisition' }],

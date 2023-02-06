@@ -3,7 +3,6 @@ const Joi = require('joi');
 const _ = require('lodash');
 const localeCodes = require('locale-codes');
 const ObjectID = require('mongodb').ObjectID;
-const { ApplicationExist } = require('../middleware/baseError');
 
 const {jobMinimal, convertToAvatar, convertToCompany, convertIndustry, categoryMinimal, isUserActive, validateMeetingType, orderAttendees} = require('../utils/helper');
 const axiosInstance = require('../services/api.service');

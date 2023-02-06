@@ -335,12 +335,13 @@ async function getUserSession(currentUserId, preferredCompany) {
   let result;
   let user;
   let member = await memberService.findByUserId(currentUserId);
+  console.log(member)
   if(!member){
     return;
   }
 
-  user = member.toJSON();
-  let companies = await companyService.findAllCompanyByMemberId(member._id);
+  // user = member.toJSON();
+  // let companies = await companyService.findAllCompanyByMemberId(member._id);
 
   user.company = _.reduce(companies, function(res, co){
     let company = _.clone(co);

@@ -58,7 +58,6 @@ async function updateSubscription(req, res, next) {
     let id = req.params.id;
     let subscription = req.body;
     let data = await subscriptionCtl.updateSubscription(currentUserId, id, subscription);
-    console.log('no errorrrrrrrr')
     res.json(new Response(data, data?'subscription_updated_successful':'not_found', res));
   } catch(error){
     console.log('next................')

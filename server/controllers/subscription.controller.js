@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
-const { SubscriptionExist } = require('../middleware/baseError');
 
 let statusEnum = require('../const/statusEnum');
 const paymentService = require('../services/api/payment.service.api');

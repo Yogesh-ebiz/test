@@ -18,7 +18,7 @@ const multer = require('multer');
 const { logError, returnError } = require('../middleware/error/errorHandler')
 
 const handleErrors = require('../middleware/handleErrors');
-const { BadRequest, BaseError} = require('../middleware/baseError');
+const { BadRequest, BaseError} = require('../middleware/error/baseError');
 
 const i18n = require('./i18n');
 let Response = require('../const/response');
