@@ -2002,6 +2002,7 @@ async function acceptMemberInvitation(req, res) {
 
 
 async function getCompanyMembers(req, res) {
+  console.log(req.user)
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
   let query = req.query.query;

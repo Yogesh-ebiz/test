@@ -336,12 +336,17 @@ async function getUserSession(currentUserId, preferredCompany) {
   let user;
   let allAccounts = await memberService.findMemberByUserId(currentUserId);
   // let companies = await feedService.lookupCompaniesIds(_.map(allAccounts, 'company'));
-  let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
+  // let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
+  let companies = _.map(allAccounts, 'company');
 
   if(allAccounts.length>1) {
     if (preferredCompany) {
-      preferredCompany = _.some(companies, {companyId: preferredCompany}) ? preferredCompany : companies.length ? companies[0].companyId : null;
-      user = convertToTalentUser(_.find(allAccounts, {company: preferredCompany}));
+      const member = _.find(allAccounts, function(o){ return o.company.companyId===preferredCompany});
+      if(member){
+        user = convertToTalentUser(member);
+      } else {
+        user = convertToTalentUser(allAccounts[0]);
+      }
     } else {
       user = convertToTalentUser(allAccounts[0]);
       preferredCompany = companies[0].companyId;
@@ -349,13 +354,14 @@ async function getUserSession(currentUserId, preferredCompany) {
   } else {
     user = await feedService.findUserByIdFull(currentUserId);
     user = convertToTalentUser(user);
+
     if(companies.length) {
       preferredCompany = companies[0].companyId;
     }
   }
 
   companies = _.reduce(companies, function (res, item) {
-    let found = _.find(allAccounts, {company: item.companyId});
+    let found = _.find(allAccounts, function(o){ return o.company._id===item._id});
     // item = convertToCompany(item);
     item.avatar = buildCompanyUrl(item);
     item.role = roleMinimal(found.role);

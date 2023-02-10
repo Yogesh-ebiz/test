@@ -125,8 +125,8 @@ app.use((req, res, next) => {
 // app.use(handleErrors);
 
 
-app.use(logError)
-app.use(returnError)
+// app.use(logError)
+// app.use(returnError)
 
 app.use((err, req, res, next) => {
 
