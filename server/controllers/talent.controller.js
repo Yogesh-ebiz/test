@@ -924,22 +924,21 @@ async function searchJobs(currentUserId, companyId, query, filter, sort, locale)
   if(!currentUserId || !companyId || !filter || !sort){
     return null;
   }
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-
-  if(!memberRole){
+  if(!member){
     return null;
   }
 
   filter.company = [companyId];
   filter.status = filter.status? filter.status:[statusEnum.ACTIVE, statusEnum.DRAFT];
 
-  let result = await jobService.talentSearch(memberRole.member, query, filter, sort, locale);
+  let result = await jobService.talentSearch(member, query, filter, sort, locale);
 
   if(result) {
     let departmentIds = _.map(result.docs, 'department');
     let departments = await departmentService.findDepartmentsByCompany(companyId);
-    let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(memberRole.member._id, subjectType.JOB);
+    let jobSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.JOB);
 
     result.docs.map(job => {
       job.department = _.find(departments, {_id: job.department});
@@ -6170,14 +6169,16 @@ async function searchTasks(companyId, currentUserId, filter, sort, query) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
     return null;
   }
 
   let result = null;
   try {
     filter.members = [member._id];
+    console.log(filter)
     result = await taskService.search(filter, sort, query);
 
   } catch(e){

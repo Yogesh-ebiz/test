@@ -1014,6 +1014,7 @@ async function search(currentUserId, query, filter, sort, locale) {
 }
 
 async function talentSearch(member, query, filter, sort, locale) {
+  console.log('member', member)
   if(!member || !filter || !sort){
     return null;
   }

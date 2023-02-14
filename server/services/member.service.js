@@ -3,8 +3,8 @@ const ObjectID = require('mongodb').ObjectID;
 const Joi = require('joi');
 const statusEnum = require('../const/statusEnum');
 const subjectType = require('../const/subjectType');
-const Member = require('../models/member.model');
 const Company = require('../models/company.model');
+const Member = require('../models/member.model');
 const MemberInvitation = require('../models/memberInvitation.model');
 const MemberSubscribe = require('../models/membersubscribe.model');
 const feedService = require('../services/api/feed.service.api');
@@ -196,22 +196,22 @@ async function findMemberByUserId(userId) {
 
 
 async function findByUserIdAndCompany(userId, companyId) {
-  let data = null;
+  let member = null;
 
   if(!userId || !companyId){
     return;
   }
 
   // let member = await Member.findOne({userId: userId, company: company}).populate('role');
-  const company = await Company.findOne({companyId: companyId}).populate({
-    path: 'members.member',
-    model: 'Member'
-  }).populate({
-    path: 'members.role',
-    model: 'Role'
-  });
+  const company = await Company.findOne({companyId: companyId});
 
-  const member = _.find(company.members, function(o){ return o.member.userId===userId});
+  if(company){
+    member = await Member.findOne({company: company._id});
+  }
+  // const member = _.find(company.members, function(o){
+  //   console.log(o)
+  //   return o.userId===userId
+  // });
   return member
 }
 

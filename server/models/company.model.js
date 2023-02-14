@@ -52,10 +52,7 @@ const CompanySchema = new mongoose.Schema({
   memberId: {
     type: Object
   },
-  members: {
-    type: Array,
-    default: []
-  },
+  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
   benefits: {
     type: Array,
     default: []

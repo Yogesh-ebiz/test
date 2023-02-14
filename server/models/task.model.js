@@ -63,6 +63,10 @@ const TaskSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  priority: {
+    type: Number,
+    default: 0
+  },
   owner: { type: Schema.Types.ObjectId, ref: 'Member' },
   members: [{ type: Schema.Types.ObjectId, ref: 'Member' }]
 }, {

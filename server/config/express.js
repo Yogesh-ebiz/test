@@ -137,7 +137,6 @@ app.use((err, req, res, next) => {
 
   }
 
-  console.log('hello', err)
   res.status(err.status ||  500).json({
     data: null,
     message: err.message,

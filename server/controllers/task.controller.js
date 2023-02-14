@@ -32,12 +32,13 @@ async function addTask(companyId, currentUserId, task) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
 
-  task.owner = memberRole.member._id;
+  task.owner = member._id;
+  task.members = _.reduce(task.members, function(res, o){res.push(ObjectID(o)); return res;}, []);
   let result = await taskService.add(task);
   return result;
 

@@ -10,7 +10,7 @@ function TaskSearchParam(filter) {
   if(filter.status && filter.status.length){
     this.query.status =  { $in: filter.status };
   }
-  
+
   if (filter.members && filter.members.length) {
     this.query.$or =  [{members: { $in: filter.members} }, {owner: { $in: filter.members}}];
   }
@@ -28,12 +28,14 @@ function TaskSearchParam(filter) {
     let start, end;
 
 
+
     start = new Date(filter.startDate);
     start.setHours(0,0,0,0);
+    console.log(filter.startDate, start)
 
     end = new Date(filter.endDate );
     end.setHours(23,59,59,0);
-
+    console.log(filter.endDate, end)
     this.query.$and =  [{startDate: { $gte: start.getTime() }}, {startDate: { $lte: end.getTime()} }];
   }
 
