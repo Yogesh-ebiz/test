@@ -12,17 +12,26 @@ const applicationService = require('../services/application.service');
 
 
 const taskSchema = Joi.object({
+  _id: Joi.string().optional(),
   updatedBy: Joi.object().optional(),
-  required: Joi.boolean().required(),
-  type: Joi.string().required(),
+  required: Joi.boolean().optional(),
+  type: Joi.string().allow('').optional(),
   name: Joi.string().required(),
   description: Joi.string().allow('').optional(),
   members: Joi.array().required(),
   owner: Joi.object().optional(),
-  startDate: Joi.number(),
+  createdDate: Joi.number().optional(),
+  updatedDate: Joi.number().optional(),
+  startDate: Joi.number().optional(),
   endDate: Joi.number(),
   meta: Joi.object().optional(),
-  reminders: Joi.array().optional()
+  priority: Joi.number().optional(),
+  notes: Joi.string().allow('').optional(),
+  reminders: Joi.array().optional(),
+  tags: Joi.array().optional(),
+  order: Joi.number().optional(),
+  hasCompleted: Joi.boolean().optional(),
+  status: Joi.string().optional(),
 });
 
 function findById(id) {

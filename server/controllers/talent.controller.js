@@ -5742,8 +5742,8 @@ async function addCompanyLabel(companyId, currentUserId, form) {
   if(!companyId || !currentUserId || !form){
     return null;
   }
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -5768,8 +5768,8 @@ async function updateCompanyLabel(companyId, labelId, currentUserId, form) {
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -5796,8 +5796,8 @@ async function deleteCompanyLabel(companyId, labelId, currentUserId) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -5836,8 +5836,8 @@ async function inviteMembers(companyId, currentUserId, form) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
   let result = await memberService.inviteMembers(companyId, currentUserId, form.emails, form.role);
@@ -5853,8 +5853,8 @@ async function getCompanyMemberInvitations(companyId, currentUserId, query) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -5874,8 +5874,8 @@ async function cancelMemberInvitation(companyId, currentUserId, invitationId) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 

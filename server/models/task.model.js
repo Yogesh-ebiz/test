@@ -8,7 +8,6 @@ const statusEnum = require('../const/statusEnum');
 const TaskSchema = new mongoose.Schema({
   required: {
     type: Boolean,
-    required: true,
     default: false
   },
   status: {
@@ -29,8 +28,7 @@ const TaskSchema = new mongoose.Schema({
     type: Boolean
   },
   type: {
-    type: String,
-    required: true
+    type: String
   },
   data: {
     type: Object
@@ -58,6 +56,10 @@ const TaskSchema = new mongoose.Schema({
   },
   endDate: {
     type: Number
+  },
+  order: {
+    type: Number,
+    default: 1
   },
   hasCompleted: {
     type: Boolean,

@@ -52,8 +52,8 @@ async function getTask(companyId, currentUserId, taskId) {
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -69,12 +69,12 @@ async function updateTask(companyId, currentUserId, taskId, task) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
-  task.updatedBy = memberRole.member._id
+  task.updatedBy = member._id
   let result = await taskService.update(taskId, task);
   return result;
 
@@ -87,12 +87,12 @@ async function markComplete(companyId, currentUserId, taskId) {
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
-  let task = await taskService.markComplete(taskId, memberRole.member._id);
+  let task = await taskService.markComplete(taskId, member._id);
   if(task){
     result = {success: true}
   }
@@ -111,8 +111,8 @@ async function removeTask(companyId, currentUserId, taskId) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
