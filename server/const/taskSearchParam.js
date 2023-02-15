@@ -54,8 +54,6 @@ function TaskSearchParam(filter) {
     this.query.createdBy =  { $in: filter.createdBy};
   }
 
-  console.log(this.query)
-  console.log(this.query.$and)
   return this.query;
 }
 

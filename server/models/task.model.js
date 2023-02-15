@@ -67,8 +67,12 @@ const TaskSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  notes: {
+    type: String
+  },
   owner: { type: Schema.Types.ObjectId, ref: 'Member' },
-  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }]
+  members: [{ type: Schema.Types.ObjectId, ref: 'Member' }],
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Label' }]
 }, {
   versionKey: false
 });

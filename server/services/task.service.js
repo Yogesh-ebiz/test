@@ -73,6 +73,9 @@ async function update(id, form) {
   task.endDate = form.endDate;
   task.meta = form.meta;
   task.reminders = form.reminders;
+  task.notes = form.notes;
+  task.priority = form.priority;
+  task.tags = _.reduce(form.tags, function(res, o){res.push(ObjectID(o)); return res;}, []);
   result = await task.save();
 
 

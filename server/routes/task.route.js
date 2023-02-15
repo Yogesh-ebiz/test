@@ -28,6 +28,7 @@ async function addTask(req, res) {
 }
 
 async function getTask(req, res) {
+  console.log('getTask', req.header('userId'))
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.query.companyId);
   let taskId = ObjectID(req.params.id);

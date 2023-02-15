@@ -207,6 +207,9 @@ async function findByUserIdAndCompany(userId, companyId) {
 
   if(company){
     member = await Member.findOne({company: company._id});
+    if(member){
+      member.company = company;
+    }
   }
   // const member = _.find(company.members, function(o){
   //   console.log(o)
@@ -530,7 +533,7 @@ async function findJobSubscriptions(memberId, sort) {
     //   },
     // },
     // { $unwind: '$subject'}
-    {$lookup:{
+    { $lookup:{
         from:"jobrequisitions",
         let:{subject: '$subject'},
         pipeline:[

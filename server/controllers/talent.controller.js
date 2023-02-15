@@ -5893,12 +5893,12 @@ async function getCompanyMembers(companyId, query, currentUserId, locale) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
-  let result = await companyService.getMembers(companyId, query);
+  let result = await memberService.searchMembers(member.company, query);
 
   // result.forEach(function(member){
   //   let found = _.find(users, {id: member.userId});
@@ -7329,8 +7329,8 @@ async function searchContacts(companyId, currentUserId, query) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
