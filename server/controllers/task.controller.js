@@ -21,6 +21,7 @@ module.exports = {
   getTask,
   updateTask,
   markComplete,
+  closeTask,
   removeTask,
 }
 
@@ -81,26 +82,44 @@ async function updateTask(companyId, currentUserId, taskId, task) {
 }
 
 
-async function markComplete(companyId, currentUserId, taskId) {
+async function markComplete(companyId, currentUserId, taskId, hasCompleted) {
   if(!companyId || !currentUserId || !taskId){
     return null;
   }
 
 
+  let result = { success: false };
   let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
   if(!member){
     return null;
   }
 
-  let task = await taskService.markComplete(taskId, member._id);
-  if(task){
+  let task = await taskService.markComplete(taskId, hasCompleted, member._id);
+  if(task && task.nModified){
     result = {success: true}
   }
 
 
+  return result;
+}
+
+async function closeTask(companyId, currentUserId, taskId, hasCompleted) {
+  if(!companyId || !currentUserId || !taskId){
+    return null;
+  }
+
+  let result = { success: false };
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let task = await taskService.closeTask(taskId, member._id);
+  if(task && task.nModified){
+    result = {success: true, status: statusEnum.CLOSED}
+  }
 
   return result;
-
 }
 
 

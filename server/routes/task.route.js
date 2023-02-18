@@ -15,6 +15,7 @@ router.route('/:id').get(asyncHandler(getTask));
 router.route('/:id').put(asyncHandler(updateTask));
 router.route('/:id').delete(asyncHandler(removeTask));
 router.route('/:id/complete').post(asyncHandler(markComplete));
+router.route('/:id/close').post(asyncHandler(closeTask));
 
 
 
@@ -49,9 +50,17 @@ async function updateTask(req, res) {
 async function markComplete(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.query.companyId);
+  let hasCompleted = req.query.hasCompleted==='false'?false:true;
   let taskId = ObjectID(req.params.id);
-  let data = await taskCtl.markComplete(companyId, currentUserId, taskId, res.locale);
-  res.json(new Response(data, data?'task_retrieved_successful':'not_found', res));
+  let data = await taskCtl.markComplete(companyId, currentUserId, taskId, hasCompleted, res.locale);
+  res.json(new Response(data, data?'task_completed_successful':'not_found', res));
+}
+async function closeTask(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.query.companyId);
+  let taskId = ObjectID(req.params.id);
+  let data = await taskCtl.closeTask(companyId, currentUserId, taskId, res.locale);
+  res.json(new Response(data, data?'task_closed_successful':'not_found', res));
 }
 
 

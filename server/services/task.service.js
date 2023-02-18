@@ -84,7 +84,7 @@ async function update(id, form) {
   task.reminders = form.reminders;
   task.notes = form.notes;
   task.priority = form.priority;
-  task.tags = _.reduce(form.tags, function(res, o){res.push(ObjectID(o)); return res;}, []);
+  task.tags = form.tags;
   result = await task.save();
 
 
@@ -107,16 +107,28 @@ async function remove(id) {
 
 }
 
-async function markComplete(id, memberId) {
+async function markComplete(id, hasCompleted, memberId) {
   let data = null;
 
   if(!id || !memberId){
     return;
   }
 
-  let task = await Task.updateOne({_id: id, $or: [{members: memberId}, {owner: memberId}]}, { $set: {status: statusEnum.COMPLETED, hasCompleted:true} });
+  hasCompleted = hasCompleted || false;
+  const status = hasCompleted?statusEnum.COMPLETED:statusEnum.ACTIVE;
+  let task = await Task.updateOne({_id: id, $or: [{members: memberId}, {owner: memberId}]}, { $set: {status: status, hasCompleted: hasCompleted} });
   return task;
+}
 
+async function closeTask(id, memberId) {
+  let data = null;
+
+  if(!id || !memberId){
+    return;
+  }
+
+  let task = await Task.updateOne({_id: id, $or: [{members: memberId}, {owner: memberId}]}, { $set: {status: statusEnum.CLOSED} });
+  return task;
 }
 
 
@@ -189,6 +201,7 @@ module.exports = {
   update:update,
   remove:remove,
   markComplete:markComplete,
+  closeTask:closeTask,
   getTasksDueSoon:getTasksDueSoon,
   search: search
 }
