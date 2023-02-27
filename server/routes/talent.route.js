@@ -124,6 +124,7 @@ router.route('/company/:id/applications/:applicationId/files').get(asyncHandler(
 router.route('/company/:id/candidates').post(asyncHandler(addCandidate));
 router.route('/company/:id/candidates/resumes').post(asyncHandler(importResumes));
 router.route('/company/:id/candidates/search').post(asyncHandler(searchCandidates));
+router.route('/company/:id/candidates/lookup').post(asyncHandler(lookupCandidates));
 router.route('/company/:id/candidates/:candidateId').get(asyncHandler(getCandidateById));
 router.route('/company/:id/candidates/:candidateId').put(asyncHandler(updateCandidateById));
 router.route('/company/:id/candidates/:candidateId').delete(asyncHandler(removeCandidateById));
@@ -1219,6 +1220,17 @@ async function searchCandidates(req, res) {
   res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
 }
 
+async function lookupCandidates(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let company = parseInt(req.params.id);
+  let filter = {...req.body, company: [company]};
+  let sort = req.query;
+  filter.query = req.query.query;
+  filter.tags = _.reduce(filter.tags, function(res, item){res.push(ObjectID(item)); return res;}, []);
+  filter.sources = _.reduce(filter.sources, function(res, item){res.push(ObjectID(item)); return res;}, []);
+  let data = await talentCtrl.lookupCandidates(currentUserId, company, filter, sort);
+  res.json(new Response(data, data?'candidates_retrieved_successful':'not_found', res));
+}
 
 async function getCandidateById(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;

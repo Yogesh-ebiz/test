@@ -41,7 +41,7 @@ function findById(id) {
     return;
   }
 
-  return Task.findById(id).populate('members').populate('owner');
+  return Task.findById(id).populate('members').populate('owner').populate('tags');
 }
 
 

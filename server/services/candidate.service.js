@@ -476,6 +476,16 @@ async function search(filter, sort) {
 }
 
 
+async function lookup(filter) {
+  if(!filter){
+    return;
+  }
+
+  filter.status = filter.status?filter.status:[statusEnum.ACTIVE];
+  return await Candidate.find(new CandidateParam(filter));
+}
+
+
 
 async function getAllCandidatesSkills(company) {
 
@@ -721,6 +731,7 @@ module.exports = {
   getListofCandidates:getListofCandidates,
   searchCandidates:searchCandidates,
   search:search,
+  lookup:lookup,
   getAllCandidatesSkills:getAllCandidatesSkills,
   getCandidatesSimilar:getCandidatesSimilar,
   getCompanyBlacklisted:getCompanyBlacklisted,

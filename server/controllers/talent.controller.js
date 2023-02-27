@@ -201,6 +201,7 @@ module.exports = {
   addCandidate,
   importResumes,
   searchCandidates,
+  lookupCandidates,
   getCandidateById,
   updateCandidateById,
   removeCandidateById,
@@ -1322,8 +1323,9 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  console.log(member)
+  if(!member){
     return null;
   }
 
@@ -1382,7 +1384,7 @@ async function getJobById(currentUserId, companyId, jobId, locale) {
       //   }
       // });
 
-      job.hasSaved = _.some(memberRole.member.followedJobs, job._id);
+      job.hasSaved = _.some(member.followedJobs, job._id);
 
 
       result = job;
@@ -3818,6 +3820,45 @@ async function searchCandidates(currentUserId, companyId, filter, sort, locale) 
 }
 
 
+async function lookupCandidates(currentUserId, companyId, filter, sort, locale) {
+  console.log('lookupCandidates')
+  if(!currentUserId || !companyId || !filter || !sort){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  result = await candidateService.lookup(filter, sort);
+  let people = await feedService.lookupCandidateIds(_.map(result.docs, 'userId'));
+
+  result = _.reduce(result, function(res, candidate){
+    let hasSaved = false;
+
+    let found = _.find(people, {id: candidate.userId});
+    if(found)
+    {
+      candidate.skills = found.skills
+      candidate.past = found.past;
+      candidate.experiences = found.experiences;
+      candidate.educations = found.educations;
+      candidate.avatar = candidate.avatar || found.avatar;
+    }
+    candidate.firstName = candidate.firstName?candidate.firstName:candidate.email;
+    candidate.hasSaved=hasSaved;
+    candidate.avatar = buildCandidateUrl(candidate);
+    res.push(convertToCandidate(candidate));
+    return res;
+  }, []);
+
+  return result;
+
+}
+
+
 async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
   if(!currentUserId || !companyId || !candidateId){
@@ -3835,7 +3876,6 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
   let candidate = null;
 
   if(isNaN(candidateId)) {
-    console.log('isnan')
     candidate = await candidateService.findById(candidateId).populate([
       {
         path: 'applications',
@@ -3887,9 +3927,10 @@ async function getCandidateById(currentUserId, companyId, candidateId, locale) {
 
   if(candidate) {
     candidate = _.merge({}, candidate);
-    if(candidate.skills) {
-      candidate.skills = await feedService.findSkillsById(candidate.skills);
+    if(candidate.skills && candidate.skills.length>0) {
+      candidate.skills = await feedService.findSkillsById(_.map(candidate.skills, 'id'));
     }
+
     if(candidate.userId){
       let people = await feedService.findCandidateById(candidate.userId);
       if(people){
