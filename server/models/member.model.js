@@ -80,6 +80,9 @@ const MemberSchema = new mongoose.Schema({
     type: Number,
     required:true
   },
+  messengerId: {
+    type: String
+  },
   company: { type: Schema.Types.ObjectId, ref: 'Company' },
   role: { type: Schema.Types.ObjectId, ref: 'Role' },
   notificationPreference: { type: Schema.Types.ObjectId, ref: 'NotificationPreference' },

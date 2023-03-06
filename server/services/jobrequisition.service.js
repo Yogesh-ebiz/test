@@ -283,7 +283,7 @@ async function findJob_Id(jobId, locale) {
   if(!jobId){
     return;
   }
-  data = await JobRequisition.findById(jobId).populate('department').populate('tags').populate('members').populate('createdBy');
+  data = await JobRequisition.findById(jobId).populate('department').populate('tags').populate('members').populate('createdBy').populate('pipeline');
   return data;
 
   // return JobRequisition.findOne({jobId: jobId});

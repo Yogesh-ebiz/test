@@ -52,6 +52,7 @@ const cardTest = (card) => {
 
 const convertToTalentUser = (user) => {
 
+  console.log(user)
   if(!user){
     return;
   }
@@ -78,6 +79,7 @@ const convertToTalentUser = (user) => {
     currency: user.currency,
     language: user.language,
     userId: user.userId,
+    messengerId: user.messengerId,
     preferredCompany: user.preferredCompany,
     preferTimeFormat: user.preferTimeFormat,
     timezone: user.timezone,
@@ -136,6 +138,7 @@ const convertToCandidate = (user) => {
     return;
   }
 
+  console.log(user)
   let current = user.current?user.current:null;
   if(current){
     current.employer = convertToCompany(current.employer);

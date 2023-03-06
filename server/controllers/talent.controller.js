@@ -340,7 +340,8 @@ async function getUserSession(currentUserId, preferredCompany) {
   // let companies = await companyService.findByCompanyIds(_.map(allAccounts, 'company'), true);
   let companies = _.map(allAccounts, 'company');
 
-  if(allAccounts.length>1) {
+  // console.log(allAccounts)
+  if(allAccounts.length) {
     if (preferredCompany) {
       const member = _.find(allAccounts, function(o){ return o.company.companyId===preferredCompany});
       if(member){
@@ -349,6 +350,7 @@ async function getUserSession(currentUserId, preferredCompany) {
         user = convertToTalentUser(allAccounts[0]);
       }
     } else {
+      console.log(allAccounts.length)
       user = convertToTalentUser(allAccounts[0]);
       preferredCompany = companies[0].companyId;
     }
@@ -1422,9 +1424,9 @@ async function getJobPipeline(companyId, jobId, currentUserId) {
 
   let result = null;
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!memberRole){
+  if(!member){
     return null;
   }
 
@@ -1433,7 +1435,7 @@ async function getJobPipeline(companyId, jobId, currentUserId) {
     result.stages = _.reduce(result.stages, function(res, stage){
       stage.tasks = _.reduce(stage.tasks, function(res, task){
         task.members = _.reduce(task.members, function(res, member){
-          member.avatar = buildUserUrl(memberRole.member);
+          member.avatar = buildUserUrl(member);
           res.push(member);
           return res;
         }, []);
@@ -1889,14 +1891,14 @@ async function searchApplications(companyId, currentUserId, jobId, filter, sort,
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
   let result = await applicationService.search(jobId, filter, sort);
 
-  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(memberRole.member._id, subjectType.APPLICATION);
+  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
   result.docs.forEach(function(app){
     app.labels = [];
     app.note = [];
@@ -3303,8 +3305,8 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -3336,16 +3338,18 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
   let boardStages = [];
   let pipelineStages;
-  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(memberRole.member._id, subjectType.APPLICATION);
+  let applicationSubscribed = await memberService.findMemberSubscribedToSubjectType(member._id, subjectType.APPLICATION);
   let job = await jobService.findJob_Id(jobId, locale);
   if(job.pipeline) {
-    let pipeline = await pipelineService.findById(job.pipeline);
+    // console.log(job.pipeline)
+    // let pipeline = await pipelineService.findById(job.pipeline);
+    const { pipeline } = job;
     if (pipeline.stages) {
 
       let pipelineStages = pipeline.stages;
@@ -3435,9 +3439,11 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
             noOfEvaluations: 1
           }
         },
-        {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}}
+        {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}},
+        {$project:{ _id: "$_id", noOfApplications:{ $size:"$applications"}, applications:{ $slice:["$applications", 1] }}}
       ]);
 
+      // console.log(applicationsGroupByStage)
       pipelineStages.forEach(function (item) {
 
         let stage = {
@@ -3446,11 +3452,17 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
           name: item.name,
           timeLimit: item.timeLimit,
           tasks: item.tasks,
-          applications: []
+          applications: [],
+          noOfApplications: 0
         }
-        let found = _.find(applicationsGroupByStage, {'_id': item._id});
+
+        console.log('item', item)
+        let found = _.find(applicationsGroupByStage, {'_id': item.type});
+        console.log('found', found)
         if (found) {
           stage.applications = found.applications;
+          stage.noOfApplications = found.noOfApplications;
+
           for (let [i, item] of stage.applications.entries()) {
             item.hasFollowed = _.find(applicationSubscribed, {subject: item._id}) ? true : false;
             item.user.avatar = buildCandidateUrl(item.user);
