@@ -2156,9 +2156,9 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!memberRole){
+  if(!member){
     return null;
   }
 
@@ -2170,10 +2170,6 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         path: 'progress',
         model: 'ApplicationProgress',
         populate: [
-          {
-            path: 'stage',
-            model: 'Stage'
-          },
           {
             path: 'attachment',
             model: 'File'
@@ -2255,7 +2251,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
           }
         }
 
-        hasEvaluated = _.some(progress.evaluations, {createdBy: memberRole.member._id});
+        hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
         if(progress.stage) {
           progress.stage.tasks.forEach(function (task) {
             if (task.type === taskType.EMAIL) {
@@ -2289,6 +2285,7 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
       }
 
+      console.log(application)
       application.progress = _.orderBy(application.progress, p => { return p.stage.stageId; }, ['asc']);
 
       application.noOfEvaluations = noOfEvaluations;
@@ -2383,9 +2380,9 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!memberRole){
+  if(!member){
     return null;
   }
 
@@ -2395,19 +2392,11 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
     let application = await applicationService.findApplicationBy_Id(applicationId).populate([
       {
         path: 'currentProgress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
+        model: 'ApplicationProgress'
       },
       {
         path: 'progress',
-        model: 'ApplicationProgress',
-        populate: {
-          path: 'stage',
-          model: 'Stage'
-        }
+        model: 'ApplicationProgress'
       },
       {
         path: 'user',
@@ -2416,33 +2405,33 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
     ]);
 
 
-    let foundStage;
+
     if(application) {
+
       let job = await jobService.findById(application.jobId).populate('createdBy');
-
       let previousProgress = application.currentProgress;
-      _.forEach(application.progress, function(item){
-        if(item.stage._id.equals(ObjectID(newStage))){
-          progress = item;
-          foundStage = item.stage;
-        }
-      });
+      // _.forEach(application.progress, function(item){
+      //   if(item.stage.equals(newStage)){
+      //     progress = item;
+      //     foundStage = item.stage;
+      //   }
+      // });
 
+      progress = _.find(application.progress, {stage: newStage});
+      let pipeline = await pipelineTemplateService.findById(job.pipeline);
+      let foundStage = _.find(pipeline.stages, {type: newStage});
 
       if(progress){
         application.currentProgress = progress;
-        newStage = progress.stage;
         await application.save();
-
       } else {
-        let pipeline = await pipelineService.findById(job.pipeline);
         if(pipeline) {
-          foundStage = _.find(pipeline.stages, {_id: ObjectID(newStage)});
+          foundStage = _.find(pipeline.stages, {type: newStage});
 
           if(foundStage) {
             progress = await  applicationProgressService.addApplicationProgress({
               applicationId: application.applicationId,
-              stage: foundStage
+              stage: foundStage.type
             });
 
             newStage = foundStage;
@@ -2458,8 +2447,8 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
       }
 
 
-      let activity = await activityService.addActivity({causer: memberRole.member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, job: job._id, jobTitle: job.title, from: previousProgress.stage.name, to: newStage.name}});
-
+      let activity = await activityService.addActivity({causer: member._id, causerType: subjectType.MEMBER, subjectType: subjectType.APPLICATION, subject: application._id, action: actionEnum.MOVED, meta: {name: application.user.firstName + ' ' + application.user.lastName, candidate: application.user, job: job._id, jobTitle: job.title, from: previousProgress.stage, to: newStage}});
+      console.log(activity)
       //Create Notification
       let meta = {
         applicationId: application._id,
@@ -2783,9 +2772,9 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!memberRole){
+  if(!member){
     return null;
   }
 
@@ -2795,8 +2784,8 @@ async function addApplicationComment(companyId, currentUserId, applicationId, co
   if(application) {
     comment.subjectType = subjectType.APPLICATION;
     comment.subject = application;
-    comment.createdBy = memberRole.member._id;
-    result = await commentService.addComment(comment, memberRole.member);
+    comment.createdBy = member._id;
+    result = await commentService.addComment(comment, member);
     if(result){
       application.noOfComments++;
       await application.save();
@@ -2899,7 +2888,8 @@ async function getApplicationEvaluations(companyId, currentUserId, applicationId
   try {
 
     result = await evaluationService.findByApplicationId(applicationId);
-    if(result){
+    console.log(result)
+    if(result.length){
       const fields = _.keys(_.omit(result[0].assessment.toJSON(), ['_id', 'createdBy', 'candidateId', 'createdDate']));
       stats = _.reduce(fields, function(res, field){
         res[field] = _.meanBy(result, function(o) { return o.assessment[field]; });
@@ -3440,7 +3430,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
           }
         },
         {$group: {_id: '$currentProgress.stage', applications: {$push: "$$ROOT"}}},
-        {$project:{ _id: "$_id", noOfApplications:{ $size:"$applications"}, applications:{ $slice:["$applications", 1] }}}
+        {$project:{ _id: "$_id", noOfApplications:{ $size:"$applications"}, applications:{ $slice:["$applications", 10] }}}
       ]);
 
       // console.log(applicationsGroupByStage)
@@ -3458,7 +3448,7 @@ async function getBoard(currentUserId, companyId, jobId, locale) {
 
         console.log('item', item)
         let found = _.find(applicationsGroupByStage, {'_id': item.type});
-        console.log('found', found)
+
         if (found) {
           stage.applications = found.applications;
           stage.noOfApplications = found.noOfApplications;
