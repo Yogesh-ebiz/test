@@ -138,7 +138,6 @@ const convertToCandidate = (user) => {
     return;
   }
 
-  console.log(user)
   let current = user.current?user.current:null;
   if(current){
     current.employer = convertToCompany(current.employer);
@@ -396,13 +395,18 @@ const buildUserUrl = (user) => {
 }
 
 const buildCandidateUrl = (candidate) => {
-  if(candidate && candidate.avatar && candidate.avatar.indexOf('http')>-1){
-    return candidate.avatar;
+  let avatar = candidate?.avatar?candidate.avatar:candidate?._avatar;
+  if(!avatar){
+    return;
   }
 
-  let avatar = candidate.avatar?candidate.avatar:candidate._avatar;
-  let path = avatar && avatar.indexOf('http')>-1?avatar:`${process.env.CDN}/candidates/${candidate._id}/images/${avatar}`;
-  return avatar?path:'';
+  if(avatar.indexOf('http')>-1){
+    return avatar;
+  }
+
+
+  let path = `${process.env.CDN}/candidates/${candidate._id}/images/${avatar}`;
+  return path;
 }
 
 module.exports = {

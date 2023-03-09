@@ -2257,23 +2257,25 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
 
         hasEvaluated = _.some(progress.evaluations, {createdBy: member._id});
         if(progress.stage) {
-          progress.stage.tasks.forEach(function (task) {
-            if (task.type === taskType.EMAIL) {
-              task.isCompleted = progress.emails.length ? true : false;
-              task.required = (!progress.emails.length) ? true : false;
-            }
 
-            if (task.type === taskType.EVENT) {
-              task.isCompleted = progress.event ? true : false;
-              task.required = (!progress.event) ? true : false;
-            }
-
-            if (task.type === taskType.EVALUATION) {
-              task.isCompleted = hasEvaluated;
-              task.required = (!hasEvaluated) ? true : false;
-            }
-          });
-          progress.stage.members = [];
+          //ToDo: Mobile will need to remove this on UI.  No more tasks per stage.  Only applications.task
+          // progress.stage.tasks.forEach(function (task) {
+          //   if (task.type === taskType.EMAIL) {
+          //     task.isCompleted = progress.emails.length ? true : false;
+          //     task.required = (!progress.emails.length) ? true : false;
+          //   }
+          //
+          //   if (task.type === taskType.EVENT) {
+          //     task.isCompleted = progress.event ? true : false;
+          //     task.required = (!progress.event) ? true : false;
+          //   }
+          //
+          //   if (task.type === taskType.EVALUATION) {
+          //     task.isCompleted = hasEvaluated;
+          //     task.required = (!hasEvaluated) ? true : false;
+          //   }
+          // });
+          // progress.stage.members = [];
         }
 
         if (progress._id.equals(application.currentProgress)) {
