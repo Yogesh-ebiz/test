@@ -2193,6 +2193,10 @@ async function getApplicationById(companyId, currentUserId, applicationId) {
         model: 'Candidate'
       },
       {
+        path: 'evaluations',
+        model: 'Evaluation'
+      },
+      {
         path: 'resume',
         model: 'File'
       },
@@ -3312,6 +3316,8 @@ async function getApplicationActivities(companyId, currentUserId, applicationId,
       //   activity.causer = convertToTalentUser(found);
       // }
     });
+
+    // result.docs = result.docs.reverse();
     return new Pagination(result);
 
   } catch (error) {

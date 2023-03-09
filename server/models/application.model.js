@@ -125,6 +125,7 @@ const ApplicationSchema = new mongoose.Schema({
   job: { type: Schema.Types.ObjectId, ref: 'JobRequisition' },
   questionSubmission: { type: Schema.Types.ObjectId, ref: 'QuestionSubmission' },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+  evaluations: [{ type: Schema.Types.ObjectId, ref: 'Evaluation' }],
   labels: [{ type: Schema.Types.ObjectId, ref: 'Label' }],
   progress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
   allProgress: [{ type: Schema.Types.ObjectId, ref: 'ApplicationProgress' }],
