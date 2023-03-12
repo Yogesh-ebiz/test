@@ -1486,6 +1486,7 @@ async function search(jobId, filter, sort) {
     return;
   }
 
+  console.log(jobId, filter, sort)
   let select = '';
   let limit = (sort.size && sort.size>0) ? sort.size:20;
   let page = (sort.page && sort.page==0) ? sort.page:1;
@@ -1513,16 +1514,7 @@ async function search(jobId, filter, sort) {
         from:"applicationprogresses",
         let:{currentProgress:"$currentProgress"},
         pipeline:[
-          {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}},
-          {
-            $lookup: {
-              from: 'stages',
-              localField: 'stage',
-              foreignField: '_id',
-              as: 'stage',
-            },
-          },
-          {$unwind: '$stage'}
+          {$match:{$expr:{$eq:["$_id","$$currentProgress"]}}}
         ],
         as: 'currentProgress'
       }},

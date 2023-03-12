@@ -870,7 +870,7 @@ async function getSimilarCompany(currentUserId, jobId, filter) {
 
 async function applyJobById(currentUserId, jobId, application, locale ) {
 
-  if(currentUserId==null || !jobId || application==null){
+  if(!jobId || !application){
     return null;
   }
 
@@ -878,8 +878,13 @@ async function applyJobById(currentUserId, jobId, application, locale ) {
   let savedApplication;
   try {
 
-    let currentParty = await findCandidateById(currentUserId);
-    //Security Check if user is part of meeting attendees that is ACTIVE.
+    let currentParty;
+
+    if(currentUserId){
+      currentParty = await findCandidateById(currentUserId);
+    } else {
+      currentParty = await f
+    }
 
     if (isPartyActive(currentParty)) {
 

@@ -67,7 +67,7 @@ function SearchParam(filter) {
   }
 
   if (filter.stages && filter.stages.length) {
-    this.query['currentProgress.stage.type'] =  { $in: filter.stages};
+    this.query['currentProgress.stage'] =  { $in: filter.stages};
   }
 
 
