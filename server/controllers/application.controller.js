@@ -25,6 +25,8 @@ const candidateService = require('../services/candidate.service');
 const jobService = require('../services/jobrequisition.service');
 const fileService = require('../services/file.service');
 const calendarService = require('../services/api/calendar.service.api');
+const taskService = require('../services/task.service');
+const memberService = require('../services/member.service');
 
 const {upload} = require('../services/aws.service');
 const {findApplicationByIdAndUserId, findApplicationByUserId, findById, findByApplicationId} = require('../services/application.service');
@@ -45,7 +47,7 @@ module.exports = {
   addProgress,
   updateProgress,
   submitApplicationQuestions,
-  getFiles
+  getApplicationTasks
 }
 
 
@@ -858,4 +860,28 @@ async function getFiles(company, currentUserId, applicationId) {
   }
 
   return application;
+}
+
+
+
+async function getApplicationTasks(companyId, currentUserId, applicationId) {
+
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+  let tasks;
+  try {
+    tasks = await taskService.getTasksByApplicationId(applicationId);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return tasks;
 }

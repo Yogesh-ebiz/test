@@ -150,7 +150,18 @@ async function getTasksDueSoon(member) {
   return tasks;
 }
 
+async function getTasksByApplication(applicationId) {
+  let result = null;
 
+  if(!applicationId){
+    return;
+  }
+
+  let today = Date.now();
+  let tasks = await Task.find({});
+
+  return tasks;
+}
 async function search(filter, sort, query) {
   let result = null;
   if(!filter || !sort){
@@ -194,6 +205,14 @@ async function search(filter, sort, query) {
   return tasks;
 }
 
+async function getTasksByApplicationId(applicationId) {
+  let result = null;
+
+  let today = Date.now();
+  let tasks = await Task.find({'meta.applicationId': applicationId}).sort({createdDate: -1});
+  return tasks;
+}
+
 
 module.exports = {
   findById:findById,
@@ -203,5 +222,6 @@ module.exports = {
   markComplete:markComplete,
   closeTask:closeTask,
   getTasksDueSoon:getTasksDueSoon,
-  search: search
+  search: search,
+  getTasksByApplicationId:getTasksByApplicationId
 }

@@ -273,5 +273,6 @@
 	"job_uploaded_successful": "job_uploaded_successful",
 	"get_salary_successful": "get_salary_successful",
 	"task_completed_successful": "task_completed_successful",
-	"task_closed_successful": "task_closed_successful"
+	"task_closed_successful": "task_closed_successful",
+	"tasks_retrieved_successful": "tasks_retrieved_successful"
 }

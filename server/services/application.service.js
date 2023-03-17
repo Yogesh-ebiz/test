@@ -1725,5 +1725,4 @@ module.exports = {
   getApplicationsStagesByJobId:getApplicationsStagesByJobId,
   search:search,
   searchEmails:searchEmails
-
 }

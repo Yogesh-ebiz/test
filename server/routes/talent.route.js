@@ -8,6 +8,7 @@ const _ = require('lodash');
 
 let Response = require('../const/response');
 const {parse} = require("url");
+const applicationCtl = require("../controllers/application.controller");
 
 const router = express.Router();
 module.exports = router;
@@ -115,6 +116,8 @@ router.route('/company/:id/applications/:applicationId/reject').post(asyncHandle
 
 router.route('/company/:id/applications/:applicationId/subscribe').post(asyncHandler(subscribeApplication));
 router.route('/company/:id/applications/:applicationId/subscribe').delete(asyncHandler(unsubscribeApplication));
+
+router.route('/company/:id/applications/:applicationId/tasks').get(asyncHandler(getByApplicationTasks));
 
 router.route('/company/:id/applications/:applicationId/activities').get(asyncHandler(getApplicationActivities));
 router.route('/company/:id/applications/:applicationId/upload').post(asyncHandler(uploadApplication));
@@ -1076,6 +1079,16 @@ async function unsubscribeApplication(req, res) {
 }
 
 
+
+async function getByApplicationTasks(req, res) {
+
+  let currentUserId = parseInt(req.header('UserId'));
+  let companyId = parseInt(req.params.id);
+  let applicationId = ObjectID(req.params.applicationId);
+  let data = await applicationCtl.getApplicationTasks(companyId, currentUserId, applicationId);
+
+  res.json(new Response(data, data?'tasks_retrieved_successful':'not_found', res));
+}
 
 
 async function getApplicationActivities(req, res) {

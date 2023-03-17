@@ -114,3 +114,4 @@ async function submitApplicationQuestions(req, res) {
 
   res.json(new Response(data, data?'answers_submitted_successful':'not_found', res));
 }
+

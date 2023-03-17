@@ -19,6 +19,7 @@ const memberService = require('../services/member.service');
 module.exports = {
   addTask,
   getTask,
+  getTasksByApplicationId,
   updateTask,
   markComplete,
   closeTask,
@@ -59,6 +60,23 @@ async function getTask(companyId, currentUserId, taskId) {
   }
 
   let result = await taskService.findById(taskId);
+  return result;
+
+}
+
+
+async function getTasksByApplicationId(companyId, currentUserId, applicationId) {
+  if(!companyId || !currentUserId || !applicationId){
+    return null;
+  }
+
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
+    return null;
+  }
+
+  let result = await taskService.getTasksByApplicationId(taskId);
   return result;
 
 }

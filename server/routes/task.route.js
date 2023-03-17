@@ -11,6 +11,7 @@ module.exports = router;
 
 //router.use(passport.authenticate('jwt', { session: false }))
 router.route('').post(asyncHandler(addTask));
+router.route('').get(asyncHandler(getTasksByApplicationId));
 router.route('/:id').get(asyncHandler(getTask));
 router.route('/:id').put(asyncHandler(updateTask));
 router.route('/:id').delete(asyncHandler(removeTask));
@@ -70,4 +71,14 @@ async function removeTask(req, res) {
   let taskId = ObjectID(req.params.id);
   let data = await taskCtl.removeTask(companyId, currentUserId, taskId);
   res.json(new Response(data, data?'task_retrieved_successful':'not_found', res));
+}
+
+
+
+async function getTasksByApplicationId(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let applicationId = ObjectID(req.params.applicationId);
+
+  let data = await taskCtl.getTasksByApplicationId(companyId, currentUserId, applicationId, res.locale);
+  res.json(new Response(data, data?'tasks_retrieved_successful':'not_found', res));
 }
