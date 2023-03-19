@@ -143,7 +143,6 @@ async function closeTask(companyId, currentUserId, taskId, hasCompleted) {
 
 
 async function removeTask(companyId, currentUserId, taskId) {
-
   if(!companyId || !currentUserId || !taskId){
     return null;
   }
@@ -154,7 +153,7 @@ async function removeTask(companyId, currentUserId, taskId) {
   }
 
 
-  let result = await taskService.remove(taskId,  memberRole.member._id);
+  let result = await taskService.remove(taskId,  member._id);
   result = {success: true}
 
 
