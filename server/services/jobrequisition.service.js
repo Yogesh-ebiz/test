@@ -202,7 +202,7 @@ async function updateJob(jobId, member, form) {
       job.department =  ObjectID(form.department);
     }
 
-    job.updatedBy = member;
+    job.updatedBy = member._id;
     job.updatedDate = Date.now();
 
     console.log(job);

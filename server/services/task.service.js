@@ -90,8 +90,11 @@ async function update(id, form) {
   task.notes = form.notes;
   task.priority = form.priority;
   task.tags = form.tags;
+  if(task.meta?.applicationId){
+    task.meta.applicationId = ObjectID(task.meta.applicationId);
+    task.meta.applicationProgressId = ObjectID(task.meta.applicationProgressId);
+  }
   result = await task.save();
-
 
   return result;
 
