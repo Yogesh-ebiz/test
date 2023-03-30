@@ -939,7 +939,7 @@ async function getApplicationEvaluations(req, res) {
   let pagination = req.query;
   let data = await talentCtrl.getApplicationEvaluations(companyId, currentUserId, applicationId, pagination);
 
-  res.json(new Response(data, data?'evaluation_added_successful':'not_found', res));
+  res.json(new Response(data, data?'evaluation_retrieved_successful':'not_found', res));
 }
 
 

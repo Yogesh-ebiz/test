@@ -2018,14 +2018,13 @@ async function addSourceApplication(companyId, currentUserId, jobId, sourceId, a
 
 
 async function searchCampaigns(companyId, currentUserId, jobId, filter, sort, locale) {
-
   if(!companyId || !currentUserId || !jobId || !filter || !sort){
     return null;
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -2885,8 +2884,8 @@ async function getApplicationEvaluations(companyId, currentUserId, applicationId
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -2942,8 +2941,8 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
@@ -2957,10 +2956,6 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
         populate: [{
           path: 'evaluations',
           model: 'Evaluation'
-        },
-        {
-          path: 'stage',
-          model: 'Stage'
         }]
       },
       {
@@ -2971,7 +2966,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
 
     if(application && application.currentProgress && !_.some(application.currentProgress.evaluations, {createdBy: currentUserId})) {
 
-      form.createdBy = memberRole.member._id;
+      form.createdBy = member._id;
       form.applicationId=ObjectID(applicationId);
       form.applicationProgressId=ObjectID(applicationProgressId);
       form.candidateId = application.user._id;
@@ -2983,7 +2978,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
 
       if(result){
         result.applicationProgressId = application.currentProgress;
-        result.createdBy = memberRole.member;
+        result.createdBy = member._id;
 
         application.user.evaluations.push(result._id);
         application.currentProgress.evaluations.push(result._id);
@@ -2991,8 +2986,9 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
         await application.user.save();
         let job = await jobService.findJob_Id(application.jobId);
 
+        console.log(job)
         let activity = await activityService.addActivity({
-          causer: memberRole.member._id,
+          causer: member._id,
           causerType: subjectType.MEMBER,
           subjectType: subjectType.EVALUATION,
           subject: result._id,
@@ -3000,7 +2996,7 @@ async function addApplicationProgressEvaluation(companyId, currentUserId, applic
           meta: {
             candidate: application.user._id,
             name: application.user.firstName + ' ' + application.user.lastName,
-            stage: application.currentProgress.stage.name,
+            stage: application.currentProgress.stage,
             job: job._id,
             application: application._id,
             rating: result.rating

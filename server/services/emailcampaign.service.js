@@ -145,15 +145,14 @@ async function search(jobId, filter, sort) {
     sort:     sortBy,
     lean:     true,
     limit:    limit,
-    page: parseInt(filter.page)+1
+    page: parseInt(sort.page)+1
   };
 
   let aList = [];
   let aLookup = [];
   let aMatch = {};
 
-
-  aList.push({ $match: {jobId: jobId, status: {$in: filter.status} } });
+  aList.push({ $match: {job: jobId } });
   // aList.push(
   //   {
   //     $lookup: {
@@ -206,7 +205,6 @@ async function search(jobId, filter, sort) {
   aList.push({ $match: params});
 
   const aggregate = EmailCampaign.aggregate(aList);
-
   let result = await EmailCampaign.aggregatePaginate(aggregate, options);
   if(result.docs.length){
     // let job = await jobService.findJob_Id(result.docs[0].jobId);

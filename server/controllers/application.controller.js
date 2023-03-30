@@ -70,10 +70,6 @@ async function getById(currentUserId, id) {
           model: 'ApplicationProgress',
           populate: [
             {
-              path: 'stage',
-              model: 'Stage'
-            },
-            {
               path: 'attachment',
               model: 'File'
             },
@@ -762,28 +758,25 @@ async function submitApplicationQuestions(currentUserId, applicationId, form) {
 
   let result = false;
   try {
-    let currentParty = await findByUserId(currentUserId);
-    let application;
+    let application = await findByApplicationId(applicationId);
+    let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, application.company);
 
-    if(isPartyActive(currentParty)) {
-      application = await findByApplicationId(applicationId);
-      let candidate = await candidateService.findByUserIdAndCompanyId(currentUserId, application.company);
-      if (application && !application.hasSubmittedQuestion && application.user.equals(candidate._id)) {
-        form.createdBy = currentUserId;
-        let questionSubmission = await questionSubmissionService.addSubmission(form);
+    if (application && !application.hasSubmittedQuestion && application.user.equals(candidate._id)) {
+      form.createdBy = currentUserId;
+      let questionSubmission = await questionSubmissionService.addSubmission(form);
 
-        if(questionSubmission){
-          application.questionSubmission=questionSubmission._id;
-          application.hasSubmittedQuestion = true;
-          application = await application.save();
-          result = application.hasSubmittedQuestion;
-        }
-
-
-
-
+      if(questionSubmission){
+        application.questionSubmission=questionSubmission._id;
+        application.hasSubmittedQuestion = true;
+        application = await application.save();
+        result = application.hasSubmittedQuestion;
       }
+
+
+
+
     }
+
 
   } catch (error) {
     console.log(error);

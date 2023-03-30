@@ -66,6 +66,7 @@ async function add(form) {
     form.assessment.candidateId = form.candidateId;
     form.assessment.createdBy = form.createdBy;
     assessment = await assessmentService.addAssessment(form.assessment);
+
     if(assessment){
       form.assessment = assessment._id;
     }
@@ -520,13 +521,7 @@ async function findByApplicationId(applicationId) {
     },
     {
       path: 'applicationProgressId',
-      model: 'ApplicationProgress',
-      populate: [
-        {
-          path: 'stage',
-          model: 'Stage'
-        }
-      ]
+      model: 'ApplicationProgress'
     }]);
   return evaluations;
 }
@@ -565,15 +560,6 @@ async function getCandidateEvaluationsStats(candidateId, companyId, filter) {
         let:{applicationProgressId:"$applicationProgressId"},
         pipeline:[
           {$match:{$expr:{$eq:["$_id","$$applicationProgressId"]}}},
-          {$lookup:{
-              from:"stages",
-              let:{stage:"$stage"},
-              pipeline:[
-                {$match:{$expr:{$eq:["$_id","$$stage"]}}},
-              ],
-              as: 'stage'
-            }},
-          { $unwind: '$stage'}
         ],
         as: 'applicationProgressId'
       }},
@@ -581,7 +567,7 @@ async function getCandidateEvaluationsStats(candidateId, companyId, filter) {
   ];
 
   if(filter.stages.length){
-    aggregate.push({ $match: {'applicationProgressId.stage.type': {$in: filter.stages} } });
+    aggregate.push({ $match: {'applicationProgressId.stage': {$in: filter.stages} } });
   }
   let evaluations = await Evaluation.aggregate(aggregate);
 
@@ -608,6 +594,7 @@ async function getCandidateEvaluationsStats(candidateId, companyId, filter) {
       return res;
     }, {rating: 0, group: {}});
 
+    console.log(data)
     result.noOfEvaluations = evaluations.length;
     result.rating = Math.round(data.rating / evaluations.length * 10)/10;
     delete data.rating;
