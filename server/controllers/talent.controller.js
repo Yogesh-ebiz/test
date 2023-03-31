@@ -1117,13 +1117,13 @@ async function updateJob(companyId, currentUserId, jobId, form) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
   let result;
-  result = await jobService.updateJob(jobId, memberRole.member, form);
+  result = await jobService.updateJob(jobId, member, form);
 
   return result;
 }

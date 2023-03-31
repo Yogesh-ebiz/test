@@ -54,6 +54,11 @@ async function add(task) {
 
   task = await Joi.validate(task, taskSchema, { abortEarly: false });
 
+  if(task.meta?.applicationId){
+    task.meta.applicationId = ObjectID(task.meta.applicationId);
+    task.meta.applicationProgressId = ObjectID(task.meta.applicationProgressId);
+  }
+
   task = await new Task(task).save();
   return task;
 
@@ -85,8 +90,11 @@ async function update(id, form) {
   task.notes = form.notes;
   task.priority = form.priority;
   task.tags = form.tags;
+  if(task.meta?.applicationId){
+    task.meta.applicationId = ObjectID(task.meta.applicationId);
+    task.meta.applicationProgressId = ObjectID(task.meta.applicationProgressId);
+  }
   result = await task.save();
-
 
   return result;
 
@@ -101,7 +109,6 @@ async function remove(id) {
     return;
   }
 
-
   let task = await Task.deleteOne({_id: id});
   return task;
 
@@ -110,13 +117,15 @@ async function remove(id) {
 async function markComplete(id, hasCompleted, memberId) {
   let data = null;
 
+  console.log(id, hasCompleted, memberId)
   if(!id || !memberId){
     return;
   }
 
   hasCompleted = hasCompleted || false;
   const status = hasCompleted?statusEnum.COMPLETED:statusEnum.ACTIVE;
-  let task = await Task.updateOne({_id: id, $or: [{members: memberId}, {owner: memberId}]}, { $set: {status: status, hasCompleted: hasCompleted} });
+
+  let task = await Task.updateOne({_id: id}, { $set: {status: status, hasCompleted: hasCompleted, updatedBy: memberId} });
   return task;
 }
 
@@ -127,7 +136,7 @@ async function closeTask(id, memberId) {
     return;
   }
 
-  let task = await Task.updateOne({_id: id, $or: [{members: memberId}, {owner: memberId}]}, { $set: {status: statusEnum.CLOSED} });
+  let task = await Task.updateOne({_id: id}, { $set: {status: statusEnum.CLOSED, updatedBy: memberId} });
   return task;
 }
 
