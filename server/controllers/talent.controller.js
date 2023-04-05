@@ -2413,8 +2413,9 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
 
     if(application) {
 
-      let job = await jobService.findById(application.jobId).populate('createdBy');
+      let job = await jobService.findById(application.jobId).populate('createdBy').populate('pipeline');
       let previousProgress = application.currentProgress;
+      const {pipeline} = job;
       // _.forEach(application.progress, function(item){
       //   if(item.stage.equals(newStage)){
       //     progress = item;
@@ -2422,8 +2423,9 @@ async function updateApplicationProgress(companyId, currentUserId, applicationId
       //   }
       // });
 
+      console.log(pipeline)
       progress = _.find(application.progress, {stage: newStage});
-      let pipeline = await pipelineTemplateService.findById(job.pipeline);
+      // let pipeline = await pipelineTemplateService.findById(job.pipeline);
       let foundStage = _.find(pipeline.stages, {type: newStage});
 
       if(progress){
