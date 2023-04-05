@@ -312,6 +312,7 @@ module.exports = {
   getEvaluationFilters,
   getCompanyEmailTemplates,
   addCompanyEmailTemplate,
+  getCompanyEmailTemplate,
   updateCompanyEmailTemplate,
   deleteCompanyEmailTemplate,
   deactivateCompanyEmailTemplate,
@@ -7272,15 +7273,40 @@ async function addCompanyEmailTemplate(companyId, form, currentUserId) {
   return result
 }
 
+async function getCompanyEmailTemplate(companyId, templateId, currentUserId) {
+  if(!companyId || !currentUserId || !templateId){
+    return null;
+  }
+
+
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+
+  if(!member){
+    return null;
+  }
+
+
+  let result = null;
+  try {
+
+    result = await emailTemplateService.findById(templateId);
+
+  } catch(e){
+    console.log('getCompanyEmailTemplate: Error', e);
+  }
+
+
+  return result
+}
 async function updateCompanyEmailTemplate(companyId, templateId, currentUserId, form) {
   if(!companyId || !currentUserId || !templateId || !form){
     return null;
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
 
-  if(!memberRole){
+  if(!member){
     return null;
   }
 

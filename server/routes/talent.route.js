@@ -272,6 +272,7 @@ router.route('/company/:id/evaluations/filters').get(asyncHandler(getEvaluationF
 
 router.route('/company/:id/emails/templates').get(asyncHandler(getCompanyEmailTemplates));
 router.route('/company/:id/emails/templates').post(asyncHandler(addCompanyEmailTemplate));
+router.route('/company/:id/emails/templates/:templateId').get(asyncHandler(getCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').put(asyncHandler(updateCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId').delete(asyncHandler(deleteCompanyEmailTemplate));
 router.route('/company/:id/emails/templates/:templateId/disable').post(asyncHandler(deactivateCompanyEmailTemplate));
@@ -2490,13 +2491,23 @@ async function addCompanyEmailTemplate(req, res) {
   res.json(new Response(data, data?'email_added_successful':'not_found', res));
 }
 
+
+async function getCompanyEmailTemplate(req, res) {
+  let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
+  let companyId = parseInt(req.params.id);
+  let templateId = req.params.templateId;
+  let template = req.body;
+
+  let data = await talentCtrl.getCompanyEmailTemplate(companyId, ObjectID(templateId), currentUserId);
+  res.json(new Response(data, data?'email_retrieved_successful':'not_found', res));
+}
 async function updateCompanyEmailTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let companyId = parseInt(req.params.id);
   let templateId = req.params.templateId;
   let template = req.body;
 
-  let data = await talentCtrl.updateCompanyEmailTemplate(companyId, templateId, currentUserId, template);
+  let data = await talentCtrl.updateCompanyEmailTemplate(companyId, ObjectID(templateId), currentUserId, template);
   res.json(new Response(data, data?'email_updated_successful':'not_found', res));
 }
 

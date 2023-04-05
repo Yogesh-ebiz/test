@@ -85,9 +85,9 @@ async function update(id, form) {
 
   form = await Joi.validate(form, emailTemplateSchema, { abortEarly: false });
   let template = await findById(id);
+  console.log(template)
 
   if(template){
-    let questions = [];
     template.name = form.name;
     template.subject = form.subject;
     template.bodyHtml = form.bodyHtml;
