@@ -10,7 +10,7 @@ const QuestionTemplateSchema = new mongoose.Schema({
     default: Date.now
   },
   createdBy: {
-    type: Number,
+    type: Object,
     required: true
   },
   updatedDate: {

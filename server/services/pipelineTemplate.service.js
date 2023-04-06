@@ -19,10 +19,18 @@ const pipelineSchema = Joi.object({
   stages: Joi.array().required(),
   createdBy: Joi.number().optional(),
   updatedBy: Joi.number().optional(),
-  default: Joi.boolean().optional(),
+  default: Joi.boolean().optional().allow(null),
   custom: Joi.boolean().optional(),
   stageMigration: Joi.array().optional(),
   autoRejectBlackList: Joi.boolean().optional()
+});
+
+const taskSchema = Joi.object({
+  type: Joi.string().required(),
+  required: Joi.boolean().required(),
+  allowChange: Joi.boolean().required(),
+  sendEmailAt: Joi.string().allow(null, '').optional(),
+  default: Joi.boolean().optional().allow(null, '')
 });
 
 
@@ -36,10 +44,14 @@ async function add(newPipeline) {
   }
 
   let pipeline = null;
-  // for (let stage of newPipeline.stages) {
-  //   stage._id = new ObjectID();
-  //   stage = await addStage(stage)
-  // }
+  for (const stage of newPipeline.stages) {
+    for (const task of stage.tasks) {
+      console.log(task)
+      const newTask = await Joi.validate(task, taskSchema, { abortEarly: false });
+    }
+  }
+
+
 
   newPipeline = new PipelineTemplate(newPipeline).save();
   return newPipeline;

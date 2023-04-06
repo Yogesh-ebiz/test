@@ -1721,10 +1721,8 @@ async function getCompanyQuestionTemplate(req, res) {
 async function updateCompanyQuestionTemplate(req, res) {
   let currentUserId = req.header('UserId') ? parseInt(req.header('UserId')) : null;
   let company = parseInt(req.params.id);
-  let questionTemplateId = req.params.questionTemplateId;
+  let questionTemplateId = ObjectID(req.params.questionTemplateId);
   let question = req.body;
-  question.company = company;
-  question.updatedBy = currentUserId;
 
   let data = await talentCtrl.updateCompanyQuestionTemplate(company, questionTemplateId, currentUserId, question);
   res.json(new Response(data, data?'question_updated_successful':'not_found', res));
@@ -1776,7 +1774,6 @@ async function addCompanyPipelineTemplate(req, res) {
   let pipeline = req.body;
   pipeline.company = company;
   pipeline.createdBy = currentUserId;
-
   let data = await talentCtrl.addCompanyPipelineTemplate(company, currentUserId, pipeline);
   res.json(new Response(data, data?'pipeline_added_successful':'not_found', res));
 }

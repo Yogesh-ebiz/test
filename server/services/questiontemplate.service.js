@@ -22,8 +22,8 @@ const questionTemplateSchema = Joi.object({
   name: Joi.string().required(),
   questions: Joi.array().required(),
   company: Joi.number().required(),
-  createdBy: Joi.number().optional(),
-  updatedBy: Joi.number().optional(),
+  createdBy: Joi.object().optional(),
+  updatedBy: Joi.object().optional(),
   status: Joi.string().optional()
 });
 
@@ -87,8 +87,8 @@ async function addQuestionTemplate(form) {
 
 async function updateQuestionTemplate(id, form) {
   let data = null;
-
-  if(!id || !form){
+  console.log(form)
+  if(!form || !id){
     return;
   }
 
@@ -116,7 +116,7 @@ async function updateQuestionTemplate(id, form) {
         }
 
       } else {
-        question._id = new ObjectID();
+        // question._id = new ObjectID();
         question = await questionService.add(question)
       }
       questions.push(question._id);

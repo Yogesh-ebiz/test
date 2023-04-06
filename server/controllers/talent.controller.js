@@ -5349,15 +5349,15 @@ async function addCompanyQuestionTemplate(companyId, currentUserId, form) {
   }
 
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
   let result = null;
 
   try {
-    form.createdBy = currentUserId;
+    form.createdBy = member._id;
     form.company = companyId;
     result = await questionTemplateService.addQuestionTemplate(form);
 
@@ -5397,14 +5397,15 @@ async function updateCompanyQuestionTemplate(companyId, questionId, currentUserI
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
   let result = null;
 
   try {
+    form.updatedBy = member._id;
     result = await questionTemplateService.updateQuestionTemplate(questionId, form);
 
   } catch(e){
@@ -5506,8 +5507,8 @@ async function addCompanyPipelineTemplate(companyId, currentUserId, form) {
     return null;
   }
 
-  let memberRole = await memberService.findByUserIdAndCompany(currentUserId, companyId);
-  if(!memberRole){
+  let member = await memberService.findByUserIdAndCompany(currentUserId, companyId);
+  if(!member){
     return null;
   }
 
