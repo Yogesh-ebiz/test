@@ -1,0 +1,5317 @@
+[
+    {
+        "name": "accounting",
+        "count": 8119992,
+        "meta": null
+    },
+    {
+        "name": "art",
+        "count": 1799974,
+        "meta": null
+    },
+    {
+        "name": "architecture",
+        "count": 1767567,
+        "meta": null
+    },
+    {
+        "name": "accountancy",
+        "count": 1344260,
+        "meta": null
+    },
+    {
+        "name": "advertising",
+        "count": 1062772,
+        "meta": null
+    },
+    {
+        "name": "anthropology",
+        "count": 593552,
+        "meta": null
+    },
+    {
+        "name": "applied science",
+        "count": 574034,
+        "meta": null
+    },
+    {
+        "name": "agriculture",
+        "count": 512419,
+        "meta": null
+    },
+    {
+        "name": "animation",
+        "count": 440498,
+        "meta": null
+    },
+    {
+        "name": "aviation",
+        "count": 435623,
+        "meta": null
+    },
+    {
+        "name": "art history",
+        "count": 359459,
+        "meta": null
+    },
+    {
+        "name": "applied mathematics",
+        "count": 280999,
+        "meta": null
+    },
+    {
+        "name": "aerospace engineering",
+        "count": 213837,
+        "meta": null
+    },
+    {
+        "name": "apparel design",
+        "count": 212633,
+        "meta": null
+    },
+    {
+        "name": "acting",
+        "count": 195279,
+        "meta": null
+    },
+    {
+        "name": "actuarial science",
+        "count": 145065,
+        "meta": null
+    },
+    {
+        "name": "art and design",
+        "count": 133946,
+        "meta": null
+    },
+    {
+        "name": "animal science",
+        "count": 131698,
+        "meta": null
+    },
+    {
+        "name": "automotive mechanics",
+        "count": 128820,
+        "meta": null
+    },
+    {
+        "name": "architectural engineering",
+        "count": 111244,
+        "meta": null
+    },
+    {
+        "name": "american studies",
+        "count": 109100,
+        "meta": null
+    },
+    {
+        "name": "applied psychology",
+        "count": 103586,
+        "meta": null
+    },
+    {
+        "name": "applied economics",
+        "count": 100139,
+        "meta": null
+    },
+    {
+        "name": "agricultural economics",
+        "count": 99253,
+        "meta": null
+    },
+    {
+        "name": "agronomy",
+        "count": 98897,
+        "meta": null
+    },
+    {
+        "name": "applied physics",
+        "count": 94973,
+        "meta": null
+    },
+    {
+        "name": "anatomy",
+        "count": 94775,
+        "meta": null
+    },
+    {
+        "name": "agricultural engineering",
+        "count": 93926,
+        "meta": null
+    },
+    {
+        "name": "applied linguistics",
+        "count": 81074,
+        "meta": null
+    },
+    {
+        "name": "art education",
+        "count": 80236,
+        "meta": null
+    },
+    {
+        "name": "audiology",
+        "count": 67425,
+        "meta": null
+    },
+    {
+        "name": "arabic",
+        "count": 67097,
+        "meta": null
+    },
+    {
+        "name": "astronomy",
+        "count": 64467,
+        "meta": null
+    },
+    {
+        "name": "asian studies",
+        "count": 63503,
+        "meta": null
+    },
+    {
+        "name": "american history",
+        "count": 63060,
+        "meta": null
+    },
+    {
+        "name": "astrophysics",
+        "count": 55566,
+        "meta": null
+    },
+    {
+        "name": "arabic language",
+        "count": 45348,
+        "meta": null
+    },
+    {
+        "name": "applied statistics",
+        "count": 44609,
+        "meta": null
+    },
+    {
+        "name": "administration of justice",
+        "count": 44055,
+        "meta": null
+    },
+    {
+        "name": "avionics",
+        "count": 38825,
+        "meta": null
+    },
+    {
+        "name": "american literature",
+        "count": 38780,
+        "meta": null
+    },
+    {
+        "name": "art therapy",
+        "count": 34448,
+        "meta": null
+    },
+    {
+        "name": "aquaculture",
+        "count": 34092,
+        "meta": null
+    },
+    {
+        "name": "american sign language",
+        "count": 32008,
+        "meta": null
+    },
+    {
+        "name": "addiction counseling",
+        "count": 27469,
+        "meta": null
+    },
+    {
+        "name": "arabic language and literature",
+        "count": 26658,
+        "meta": null
+    },
+    {
+        "name": "apparel and textiles",
+        "count": 25061,
+        "meta": null
+    },
+    {
+        "name": "avionics maintenance",
+        "count": 24100,
+        "meta": null
+    },
+    {
+        "name": "archeology",
+        "count": 23237,
+        "meta": null
+    },
+    {
+        "name": "african studies",
+        "count": 22417,
+        "meta": null
+    },
+    {
+        "name": "afrikaans",
+        "count": 20568,
+        "meta": null
+    },
+    {
+        "name": "anesthesiology",
+        "count": 18212,
+        "meta": null
+    },
+    {
+        "name": "african american studies",
+        "count": 16270,
+        "meta": null
+    },
+    {
+        "name": "astronomy and astrophysics",
+        "count": 13157,
+        "meta": null
+    },
+    {
+        "name": "administration",
+        "count": 12985,
+        "meta": null
+    },
+    {
+        "name": "animal behavior",
+        "count": 10934,
+        "meta": null
+    },
+    {
+        "name": "africana studies",
+        "count": 7610,
+        "meta": null
+    },
+    {
+        "name": "astrology",
+        "count": 5978,
+        "meta": null
+    },
+    {
+        "name": "asian american studies",
+        "count": 5410,
+        "meta": null
+    },
+    {
+        "name": "arabic studies",
+        "count": 3732,
+        "meta": null
+    },
+    {
+        "name": "arabic literature",
+        "count": 3585,
+        "meta": null
+    },
+    {
+        "name": "african languages",
+        "count": 3098,
+        "meta": null
+    },
+    {
+        "name": "architecture and engineering",
+        "count": 2730,
+        "meta": null
+    },
+    {
+        "name": "american indian studies",
+        "count": 2386,
+        "meta": null
+    },
+    {
+        "name": "avionic systems",
+        "count": 2099,
+        "meta": null
+    },
+    {
+        "name": "airway science",
+        "count": 1744,
+        "meta": null
+    },
+    {
+        "name": "apparel and merchandising",
+        "count": 1625,
+        "meta": null
+    },
+    {
+        "name": "arabic language and culture",
+        "count": 1534,
+        "meta": null
+    },
+    {
+        "name": "aquatics",
+        "count": 1385,
+        "meta": null
+    },
+    {
+        "name": "african literature",
+        "count": 1026,
+        "meta": null
+    },
+    {
+        "name": "ancient civilizations",
+        "count": 913,
+        "meta": null
+    },
+    {
+        "name": "animal bioscience",
+        "count": 885,
+        "meta": null
+    },
+    {
+        "name": "aerospace and aeronautical engineering",
+        "count": 858,
+        "meta": null
+    },
+    {
+        "name": "arabic language studies",
+        "count": 493,
+        "meta": null
+    },
+    {
+        "name": "arabic languages",
+        "count": 406,
+        "meta": null
+    },
+    {
+        "name": "architectural tech",
+        "count": 326,
+        "meta": null
+    },
+    {
+        "name": "african culture",
+        "count": 315,
+        "meta": null
+    },
+    {
+        "name": "applied graphic design",
+        "count": 253,
+        "meta": null
+    },
+    {
+        "name": "anthropology and archeology",
+        "count": 162,
+        "meta": null
+    },
+    {
+        "name": "arabic culture",
+        "count": 158,
+        "meta": null
+    },
+    {
+        "name": "afrikaans language",
+        "count": 155,
+        "meta": null
+    },
+    {
+        "name": "african language",
+        "count": 154,
+        "meta": null
+    },
+    {
+        "name": "agriculture production and management",
+        "count": 152,
+        "meta": null
+    },
+    {
+        "name": "agriculture production",
+        "count": 152,
+        "meta": null
+    },
+    {
+        "name": "atmospheric science",
+        "count": 127,
+        "meta": null
+    },
+    {
+        "name": "afrikaans literature",
+        "count": 119,
+        "meta": null
+    },
+    {
+        "name": "atmospheric science and meteorology",
+        "count": 80,
+        "meta": null
+    },
+    {
+        "name": "art and music education",
+        "count": 40,
+        "meta": null
+    },
+    {
+        "name": "afrikaans language and literature",
+        "count": 30,
+        "meta": null
+    },
+    {
+        "name": "african language and culture",
+        "count": 27,
+        "meta": null
+    },
+    {
+        "name": "african language and literature",
+        "count": 26,
+        "meta": null
+    },
+    {
+        "name": "african language studies",
+        "count": 18,
+        "meta": null
+    },
+    {
+        "name": "african literature and culture",
+        "count": 14,
+        "meta": null
+    },
+    {
+        "name": "arabic literature and culture",
+        "count": 14,
+        "meta": null
+    },
+    {
+        "name": "afrikaans languages",
+        "count": 13,
+        "meta": null
+    },
+    {
+        "name": "applied digital art",
+        "count": 11,
+        "meta": null
+    },
+    {
+        "name": "africana study",
+        "count": 5,
+        "meta": null
+    },
+    {
+        "name": "afrikaans studies",
+        "count": 4,
+        "meta": null
+    },
+    {
+        "name": "afrikaans language studies",
+        "count": 4,
+        "meta": null
+    },
+    {
+        "name": "afrikaans culture",
+        "count": 3,
+        "meta": null
+    },
+    {
+        "name": "business",
+        "count": 11068549,
+        "meta": null
+    },
+    {
+        "name": "business administration",
+        "count": 10627634,
+        "meta": null
+    },
+    {
+        "name": "business administration and management",
+        "count": 5612312,
+        "meta": null
+    },
+    {
+        "name": "business management",
+        "count": 4532367,
+        "meta": null
+    },
+    {
+        "name": "biology",
+        "count": 3697455,
+        "meta": null
+    },
+    {
+        "name": "banking",
+        "count": 1078037,
+        "meta": null
+    },
+    {
+        "name": "biochemistry",
+        "count": 752999,
+        "meta": null
+    },
+    {
+        "name": "business studies",
+        "count": 654201,
+        "meta": null
+    },
+    {
+        "name": "biotechnology",
+        "count": 630232,
+        "meta": null
+    },
+    {
+        "name": "business marketing",
+        "count": 344891,
+        "meta": null
+    },
+    {
+        "name": "business economics",
+        "count": 316168,
+        "meta": null
+    },
+    {
+        "name": "biomedical engineering",
+        "count": 242635,
+        "meta": null
+    },
+    {
+        "name": "business law",
+        "count": 190876,
+        "meta": null
+    },
+    {
+        "name": "business finance",
+        "count": 190837,
+        "meta": null
+    },
+    {
+        "name": "botany",
+        "count": 158417,
+        "meta": null
+    },
+    {
+        "name": "broadcast journalism",
+        "count": 158029,
+        "meta": null
+    },
+    {
+        "name": "broadcasting",
+        "count": 137601,
+        "meta": null
+    },
+    {
+        "name": "business admin",
+        "count": 133594,
+        "meta": null
+    },
+    {
+        "name": "biblical studies",
+        "count": 106638,
+        "meta": null
+    },
+    {
+        "name": "bioengineering",
+        "count": 105680,
+        "meta": null
+    },
+    {
+        "name": "baking",
+        "count": 96773,
+        "meta": null
+    },
+    {
+        "name": "biomedical science",
+        "count": 86352,
+        "meta": null
+    },
+    {
+        "name": "bioinformatics",
+        "count": 82076,
+        "meta": null
+    },
+    {
+        "name": "behavioral science",
+        "count": 56612,
+        "meta": null
+    },
+    {
+        "name": "biological science",
+        "count": 47847,
+        "meta": null
+    },
+    {
+        "name": "biophysics",
+        "count": 47448,
+        "meta": null
+    },
+    {
+        "name": "ballet",
+        "count": 27353,
+        "meta": null
+    },
+    {
+        "name": "biochemical engineering",
+        "count": 24856,
+        "meta": null
+    },
+    {
+        "name": "biological engineering",
+        "count": 24470,
+        "meta": null
+    },
+    {
+        "name": "behavioural science",
+        "count": 15104,
+        "meta": null
+    },
+    {
+        "name": "business management and administration",
+        "count": 12985,
+        "meta": null
+    },
+    {
+        "name": "british literature",
+        "count": 5300,
+        "meta": null
+    },
+    {
+        "name": "biobehavioral health",
+        "count": 3948,
+        "meta": null
+    },
+    {
+        "name": "buddhist studies",
+        "count": 3523,
+        "meta": null
+    },
+    {
+        "name": "bulgarian",
+        "count": 3200,
+        "meta": null
+    },
+    {
+        "name": "bulgarian language",
+        "count": 1855,
+        "meta": null
+    },
+    {
+        "name": "bulgarian language and literature",
+        "count": 1375,
+        "meta": null
+    },
+    {
+        "name": "biochemical science",
+        "count": 641,
+        "meta": null
+    },
+    {
+        "name": "balkan studies",
+        "count": 594,
+        "meta": null
+    },
+    {
+        "name": "baltic studies",
+        "count": 475,
+        "meta": null
+    },
+    {
+        "name": "baking and pastry art",
+        "count": 361,
+        "meta": null
+    },
+    {
+        "name": "biblical preaching",
+        "count": 273,
+        "meta": null
+    },
+    {
+        "name": "baltic languages",
+        "count": 264,
+        "meta": null
+    },
+    {
+        "name": "brass instruments",
+        "count": 217,
+        "meta": null
+    },
+    {
+        "name": "bulgarian literature",
+        "count": 109,
+        "meta": null
+    },
+    {
+        "name": "bulgarian studies",
+        "count": 71,
+        "meta": null
+    },
+    {
+        "name": "bulgarian languages",
+        "count": 64,
+        "meta": null
+    },
+    {
+        "name": "business and medical administration",
+        "count": 50,
+        "meta": null
+    },
+    {
+        "name": "bulgarian language and culture",
+        "count": 42,
+        "meta": null
+    },
+    {
+        "name": "balkan languages",
+        "count": 22,
+        "meta": null
+    },
+    {
+        "name": "broadcast and cinematic art",
+        "count": 10,
+        "meta": null
+    },
+    {
+        "name": "bulgarian culture",
+        "count": 7,
+        "meta": null
+    },
+    {
+        "name": "bulgarian language studies",
+        "count": 5,
+        "meta": null
+    },
+    {
+        "name": "balkan culture",
+        "count": 4,
+        "meta": null
+    },
+    {
+        "name": "balkan language",
+        "count": 3,
+        "meta": null
+    },
+    {
+        "name": "balkan literature",
+        "count": 3,
+        "meta": null
+    },
+    {
+        "name": "baltic culture",
+        "count": 2,
+        "meta": null
+    },
+    {
+        "name": "baltic language",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "computer science",
+        "count": 8285462,
+        "meta": null
+    },
+    {
+        "name": "communication",
+        "count": 5502620,
+        "meta": null
+    },
+    {
+        "name": "commerce",
+        "count": 3976515,
+        "meta": null
+    },
+    {
+        "name": "communications",
+        "count": 3415262,
+        "meta": null
+    },
+    {
+        "name": "chemistry",
+        "count": 2628187,
+        "meta": null
+    },
+    {
+        "name": "civil engineering",
+        "count": 2577072,
+        "meta": null
+    },
+    {
+        "name": "criminal justice",
+        "count": 1583428,
+        "meta": null
+    },
+    {
+        "name": "computer engineering",
+        "count": 1561655,
+        "meta": null
+    },
+    {
+        "name": "chemical engineering",
+        "count": 1136445,
+        "meta": null
+    },
+    {
+        "name": "counseling",
+        "count": 843779,
+        "meta": null
+    },
+    {
+        "name": "construction",
+        "count": 827863,
+        "meta": null
+    },
+    {
+        "name": "computer applications",
+        "count": 743333,
+        "meta": null
+    },
+    {
+        "name": "coaching",
+        "count": 646581,
+        "meta": null
+    },
+    {
+        "name": "criminology",
+        "count": 623742,
+        "meta": null
+    },
+    {
+        "name": "computer programming",
+        "count": 527894,
+        "meta": null
+    },
+    {
+        "name": "culinary arts",
+        "count": 460728,
+        "meta": null
+    },
+    {
+        "name": "computer systems",
+        "count": 449200,
+        "meta": null
+    },
+    {
+        "name": "cosmetology",
+        "count": 391945,
+        "meta": null
+    },
+    {
+        "name": "construction management",
+        "count": 387974,
+        "meta": null
+    },
+    {
+        "name": "corporate finance",
+        "count": 337496,
+        "meta": null
+    },
+    {
+        "name": "computer science and engineering",
+        "count": 322723,
+        "meta": null
+    },
+    {
+        "name": "computer application",
+        "count": 320963,
+        "meta": null
+    },
+    {
+        "name": "creative writing",
+        "count": 316184,
+        "meta": null
+    },
+    {
+        "name": "computer information systems",
+        "count": 288699,
+        "meta": null
+    },
+    {
+        "name": "clinical psychology",
+        "count": 284037,
+        "meta": null
+    },
+    {
+        "name": "corrections",
+        "count": 267292,
+        "meta": null
+    },
+    {
+        "name": "communication studies",
+        "count": 262534,
+        "meta": null
+    },
+    {
+        "name": "counseling psychology",
+        "count": 242167,
+        "meta": null
+    },
+    {
+        "name": "chinese",
+        "count": 182360,
+        "meta": null
+    },
+    {
+        "name": "curriculum and instruction",
+        "count": 148296,
+        "meta": null
+    },
+    {
+        "name": "composition",
+        "count": 139837,
+        "meta": null
+    },
+    {
+        "name": "child development",
+        "count": 138111,
+        "meta": null
+    },
+    {
+        "name": "computer and information systems",
+        "count": 130198,
+        "meta": null
+    },
+    {
+        "name": "chinese language",
+        "count": 124727,
+        "meta": null
+    },
+    {
+        "name": "cybersecurity",
+        "count": 124645,
+        "meta": null
+    },
+    {
+        "name": "consulting",
+        "count": 104207,
+        "meta": null
+    },
+    {
+        "name": "community development",
+        "count": 72952,
+        "meta": null
+    },
+    {
+        "name": "classics",
+        "count": 72736,
+        "meta": null
+    },
+    {
+        "name": "computer graphics",
+        "count": 70490,
+        "meta": null
+    },
+    {
+        "name": "customer service",
+        "count": 69874,
+        "meta": null
+    },
+    {
+        "name": "communication management",
+        "count": 60993,
+        "meta": null
+    },
+    {
+        "name": "cognitive science",
+        "count": 60067,
+        "meta": null
+    },
+    {
+        "name": "conflict resolution",
+        "count": 55975,
+        "meta": null
+    },
+    {
+        "name": "comparative literature",
+        "count": 55879,
+        "meta": null
+    },
+    {
+        "name": "corporate law",
+        "count": 53760,
+        "meta": null
+    },
+    {
+        "name": "chinese language and literature",
+        "count": 53461,
+        "meta": null
+    },
+    {
+        "name": "computer systems engineering",
+        "count": 42937,
+        "meta": null
+    },
+    {
+        "name": "ceramics",
+        "count": 41218,
+        "meta": null
+    },
+    {
+        "name": "clinical nursing",
+        "count": 39357,
+        "meta": null
+    },
+    {
+        "name": "chinese studies",
+        "count": 38715,
+        "meta": null
+    },
+    {
+        "name": "commercial art",
+        "count": 27319,
+        "meta": null
+    },
+    {
+        "name": "classical languages",
+        "count": 23048,
+        "meta": null
+    },
+    {
+        "name": "customer service management",
+        "count": 22683,
+        "meta": null
+    },
+    {
+        "name": "computer",
+        "count": 22412,
+        "meta": null
+    },
+    {
+        "name": "computer and information science",
+        "count": 22412,
+        "meta": null
+    },
+    {
+        "name": "classical studies",
+        "count": 21529,
+        "meta": null
+    },
+    {
+        "name": "consumer science",
+        "count": 20626,
+        "meta": null
+    },
+    {
+        "name": "court reporting",
+        "count": 19885,
+        "meta": null
+    },
+    {
+        "name": "clinical nurse",
+        "count": 18984,
+        "meta": null
+    },
+    {
+        "name": "computer science and mathematics",
+        "count": 17166,
+        "meta": null
+    },
+    {
+        "name": "conducting",
+        "count": 16697,
+        "meta": null
+    },
+    {
+        "name": "comp sci",
+        "count": 12137,
+        "meta": null
+    },
+    {
+        "name": "chinese language and culture",
+        "count": 11302,
+        "meta": null
+    },
+    {
+        "name": "curriculum supervision",
+        "count": 8689,
+        "meta": null
+    },
+    {
+        "name": "communication art",
+        "count": 8235,
+        "meta": null
+    },
+    {
+        "name": "choral conducting",
+        "count": 7911,
+        "meta": null
+    },
+    {
+        "name": "communications and media studies",
+        "count": 7425,
+        "meta": null
+    },
+    {
+        "name": "child and adolescent development",
+        "count": 7213,
+        "meta": null
+    },
+    {
+        "name": "culinary art",
+        "count": 7039,
+        "meta": null
+    },
+    {
+        "name": "czech",
+        "count": 6988,
+        "meta": null
+    },
+    {
+        "name": "computer tech",
+        "count": 6784,
+        "meta": null
+    },
+    {
+        "name": "commercial studies",
+        "count": 6411,
+        "meta": null
+    },
+    {
+        "name": "chinese literature",
+        "count": 6238,
+        "meta": null
+    },
+    {
+        "name": "czech language",
+        "count": 4743,
+        "meta": null
+    },
+    {
+        "name": "computer systems management",
+        "count": 4734,
+        "meta": null
+    },
+    {
+        "name": "chinese culture",
+        "count": 4647,
+        "meta": null
+    },
+    {
+        "name": "commercial science",
+        "count": 4338,
+        "meta": null
+    },
+    {
+        "name": "chicano studies",
+        "count": 4223,
+        "meta": null
+    },
+    {
+        "name": "college student affairs",
+        "count": 3335,
+        "meta": null
+    },
+    {
+        "name": "chicano",
+        "count": 2917,
+        "meta": null
+    },
+    {
+        "name": "computer science and electrical engineering",
+        "count": 2830,
+        "meta": null
+    },
+    {
+        "name": "chinese language studies",
+        "count": 2713,
+        "meta": null
+    },
+    {
+        "name": "czech language and literature",
+        "count": 2326,
+        "meta": null
+    },
+    {
+        "name": "classical literature",
+        "count": 1817,
+        "meta": null
+    },
+    {
+        "name": "celtic studies",
+        "count": 1761,
+        "meta": null
+    },
+    {
+        "name": "community and public health",
+        "count": 1495,
+        "meta": null
+    },
+    {
+        "name": "community",
+        "count": 1495,
+        "meta": null
+    },
+    {
+        "name": "composition and rhetoric",
+        "count": 1121,
+        "meta": null
+    },
+    {
+        "name": "comparative religious studies",
+        "count": 745,
+        "meta": null
+    },
+    {
+        "name": "communication tech",
+        "count": 707,
+        "meta": null
+    },
+    {
+        "name": "computer networking and telecommunications",
+        "count": 678,
+        "meta": null
+    },
+    {
+        "name": "chinese languages",
+        "count": 659,
+        "meta": null
+    },
+    {
+        "name": "comp lit",
+        "count": 652,
+        "meta": null
+    },
+    {
+        "name": "classical culture",
+        "count": 518,
+        "meta": null
+    },
+    {
+        "name": "czech studies",
+        "count": 361,
+        "meta": null
+    },
+    {
+        "name": "classical language",
+        "count": 300,
+        "meta": null
+    },
+    {
+        "name": "construction services",
+        "count": 211,
+        "meta": null
+    },
+    {
+        "name": "czech literature",
+        "count": 198,
+        "meta": null
+    },
+    {
+        "name": "computer programming and data processing",
+        "count": 176,
+        "meta": null
+    },
+    {
+        "name": "construction and land development",
+        "count": 137,
+        "meta": null
+    },
+    {
+        "name": "design",
+        "count": 4254218,
+        "meta": null
+    },
+    {
+        "name": "dentistry",
+        "count": 322551,
+        "meta": null
+    },
+    {
+        "name": "data science",
+        "count": 321817,
+        "meta": null
+    },
+    {
+        "name": "drama",
+        "count": 253470,
+        "meta": null
+    },
+    {
+        "name": "dance",
+        "count": 221116,
+        "meta": null
+    },
+    {
+        "name": "drawing",
+        "count": 124799,
+        "meta": null
+    },
+    {
+        "name": "dental hygiene",
+        "count": 123819,
+        "meta": null
+    },
+    {
+        "name": "divinity",
+        "count": 54304,
+        "meta": null
+    },
+    {
+        "name": "dutch",
+        "count": 51529,
+        "meta": null
+    },
+    {
+        "name": "demography",
+        "count": 18092,
+        "meta": null
+    },
+    {
+        "name": "disability studies",
+        "count": 15517,
+        "meta": null
+    },
+    {
+        "name": "digital art",
+        "count": 14241,
+        "meta": null
+    },
+    {
+        "name": "danish",
+        "count": 13305,
+        "meta": null
+    },
+    {
+        "name": "dance performance",
+        "count": 9488,
+        "meta": null
+    },
+    {
+        "name": "drug development",
+        "count": 8518,
+        "meta": null
+    },
+    {
+        "name": "diversity studies",
+        "count": 7971,
+        "meta": null
+    },
+    {
+        "name": "digital video",
+        "count": 7769,
+        "meta": null
+    },
+    {
+        "name": "dutch language",
+        "count": 7643,
+        "meta": null
+    },
+    {
+        "name": "documentary production",
+        "count": 6493,
+        "meta": null
+    },
+    {
+        "name": "distribution management",
+        "count": 5369,
+        "meta": null
+    },
+    {
+        "name": "danish language",
+        "count": 5012,
+        "meta": null
+    },
+    {
+        "name": "danish language and literature",
+        "count": 2030,
+        "meta": null
+    },
+    {
+        "name": "dutch language and literature",
+        "count": 1724,
+        "meta": null
+    },
+    {
+        "name": "dutch studies",
+        "count": 1205,
+        "meta": null
+    },
+    {
+        "name": "dutch literature",
+        "count": 972,
+        "meta": null
+    },
+    {
+        "name": "digital visual effects",
+        "count": 899,
+        "meta": null
+    },
+    {
+        "name": "dutch language and culture",
+        "count": 836,
+        "meta": null
+    },
+    {
+        "name": "dental tech",
+        "count": 449,
+        "meta": null
+    },
+    {
+        "name": "danish language and culture",
+        "count": 289,
+        "meta": null
+    },
+    {
+        "name": "digital video and cinema",
+        "count": 262,
+        "meta": null
+    },
+    {
+        "name": "danish literature",
+        "count": 217,
+        "meta": null
+    },
+    {
+        "name": "dutch culture",
+        "count": 206,
+        "meta": null
+    },
+    {
+        "name": "danish culture",
+        "count": 156,
+        "meta": null
+    },
+    {
+        "name": "dutch languages",
+        "count": 141,
+        "meta": null
+    },
+    {
+        "name": "danish studies",
+        "count": 111,
+        "meta": null
+    },
+    {
+        "name": "dutch language studies",
+        "count": 83,
+        "meta": null
+    },
+    {
+        "name": "danish language studies",
+        "count": 19,
+        "meta": null
+    },
+    {
+        "name": "danish languages",
+        "count": 18,
+        "meta": null
+    },
+    {
+        "name": "dutch literature and culture",
+        "count": 14,
+        "meta": null
+    },
+    {
+        "name": "drama and theater art",
+        "count": 7,
+        "meta": null
+    },
+    {
+        "name": "danish literature and culture",
+        "count": 2,
+        "meta": null
+    },
+    {
+        "name": "engineering",
+        "count": 11058660,
+        "meta": null
+    },
+    {
+        "name": "education",
+        "count": 6327035,
+        "meta": null
+    },
+    {
+        "name": "economics",
+        "count": 6279768,
+        "meta": null
+    },
+    {
+        "name": "english",
+        "count": 3997003,
+        "meta": null
+    },
+    {
+        "name": "electronics",
+        "count": 3506631,
+        "meta": null
+    },
+    {
+        "name": "electronics engineering",
+        "count": 2048002,
+        "meta": null
+    },
+    {
+        "name": "english language",
+        "count": 1859112,
+        "meta": null
+    },
+    {
+        "name": "electrical engineering",
+        "count": 1833920,
+        "meta": null
+    },
+    {
+        "name": "english language and literature",
+        "count": 1231023,
+        "meta": null
+    },
+    {
+        "name": "elementary education",
+        "count": 1186906,
+        "meta": null
+    },
+    {
+        "name": "english literature",
+        "count": 714381,
+        "meta": null
+    },
+    {
+        "name": "entrepreneurship",
+        "count": 711753,
+        "meta": null
+    },
+    {
+        "name": "early childhood education",
+        "count": 643712,
+        "meta": null
+    },
+    {
+        "name": "exercise science",
+        "count": 506827,
+        "meta": null
+    },
+    {
+        "name": "environmental science",
+        "count": 491004,
+        "meta": null
+    },
+    {
+        "name": "energy",
+        "count": 450976,
+        "meta": null
+    },
+    {
+        "name": "environmental engineering",
+        "count": 289970,
+        "meta": null
+    },
+    {
+        "name": "environmental studies",
+        "count": 221595,
+        "meta": null
+    },
+    {
+        "name": "ecology",
+        "count": 216550,
+        "meta": null
+    },
+    {
+        "name": "entrepreneurial studies",
+        "count": 181520,
+        "meta": null
+    },
+    {
+        "name": "earth science",
+        "count": 166666,
+        "meta": null
+    },
+    {
+        "name": "ethics",
+        "count": 144469,
+        "meta": null
+    },
+    {
+        "name": "european studies",
+        "count": 144453,
+        "meta": null
+    },
+    {
+        "name": "epidemiology",
+        "count": 119117,
+        "meta": null
+    },
+    {
+        "name": "english language arts",
+        "count": 99061,
+        "meta": null
+    },
+    {
+        "name": "educational psychology",
+        "count": 88017,
+        "meta": null
+    },
+    {
+        "name": "event planning",
+        "count": 58498,
+        "meta": null
+    },
+    {
+        "name": "english as a second language",
+        "count": 57574,
+        "meta": null
+    },
+    {
+        "name": "english studies",
+        "count": 50898,
+        "meta": null
+    },
+    {
+        "name": "european history",
+        "count": 39329,
+        "meta": null
+    },
+    {
+        "name": "east asian studies",
+        "count": 36315,
+        "meta": null
+    },
+    {
+        "name": "entomology",
+        "count": 33856,
+        "meta": null
+    },
+    {
+        "name": "educational administration and supervision",
+        "count": 29618,
+        "meta": null
+    },
+    {
+        "name": "electrical engineering and computer science",
+        "count": 29516,
+        "meta": null
+    },
+    {
+        "name": "exercise and sport science",
+        "count": 16599,
+        "meta": null
+    },
+    {
+        "name": "engineering tech",
+        "count": 8598,
+        "meta": null
+    },
+    {
+        "name": "english languages",
+        "count": 7127,
+        "meta": null
+    },
+    {
+        "name": "english language studies",
+        "count": 6836,
+        "meta": null
+    },
+    {
+        "name": "english language and culture",
+        "count": 5462,
+        "meta": null
+    },
+    {
+        "name": "engineering and industrial management",
+        "count": 1661,
+        "meta": null
+    },
+    {
+        "name": "english culture",
+        "count": 1372,
+        "meta": null
+    },
+    {
+        "name": "electrical engineering tech",
+        "count": 1061,
+        "meta": null
+    },
+    {
+        "name": "english literature and culture",
+        "count": 1021,
+        "meta": null
+    },
+    {
+        "name": "european civilization",
+        "count": 848,
+        "meta": null
+    },
+    {
+        "name": "energy and climate policy",
+        "count": 305,
+        "meta": null
+    },
+    {
+        "name": "european modern languages",
+        "count": 64,
+        "meta": null
+    },
+    {
+        "name": "environmental",
+        "count": 48,
+        "meta": null
+    },
+    {
+        "name": "environmental and geotechnical engineering",
+        "count": 48,
+        "meta": null
+    },
+    {
+        "name": "energy and enviornmental analysis",
+        "count": 2,
+        "meta": null
+    },
+    {
+        "name": "finance",
+        "count": 8613711,
+        "meta": null
+    },
+    {
+        "name": "film",
+        "count": 922131,
+        "meta": null
+    },
+    {
+        "name": "fashion",
+        "count": 845451,
+        "meta": null
+    },
+    {
+        "name": "french",
+        "count": 721442,
+        "meta": null
+    },
+    {
+        "name": "financial management",
+        "count": 710109,
+        "meta": null
+    },
+    {
+        "name": "fine arts",
+        "count": 479062,
+        "meta": null
+    },
+    {
+        "name": "food science",
+        "count": 257649,
+        "meta": null
+    },
+    {
+        "name": "fashion design",
+        "count": 249644,
+        "meta": null
+    },
+    {
+        "name": "fine art",
+        "count": 211196,
+        "meta": null
+    },
+    {
+        "name": "french language",
+        "count": 198777,
+        "meta": null
+    },
+    {
+        "name": "forestry",
+        "count": 127115,
+        "meta": null
+    },
+    {
+        "name": "finance and marketing",
+        "count": 120345,
+        "meta": null
+    },
+    {
+        "name": "french language and literature",
+        "count": 119578,
+        "meta": null
+    },
+    {
+        "name": "financial accounting",
+        "count": 102648,
+        "meta": null
+    },
+    {
+        "name": "forensics",
+        "count": 100952,
+        "meta": null
+    },
+    {
+        "name": "forensic science",
+        "count": 95795,
+        "meta": null
+    },
+    {
+        "name": "family therapy",
+        "count": 90342,
+        "meta": null
+    },
+    {
+        "name": "french studies",
+        "count": 72015,
+        "meta": null
+    },
+    {
+        "name": "financial economics",
+        "count": 69238,
+        "meta": null
+    },
+    {
+        "name": "film and television",
+        "count": 58391,
+        "meta": null
+    },
+    {
+        "name": "financial engineering",
+        "count": 52359,
+        "meta": null
+    },
+    {
+        "name": "food safety",
+        "count": 32648,
+        "meta": null
+    },
+    {
+        "name": "food preparation",
+        "count": 26690,
+        "meta": null
+    },
+    {
+        "name": "french literature",
+        "count": 23535,
+        "meta": null
+    },
+    {
+        "name": "fundraising",
+        "count": 21732,
+        "meta": null
+    },
+    {
+        "name": "finnish",
+        "count": 13176,
+        "meta": null
+    },
+    {
+        "name": "family and community services",
+        "count": 12073,
+        "meta": null
+    },
+    {
+        "name": "family science",
+        "count": 11338,
+        "meta": null
+    },
+    {
+        "name": "flute",
+        "count": 9339,
+        "meta": null
+    },
+    {
+        "name": "forensic chemistry",
+        "count": 9313,
+        "meta": null
+    },
+    {
+        "name": "film directing",
+        "count": 7453,
+        "meta": null
+    },
+    {
+        "name": "financial forensics and fraud investigation",
+        "count": 6693,
+        "meta": null
+    },
+    {
+        "name": "folklore",
+        "count": 6629,
+        "meta": null
+    },
+    {
+        "name": "french language and culture",
+        "count": 6493,
+        "meta": null
+    },
+    {
+        "name": "flute performance",
+        "count": 5664,
+        "meta": null
+    },
+    {
+        "name": "family",
+        "count": 5425,
+        "meta": null
+    },
+    {
+        "name": "family and consumer science",
+        "count": 5425,
+        "meta": null
+    },
+    {
+        "name": "francophone studies",
+        "count": 4481,
+        "meta": null
+    },
+    {
+        "name": "finnish language",
+        "count": 4266,
+        "meta": null
+    },
+    {
+        "name": "forensic computing",
+        "count": 4191,
+        "meta": null
+    },
+    {
+        "name": "foreign studies",
+        "count": 3606,
+        "meta": null
+    },
+    {
+        "name": "forest science",
+        "count": 3276,
+        "meta": null
+    },
+    {
+        "name": "french languages",
+        "count": 2829,
+        "meta": null
+    },
+    {
+        "name": "french language studies",
+        "count": 2594,
+        "meta": null
+    },
+    {
+        "name": "foreign relations",
+        "count": 2278,
+        "meta": null
+    },
+    {
+        "name": "french culture",
+        "count": 2179,
+        "meta": null
+    },
+    {
+        "name": "financial forensics",
+        "count": 1642,
+        "meta": null
+    },
+    {
+        "name": "folklore studies",
+        "count": 1500,
+        "meta": null
+    },
+    {
+        "name": "food",
+        "count": 1058,
+        "meta": null
+    },
+    {
+        "name": "food and nutritional science",
+        "count": 1058,
+        "meta": null
+    },
+    {
+        "name": "french pastry",
+        "count": 957,
+        "meta": null
+    },
+    {
+        "name": "fisheries",
+        "count": 733,
+        "meta": null
+    },
+    {
+        "name": "fisheries and wildlife science",
+        "count": 733,
+        "meta": null
+    },
+    {
+        "name": "finnish literature",
+        "count": 634,
+        "meta": null
+    },
+    {
+        "name": "finnish language and culture",
+        "count": 581,
+        "meta": null
+    },
+    {
+        "name": "finnish language and literature",
+        "count": 510,
+        "meta": null
+    },
+    {
+        "name": "french literature and culture",
+        "count": 257,
+        "meta": null
+    },
+    {
+        "name": "forest tech",
+        "count": 147,
+        "meta": null
+    },
+    {
+        "name": "finnish studies",
+        "count": 132,
+        "meta": null
+    },
+    {
+        "name": "fine",
+        "count": 100,
+        "meta": null
+    },
+    {
+        "name": "fine and studio art",
+        "count": 100,
+        "meta": null
+    },
+    {
+        "name": "fundraising and grantmaking",
+        "count": 79,
+        "meta": null
+    },
+    {
+        "name": "finnish language studies",
+        "count": 69,
+        "meta": null
+    },
+    {
+        "name": "finnish culture",
+        "count": 67,
+        "meta": null
+    },
+    {
+        "name": "finnish languages",
+        "count": 56,
+        "meta": null
+    },
+    {
+        "name": "feminine studies",
+        "count": 15,
+        "meta": null
+    },
+    {
+        "name": "feminine spirituality",
+        "count": 14,
+        "meta": null
+    },
+    {
+        "name": "film video and photographic art",
+        "count": 10,
+        "meta": null
+    },
+    {
+        "name": "film photography",
+        "count": 7,
+        "meta": null
+    },
+    {
+        "name": "film photography and visual art",
+        "count": 7,
+        "meta": null
+    },
+    {
+        "name": "finnish literature and culture",
+        "count": 3,
+        "meta": null
+    },
+    {
+        "name": "general studies",
+        "count": 1572616,
+        "meta": null
+    },
+    {
+        "name": "graphic design",
+        "count": 1432108,
+        "meta": null
+    },
+    {
+        "name": "government",
+        "count": 1037154,
+        "meta": null
+    },
+    {
+        "name": "geography",
+        "count": 844975,
+        "meta": null
+    },
+    {
+        "name": "geology",
+        "count": 475020,
+        "meta": null
+    },
+    {
+        "name": "german",
+        "count": 337060,
+        "meta": null
+    },
+    {
+        "name": "general education",
+        "count": 248699,
+        "meta": null
+    },
+    {
+        "name": "genetics",
+        "count": 212075,
+        "meta": null
+    },
+    {
+        "name": "global studies",
+        "count": 160348,
+        "meta": null
+    },
+    {
+        "name": "german language",
+        "count": 117914,
+        "meta": null
+    },
+    {
+        "name": "general business",
+        "count": 109866,
+        "meta": null
+    },
+    {
+        "name": "general science",
+        "count": 81693,
+        "meta": null
+    },
+    {
+        "name": "geosciences",
+        "count": 79459,
+        "meta": null
+    },
+    {
+        "name": "geophysics",
+        "count": 79376,
+        "meta": null
+    },
+    {
+        "name": "game design",
+        "count": 62797,
+        "meta": null
+    },
+    {
+        "name": "german language and literature",
+        "count": 56835,
+        "meta": null
+    },
+    {
+        "name": "gender studies",
+        "count": 55479,
+        "meta": null
+    },
+    {
+        "name": "global health",
+        "count": 51797,
+        "meta": null
+    },
+    {
+        "name": "german studies",
+        "count": 41293,
+        "meta": null
+    },
+    {
+        "name": "greek",
+        "count": 37733,
+        "meta": null
+    },
+    {
+        "name": "geotechnical engineering",
+        "count": 29592,
+        "meta": null
+    },
+    {
+        "name": "government and politics",
+        "count": 28741,
+        "meta": null
+    },
+    {
+        "name": "general engineering",
+        "count": 28736,
+        "meta": null
+    },
+    {
+        "name": "gynecology",
+        "count": 23197,
+        "meta": null
+    },
+    {
+        "name": "geoscience",
+        "count": 22837,
+        "meta": null
+    },
+    {
+        "name": "genomics",
+        "count": 17123,
+        "meta": null
+    },
+    {
+        "name": "geochemistry",
+        "count": 16799,
+        "meta": null
+    },
+    {
+        "name": "graphic art",
+        "count": 14313,
+        "meta": null
+    },
+    {
+        "name": "greek language",
+        "count": 10895,
+        "meta": null
+    },
+    {
+        "name": "german literature",
+        "count": 10552,
+        "meta": null
+    },
+    {
+        "name": "graphic and printing",
+        "count": 9105,
+        "meta": null
+    },
+    {
+        "name": "greek language and literature",
+        "count": 7929,
+        "meta": null
+    },
+    {
+        "name": "general agriculture",
+        "count": 7241,
+        "meta": null
+    },
+    {
+        "name": "german languages",
+        "count": 5245,
+        "meta": null
+    },
+    {
+        "name": "german language and culture",
+        "count": 2995,
+        "meta": null
+    },
+    {
+        "name": "global history",
+        "count": 2426,
+        "meta": null
+    },
+    {
+        "name": "general social science",
+        "count": 1820,
+        "meta": null
+    },
+    {
+        "name": "german language studies",
+        "count": 1622,
+        "meta": null
+    },
+    {
+        "name": "greek literature",
+        "count": 1488,
+        "meta": null
+    },
+    {
+        "name": "greek studies",
+        "count": 934,
+        "meta": null
+    },
+    {
+        "name": "german culture",
+        "count": 726,
+        "meta": null
+    },
+    {
+        "name": "greek mythology",
+        "count": 342,
+        "meta": null
+    },
+    {
+        "name": "government and management",
+        "count": 310,
+        "meta": null
+    },
+    {
+        "name": "greek culture",
+        "count": 305,
+        "meta": null
+    },
+    {
+        "name": "greek language and culture",
+        "count": 262,
+        "meta": null
+    },
+    {
+        "name": "greek languages",
+        "count": 199,
+        "meta": null
+    },
+    {
+        "name": "geology and earth science",
+        "count": 156,
+        "meta": null
+    },
+    {
+        "name": "german literature and culture",
+        "count": 155,
+        "meta": null
+    },
+    {
+        "name": "geological and geophysical engineering",
+        "count": 141,
+        "meta": null
+    },
+    {
+        "name": "gender and diversity studies",
+        "count": 141,
+        "meta": null
+    },
+    {
+        "name": "gay lesbian studies",
+        "count": 131,
+        "meta": null
+    },
+    {
+        "name": "gender and womens studies",
+        "count": 98,
+        "meta": null
+    },
+    {
+        "name": "graphic and printing science",
+        "count": 90,
+        "meta": null
+    },
+    {
+        "name": "greek language studies",
+        "count": 47,
+        "meta": null
+    },
+    {
+        "name": "gay and lesbian studies",
+        "count": 28,
+        "meta": null
+    },
+    {
+        "name": "greek literature and culture",
+        "count": 9,
+        "meta": null
+    },
+    {
+        "name": "history",
+        "count": 2509997,
+        "meta": null
+    },
+    {
+        "name": "human resources management",
+        "count": 1472429,
+        "meta": null
+    },
+    {
+        "name": "hospitality",
+        "count": 876745,
+        "meta": null
+    },
+    {
+        "name": "human resources",
+        "count": 781602,
+        "meta": null
+    },
+    {
+        "name": "human resource management",
+        "count": 602787,
+        "meta": null
+    },
+    {
+        "name": "humanities",
+        "count": 542206,
+        "meta": null
+    },
+    {
+        "name": "health care administration",
+        "count": 444179,
+        "meta": null
+    },
+    {
+        "name": "hospitality management",
+        "count": 416637,
+        "meta": null
+    },
+    {
+        "name": "hotel management",
+        "count": 322087,
+        "meta": null
+    },
+    {
+        "name": "human services",
+        "count": 319345,
+        "meta": null
+    },
+    {
+        "name": "healthcare",
+        "count": 284736,
+        "meta": null
+    },
+    {
+        "name": "health services",
+        "count": 277774,
+        "meta": null
+    },
+    {
+        "name": "health science",
+        "count": 239877,
+        "meta": null
+    },
+    {
+        "name": "human development",
+        "count": 208211,
+        "meta": null
+    },
+    {
+        "name": "health care",
+        "count": 194964,
+        "meta": null
+    },
+    {
+        "name": "horticulture",
+        "count": 152096,
+        "meta": null
+    },
+    {
+        "name": "healthcare administration",
+        "count": 116047,
+        "meta": null
+    },
+    {
+        "name": "health administration",
+        "count": 102639,
+        "meta": null
+    },
+    {
+        "name": "hospitality and tourism",
+        "count": 97891,
+        "meta": null
+    },
+    {
+        "name": "health education",
+        "count": 90580,
+        "meta": null
+    },
+    {
+        "name": "homeland security",
+        "count": 81005,
+        "meta": null
+    },
+    {
+        "name": "health promotion",
+        "count": 74405,
+        "meta": null
+    },
+    {
+        "name": "human resource development",
+        "count": 58460,
+        "meta": null
+    },
+    {
+        "name": "hindi",
+        "count": 54604,
+        "meta": null
+    },
+    {
+        "name": "human relations",
+        "count": 44420,
+        "meta": null
+    },
+    {
+        "name": "human physiology",
+        "count": 22990,
+        "meta": null
+    },
+    {
+        "name": "historic preservation",
+        "count": 16786,
+        "meta": null
+    },
+    {
+        "name": "hindi language",
+        "count": 15676,
+        "meta": null
+    },
+    {
+        "name": "hebrew",
+        "count": 15044,
+        "meta": null
+    },
+    {
+        "name": "hindi language and literature",
+        "count": 14005,
+        "meta": null
+    },
+    {
+        "name": "hindu",
+        "count": 8360,
+        "meta": null
+    },
+    {
+        "name": "hungarian",
+        "count": 8346,
+        "meta": null
+    },
+    {
+        "name": "health and medical administrative services",
+        "count": 7669,
+        "meta": null
+    },
+    {
+        "name": "health service administration",
+        "count": 7171,
+        "meta": null
+    },
+    {
+        "name": "hebrew language",
+        "count": 5641,
+        "meta": null
+    },
+    {
+        "name": "hebrew language and literature",
+        "count": 3289,
+        "meta": null
+    },
+    {
+        "name": "hindi literature",
+        "count": 2673,
+        "meta": null
+    },
+    {
+        "name": "hungarian language",
+        "count": 1976,
+        "meta": null
+    },
+    {
+        "name": "hungarian language and literature",
+        "count": 1148,
+        "meta": null
+    },
+    {
+        "name": "hebrew literature",
+        "count": 832,
+        "meta": null
+    },
+    {
+        "name": "holocaust studies",
+        "count": 723,
+        "meta": null
+    },
+    {
+        "name": "hindu studies",
+        "count": 723,
+        "meta": null
+    },
+    {
+        "name": "hungarian literature",
+        "count": 691,
+        "meta": null
+    },
+    {
+        "name": "hebrew studies",
+        "count": 485,
+        "meta": null
+    },
+    {
+        "name": "human resources and personnel management",
+        "count": 468,
+        "meta": null
+    },
+    {
+        "name": "hungarian studies",
+        "count": 406,
+        "meta": null
+    },
+    {
+        "name": "hungarian language and culture",
+        "count": 184,
+        "meta": null
+    },
+    {
+        "name": "hebrew language and culture",
+        "count": 138,
+        "meta": null
+    },
+    {
+        "name": "hebrew languages",
+        "count": 66,
+        "meta": null
+    },
+    {
+        "name": "hebrew culture",
+        "count": 65,
+        "meta": null
+    },
+    {
+        "name": "hebrew language studies",
+        "count": 65,
+        "meta": null
+    },
+    {
+        "name": "hungarian languages",
+        "count": 59,
+        "meta": null
+    },
+    {
+        "name": "hungarian culture",
+        "count": 53,
+        "meta": null
+    },
+    {
+        "name": "hindi studies",
+        "count": 46,
+        "meta": null
+    },
+    {
+        "name": "hindi languages",
+        "count": 42,
+        "meta": null
+    },
+    {
+        "name": "hindi language and culture",
+        "count": 13,
+        "meta": null
+    },
+    {
+        "name": "hungarian language studies",
+        "count": 12,
+        "meta": null
+    },
+    {
+        "name": "health education teaching",
+        "count": 11,
+        "meta": null
+    },
+    {
+        "name": "hindi culture",
+        "count": 10,
+        "meta": null
+    },
+    {
+        "name": "hindi language studies",
+        "count": 10,
+        "meta": null
+    },
+    {
+        "name": "human services and community organization",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "hungarian literature and culture",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "health medical professions",
+        "count": 4,
+        "meta": null
+    },
+    {
+        "name": "hebrew literature and culture",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "hindi literature and culture",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "international business",
+        "count": 2162166,
+        "meta": null
+    },
+    {
+        "name": "international relations",
+        "count": 1032654,
+        "meta": null
+    },
+    {
+        "name": "industrial engineering",
+        "count": 951027,
+        "meta": null
+    },
+    {
+        "name": "information systems",
+        "count": 915302,
+        "meta": null
+    },
+    {
+        "name": "informatics",
+        "count": 486136,
+        "meta": null
+    },
+    {
+        "name": "information science",
+        "count": 419550,
+        "meta": null
+    },
+    {
+        "name": "international studies",
+        "count": 245628,
+        "meta": null
+    },
+    {
+        "name": "international law",
+        "count": 205947,
+        "meta": null
+    },
+    {
+        "name": "illustration",
+        "count": 205856,
+        "meta": null
+    },
+    {
+        "name": "international economics",
+        "count": 195078,
+        "meta": null
+    },
+    {
+        "name": "industrial design",
+        "count": 177396,
+        "meta": null
+    },
+    {
+        "name": "interdisciplinary studies",
+        "count": 169645,
+        "meta": null
+    },
+    {
+        "name": "international development",
+        "count": 142389,
+        "meta": null
+    },
+    {
+        "name": "industrial and organizational psychology",
+        "count": 128507,
+        "meta": null
+    },
+    {
+        "name": "international affairs",
+        "count": 127397,
+        "meta": null
+    },
+    {
+        "name": "international finance",
+        "count": 120063,
+        "meta": null
+    },
+    {
+        "name": "immunology",
+        "count": 116678,
+        "meta": null
+    },
+    {
+        "name": "industrial relations",
+        "count": 113192,
+        "meta": null
+    },
+    {
+        "name": "italian",
+        "count": 102718,
+        "meta": null
+    },
+    {
+        "name": "interactive media",
+        "count": 81191,
+        "meta": null
+    },
+    {
+        "name": "international commerce",
+        "count": 69250,
+        "meta": null
+    },
+    {
+        "name": "information systems management",
+        "count": 60962,
+        "meta": null
+    },
+    {
+        "name": "italian language",
+        "count": 50551,
+        "meta": null
+    },
+    {
+        "name": "islamic studies",
+        "count": 48400,
+        "meta": null
+    },
+    {
+        "name": "industrial safety",
+        "count": 38618,
+        "meta": null
+    },
+    {
+        "name": "international economic relations",
+        "count": 29692,
+        "meta": null
+    },
+    {
+        "name": "italian language and literature",
+        "count": 25134,
+        "meta": null
+    },
+    {
+        "name": "investment banking",
+        "count": 23230,
+        "meta": null
+    },
+    {
+        "name": "italian studies",
+        "count": 19466,
+        "meta": null
+    },
+    {
+        "name": "investment analysis",
+        "count": 12639,
+        "meta": null
+    },
+    {
+        "name": "indonesian",
+        "count": 7706,
+        "meta": null
+    },
+    {
+        "name": "industrial administration",
+        "count": 7569,
+        "meta": null
+    },
+    {
+        "name": "international communications",
+        "count": 7145,
+        "meta": null
+    },
+    {
+        "name": "information tech",
+        "count": 6319,
+        "meta": null
+    },
+    {
+        "name": "industrial and manufacturing engineering",
+        "count": 4907,
+        "meta": null
+    },
+    {
+        "name": "irish studies",
+        "count": 4817,
+        "meta": null
+    },
+    {
+        "name": "industrial engineering and operations research",
+        "count": 4739,
+        "meta": null
+    },
+    {
+        "name": "italian literature",
+        "count": 4132,
+        "meta": null
+    },
+    {
+        "name": "italian language and culture",
+        "count": 4111,
+        "meta": null
+    },
+    {
+        "name": "industrial tech",
+        "count": 2646,
+        "meta": null
+    },
+    {
+        "name": "indonesian language",
+        "count": 2386,
+        "meta": null
+    },
+    {
+        "name": "interdisciplinary social science",
+        "count": 1999,
+        "meta": null
+    },
+    {
+        "name": "industrial sales",
+        "count": 1682,
+        "meta": null
+    },
+    {
+        "name": "italian culture",
+        "count": 1502,
+        "meta": null
+    },
+    {
+        "name": "italian languages",
+        "count": 941,
+        "meta": null
+    },
+    {
+        "name": "indonesian literature",
+        "count": 713,
+        "meta": null
+    },
+    {
+        "name": "islamic religion",
+        "count": 610,
+        "meta": null
+    },
+    {
+        "name": "islamic culture",
+        "count": 541,
+        "meta": null
+    },
+    {
+        "name": "italian language studies",
+        "count": 526,
+        "meta": null
+    },
+    {
+        "name": "indonesian studies",
+        "count": 525,
+        "meta": null
+    },
+    {
+        "name": "indonesian language and literature",
+        "count": 502,
+        "meta": null
+    },
+    {
+        "name": "indonesian language and culture",
+        "count": 417,
+        "meta": null
+    },
+    {
+        "name": "indonesian languages",
+        "count": 348,
+        "meta": null
+    },
+    {
+        "name": "illustraton",
+        "count": 221,
+        "meta": null
+    },
+    {
+        "name": "instructional tech",
+        "count": 182,
+        "meta": null
+    },
+    {
+        "name": "international development and conflict management",
+        "count": 117,
+        "meta": null
+    },
+    {
+        "name": "indonesian culture",
+        "count": 88,
+        "meta": null
+    },
+    {
+        "name": "italian literature and culture",
+        "count": 86,
+        "meta": null
+    },
+    {
+        "name": "indonesian language studies",
+        "count": 39,
+        "meta": null
+    },
+    {
+        "name": "intercultural and international studies",
+        "count": 36,
+        "meta": null
+    },
+    {
+        "name": "information science and tech",
+        "count": 24,
+        "meta": null
+    },
+    {
+        "name": "industrial production tech",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "indonesian and malay languages",
+        "count": 3,
+        "meta": null
+    },
+    {
+        "name": "journalism",
+        "count": 1495913,
+        "meta": null
+    },
+    {
+        "name": "japanese",
+        "count": 101778,
+        "meta": null
+    },
+    {
+        "name": "japanese language",
+        "count": 92848,
+        "meta": null
+    },
+    {
+        "name": "jazz",
+        "count": 76255,
+        "meta": null
+    },
+    {
+        "name": "japanese studies",
+        "count": 40821,
+        "meta": null
+    },
+    {
+        "name": "japanese language and literature",
+        "count": 36119,
+        "meta": null
+    },
+    {
+        "name": "judaic studies",
+        "count": 10411,
+        "meta": null
+    },
+    {
+        "name": "japanese language and culture",
+        "count": 7280,
+        "meta": null
+    },
+    {
+        "name": "jazz performance",
+        "count": 6841,
+        "meta": null
+    },
+    {
+        "name": "japanese literature",
+        "count": 4850,
+        "meta": null
+    },
+    {
+        "name": "japanese culture",
+        "count": 2301,
+        "meta": null
+    },
+    {
+        "name": "japanese language studies",
+        "count": 1064,
+        "meta": null
+    },
+    {
+        "name": "japanese languages",
+        "count": 413,
+        "meta": null
+    },
+    {
+        "name": "japanese literature and culture",
+        "count": 66,
+        "meta": null
+    },
+    {
+        "name": "kinesiology",
+        "count": 479455,
+        "meta": null
+    },
+    {
+        "name": "korean language",
+        "count": 30684,
+        "meta": null
+    },
+    {
+        "name": "korean",
+        "count": 19751,
+        "meta": null
+    },
+    {
+        "name": "korean studies",
+        "count": 10674,
+        "meta": null
+    },
+    {
+        "name": "korean language and literature",
+        "count": 9590,
+        "meta": null
+    },
+    {
+        "name": "korean language and culture",
+        "count": 2405,
+        "meta": null
+    },
+    {
+        "name": "korean literature",
+        "count": 892,
+        "meta": null
+    },
+    {
+        "name": "korean culture",
+        "count": 732,
+        "meta": null
+    },
+    {
+        "name": "korean language studies",
+        "count": 548,
+        "meta": null
+    },
+    {
+        "name": "korean languages",
+        "count": 371,
+        "meta": null
+    },
+    {
+        "name": "korean literature and culture",
+        "count": 32,
+        "meta": null
+    },
+    {
+        "name": "law",
+        "count": 4597180,
+        "meta": null
+    },
+    {
+        "name": "literature",
+        "count": 2230399,
+        "meta": null
+    },
+    {
+        "name": "leadership",
+        "count": 1885289,
+        "meta": null
+    },
+    {
+        "name": "liberal arts",
+        "count": 1171946,
+        "meta": null
+    },
+    {
+        "name": "logistics",
+        "count": 802106,
+        "meta": null
+    },
+    {
+        "name": "liberal studies",
+        "count": 485871,
+        "meta": null
+    },
+    {
+        "name": "linguistics",
+        "count": 453226,
+        "meta": null
+    },
+    {
+        "name": "law enforcement",
+        "count": 306414,
+        "meta": null
+    },
+    {
+        "name": "legal studies",
+        "count": 286960,
+        "meta": null
+    },
+    {
+        "name": "latin",
+        "count": 129073,
+        "meta": null
+    },
+    {
+        "name": "landscape architecture",
+        "count": 125196,
+        "meta": null
+    },
+    {
+        "name": "library science",
+        "count": 69918,
+        "meta": null
+    },
+    {
+        "name": "latin american studies",
+        "count": 49240,
+        "meta": null
+    },
+    {
+        "name": "labor relations",
+        "count": 31837,
+        "meta": null
+    },
+    {
+        "name": "logic",
+        "count": 27457,
+        "meta": null
+    },
+    {
+        "name": "labor studies",
+        "count": 12184,
+        "meta": null
+    },
+    {
+        "name": "landscaping",
+        "count": 9196,
+        "meta": null
+    },
+    {
+        "name": "legal administration",
+        "count": 6242,
+        "meta": null
+    },
+    {
+        "name": "liberal art",
+        "count": 4410,
+        "meta": null
+    },
+    {
+        "name": "latin american and caribbean studies",
+        "count": 3768,
+        "meta": null
+    },
+    {
+        "name": "landscaping and groundskeeping",
+        "count": 2341,
+        "meta": null
+    },
+    {
+        "name": "liturgical studies",
+        "count": 615,
+        "meta": null
+    },
+    {
+        "name": "lgbtq studies",
+        "count": 356,
+        "meta": null
+    },
+    {
+        "name": "law enforcement executive development",
+        "count": 208,
+        "meta": null
+    },
+    {
+        "name": "language and drama education",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "management",
+        "count": 22570496,
+        "meta": null
+    },
+    {
+        "name": "marketing",
+        "count": 12125277,
+        "meta": null
+    },
+    {
+        "name": "mechanical engineering",
+        "count": 4825789,
+        "meta": null
+    },
+    {
+        "name": "mathematics",
+        "count": 3497107,
+        "meta": null
+    },
+    {
+        "name": "medicine",
+        "count": 2515861,
+        "meta": null
+    },
+    {
+        "name": "music",
+        "count": 1477595,
+        "meta": null
+    },
+    {
+        "name": "media studies",
+        "count": 1206774,
+        "meta": null
+    },
+    {
+        "name": "multimedia",
+        "count": 719472,
+        "meta": null
+    },
+    {
+        "name": "microbiology",
+        "count": 494696,
+        "meta": null
+    },
+    {
+        "name": "molecular biology",
+        "count": 365742,
+        "meta": null
+    },
+    {
+        "name": "mechatronics",
+        "count": 257960,
+        "meta": null
+    },
+    {
+        "name": "management studies",
+        "count": 221731,
+        "meta": null
+    },
+    {
+        "name": "ministry",
+        "count": 200789,
+        "meta": null
+    },
+    {
+        "name": "music education",
+        "count": 184397,
+        "meta": null
+    },
+    {
+        "name": "medical engineering",
+        "count": 171868,
+        "meta": null
+    },
+    {
+        "name": "materials science",
+        "count": 156295,
+        "meta": null
+    },
+    {
+        "name": "management science",
+        "count": 116888,
+        "meta": null
+    },
+    {
+        "name": "mining",
+        "count": 108465,
+        "meta": null
+    },
+    {
+        "name": "media management",
+        "count": 103453,
+        "meta": null
+    },
+    {
+        "name": "modern languages",
+        "count": 96415,
+        "meta": null
+    },
+    {
+        "name": "marine biology",
+        "count": 95834,
+        "meta": null
+    },
+    {
+        "name": "mass media",
+        "count": 78530,
+        "meta": null
+    },
+    {
+        "name": "metallurgical engineering",
+        "count": 77508,
+        "meta": null
+    },
+    {
+        "name": "medical insurance",
+        "count": 63922,
+        "meta": null
+    },
+    {
+        "name": "mining engineering",
+        "count": 59428,
+        "meta": null
+    },
+    {
+        "name": "meteorology",
+        "count": 55493,
+        "meta": null
+    },
+    {
+        "name": "mechatronics engineering",
+        "count": 49974,
+        "meta": null
+    },
+    {
+        "name": "mandarin",
+        "count": 47520,
+        "meta": null
+    },
+    {
+        "name": "mining and mineral engineering",
+        "count": 46306,
+        "meta": null
+    },
+    {
+        "name": "marine science",
+        "count": 36834,
+        "meta": null
+    },
+    {
+        "name": "military science",
+        "count": 33522,
+        "meta": null
+    },
+    {
+        "name": "mandarin chinese",
+        "count": 22395,
+        "meta": null
+    },
+    {
+        "name": "middle eastern studies",
+        "count": 19872,
+        "meta": null
+    },
+    {
+        "name": "medical biology",
+        "count": 13710,
+        "meta": null
+    },
+    {
+        "name": "multimedia journalism",
+        "count": 13350,
+        "meta": null
+    },
+    {
+        "name": "medical assisting services",
+        "count": 12890,
+        "meta": null
+    },
+    {
+        "name": "media art",
+        "count": 12332,
+        "meta": null
+    },
+    {
+        "name": "mathematical science",
+        "count": 9671,
+        "meta": null
+    },
+    {
+        "name": "masonry",
+        "count": 8737,
+        "meta": null
+    },
+    {
+        "name": "metaphysics",
+        "count": 7311,
+        "meta": null
+    },
+    {
+        "name": "medieval studies",
+        "count": 6657,
+        "meta": null
+    },
+    {
+        "name": "mandarin language",
+        "count": 5754,
+        "meta": null
+    },
+    {
+        "name": "molecular biophysics",
+        "count": 5222,
+        "meta": null
+    },
+    {
+        "name": "modern art",
+        "count": 4100,
+        "meta": null
+    },
+    {
+        "name": "mathematical modeling",
+        "count": 3813,
+        "meta": null
+    },
+    {
+        "name": "medieval and renaissance studies",
+        "count": 3809,
+        "meta": null
+    },
+    {
+        "name": "medical tech",
+        "count": 2828,
+        "meta": null
+    },
+    {
+        "name": "mythology",
+        "count": 2769,
+        "meta": null
+    },
+    {
+        "name": "multicultural studies",
+        "count": 2077,
+        "meta": null
+    },
+    {
+        "name": "mechanical tech",
+        "count": 1202,
+        "meta": null
+    },
+    {
+        "name": "mechatronics and automation",
+        "count": 838,
+        "meta": null
+    },
+    {
+        "name": "mandarin studies",
+        "count": 828,
+        "meta": null
+    },
+    {
+        "name": "mandarin language studies",
+        "count": 426,
+        "meta": null
+    },
+    {
+        "name": "mandarin language and culture",
+        "count": 145,
+        "meta": null
+    },
+    {
+        "name": "mandarin literature",
+        "count": 64,
+        "meta": null
+    },
+    {
+        "name": "mandarin languages",
+        "count": 59,
+        "meta": null
+    },
+    {
+        "name": "mandarin culture",
+        "count": 55,
+        "meta": null
+    },
+    {
+        "name": "mandarin language and literature",
+        "count": 53,
+        "meta": null
+    },
+    {
+        "name": "management information systems and statistics",
+        "count": 22,
+        "meta": null
+    },
+    {
+        "name": "military tech",
+        "count": 22,
+        "meta": null
+    },
+    {
+        "name": "mythology and folklore",
+        "count": 21,
+        "meta": null
+    },
+    {
+        "name": "media art and entertainment",
+        "count": 12,
+        "meta": null
+    },
+    {
+        "name": "materials engineering",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "materials engineering and materials science",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "mechanical engineering related tech",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "nursing",
+        "count": 4251947,
+        "meta": null
+    },
+    {
+        "name": "nutrition",
+        "count": 673658,
+        "meta": null
+    },
+    {
+        "name": "neuroscience",
+        "count": 279546,
+        "meta": null
+    },
+    {
+        "name": "nursing administration",
+        "count": 82182,
+        "meta": null
+    },
+    {
+        "name": "nuclear engineering",
+        "count": 59516,
+        "meta": null
+    },
+    {
+        "name": "naval architecture and marine engineering",
+        "count": 53544,
+        "meta": null
+    },
+    {
+        "name": "natural science",
+        "count": 49388,
+        "meta": null
+    },
+    {
+        "name": "network administration",
+        "count": 47264,
+        "meta": null
+    },
+    {
+        "name": "nanotechnology",
+        "count": 45672,
+        "meta": null
+    },
+    {
+        "name": "naval architecture",
+        "count": 39652,
+        "meta": null
+    },
+    {
+        "name": "natural resources management",
+        "count": 23437,
+        "meta": null
+    },
+    {
+        "name": "nutrition science",
+        "count": 13971,
+        "meta": null
+    },
+    {
+        "name": "nutritional science",
+        "count": 13760,
+        "meta": null
+    },
+    {
+        "name": "near eastern studies",
+        "count": 12026,
+        "meta": null
+    },
+    {
+        "name": "norwegian",
+        "count": 10664,
+        "meta": null
+    },
+    {
+        "name": "near and middle eastern studies",
+        "count": 8975,
+        "meta": null
+    },
+    {
+        "name": "natural resources conservation",
+        "count": 8695,
+        "meta": null
+    },
+    {
+        "name": "norwegian language",
+        "count": 6170,
+        "meta": null
+    },
+    {
+        "name": "native american studies",
+        "count": 5806,
+        "meta": null
+    },
+    {
+        "name": "norwegian language and literature",
+        "count": 3743,
+        "meta": null
+    },
+    {
+        "name": "naval architecture and ocean engineering",
+        "count": 3630,
+        "meta": null
+    },
+    {
+        "name": "number theory",
+        "count": 2228,
+        "meta": null
+    },
+    {
+        "name": "natural resource conservation",
+        "count": 1983,
+        "meta": null
+    },
+    {
+        "name": "nuclear propulsion",
+        "count": 1258,
+        "meta": null
+    },
+    {
+        "name": "network and systems administration",
+        "count": 989,
+        "meta": null
+    },
+    {
+        "name": "norwegian language and culture",
+        "count": 518,
+        "meta": null
+    },
+    {
+        "name": "norwegian literature",
+        "count": 138,
+        "meta": null
+    },
+    {
+        "name": "norwegian culture",
+        "count": 118,
+        "meta": null
+    },
+    {
+        "name": "norwegian studies",
+        "count": 106,
+        "meta": null
+    },
+    {
+        "name": "norwegian languages",
+        "count": 45,
+        "meta": null
+    },
+    {
+        "name": "norwegian language studies",
+        "count": 33,
+        "meta": null
+    },
+    {
+        "name": "norwegian literature and culture",
+        "count": 4,
+        "meta": null
+    },
+    {
+        "name": "organizational leadership",
+        "count": 335841,
+        "meta": null
+    },
+    {
+        "name": "operations management",
+        "count": 315022,
+        "meta": null
+    },
+    {
+        "name": "occupational therapy",
+        "count": 225544,
+        "meta": null
+    },
+    {
+        "name": "organizational management",
+        "count": 164379,
+        "meta": null
+    },
+    {
+        "name": "organic chemistry",
+        "count": 153861,
+        "meta": null
+    },
+    {
+        "name": "occupational safety",
+        "count": 130323,
+        "meta": null
+    },
+    {
+        "name": "optometry",
+        "count": 78024,
+        "meta": null
+    },
+    {
+        "name": "occupational health",
+        "count": 75404,
+        "meta": null
+    },
+    {
+        "name": "occupational health and safety",
+        "count": 75189,
+        "meta": null
+    },
+    {
+        "name": "oceanography",
+        "count": 61863,
+        "meta": null
+    },
+    {
+        "name": "orthodontics",
+        "count": 20349,
+        "meta": null
+    },
+    {
+        "name": "organizational communications",
+        "count": 18100,
+        "meta": null
+    },
+    {
+        "name": "organ performance",
+        "count": 3346,
+        "meta": null
+    },
+    {
+        "name": "orchestral conducting",
+        "count": 2632,
+        "meta": null
+    },
+    {
+        "name": "operations logistics",
+        "count": 2573,
+        "meta": null
+    },
+    {
+        "name": "organization administration",
+        "count": 977,
+        "meta": null
+    },
+    {
+        "name": "occupational safety engineering",
+        "count": 692,
+        "meta": null
+    },
+    {
+        "name": "organizational and professional communications",
+        "count": 112,
+        "meta": null
+    },
+    {
+        "name": "psychology",
+        "count": 5712737,
+        "meta": null
+    },
+    {
+        "name": "philosophy",
+        "count": 3673465,
+        "meta": null
+    },
+    {
+        "name": "political science",
+        "count": 2462161,
+        "meta": null
+    },
+    {
+        "name": "physics",
+        "count": 2049592,
+        "meta": null
+    },
+    {
+        "name": "project management",
+        "count": 1446013,
+        "meta": null
+    },
+    {
+        "name": "pharmacy",
+        "count": 1219096,
+        "meta": null
+    },
+    {
+        "name": "public relations",
+        "count": 963625,
+        "meta": null
+    },
+    {
+        "name": "public administration",
+        "count": 843297,
+        "meta": null
+    },
+    {
+        "name": "political science and government",
+        "count": 759595,
+        "meta": null
+    },
+    {
+        "name": "photography",
+        "count": 636199,
+        "meta": null
+    },
+    {
+        "name": "politics",
+        "count": 613030,
+        "meta": null
+    },
+    {
+        "name": "public health",
+        "count": 572765,
+        "meta": null
+    },
+    {
+        "name": "physical education",
+        "count": 456706,
+        "meta": null
+    },
+    {
+        "name": "physical therapy",
+        "count": 374003,
+        "meta": null
+    },
+    {
+        "name": "paralegal",
+        "count": 340577,
+        "meta": null
+    },
+    {
+        "name": "public policy",
+        "count": 337834,
+        "meta": null
+    },
+    {
+        "name": "physiology",
+        "count": 314755,
+        "meta": null
+    },
+    {
+        "name": "product design",
+        "count": 256300,
+        "meta": null
+    },
+    {
+        "name": "painting",
+        "count": 212455,
+        "meta": null
+    },
+    {
+        "name": "petroleum engineering",
+        "count": 192066,
+        "meta": null
+    },
+    {
+        "name": "pharmacology",
+        "count": 156651,
+        "meta": null
+    },
+    {
+        "name": "police science",
+        "count": 151758,
+        "meta": null
+    },
+    {
+        "name": "physiotherapy",
+        "count": 147001,
+        "meta": null
+    },
+    {
+        "name": "performing arts",
+        "count": 130864,
+        "meta": null
+    },
+    {
+        "name": "piano",
+        "count": 130579,
+        "meta": null
+    },
+    {
+        "name": "paralegal studies",
+        "count": 120329,
+        "meta": null
+    },
+    {
+        "name": "pre law",
+        "count": 109282,
+        "meta": null
+    },
+    {
+        "name": "publishing",
+        "count": 105856,
+        "meta": null
+    },
+    {
+        "name": "public affairs",
+        "count": 66024,
+        "meta": null
+    },
+    {
+        "name": "portuguese",
+        "count": 33938,
+        "meta": null
+    },
+    {
+        "name": "physical science",
+        "count": 33684,
+        "meta": null
+    },
+    {
+        "name": "piano performance",
+        "count": 32807,
+        "meta": null
+    },
+    {
+        "name": "public law",
+        "count": 31330,
+        "meta": null
+    },
+    {
+        "name": "poetry",
+        "count": 27548,
+        "meta": null
+    },
+    {
+        "name": "parks recreation and leisure studies",
+        "count": 22534,
+        "meta": null
+    },
+    {
+        "name": "public service",
+        "count": 22095,
+        "meta": null
+    },
+    {
+        "name": "pharmaceutical science",
+        "count": 20760,
+        "meta": null
+    },
+    {
+        "name": "percussion",
+        "count": 16746,
+        "meta": null
+    },
+    {
+        "name": "plant science",
+        "count": 15364,
+        "meta": null
+    },
+    {
+        "name": "playwriting",
+        "count": 14891,
+        "meta": null
+    },
+    {
+        "name": "premed",
+        "count": 13701,
+        "meta": null
+    },
+    {
+        "name": "portuguese language",
+        "count": 13454,
+        "meta": null
+    },
+    {
+        "name": "physical activity",
+        "count": 13286,
+        "meta": null
+    },
+    {
+        "name": "pre dental",
+        "count": 11090,
+        "meta": null
+    },
+    {
+        "name": "public admin",
+        "count": 10165,
+        "meta": null
+    },
+    {
+        "name": "portuguese language and literature",
+        "count": 8681,
+        "meta": null
+    },
+    {
+        "name": "petroleum geoscience",
+        "count": 7090,
+        "meta": null
+    },
+    {
+        "name": "parks",
+        "count": 5843,
+        "meta": null
+    },
+    {
+        "name": "parks and recreation",
+        "count": 5843,
+        "meta": null
+    },
+    {
+        "name": "paleontology",
+        "count": 5025,
+        "meta": null
+    },
+    {
+        "name": "product marketing",
+        "count": 3713,
+        "meta": null
+    },
+    {
+        "name": "prelaw",
+        "count": 3326,
+        "meta": null
+    },
+    {
+        "name": "pre optometry",
+        "count": 3009,
+        "meta": null
+    },
+    {
+        "name": "poly sci",
+        "count": 2701,
+        "meta": null
+    },
+    {
+        "name": "political development",
+        "count": 2491,
+        "meta": null
+    },
+    {
+        "name": "performing art",
+        "count": 1986,
+        "meta": null
+    },
+    {
+        "name": "premedicine",
+        "count": 1873,
+        "meta": null
+    },
+    {
+        "name": "portuguese studies",
+        "count": 1115,
+        "meta": null
+    },
+    {
+        "name": "puppetry",
+        "count": 1010,
+        "meta": null
+    },
+    {
+        "name": "public service and administration",
+        "count": 855,
+        "meta": null
+    },
+    {
+        "name": "portuguese languages",
+        "count": 693,
+        "meta": null
+    },
+    {
+        "name": "portuguese language and culture",
+        "count": 681,
+        "meta": null
+    },
+    {
+        "name": "portuguese literature",
+        "count": 658,
+        "meta": null
+    },
+    {
+        "name": "pharmaceutical administration",
+        "count": 592,
+        "meta": null
+    },
+    {
+        "name": "pharmaceutical development",
+        "count": 564,
+        "meta": null
+    },
+    {
+        "name": "production tech",
+        "count": 379,
+        "meta": null
+    },
+    {
+        "name": "piano performace",
+        "count": 317,
+        "meta": null
+    },
+    {
+        "name": "pre med",
+        "count": 233,
+        "meta": null
+    },
+    {
+        "name": "petroleum tech",
+        "count": 182,
+        "meta": null
+    },
+    {
+        "name": "portuguese culture",
+        "count": 109,
+        "meta": null
+    },
+    {
+        "name": "portuguese language studies",
+        "count": 104,
+        "meta": null
+    },
+    {
+        "name": "planetary",
+        "count": 47,
+        "meta": null
+    },
+    {
+        "name": "planetary and atmospheric science",
+        "count": 47,
+        "meta": null
+    },
+    {
+        "name": "pre law and legal studies",
+        "count": 39,
+        "meta": null
+    },
+    {
+        "name": "portuguese literature and culture",
+        "count": 19,
+        "meta": null
+    },
+    {
+        "name": "physical",
+        "count": 11,
+        "meta": null
+    },
+    {
+        "name": "physical and health education teaching",
+        "count": 11,
+        "meta": null
+    },
+    {
+        "name": "plant science and agronomy",
+        "count": 8,
+        "meta": null
+    },
+    {
+        "name": "pre orthodontics",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "quality improvement",
+        "count": 4624,
+        "meta": null
+    },
+    {
+        "name": "queer studies",
+        "count": 659,
+        "meta": null
+    },
+    {
+        "name": "real estate",
+        "count": 640481,
+        "meta": null
+    },
+    {
+        "name": "retail",
+        "count": 273872,
+        "meta": null
+    },
+    {
+        "name": "robotics",
+        "count": 261920,
+        "meta": null
+    },
+    {
+        "name": "regional planning",
+        "count": 169347,
+        "meta": null
+    },
+    {
+        "name": "religious studies",
+        "count": 168979,
+        "meta": null
+    },
+    {
+        "name": "radiology",
+        "count": 95379,
+        "meta": null
+    },
+    {
+        "name": "russian",
+        "count": 91299,
+        "meta": null
+    },
+    {
+        "name": "rhetoric",
+        "count": 80360,
+        "meta": null
+    },
+    {
+        "name": "russian language",
+        "count": 58532,
+        "meta": null
+    },
+    {
+        "name": "recording arts",
+        "count": 32334,
+        "meta": null
+    },
+    {
+        "name": "religious education",
+        "count": 31579,
+        "meta": null
+    },
+    {
+        "name": "russian language and literature",
+        "count": 27734,
+        "meta": null
+    },
+    {
+        "name": "radio broadcasting",
+        "count": 19772,
+        "meta": null
+    },
+    {
+        "name": "russian studies",
+        "count": 19120,
+        "meta": null
+    },
+    {
+        "name": "recreation administration",
+        "count": 12512,
+        "meta": null
+    },
+    {
+        "name": "recreation",
+        "count": 5843,
+        "meta": null
+    },
+    {
+        "name": "russian literature",
+        "count": 3644,
+        "meta": null
+    },
+    {
+        "name": "russian language and culture",
+        "count": 2264,
+        "meta": null
+    },
+    {
+        "name": "rabbinical studies",
+        "count": 1807,
+        "meta": null
+    },
+    {
+        "name": "russian languages",
+        "count": 1462,
+        "meta": null
+    },
+    {
+        "name": "russian language studies",
+        "count": 505,
+        "meta": null
+    },
+    {
+        "name": "russian culture",
+        "count": 488,
+        "meta": null
+    },
+    {
+        "name": "rabbinic studies",
+        "count": 327,
+        "meta": null
+    },
+    {
+        "name": "recording art",
+        "count": 180,
+        "meta": null
+    },
+    {
+        "name": "russian literature and culture",
+        "count": 76,
+        "meta": null
+    },
+    {
+        "name": "sociology",
+        "count": 1938972,
+        "meta": null
+    },
+    {
+        "name": "social work",
+        "count": 1161822,
+        "meta": null
+    },
+    {
+        "name": "software engineering",
+        "count": 1060859,
+        "meta": null
+    },
+    {
+        "name": "supply chain management",
+        "count": 714750,
+        "meta": null
+    },
+    {
+        "name": "statistics",
+        "count": 704455,
+        "meta": null
+    },
+    {
+        "name": "spanish",
+        "count": 655793,
+        "meta": null
+    },
+    {
+        "name": "social sciences",
+        "count": 614826,
+        "meta": null
+    },
+    {
+        "name": "special education",
+        "count": 550485,
+        "meta": null
+    },
+    {
+        "name": "social science",
+        "count": 339433,
+        "meta": null
+    },
+    {
+        "name": "studio arts",
+        "count": 264013,
+        "meta": null
+    },
+    {
+        "name": "spanish language",
+        "count": 254551,
+        "meta": null
+    },
+    {
+        "name": "social studies",
+        "count": 189544,
+        "meta": null
+    },
+    {
+        "name": "sports management",
+        "count": 173164,
+        "meta": null
+    },
+    {
+        "name": "speech language pathology",
+        "count": 160694,
+        "meta": null
+    },
+    {
+        "name": "software development",
+        "count": 152742,
+        "meta": null
+    },
+    {
+        "name": "sport management",
+        "count": 144550,
+        "meta": null
+    },
+    {
+        "name": "sustainability",
+        "count": 136667,
+        "meta": null
+    },
+    {
+        "name": "spanish language and literature",
+        "count": 134091,
+        "meta": null
+    },
+    {
+        "name": "studio art",
+        "count": 90596,
+        "meta": null
+    },
+    {
+        "name": "social psychology",
+        "count": 88163,
+        "meta": null
+    },
+    {
+        "name": "sculpture",
+        "count": 80345,
+        "meta": null
+    },
+    {
+        "name": "screenwriting",
+        "count": 43492,
+        "meta": null
+    },
+    {
+        "name": "sommelier",
+        "count": 42336,
+        "meta": null
+    },
+    {
+        "name": "sustainability studies",
+        "count": 36154,
+        "meta": null
+    },
+    {
+        "name": "social services",
+        "count": 35591,
+        "meta": null
+    },
+    {
+        "name": "soil science",
+        "count": 35549,
+        "meta": null
+    },
+    {
+        "name": "speech pathology",
+        "count": 34889,
+        "meta": null
+    },
+    {
+        "name": "speech communications",
+        "count": 27067,
+        "meta": null
+    },
+    {
+        "name": "swedish",
+        "count": 26864,
+        "meta": null
+    },
+    {
+        "name": "science information",
+        "count": 17289,
+        "meta": null
+    },
+    {
+        "name": "spanish literature",
+        "count": 14779,
+        "meta": null
+    },
+    {
+        "name": "sport administration",
+        "count": 14517,
+        "meta": null
+    },
+    {
+        "name": "sport psychology",
+        "count": 14062,
+        "meta": null
+    },
+    {
+        "name": "sustainability management",
+        "count": 12735,
+        "meta": null
+    },
+    {
+        "name": "spanish language and culture",
+        "count": 12405,
+        "meta": null
+    },
+    {
+        "name": "swedish language",
+        "count": 8479,
+        "meta": null
+    },
+    {
+        "name": "spanish studies",
+        "count": 8333,
+        "meta": null
+    },
+    {
+        "name": "slavic languages",
+        "count": 6560,
+        "meta": null
+    },
+    {
+        "name": "scandinavian studies",
+        "count": 5915,
+        "meta": null
+    },
+    {
+        "name": "speech and hearing science",
+        "count": 5441,
+        "meta": null
+    },
+    {
+        "name": "special needs education",
+        "count": 4915,
+        "meta": null
+    },
+    {
+        "name": "swedish language and literature",
+        "count": 4064,
+        "meta": null
+    },
+    {
+        "name": "scandinavian",
+        "count": 3964,
+        "meta": null
+    },
+    {
+        "name": "slavic studies",
+        "count": 3641,
+        "meta": null
+    },
+    {
+        "name": "semiconductor manufacturing",
+        "count": 3207,
+        "meta": null
+    },
+    {
+        "name": "scandinavian languages",
+        "count": 3017,
+        "meta": null
+    },
+    {
+        "name": "sports and fitness",
+        "count": 2698,
+        "meta": null
+    },
+    {
+        "name": "spanish culture",
+        "count": 2657,
+        "meta": null
+    },
+    {
+        "name": "serbian",
+        "count": 2324,
+        "meta": null
+    },
+    {
+        "name": "spanish languages",
+        "count": 2075,
+        "meta": null
+    },
+    {
+        "name": "screen writing",
+        "count": 2061,
+        "meta": null
+    },
+    {
+        "name": "secondary teacher education",
+        "count": 1588,
+        "meta": null
+    },
+    {
+        "name": "science tech",
+        "count": 1579,
+        "meta": null
+    },
+    {
+        "name": "speech science",
+        "count": 1528,
+        "meta": null
+    },
+    {
+        "name": "spanish language studies",
+        "count": 1265,
+        "meta": null
+    },
+    {
+        "name": "serbian language",
+        "count": 1233,
+        "meta": null
+    },
+    {
+        "name": "serbian language and literature",
+        "count": 790,
+        "meta": null
+    },
+    {
+        "name": "spanish literature and culture",
+        "count": 442,
+        "meta": null
+    },
+    {
+        "name": "stringed instruments",
+        "count": 427,
+        "meta": null
+    },
+    {
+        "name": "serbian literature",
+        "count": 413,
+        "meta": null
+    },
+    {
+        "name": "swedish language and culture",
+        "count": 355,
+        "meta": null
+    },
+    {
+        "name": "scandinavian literature",
+        "count": 231,
+        "meta": null
+    },
+    {
+        "name": "swedish literature",
+        "count": 230,
+        "meta": null
+    },
+    {
+        "name": "slavic language",
+        "count": 222,
+        "meta": null
+    },
+    {
+        "name": "scandinavian language",
+        "count": 219,
+        "meta": null
+    },
+    {
+        "name": "swedish culture",
+        "count": 185,
+        "meta": null
+    },
+    {
+        "name": "slavic literature",
+        "count": 183,
+        "meta": null
+    },
+    {
+        "name": "sport communications",
+        "count": 175,
+        "meta": null
+    },
+    {
+        "name": "slavic language and literature",
+        "count": 133,
+        "meta": null
+    },
+    {
+        "name": "scandinavian language and literature",
+        "count": 132,
+        "meta": null
+    },
+    {
+        "name": "swedish languages",
+        "count": 115,
+        "meta": null
+    },
+    {
+        "name": "scandinavian culture",
+        "count": 108,
+        "meta": null
+    },
+    {
+        "name": "swedish studies",
+        "count": 99,
+        "meta": null
+    },
+    {
+        "name": "serbian languages",
+        "count": 89,
+        "meta": null
+    },
+    {
+        "name": "swedish language studies",
+        "count": 86,
+        "meta": null
+    },
+    {
+        "name": "sport philosophy",
+        "count": 43,
+        "meta": null
+    },
+    {
+        "name": "statistics and decision science",
+        "count": 39,
+        "meta": null
+    },
+    {
+        "name": "slavic culture",
+        "count": 32,
+        "meta": null
+    },
+    {
+        "name": "serbian language and culture",
+        "count": 29,
+        "meta": null
+    },
+    {
+        "name": "serbian studies",
+        "count": 19,
+        "meta": null
+    },
+    {
+        "name": "scandinavian language and culture",
+        "count": 13,
+        "meta": null
+    },
+    {
+        "name": "slavic language studies",
+        "count": 9,
+        "meta": null
+    },
+    {
+        "name": "school student counseling",
+        "count": 8,
+        "meta": null
+    },
+    {
+        "name": "slavic language and culture",
+        "count": 7,
+        "meta": null
+    },
+    {
+        "name": "scandinavian language studies",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "serbian culture",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "scandinavian literature and culture",
+        "count": 6,
+        "meta": null
+    },
+    {
+        "name": "serbian language studies",
+        "count": 5,
+        "meta": null
+    },
+    {
+        "name": "slavic literature and culture",
+        "count": 5,
+        "meta": null
+    },
+    {
+        "name": "science tech and society",
+        "count": 5,
+        "meta": null
+    },
+    {
+        "name": "screen art and cultures",
+        "count": 1,
+        "meta": null
+    },
+    {
+        "name": "teaching",
+        "count": 2400968,
+        "meta": null
+    },
+    {
+        "name": "tourism",
+        "count": 1055486,
+        "meta": null
+    },
+    {
+        "name": "telecommunications",
+        "count": 751687,
+        "meta": null
+    },
+    {
+        "name": "theatre",
+        "count": 603816,
+        "meta": null
+    },
+    {
+        "name": "theology",
+        "count": 445299,
+        "meta": null
+    },
+    {
+        "name": "teacher education",
+        "count": 438579,
+        "meta": null
+    },
+    {
+        "name": "tourism management",
+        "count": 321943,
+        "meta": null
+    },
+    {
+        "name": "television",
+        "count": 307714,
+        "meta": null
+    },
+    {
+        "name": "travel services management",
+        "count": 220308,
+        "meta": null
+    },
+    {
+        "name": "theater",
+        "count": 218806,
+        "meta": null
+    },
+    {
+        "name": "theological studies",
+        "count": 143421,
+        "meta": null
+    },
+    {
+        "name": "toxicology",
+        "count": 57931,
+        "meta": null
+    },
+    {
+        "name": "television broadcasting",
+        "count": 45058,
+        "meta": null
+    },
+    {
+        "name": "theater arts",
+        "count": 23186,
+        "meta": null
+    },
+    {
+        "name": "travel",
+        "count": 17503,
+        "meta": null
+    },
+    {
+        "name": "travel and tourism management",
+        "count": 17503,
+        "meta": null
+    },
+    {
+        "name": "turkish",
+        "count": 9893,
+        "meta": null
+    },
+    {
+        "name": "turkish language",
+        "count": 9238,
+        "meta": null
+    },
+    {
+        "name": "theology and religious vocations",
+        "count": 8126,
+        "meta": null
+    },
+    {
+        "name": "turkish language and literature",
+        "count": 5270,
+        "meta": null
+    },
+    {
+        "name": "talmudic studies",
+        "count": 4382,
+        "meta": null
+    },
+    {
+        "name": "trial advocacy",
+        "count": 2882,
+        "meta": null
+    },
+    {
+        "name": "tibetan",
+        "count": 2109,
+        "meta": null
+    },
+    {
+        "name": "turfgrass science",
+        "count": 1516,
+        "meta": null
+    },
+    {
+        "name": "theater art",
+        "count": 989,
+        "meta": null
+    },
+    {
+        "name": "turkish studies",
+        "count": 747,
+        "meta": null
+    },
+    {
+        "name": "taxidermy",
+        "count": 704,
+        "meta": null
+    },
+    {
+        "name": "tibetan studies",
+        "count": 523,
+        "meta": null
+    },
+    {
+        "name": "tibetan language",
+        "count": 390,
+        "meta": null
+    },
+    {
+        "name": "turkish literature",
+        "count": 347,
+        "meta": null
+    },
+    {
+        "name": "turkish language and culture",
+        "count": 282,
+        "meta": null
+    },
+    {
+        "name": "turkish languages",
+        "count": 243,
+        "meta": null
+    },
+    {
+        "name": "telecom",
+        "count": 187,
+        "meta": null
+    },
+    {
+        "name": "telecom and electronics",
+        "count": 187,
+        "meta": null
+    },
+    {
+        "name": "tibetan language and literature",
+        "count": 152,
+        "meta": null
+    },
+    {
+        "name": "turkish culture",
+        "count": 41,
+        "meta": null
+    },
+    {
+        "name": "turkish language studies",
+        "count": 40,
+        "meta": null
+    },
+    {
+        "name": "tibetan languages",
+        "count": 36,
+        "meta": null
+    },
+    {
+        "name": "tibetan culture",
+        "count": 24,
+        "meta": null
+    },
+    {
+        "name": "tibetan literature",
+        "count": 21,
+        "meta": null
+    },
+    {
+        "name": "tibetan language and culture",
+        "count": 21,
+        "meta": null
+    },
+    {
+        "name": "tibetan language studies",
+        "count": 5,
+        "meta": null
+    },
+    {
+        "name": "turkish literature and culture",
+        "count": 3,
+        "meta": null
+    },
+    {
+        "name": "urban planning",
+        "count": 108449,
+        "meta": null
+    },
+    {
+        "name": "urban studies",
+        "count": 58557,
+        "meta": null
+    },
+    {
+        "name": "ukrainian",
+        "count": 2994,
+        "meta": null
+    },
+    {
+        "name": "united states history",
+        "count": 2577,
+        "meta": null
+    },
+    {
+        "name": "ukrainian language",
+        "count": 2217,
+        "meta": null
+    },
+    {
+        "name": "ukrainian language and literature",
+        "count": 1730,
+        "meta": null
+    },
+    {
+        "name": "urban sociology",
+        "count": 1599,
+        "meta": null
+    },
+    {
+        "name": "ukrainian studies",
+        "count": 214,
+        "meta": null
+    },
+    {
+        "name": "ukrainian languages",
+        "count": 152,
+        "meta": null
+    },
+    {
+        "name": "urban schooling",
+        "count": 139,
+        "meta": null
+    },
+    {
+        "name": "ukrainian literature",
+        "count": 120,
+        "meta": null
+    },
+    {
+        "name": "ukrainian language and culture",
+        "count": 53,
+        "meta": null
+    },
+    {
+        "name": "urban social studies",
+        "count": 26,
+        "meta": null
+    },
+    {
+        "name": "ukrainian culture",
+        "count": 21,
+        "meta": null
+    },
+    {
+        "name": "ukrainian language studies",
+        "count": 8,
+        "meta": null
+    },
+    {
+        "name": "ukrainian literature and culture",
+        "count": 2,
+        "meta": null
+    },
+    {
+        "name": "visual communications",
+        "count": 180100,
+        "meta": null
+    },
+    {
+        "name": "voice",
+        "count": 75047,
+        "meta": null
+    },
+    {
+        "name": "vocal performance",
+        "count": 50613,
+        "meta": null
+    },
+    {
+        "name": "visual art",
+        "count": 32557,
+        "meta": null
+    },
+    {
+        "name": "visual effects",
+        "count": 30168,
+        "meta": null
+    },
+    {
+        "name": "viticulture",
+        "count": 28172,
+        "meta": null
+    },
+    {
+        "name": "virology",
+        "count": 21945,
+        "meta": null
+    },
+    {
+        "name": "vlsi design",
+        "count": 20293,
+        "meta": null
+    },
+    {
+        "name": "veterinary science",
+        "count": 20129,
+        "meta": null
+    },
+    {
+        "name": "vocational rehabilitation",
+        "count": 17440,
+        "meta": null
+    },
+    {
+        "name": "veterinary studies",
+        "count": 11961,
+        "meta": null
+    },
+    {
+        "name": "voice and opera",
+        "count": 11605,
+        "meta": null
+    },
+    {
+        "name": "veterinary pathology",
+        "count": 3084,
+        "meta": null
+    },
+    {
+        "name": "vietnamese",
+        "count": 1895,
+        "meta": null
+    },
+    {
+        "name": "vietnamese language",
+        "count": 1625,
+        "meta": null
+    },
+    {
+        "name": "vietnamese language and literature",
+        "count": 735,
+        "meta": null
+    },
+    {
+        "name": "vietnamese studies",
+        "count": 586,
+        "meta": null
+    },
+    {
+        "name": "vocational counseling",
+        "count": 433,
+        "meta": null
+    },
+    {
+        "name": "vietnamese language and culture",
+        "count": 101,
+        "meta": null
+    },
+    {
+        "name": "vietnamese literature",
+        "count": 91,
+        "meta": null
+    },
+    {
+        "name": "vietnamese culture",
+        "count": 61,
+        "meta": null
+    },
+    {
+        "name": "visual",
+        "count": 56,
+        "meta": null
+    },
+    {
+        "name": "visual and performing art",
+        "count": 56,
+        "meta": null
+    },
+    {
+        "name": "vlsi engineer",
+        "count": 22,
+        "meta": null
+    },
+    {
+        "name": "vietnamese languages",
+        "count": 12,
+        "meta": null
+    },
+    {
+        "name": "vietnamese language studies",
+        "count": 11,
+        "meta": null
+    },
+    {
+        "name": "vietnamese literature and culture",
+        "count": 2,
+        "meta": null
+    },
+    {
+        "name": "writing",
+        "count": 374894,
+        "meta": null
+    },
+    {
+        "name": "welding",
+        "count": 290691,
+        "meta": null
+    },
+    {
+        "name": "web development",
+        "count": 236782,
+        "meta": null
+    },
+    {
+        "name": "welding engineering",
+        "count": 24787,
+        "meta": null
+    },
+    {
+        "name": "wellness management",
+        "count": 5481,
+        "meta": null
+    },
+    {
+        "name": "wildlife science",
+        "count": 4928,
+        "meta": null
+    },
+    {
+        "name": "womens studies",
+        "count": 3049,
+        "meta": null
+    },
+    {
+        "name": "wildlife and fisheries science",
+        "count": 1542,
+        "meta": null
+    },
+    {
+        "name": "writing and culture",
+        "count": 225,
+        "meta": null
+    },
+    {
+        "name": "wildlife tech",
+        "count": 126,
+        "meta": null
+    },
+    {
+        "name": "wildlife and fishery science",
+        "count": 60,
+        "meta": null
+    },
+    {
+        "name": "zoology",
+        "count": 309082,
+        "meta": null
+    }
+]

@@ -1,0 +1,19 @@
+{
+    "welcome_email_subject": "Chào mừng đến với Accessed Talent! Hành trình của bạn bắt đầu từ đây.",
+    "welcome_email_greeting": "Xin chào",
+    "welcome_email_body": "Chào mừng đến với Accessed Talent! Chúng tôi rất vui mừng khi công ty của bạn, {{companyName}}, tham gia vào nền tảng của chúng tôi. Tại Accessed Talent, chúng tôi nỗ lực kết nối những tài năng hàng đầu với các công ty hàng đầu. Chúng tôi mong muốn thấy sự thành công của bạn với chúng tôi!",
+    "welcome_email_thanks": "Cảm ơn bạn đã tham gia cùng chúng tôi!",
+    "welcome_email_regards": "Trân trọng",
+    "welcome_email_team": "Đội ngũ Accessed Talent",
+    "welcome_email_hotline": "Hotline: [Hotline number]",
+    "welcome_email_footer": "&copy; 2024 Accessed Talent. All rights reserved.",
+    "member_invitation_email_subject": "Lời mời gia nhập {{companyName}} trên Accessed Talent",
+    "member_invitation_email_greeting": "Dear User",
+    "member_invitation_email_invitationMessage": "Bạn đã được mời gia nhập {{companyName}} trên Accessed Talent với vai trò là thành viên HR. Vui lòng nhấp vào liên kết bên dưới để đăng ký và bắt đầu.",
+    "member_invitation_email_buttonText": "Tham gia ngay",
+    "member_invitation_email_thanks": "Thank you for joining us!",
+    "member_invitation_email_regards": "Best regards",
+    "member_invitation_email_team": "Accessed Talent Team",
+    "member_invitation_email_hotline": "Hotline: [Hotline number]",
+    "member_invitation_email_footer": "&copy; 2024 Accessed Talent. All rights reserved."
+}  

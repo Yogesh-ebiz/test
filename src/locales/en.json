@@ -1,0 +1,20 @@
+{
+    "welcome_email_subject": "Welcome to Accessed Talent! Your Journey Begins Here",
+    "welcome_email_greeting": "Dear",
+    "welcome_email_body": "Welcome to Accessed Talent! We are thrilled to have your company, {{companyName}}, join our platform. At Accessed Talent, we strive to connect top talent with leading companies. We look forward to seeing your success with us!",
+    "welcome_email_thanks": "Thank you for joining us!",
+    "welcome_email_regards": "Best regards",
+    "welcome_email_team": "Accessed Talent Team",
+    "welcome_email_hotline": "Hotline: [Hotline number]",
+    "welcome_email_footer": "&copy; 2024 Accessed Talent. All rights reserved.",
+    "member_invitation_email_subject": "Invitation to Join {{companyName}} on Accessed Talent",
+    "member_invitation_email_greeting": "Dear User",
+    "member_invitation_email_invitationMessage": "You have been invited to join {{companyName}} on Accessed Talent as an HR member. Please click the link below to register and get started.",
+    "member_invitation_email_buttonText": "Join Now",
+    "member_invitation_email_thanks": "Thank you for joining us!",
+    "member_invitation_email_regards": "Best regards",
+    "member_invitation_email_team": "Accessed Talent Team",
+    "member_invitation_email_hotline": "Hotline: [Hotline number]",
+    "member_invitation_email_footer": "&copy; 2024 Accessed Talent. All rights reserved."
+}
+  

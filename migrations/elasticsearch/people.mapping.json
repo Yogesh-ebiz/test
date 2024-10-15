@@ -1,0 +1,1068 @@
+{
+  "countries": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "created_date": {
+    "type": "date"
+  },
+  "education": {
+    "properties": {
+      "degrees": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "end_date": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "majors": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "school": {
+        "properties": {
+          "domain": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "facebook_url": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "id": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "linkedin_id": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "linkedin_url": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "location": {
+            "properties": {
+              "continent": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "country": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "locality": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "name": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "region": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "twitter_url": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "type": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "website": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "start_date": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      }
+    }
+  },
+  "emails": {
+    "properties": {
+      "address": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "type": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      }
+    }
+  },
+  "experience": {
+    "properties": {
+      "company": {
+        "properties": {
+          "facebook_url": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "founded": {
+            "type": "long"
+          },
+          "id": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "industry": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "linkedin_id": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "linkedin_url": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "location": {
+            "properties": {
+              "continent": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "country": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "geo": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "locality": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "metro": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "name": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "postal_code": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "region": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              },
+              "street_address": {
+                "type": "text",
+                  "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                      "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "size": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "twitter_url": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "website": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "end_date": {
+        "type": "date"
+      },
+      "is_primary": {
+        "type": "boolean"
+      },
+      "location_names": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "start_date": {
+        "type": "date"
+      },
+      "title": {
+        "properties": {
+          "levels": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "name": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "role": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          },
+          "sub_role": {
+            "type": "text",
+              "fields": {
+              "keyword": {
+                "type": "keyword",
+                  "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "facebook_id": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "facebook_url": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "facebook_username": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "first_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "full_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "gender": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "id": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "uuid": {
+    "type": "text",
+    "fields": {
+      "keyword": {
+        "type": "keyword",
+        "ignore_above": 256
+      }
+    }
+  },
+  "industry": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "interests": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_facebook_url": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_founded": {
+    "type": "long"
+  },
+  "job_company_id": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_industry": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_linkedin_id": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_linkedin_url": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_continent": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_country": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_geo": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_locality": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_metro": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_postal_code": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_region": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_location_street_address": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_size": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_company_website": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_last_updated": {
+    "type": "date"
+  },
+  "job_start_date": {
+    "type": "date"
+  },
+  "job_title": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_title_levels": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_title_role": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "job_title_sub_role": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "last_initial": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "last_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "linkedin_id": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "linkedin_url": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "linkedin_username": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_continent": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_country": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_geo": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_last_updated": {
+    "type": "date"
+  },
+  "location_locality": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_names": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "location_region": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "middle_initial": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "middle_name": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "mobile_phone": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "recommended_personal_email": {
+    "type": "text",
+    "fields": {
+      "keyword": {
+        "type": "keyword",
+        "ignore_above": 256
+      }
+    }
+  },
+  "personal_emails": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "phone_numbers": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "profiles": {
+    "properties": {
+      "id": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "network": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "url": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "username": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      }
+    }
+  },
+  "regions": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "skills": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "street_addresses": {
+    "properties": {
+      "continent": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "country": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "geo": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "locality": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "metro": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "name": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "postal_code": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "region": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      },
+      "street_address": {
+        "type": "text",
+          "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 256
+          }
+        }
+      }
+    }
+  },
+  "twitter_url": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "twitter_username": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  },
+  "work_email": {
+    "type": "text",
+      "fields": {
+      "keyword": {
+        "type": "keyword",
+          "ignore_above": 256
+      }
+    }
+  }
+}

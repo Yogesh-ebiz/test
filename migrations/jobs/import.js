@@ -83,14 +83,14 @@ async function addJ(companyId, form) {
   let result;
 
   if(form.department) {
-    form.department = ObjectID(form.department);
+    form.department = new ObjectID(form.department);
   }
 
 
   form = await Joi.validate(form, jobSchema, {abortEarly: false});
   let company = await companyService.findByCompanyId(companyId);
 
-  let pipeline = ObjectID("6100d4495003ec72aac89280");
+  let pipeline = new ObjectID("6100d4495003ec72aac89280");
   form.pipeline = pipeline._id;
   form.companyId = companyId;
 

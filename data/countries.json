@@ -1,0 +1,1293 @@
+[
+    {
+        "name": "australia",
+        "count": 20328919,
+        "meta": null
+    },
+    {
+        "name": "argentina",
+        "count": 15963096,
+        "meta": null
+    },
+    {
+        "name": "austria",
+        "count": 2540771,
+        "meta": null
+    },
+    {
+        "name": "algeria",
+        "count": 2214360,
+        "meta": null
+    },
+    {
+        "name": "angola",
+        "count": 1159911,
+        "meta": null
+    },
+    {
+        "name": "albania",
+        "count": 986728,
+        "meta": null
+    },
+    {
+        "name": "azerbaijan",
+        "count": 614212,
+        "meta": null
+    },
+    {
+        "name": "afghanistan",
+        "count": 471831,
+        "meta": null
+    },
+    {
+        "name": "armenia",
+        "count": 290752,
+        "meta": null
+    },
+    {
+        "name": "antigua and barbuda",
+        "count": 61190,
+        "meta": null
+    },
+    {
+        "name": "andorra",
+        "count": 57553,
+        "meta": null
+    },
+    {
+        "name": "aruba",
+        "count": 44529,
+        "meta": null
+    },
+    {
+        "name": "american samoa",
+        "count": 30101,
+        "meta": null
+    },
+    {
+        "name": "anguilla",
+        "count": 21900,
+        "meta": null
+    },
+    {
+        "name": "antarctica",
+        "count": 15695,
+        "meta": null
+    },
+    {
+            "name": "brazil",
+            "count": 94864182,
+            "meta": null
+        },
+        {
+            "name": "belgium",
+            "count": 5683775,
+            "meta": null
+        },
+        {
+            "name": "bangladesh",
+            "count": 5489800,
+            "meta": null
+        },
+        {
+            "name": "bolivia",
+            "count": 2345861,
+            "meta": null
+        },
+        {
+            "name": "bulgaria",
+            "count": 1636728,
+            "meta": null
+        },
+        {
+            "name": "benin",
+            "count": 900879,
+            "meta": null
+        },
+        {
+            "name": "bosnia and herzegovina",
+            "count": 680820,
+            "meta": null
+        },
+        {
+            "name": "botswana",
+            "count": 517461,
+            "meta": null
+        },
+        {
+            "name": "belarus",
+            "count": 491047,
+            "meta": null
+        },
+        {
+            "name": "bahrain",
+            "count": 414179,
+            "meta": null
+        },
+        {
+            "name": "bahamas",
+            "count": 312383,
+            "meta": null
+        },
+        {
+            "name": "burkina faso",
+            "count": 309672,
+            "meta": null
+        },
+        {
+            "name": "brunei",
+            "count": 263467,
+            "meta": null
+        },
+        {
+            "name": "barbados",
+            "count": 207087,
+            "meta": null
+        },
+        {
+            "name": "bermuda",
+            "count": 206436,
+            "meta": null
+        },
+        {
+            "name": "bhutan",
+            "count": 196335,
+            "meta": null
+        },
+        {
+            "name": "burundi",
+            "count": 99260,
+            "meta": null
+        },
+        {
+            "name": "belize",
+            "count": 97483,
+            "meta": null
+        },
+        {
+            "name": "british virgin islands",
+            "count": 15158,
+            "meta": null
+        },
+        {
+            "name": "british indian ocean territory",
+            "count": 4040,
+            "meta": null
+        },
+        {
+            "name": "bouvet island",
+            "count": 671,
+            "meta": null
+        },
+        {
+            "name": "canada",
+            "count": 36153219,
+            "meta": null
+        },
+        {
+            "name": "colombia",
+            "count": 21691284,
+            "meta": null
+        },
+        {
+            "name": "chile",
+            "count": 11137946,
+            "meta": null
+        },
+        {
+            "name": "china",
+            "count": 8148243,
+            "meta": null
+        },
+        {
+            "name": "czechia",
+            "count": 2963698,
+            "meta": null
+        },
+        {
+            "name": "costa rica",
+            "count": 2464131,
+            "meta": null
+        },
+        {
+            "name": "cambodia",
+            "count": 1452807,
+            "meta": null
+        },
+        {
+            "name": "croatia",
+            "count": 1291771,
+            "meta": null
+        },
+        {
+            "name": "cameroon",
+            "count": 1156154,
+            "meta": null
+        },
+        {
+            "name": "cyprus",
+            "count": 656378,
+            "meta": null
+        },
+        {
+            "name": "cuba",
+            "count": 537874,
+            "meta": null
+        },
+        {
+            "name": "côte d’ivoire",
+            "count": 260586,
+            "meta": null
+        },
+        {
+            "name": "cape verde",
+            "count": 192033,
+            "meta": null
+        },
+        {
+            "name": "central african republic",
+            "count": 98578,
+            "meta": null
+        },
+        {
+            "name": "chad",
+            "count": 85255,
+            "meta": null
+        },
+        {
+            "name": "cayman islands",
+            "count": 75573,
+            "meta": null
+        },
+        {
+            "name": "curaçao",
+            "count": 37856,
+            "meta": null
+        },
+        {
+            "name": "comoros",
+            "count": 26195,
+            "meta": null
+        },
+        {
+            "name": "cook islands",
+            "count": 5678,
+            "meta": null
+        },
+        {
+            "name": "caribbean netherlands",
+            "count": 3906,
+            "meta": null
+        },
+        {
+            "name": "christmas island",
+            "count": 2692,
+            "meta": null
+        },
+        {
+            "name": "cocos (keeling) islands",
+            "count": 1293,
+            "meta": null
+        },
+        {
+            "name": "denmark",
+            "count": 3794478,
+            "meta": null
+        },
+        {
+            "name": "dominican republic",
+            "count": 3598725,
+            "meta": null
+        },
+        {
+            "name": "democratic republic of the congo",
+            "count": 602712,
+            "meta": null
+        },
+        {
+            "name": "djibouti",
+            "count": 42407,
+            "meta": null
+        },
+        {
+            "name": "dominica",
+            "count": 41663,
+            "meta": null
+        },
+        {
+            "name": "ecuador",
+            "count": 4730814,
+            "meta": null
+        },
+        {
+            "name": "egypt",
+            "count": 4065188,
+            "meta": null
+        },
+        {
+            "name": "ethiopia",
+            "count": 1276239,
+            "meta": null
+        },
+        {
+            "name": "el salvador",
+            "count": 985513,
+            "meta": null
+        },
+        {
+            "name": "estonia",
+            "count": 409770,
+            "meta": null
+        },
+        {
+            "name": "equatorial guinea",
+            "count": 50468,
+            "meta": null
+        },
+        {
+            "name": "eritrea",
+            "count": 13464,
+            "meta": null
+        },
+        {
+            "name": "france",
+            "count": 30768456,
+            "meta": null
+        },
+        {
+            "name": "finland",
+            "count": 2138693,
+            "meta": null
+        },
+        {
+            "name": "fiji",
+            "count": 300358,
+            "meta": null
+        },
+        {
+            "name": "french polynesia",
+            "count": 51862,
+            "meta": null
+        },
+        {
+            "name": "french guiana",
+            "count": 37328,
+            "meta": null
+        },
+        {
+            "name": "faroe islands",
+            "count": 27849,
+            "meta": null
+        },
+        {
+            "name": "falkland islands",
+            "count": 1859,
+            "meta": null
+        },
+        {
+            "name": "french southern territories",
+            "count": 1477,
+            "meta": null
+        },
+        {
+            "name": "ecuador",
+            "count": 4730814,
+            "meta": null
+        },
+        {
+            "name": "egypt",
+            "count": 4065188,
+            "meta": null
+        },
+        {
+            "name": "ethiopia",
+            "count": 1276239,
+            "meta": null
+        },
+        {
+            "name": "el salvador",
+            "count": 985513,
+            "meta": null
+        },
+        {
+            "name": "estonia",
+            "count": 409770,
+            "meta": null
+        },
+        {
+            "name": "equatorial guinea",
+            "count": 50468,
+            "meta": null
+        },
+        {
+            "name": "eritrea",
+            "count": 13464,
+            "meta": null
+        },
+        {
+            "name": "germany",
+            "count": 19153098,
+            "meta": null
+        },
+        {
+            "name": "greece",
+            "count": 3031198,
+            "meta": null
+        },
+        {
+            "name": "ghana",
+            "count": 2844917,
+            "meta": null
+        },
+        {
+            "name": "guatemala",
+            "count": 2235391,
+            "meta": null
+        },
+        {
+            "name": "georgia",
+            "count": 384801,
+            "meta": null
+        },
+        {
+            "name": "guinea",
+            "count": 278066,
+            "meta": null
+        },
+        {
+            "name": "gabon",
+            "count": 218352,
+            "meta": null
+        },
+        {
+            "name": "guyana",
+            "count": 179812,
+            "meta": null
+        },
+        {
+            "name": "guam",
+            "count": 127228,
+            "meta": null
+        },
+        {
+            "name": "gambia",
+            "count": 121305,
+            "meta": null
+        },
+        {
+            "name": "guadeloupe",
+            "count": 118011,
+            "meta": null
+        },
+        {
+            "name": "grenada",
+            "count": 57098,
+            "meta": null
+        },
+        {
+            "name": "guinea-bissau",
+            "count": 40664,
+            "meta": null
+        },
+        {
+            "name": "guernsey",
+            "count": 31177,
+            "meta": null
+        },
+        {
+            "name": "gibraltar",
+            "count": 29731,
+            "meta": null
+        },
+        {
+            "name": "greenland",
+            "count": 28376,
+            "meta": null
+        },
+        {
+            "name": "hong kong",
+            "count": 3194852,
+            "meta": null
+        },
+        {
+            "name": "hungary",
+            "count": 2718351,
+            "meta": null
+        },
+        {
+            "name": "honduras",
+            "count": 1105853,
+            "meta": null
+        },
+        {
+            "name": "haiti",
+            "count": 381858,
+            "meta": null
+        },
+        {
+            "name": "heard island and mcdonald islands",
+            "count": 561,
+            "meta": null
+        },
+        {
+            "name": "india",
+            "count": 89420134,
+            "meta": null
+        },
+        {
+            "name": "indonesia",
+            "count": 51115641,
+            "meta": null
+        },
+        {
+            "name": "italy",
+            "count": 27597273,
+            "meta": null
+        },
+        {
+            "name": "iran",
+            "count": 4348180,
+            "meta": null
+        },
+        {
+            "name": "ireland",
+            "count": 3708413,
+            "meta": null
+        },
+        {
+            "name": "israel",
+            "count": 3106382,
+            "meta": null
+        },
+        {
+            "name": "iraq",
+            "count": 832811,
+            "meta": null
+        },
+        {
+            "name": "ivory coast",
+            "count": 570997,
+            "meta": null
+        },
+        {
+            "name": "iceland",
+            "count": 322715,
+            "meta": null
+        },
+        {
+            "name": "isle of man",
+            "count": 71625,
+            "meta": null
+        },
+        {
+            "name": "japan",
+            "count": 4192714,
+            "meta": null
+        },
+        {
+            "name": "jamaica",
+            "count": 1476551,
+            "meta": null
+        },
+        {
+            "name": "jordan",
+            "count": 1074200,
+            "meta": null
+        },
+        {
+            "name": "jersey",
+            "count": 95216,
+            "meta": null
+        },
+        {
+            "name": "kenya",
+            "count": 5167264,
+            "meta": null
+        },
+        {
+            "name": "kuwait",
+            "count": 691532,
+            "meta": null
+        },
+        {
+            "name": "kazakhstan",
+            "count": 606453,
+            "meta": null
+        },
+        {
+            "name": "kosovo",
+            "count": 312678,
+            "meta": null
+        },
+        {
+            "name": "kyrgyzstan",
+            "count": 112735,
+            "meta": null
+        },
+        {
+            "name": "kiribati",
+            "count": 17424,
+            "meta": null
+        },
+        {
+            "name": "lebanon",
+            "count": 1108528,
+            "meta": null
+        },
+        {
+            "name": "lithuania",
+            "count": 942458,
+            "meta": null
+        },
+        {
+            "name": "latvia",
+            "count": 568178,
+            "meta": null
+        },
+        {
+            "name": "laos",
+            "count": 442460,
+            "meta": null
+        },
+        {
+            "name": "luxembourg",
+            "count": 370447,
+            "meta": null
+        },
+        {
+            "name": "libya",
+            "count": 239555,
+            "meta": null
+        },
+        {
+            "name": "liberia",
+            "count": 206346,
+            "meta": null
+        },
+        {
+            "name": "lesotho",
+            "count": 106824,
+            "meta": null
+        },
+        {
+            "name": "liechtenstein",
+            "count": 24656,
+            "meta": null
+        },
+        {
+            "name": "mexico",
+            "count": 31074826,
+            "meta": null
+        },
+        {
+            "name": "malaysia",
+            "count": 18612598,
+            "meta": null
+        },
+        {
+            "name": "morocco",
+            "count": 3218737,
+            "meta": null
+        },
+        {
+            "name": "montserrat",
+            "count": 1672565,
+            "meta": null
+        },
+        {
+            "name": "myanmar",
+            "count": 1619345,
+            "meta": null
+        },
+        {
+            "name": "macedonia",
+            "count": 756574,
+            "meta": null
+        },
+        {
+            "name": "madagascar",
+            "count": 613148,
+            "meta": null
+        },
+        {
+            "name": "mauritius",
+            "count": 544449,
+            "meta": null
+        },
+        {
+            "name": "mozambique",
+            "count": 485225,
+            "meta": null
+        },
+        {
+            "name": "moldova",
+            "count": 457947,
+            "meta": null
+        },
+        {
+            "name": "mongolia",
+            "count": 340846,
+            "meta": null
+        },
+        {
+            "name": "mali",
+            "count": 326441,
+            "meta": null
+        },
+        {
+            "name": "malta",
+            "count": 294493,
+            "meta": null
+        },
+        {
+            "name": "malawi",
+            "count": 269541,
+            "meta": null
+        },
+        {
+            "name": "montenegro",
+            "count": 227581,
+            "meta": null
+        },
+        {
+            "name": "maldives",
+            "count": 202338,
+            "meta": null
+        },
+        {
+            "name": "mauritania",
+            "count": 103856,
+            "meta": null
+        },
+        {
+            "name": "martinique",
+            "count": 92054,
+            "meta": null
+        },
+        {
+            "name": "macau",
+            "count": 78604,
+            "meta": null
+        },
+        {
+            "name": "monaco",
+            "count": 60077,
+            "meta": null
+        },
+        {
+            "name": "mayotte",
+            "count": 23441,
+            "meta": null
+        },
+        {
+            "name": "micronesia",
+            "count": 20489,
+            "meta": null
+        },
+        {
+            "name": "marshall islands",
+            "count": 12518,
+            "meta": null
+        },
+        {
+            "name": "nigeria",
+            "count": 14554695,
+            "meta": null
+        },
+        {
+            "name": "netherlands",
+            "count": 12138553,
+            "meta": null
+        },
+        {
+            "name": "new zealand",
+            "count": 3577496,
+            "meta": null
+        },
+        {
+            "name": "norway",
+            "count": 3331930,
+            "meta": null
+        },
+        {
+            "name": "nepal",
+            "count": 1785290,
+            "meta": null
+        },
+        {
+            "name": "nicaragua",
+            "count": 729554,
+            "meta": null
+        },
+        {
+            "name": "namibia",
+            "count": 493339,
+            "meta": null
+        },
+        {
+            "name": "niger",
+            "count": 244596,
+            "meta": null
+        },
+        {
+            "name": "new caledonia",
+            "count": 105413,
+            "meta": null
+        },
+        {
+            "name": "netherlands antilles",
+            "count": 56462,
+            "meta": null
+        },
+        {
+            "name": "northern mariana islands",
+            "count": 31949,
+            "meta": null
+        },
+        {
+            "name": "north korea",
+            "count": 9034,
+            "meta": null
+        },
+        {
+            "name": "nauru",
+            "count": 2848,
+            "meta": null
+        },
+        {
+            "name": "niue",
+            "count": 1629,
+            "meta": null
+        },
+        {
+            "name": "norfolk island",
+            "count": 1438,
+            "meta": null
+        },
+        {
+            "name": "oman",
+            "count": 381263,
+            "meta": null
+        },
+        {
+            "name": "philippines",
+            "count": 48185410,
+            "meta": null
+        },
+        {
+            "name": "peru",
+            "count": 11538227,
+            "meta": null
+        },
+        {
+            "name": "pakistan",
+            "count": 7954610,
+            "meta": null
+        },
+        {
+            "name": "portugal",
+            "count": 6870125,
+            "meta": null
+        },
+        {
+            "name": "poland",
+            "count": 5869563,
+            "meta": null
+        },
+        {
+            "name": "puerto rico",
+            "count": 2401067,
+            "meta": null
+        },
+        {
+            "name": "panama",
+            "count": 1658116,
+            "meta": null
+        },
+        {
+            "name": "paraguay",
+            "count": 1357149,
+            "meta": null
+        },
+        {
+            "name": "papua new guinea",
+            "count": 327998,
+            "meta": null
+        },
+        {
+            "name": "palestine",
+            "count": 294540,
+            "meta": null
+        },
+        {
+            "name": "palau",
+            "count": 9801,
+            "meta": null
+        },
+        {
+            "name": "pitcairn",
+            "count": 1027,
+            "meta": null
+        },
+        {
+            "name": "qatar",
+            "count": 804606,
+            "meta": null
+        },
+        {
+            "name": "romania",
+            "count": 5769643,
+            "meta": null
+        },
+        {
+            "name": "russia",
+            "count": 4724523,
+            "meta": null
+        },
+        {
+            "name": "rwanda",
+            "count": 343699,
+            "meta": null
+        },
+        {
+            "name": "réunion",
+            "count": 227231,
+            "meta": null
+        },
+        {
+            "name": "republic of the congo",
+            "count": 98893,
+            "meta": null
+        },
+        {
+            "name": "spain",
+            "count": 21017236,
+            "meta": null
+        },
+        {
+            "name": "south africa",
+            "count": 15245512,
+            "meta": null
+        },
+        {
+            "name": "sweden",
+            "count": 5620163,
+            "meta": null
+        },
+        {
+            "name": "singapore",
+            "count": 4856393,
+            "meta": null
+        },
+        {
+            "name": "switzerland",
+            "count": 4410685,
+            "meta": null
+        },
+        {
+            "name": "saudi arabia",
+            "count": 4302832,
+            "meta": null
+        },
+        {
+            "name": "sri lanka",
+            "count": 2221825,
+            "meta": null
+        },
+        {
+            "name": "serbia",
+            "count": 1546364,
+            "meta": null
+        },
+        {
+            "name": "south korea",
+            "count": 1513048,
+            "meta": null
+        },
+        {
+            "name": "slovakia",
+            "count": 1098327,
+            "meta": null
+        },
+        {
+            "name": "senegal",
+            "count": 1015596,
+            "meta": null
+        },
+        {
+            "name": "slovenia",
+            "count": 720403,
+            "meta": null
+        },
+        {
+            "name": "sudan",
+            "count": 439064,
+            "meta": null
+        },
+        {
+            "name": "syria",
+            "count": 432098,
+            "meta": null
+        },
+        {
+            "name": "somalia",
+            "count": 304076,
+            "meta": null
+        },
+        {
+            "name": "sierra leone",
+            "count": 206733,
+            "meta": null
+        },
+        {
+            "name": "suriname",
+            "count": 156926,
+            "meta": null
+        },
+        {
+            "name": "saint lucia",
+            "count": 115700,
+            "meta": null
+        },
+        {
+            "name": "swaziland",
+            "count": 73615,
+            "meta": null
+        },
+        {
+            "name": "saint vincent and the grenadines",
+            "count": 59594,
+            "meta": null
+        },
+        {
+            "name": "south sudan",
+            "count": 51398,
+            "meta": null
+        },
+        {
+            "name": "seychelles",
+            "count": 47325,
+            "meta": null
+        },
+        {
+            "name": "saint kitts and nevis",
+            "count": 33061,
+            "meta": null
+        },
+        {
+            "name": "solomon islands",
+            "count": 32083,
+            "meta": null
+        },
+        {
+            "name": "san marino",
+            "count": 26873,
+            "meta": null
+        },
+        {
+            "name": "são tomé and príncipe",
+            "count": 26069,
+            "meta": null
+        },
+        {
+            "name": "samoa",
+            "count": 14965,
+            "meta": null
+        },
+        {
+            "name": "saint helena",
+            "count": 3837,
+            "meta": null
+        },
+        {
+            "name": "saint pierre and miquelon",
+            "count": 3329,
+            "meta": null
+        },
+        {
+            "name": "sint maarten",
+            "count": 2319,
+            "meta": null
+        },
+        {
+            "name": "svalbard and jan mayen",
+            "count": 1971,
+            "meta": null
+        },
+        {
+            "name": "saint martin",
+            "count": 1550,
+            "meta": null
+        },
+        {
+            "name": "south georgia and the south sandwich islands",
+            "count": 1379,
+            "meta": null
+        },
+        {
+            "name": "saint barthélemy",
+            "count": 497,
+            "meta": null
+        },
+        {
+            "name": "turkey",
+            "count": 15068959,
+            "meta": null
+        },
+        {
+            "name": "thailand",
+            "count": 8813512,
+            "meta": null
+        },
+        {
+            "name": "taiwan",
+            "count": 2436448,
+            "meta": null
+        },
+        {
+            "name": "tunisia",
+            "count": 1725162,
+            "meta": null
+        },
+        {
+            "name": "tanzania",
+            "count": 1254306,
+            "meta": null
+        },
+        {
+            "name": "trinidad and tobago",
+            "count": 729951,
+            "meta": null
+        },
+        {
+            "name": "togo",
+            "count": 248634,
+            "meta": null
+        },
+        {
+            "name": "tajikistan",
+            "count": 48634,
+            "meta": null
+        },
+        {
+            "name": "tuvalu",
+            "count": 34326,
+            "meta": null
+        },
+        {
+            "name": "turkmenistan",
+            "count": 33291,
+            "meta": null
+        },
+        {
+            "name": "tonga",
+            "count": 32231,
+            "meta": null
+        },
+        {
+            "name": "timor-leste",
+            "count": 24230,
+            "meta": null
+        },
+        {
+            "name": "turks and caicos islands",
+            "count": 17470,
+            "meta": null
+        },
+        {
+            "name": "tokelau",
+            "count": 1234,
+            "meta": null
+        },
+        {
+            "name": "united states",
+            "count": 1172193517,
+            "meta": null
+        },
+        {
+            "name": "united kingdom",
+            "count": 53866139,
+            "meta": null
+        },
+        {
+            "name": "united arab emirates",
+            "count": 5085050,
+            "meta": null
+        },
+        {
+            "name": "ukraine",
+            "count": 2374864,
+            "meta": null
+        },
+        {
+            "name": "uruguay",
+            "count": 2206911,
+            "meta": null
+        },
+        {
+            "name": "uganda",
+            "count": 1686033,
+            "meta": null
+        },
+        {
+            "name": "uzbekistan",
+            "count": 287562,
+            "meta": null
+        },
+        {
+            "name": "u.s. virgin islands",
+            "count": 45410,
+            "meta": null
+        },
+        {
+            "name": "united states minor outlying islands",
+            "count": 463,
+            "meta": null
+        },
+        {
+            "name": "vietnam",
+            "count": 24334096,
+            "meta": null
+        },
+        {
+            "name": "venezuela",
+            "count": 8717383,
+            "meta": null
+        },
+        {
+            "name": "vanuatu",
+            "count": 19993,
+            "meta": null
+        },
+        {
+            "name": "vatican city",
+            "count": 4379,
+            "meta": null
+        },
+        {
+            "name": "wallis and futuna",
+            "count": 2710,
+            "meta": null
+        },
+        {
+            "name": "western sahara",
+            "count": 1588,
+            "meta": null
+        },
+        {
+            "name": "yemen",
+            "count": 197513,
+            "meta": null
+        },
+        {
+            "name": "zimbabwe",
+            "count": 1046078,
+            "meta": null
+        },
+        {
+            "name": "zambia",
+            "count": 802017,
+            "meta": null
+        }
+
+]

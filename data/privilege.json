@@ -1,0 +1,466 @@
+[
+	{
+		"name": "view_candidate",
+		"description": {
+			"en": "View Candidates",
+			"vi": "Xem ứng viên"
+		},
+		"type": "CANDIDATE"
+	},
+	{
+		"name": "add_candidate",
+		"description": {
+			"en": "Add Candidate",
+			"vi": "Thêm ứng viên"
+		},
+		"type": "CANDIDATE"
+	},
+	{
+		"name": "update_candidate",
+		"description": {
+			"en": "Update Candidate",
+			"vi": "Cập nhật ứng viên"
+		},
+		"type": "CANDIDATE"
+	},
+	{
+		"name": "delete_candidate",
+		"description": {
+			"en": "Delete Candidate",
+			"vi": "Xóa ứng viên"
+		},
+		"type": "CANDIDATE"
+	},
+	{
+		"name": "view_application",
+		"description": {
+			"en": "View Application",
+			"vi": "Xem đơn ứng tuyển"
+		},
+		"type": "APPLICATION"
+	},
+	{
+		"name": "manage_application",
+		"description": {
+			"en": "Manage Application",
+			"vi": "Quản lý đơn ứng tuyển"
+		},
+		"type": "APPLICATION"
+	},
+	{
+		"name": "update_application",
+		"description": {
+			"en": "Update Application",
+			"vi": "Cập nhật đơn ứng tuyển"
+		},
+		"type": "APPLICATION"
+	},
+	{
+		"name": "view_job",
+		"description": {
+			"en": "View Jobs",
+			"vi": "Xem công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "create_job",
+		"description": {
+			"en": "Create Job",
+			"vi": "Tạo công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "update_job",
+		"description": {
+			"en": "Update Job",
+			"vi": "Cập nhật công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "publish_job",
+		"description": {
+			"en": "Publish Job",
+			"vi": "Đăng công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "delete_job",
+		"description": {
+			"en": "Delete Job",
+			"vi": "Xóa công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "archive_job",
+		"description": {
+			"en": "Archive Job",
+			"vi": "Lưu trữ công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "close_job",
+		"description": {
+			"en": "Close Job",
+			"vi": "Đóng công việc"
+		},
+		"type": "JOB"
+	},
+	{
+		"name": "view_source",
+		"description": {
+			"en": "View Job Source",
+			"vi": "Xem nguồn công việc"
+		},
+		"type": "SOURCE"
+	},
+	{
+		"name": "manage_source",
+		"description": {
+			"en": "Manage Source",
+			"vi": "Quản lý nguồn"
+		},
+		"type": "SOURCE"
+	},
+	{
+		"name": "create_campaign",
+		"description": {
+			"en": "Create Campaign",
+			"vi": "Tạo chiến dịch"
+		},
+		"type": "CAMPAIGN"
+	},
+	{
+		"name": "update_campaign",
+		"description": {
+			"en": "Update Campaign",
+			"vi": "Cập nhật chiến dịch"
+		},
+		"type": "CAMPAIGN"
+	},
+	{
+		"name": "view_campaign",
+		"description": {
+			"en": "View Campaign",
+			"vi": "Xem chiến dịch"
+		},
+		"type": "CAMPAIGN"
+	},
+	{
+		"name": "manage_campaign",
+		"description": {
+			"en": "Manage Campaign",
+			"vi": "Quản lý chiến dịch"
+		},
+		"type": "CAMPAIGN"
+	},
+	{
+		"name": "job_report",
+		"description": {
+			"en": "Job Reports",
+			"vi": "Báo cáo công việc"
+		},
+		"type": "REPORT"
+	},
+	{
+		"name": "candidate_report",
+		"description": {
+			"en": "Candidate Reports",
+			"vi": "Báo cáo ứng viên"
+		},
+		"type": "REPORT"
+	},
+	{
+		"name": "budget_report",
+		"description": {
+			"en": "Budget Reports",
+			"vi": "Báo cáo ngân sách"
+		},
+		"type": "REPORT"
+	},
+	{
+		"name": "view_department",
+		"description": {
+			"en": "View Department",
+			"vi": "Xem phòng ban"
+		},
+		"type": "DEPARTMENT"
+	},
+	{
+		"name": "update_department",
+		"description": {
+			"en": "Update Department",
+			"vi": "Cập nhật phòng ban"
+		},
+		"type": "DEPARTMENT"
+	},
+	{
+		"name": "manage_department",
+		"description": {
+			"en": "Manage Department",
+			"vi": "Quản lý phòng ban"
+		},
+		"type": "DEPARTMENT"
+	},
+	{
+		"name": "view_template",
+		"description": {
+			"en": "View Template",
+			"vi": "Xem mẫu"
+		},
+		"type": "TEMPLATE"
+	},
+	{
+		"name": "update_template",
+		"description": {
+			"en": "Update Template",
+			"vi": "Cập nhật mẫu"
+		},
+		"type": "TEMPLATE"
+	},
+	{
+		"name": "manage_template_pipeline",
+		"description": {
+			"en": "Manage Template - Pipeline",
+			"vi": "Quản lý mẫu - Quy trình"
+		},
+		"type": "TEMPLATE"
+	},
+	{
+		"name": "manage_template_email",
+		"description": {
+			"en": "Manage Template - Email",
+			"vi": "Quản lý mẫu - Email"
+		},
+		"type": "TEMPLATE"
+	},
+	{
+		"name": "manage_template_evaluation",
+		"description": {
+			"en": "Manage Template - Evaluation",
+			"vi": "Quản lý mẫu - Đánh giá"
+		},
+		"type": "TEMPLATE"
+	},
+	{
+		"name": "manage_template_question",
+		"description": {
+			"en": "Manage Template - Question",
+			"vi": "Quản lý mẫu - Câu hỏi"
+		},
+		"type": "TEMPLATE"
+	},
+	{
+		"name": "create_company",
+		"description": {
+			"en": "Create Company",
+			"vi": "Tạo công ty"
+		},
+		"type": "COMPANY"
+	},
+	{
+		"name": "update_company",
+		"description": {
+			"en": "Update Company",
+			"vi": "Cập nhật công ty"
+		},
+		"type": "COMPANY"
+	},
+	{
+		"name": "leave_company",
+		"description": {
+			"en": "Leave Company",
+			"vi": "Rời công ty"
+		},
+		"type": "COMPANY"
+	},
+	{
+		"name": "manage_company",
+		"description": {
+			"en": "Manage Company",
+			"vi": "Quản lý công ty"
+		},
+		"type": "COMPANY"
+	},
+	{
+		"name": "view_member",
+		"description": {
+			"en": "View Member",
+			"vi": "Xem thành viên"
+		},
+		"type": "MEMBER"
+	},
+	{
+		"name": "update_member",
+		"description": {
+			"en": "Update Member",
+			"vi": "Cập nhật thành viên"
+		},
+		"type": "MEMBER"
+	},
+	{
+		"name": "view_role",
+		"description": {
+			"en": "View Role",
+			"vi": "Xem vai trò"
+		},
+		"type": "ROLE"
+	},
+	{
+		"name": "update_role",
+		"description": {
+			"en": "Update Role",
+			"vi": "Cập nhật vai trò"
+		},
+		"type": "ROLE"
+	},
+	{
+		"name": "view_label",
+		"description": {
+			"en": "View Label",
+			"vi": "Xem nhãn"
+		},
+		"type": "LABEL"
+	},
+	{
+		"name": "update_label",
+		"description": {
+			"en": "Update Label",
+			"vi": "Cập nhật nhãn"
+		},
+		"type": "LABEL"
+	},
+	{
+		"name": "view_project",
+		"description": {
+			"en": "View Project",
+			"vi": "Xem dự án"
+		},
+		"type": "PROJECT"
+	},
+	{
+		"name": "update_project",
+		"description": {
+			"en": "Update Project",
+			"vi": "Cập nhật dự án"
+		},
+		"type": "PROJECT"
+	},
+	{
+		"name": "view_people",
+		"description": {
+			"en": "View People",
+			"vi": "Xem người"
+		},
+		"type": "PEOPLE"
+	},
+	{
+		"name": "update_people",
+		"description": {
+			"en": "Update People",
+			"vi": "Cập nhật người"
+		},
+		"type": "PEOPLE"
+	},
+	{
+		"name": "search_people",
+		"description": {
+			"en": "Search People",
+			"vi": "Tìm kiếm người"
+		},
+		"type": "PEOPLE"
+	},
+	{
+		"name": "update_comment",
+		"description": {
+			"en": "Update Comment",
+			"vi": "Cập nhật bình luận"
+		},
+		"type": "COMMENT"
+	},
+	{
+		"name": "manage_benefits",
+		"description": {
+			"en": "Manage Benefits",
+			"vi": "Quản lý lợi ích"
+		},
+		"type": "BENEFITS"
+	},
+	{
+		"name": "manage_member",
+		"description": {
+			"en": "Manage Member",
+			"vi": "Quản lý thành viên"
+		},
+		"type": "MEMBER"
+	},
+	{
+		"name": "manage_role",
+		"description": {
+			"en": "Manage Role",
+			"vi": "Quản lý vai trò"
+		},
+		"type": "ROLE"
+	},
+	{
+		"name": "manage_pool",
+		"description": {
+			"en": "Manage Talent Pool",
+			"vi": "Quản lý hồ bơi tài năng"
+		},
+		"type": "POOL"
+	},
+	{
+		"name": "manage_billing",
+		"description": {
+			"en": "Manage Payment Method",
+			"vi": "Quản lý phương thức thanh toán"
+		},
+		"type": "BILLING"
+	},
+	{
+		"name": "manage_subscription",
+		"description": {
+			"en": "Manage Subscription",
+			"vi": "Quản lý đăng ký"
+		},
+		"type": "SUBSCRIPTION"
+	},
+	{
+		"name": "view_dashboard",
+		"description": {
+			"en": "View Company Dashboard",
+			"vi": "Xem bảng điều khiển công ty"
+		},
+		"type": "DASHBOARD"
+	},
+	{
+		"name": "view_insight",
+		"description": {
+			"en": "View Company Insight",
+			"vi": "Xem thông tin công ty"
+		},
+		"type": "INSIGHT"
+	},
+	{
+		"name": "view_contact",
+		"description": {
+			"en": "View Contact",
+			"vi": "Xem liên hệ"
+		},
+		"type": "CONTACT"
+	},
+	{
+		"name": "manage_task",
+		"description": {
+			"en": "Manage Tasks",
+			"vi": "Quản lý nhiệm vụ"
+		},
+		"type": "TASK"
+	}
+]

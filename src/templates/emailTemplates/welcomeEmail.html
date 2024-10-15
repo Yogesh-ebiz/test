@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+        }
+        .email-header, .email-footer {
+            text-align: center;
+            background-color: #FFA73B;
+            color: #ffffff;
+            padding: 10px 0;
+        }
+        .email-body {
+            padding: 20px;
+        }
+        .email-body p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Accessed Talent</h1>
+        </div>
+        <div class="email-body">
+            <p>{{greeting}} {{userName}},</p>
+            <p>{{body}}</p>
+            <p>{{thanks}}</p>
+            <p>{{regards}}<br>{{team}}<br>{{hotline}}</p>
+        </div>
+        <div class="email-footer">
+            <p>{{footer}}</p>
+        </div>
+    </div>
+</body>
+</html>
