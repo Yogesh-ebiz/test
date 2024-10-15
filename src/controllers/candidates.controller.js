@@ -6,10 +6,13 @@ const _ = require('lodash');
 let statusEnum = require('../const/statusEnum');
 const catchAsync = require("../utils/catchAsync");
 const candidateService = require("../services/candidate.service");
+const activityService = require('../services/activity.service');
 const Pagination = require("../utils/pagination");
 const feedService = require("../services/api/feed.service.api");
 const flagService = require("../services/flag.service");
 const { deleteFromCache } = require("../services/cacheService");
+const actionEnum = require('../const/actionEnum');
+const subjectType = require('../const/subjectType');
 
 
 
@@ -458,6 +461,15 @@ const addToBlacklist = catchAsync(async (req, res) => {
     await candidate.save();
   }
 
+  await activityService.add({
+    causer: user._id,
+    causerType: subjectType.MEMBER,
+    subjectType: subjectType.CANDIDATE,
+    subject: candidate._id,
+    action: actionEnum.FLAGGED,
+    meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id}
+  });
+
   res.json(result);
 });
 
@@ -479,6 +491,16 @@ const addToBlacklistMultiple = catchAsync(async (req, res) => {
       const flag = await flagService.add(flagData);
       candidate.flag = flag._id;
       await candidate.save();
+
+      await activityService.add({
+        causer: user._id,
+        causerType: subjectType.MEMBER,
+        subjectType: subjectType.CANDIDATE,
+        subject: candidate._id,
+        action: actionEnum.FLAGGED,
+        meta: {name: candidate.firstName + ' ' + candidate.lastName, candidate: candidate._id}
+      });
+
       return flag;
     }
     return null;

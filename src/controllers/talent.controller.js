@@ -4236,10 +4236,10 @@ const getCandidateActivities = catchAsync(async (req, res) => {
 
   let result;
   try {
-    let company = await companyService.findByCompanyId(companyId);
-    if(company){
-      result = await activityService.findByCandidateId(company._id, new ObjectId(candidateId), query);
-    }
+    //let company = await companyService.findByCompanyId(companyId);
+    // if(company){
+      result = await activityService.findByCandidateId(user.company._id, new ObjectId(candidateId), query);
+    // }
 
 
   } catch (error) {

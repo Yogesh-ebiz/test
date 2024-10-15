@@ -278,6 +278,7 @@ async function findByCandidateId(companyId, candidateId, sort) {
     },
     { $unwind: { path: '$causer', preserveNullAndEmptyArrays: true } },
   );
+  aList.push(aSort)
 
   const aggregate = Activity.aggregate(aList);
 
